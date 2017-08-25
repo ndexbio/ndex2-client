@@ -70,7 +70,12 @@ class AttributeCommon(object):
     def to_json(self):
         return_dict = {}
 
-        return_dict[CX_CONSTANTS.NAME.value] = self._name
+        if self._property_of is not None:
+            return_dict[CX_CONSTANTS.PROPERTY_OF.value] = self._property_of
+
+        if self._name is not None:
+            return_dict[CX_CONSTANTS.NAME.value] = self._name
+
         if self._data_type:
             return_dict[CX_CONSTANTS.DATA_TYPE.value] = self._data_type.value
 

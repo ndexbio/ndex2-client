@@ -72,17 +72,17 @@ class EdgesElement(object):
             raise Exception('Edge element does not have a valid ID.  Unable to process this edge')
 
         node_dict = {
-            self.ID: self._id
+            CX_CONSTANTS.ID.value: self._id,
         }
 
         if self._source is not None:
-            node_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID] = self._source
+            node_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID.value] = self._source
 
         if self._target is not None:
-            node_dict[CX_CONSTANTS.EDGE_TARGET_NODE_ID] = self._target
+            node_dict[CX_CONSTANTS.EDGE_TARGET_NODE_ID.value] = self._target
 
         if self._interaction is not None:
-            node_dict[CX_CONSTANTS.EDGE_INTERACTION.value] = self._interaction.value
+            node_dict[CX_CONSTANTS.EDGE_INTERACTION.value] = self._interaction
 
         return node_dict
 

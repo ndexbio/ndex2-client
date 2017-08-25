@@ -21,5 +21,6 @@ class CX_CONSTANTS(Enum):
     ATTRIBUTES = 'attributes'
     TEXT = 'text'
     CITATION = 'citation'
+    CITATIONS = 'citations'
     PROPERTIES = 'properties'
 

@@ -6,17 +6,19 @@ import sys
 import time
 import ijson
 import pickle
+import json
 from urllib import urlopen
 from model.NiceCXNetwork import NiceCXNetwork
 from model.cx.aspects.NodesElement import NodesElement
 from model.cx.aspects.EdgesElement import EdgesElement
+from model.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
 from model.cx.aspects.NodeAttributesElement import NodeAttributesElement
 from model.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
 from model.cx.aspects.CitationElement import CitationElement
 from model.cx.aspects.SupportElement import SupportElement
 from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 from model.cx.aspects.SimpleNode import SimpleNode
-import json
+from model.cx import CX_CONSTANTS
 
 def get_nodes():
     for number in range(0, 10000):
@@ -59,6 +61,17 @@ class MyTestCase(unittest.TestCase):
         uuid = '7246d8cf-c644-11e6-b48c-0660b7976219'
 
         my_na = NodeAttributesElement(subnetwork=1, property_of=11, name=22, values=33, type=ATTRIBUTE_DATA_TYPE.convert_to_data_type('string'))
+
+        #====================
+        # NETWORK ATTRIBUTES
+        #====================
+        #objects = ijson.items(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/nodes'), 'item')
+        objects = loadAspect('networkAttributes')
+        obj_items = (o for o in objects)
+        for network_item in obj_items:
+            add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
+
+            niceCx.addNetworkAttribute(add_this_network_attribute)
 
         #===================
         # NODES
@@ -131,16 +144,17 @@ class MyTestCase(unittest.TestCase):
         objects = loadAspect('nodeCitations')
         obj_items = (o for o in objects)
         for node_cit in obj_items:
-            niceCx.addNodeCitations(node_cit)
+            niceCx.addNodeCitationsFromCX(node_cit)
 
         #===================
         # EDGE CITATIONS
         #===================
         objects = loadAspect('edgeCitations')
         obj_items = (o for o in objects)
-        for node_cit in obj_items:
-            niceCx.addNodeCitations(node_cit)
+        for edge_cit in obj_items:
+            niceCx.addEdgeCitationsFromCX(edge_cit)
 
+        nice_cx_json = niceCx.to_json()
 
 #        serialized = pickle.dumps(niceCx, protocol=0)
 #        print 'Serialized memory:', sys.getsizeof(serialized)

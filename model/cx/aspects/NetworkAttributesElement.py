@@ -1,34 +1,17 @@
 __author__ = 'aarongary'
 
 import json
-#from AbstractElementAttributesAspectElement import AbstractElementAttributesAspectElement
 from AttributeCommon import AttributeCommon
 from DataModelsUtil import DatamodelsUtil
-from . import ATTRIBUTE_DATA_TYPE
+from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 
 class NetworkAttributesElement(AttributeCommon):
-    def __init__(self, subnetwork=None, name=None, values=None, type=None):
-        super(NetworkAttributesElement.__class__, self).__init__(subnetwork=subnetwork, name=name, values=values, type=type)
+    def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
+        super(NetworkAttributesElement, self).__init__(subnetwork=subnetwork, property_of=property_of, name=None, values=values, type=type, json_obj=json_obj)
         self.ASPECT_NAME = 'networkAttributes'
 
     def __str__(self):
         return json.dumps(self.to_json())
-
-    def to_json(self):
-        return_dict = {}
-
-        return_dict['name'] = self._name
-        if self._subnetwork is not None:
-            return_dict['subnetwork'] = self._property_of
-
-        if self.isSingleValue():
-            return_dict['value'] = self.getValues()
-        else:
-            return_dict['value'] = self._values
-
-        return_dict['data type'] = self._data_type.__str__()
-
-        return return_dict
 
     def createInstanceWithSingleValue(self, subnetwork, name, value, type):
         return NetworkAttributesElement(subnetwork, name, DatamodelsUtil.removeParenthesis(value, type), type)

@@ -1,4 +1,6 @@
 __author__ = 'aarongary'
+
+import json
 from model.metadata.MetaDataCollection import MetaDataCollection
 from model.metadata.MetaDataCollection import MetaDataElement
 from model.cx.aspects.NameSpaces import NameSpaces
@@ -21,6 +23,8 @@ class NiceCXNetwork():
         self.citations = {}
         self.nodeCitations = {}
         self.edgeCitations = {}
+        self.edgeSupports = {}
+        self.nodeSupports = {}
         self.supports = {}
         self.nodeAttributes = {}
         self.edgeAttributes = {}
@@ -87,27 +91,30 @@ class NiceCXNetwork():
         else:
             raise Exception('Provided input was not of type CitationElement.')
 
-    # aspect = {}
-    # element = {
-    #				"po": [
-    #					2
-    #				],
-    #				"citations": [
-    #					3
-    #				]
-    #			}
+    def addNodeCitationsFromCX(self, node_citation_cx):
+        self.buildManyToManyRelation('nodeCitations', node_citation_cx, 'citations')
 
-    def addNodeCitations(self, node_citation_element):
+    def addNodeCitations(self, node_id, citation_id):
+        node_citation_element = {CX_CONSTANTS.PROPERTY_OF: [node_id], CX_CONSTANTS.CITATIONS: [citation_id]}
         self.buildManyToManyRelation('nodeCitations', node_citation_element, 'citations')
 
-    def addEdgeCitations(self, edge_citation_element):
+    def addEdgeCitationsFromCX(self, edge_citation_cx):
+        self.buildManyToManyRelation('edgeCitations', edge_citation_cx, 'citations')
+
+    def addEdgeCitations(self, edge_id, citation_id):
+        edge_citation_element = {CX_CONSTANTS.PROPERTY_OF: [edge_id], CX_CONSTANTS.CITATIONS: [citation_id]}
         self.buildManyToManyRelation('edgeCitations', edge_citation_element, 'citations')
+
+    def addEdgeSupports(self, edge_supports_element):
+        self.buildManyToManyRelation('edgeSupports', edge_supports_element, 'supports')
 
     def buildManyToManyRelation(self, aspect_name, element, relation_name):
         if aspect_name == 'nodeCitations':
             aspect = self.nodeCitations
         elif aspect_name == 'edgeCitations':
             aspect = self.edgeCitations
+        elif aspect_name == 'edgeSupports':
+            aspect = self.edgeSupports
         else:
             raise Exception('Only nodeCitations and edgeCitations are supported. ' + aspect_name + ' was supplied')
 
@@ -201,4 +208,85 @@ class NiceCXNetwork():
         self.provenance = provenance
 
     def __str__(self):
-        return ''
+        return json.dumps(self.to_json())
+
+    def to_json(self):
+        output_cx = []
+
+        if self.nodes:
+            output_cx.append(self.generateAspect('nodes'))
+        if self.edges:
+            output_cx.append(self.generateAspect('edges'))
+        if self.networkAttributes:
+            output_cx.append(self.generateAspect('networkAttributes'))
+        if self.nodeAttributes:
+            output_cx.append(self.generateAspect('nodeAttributes'))
+        if self.edgeAttributes:
+            output_cx.append(self.generateAspect('edgeAttributes'))
+        if self.citations:
+            output_cx.append(self.generateAspect('citations'))
+        if self.nodeCitations:
+            output_cx.append(self.generateAspect('nodeCitations'))
+        if self.edgeCitations:
+            output_cx.append(self.generateAspect('edgeCitations'))
+        if self.edgeSupports:
+            output_cx.append(self.generateAspect('edgeSupports'))
+        if self.nodeSupports:
+            output_cx.append(self.generateAspect('nodeSupports'))
+
+        return output_cx
+
+    def generateAspect(self, aspect_name):
+
+        aspect_element_array = []
+
+        use_this_aspect = None
+        if aspect_name == 'nodes':
+            use_this_aspect = self.nodes
+        elif aspect_name == 'edges':
+            use_this_aspect = self.edges
+        elif aspect_name == 'networkAttributes':
+            use_this_aspect = self.networkAttributes
+        elif aspect_name == 'nodeAttributes':
+            use_this_aspect = self.nodeAttributes
+        elif aspect_name == 'edgeAttributes':
+            use_this_aspect = self.edgeAttributes
+        elif aspect_name == 'citations':
+            use_this_aspect = self.citations
+
+        if use_this_aspect is not None:
+            if type(use_this_aspect) is list:
+                for item in use_this_aspect:
+                    aspect_element_array.append(item.to_json())
+            else:
+                for k, v in use_this_aspect.iteritems():
+                    if type(v) is list:
+                        for v_item in v:
+                            aspect_element_array.append(v_item.to_json())
+                    else:
+                        aspect_element_array.append(v.to_json())
+
+        else:
+            if aspect_name == 'nodeCitations':
+                use_this_aspect = self.nodeCitations
+            elif aspect_name == 'edgeCitations':
+                use_this_aspect = self.edgeCitations
+            elif aspect_name == 'edgeSupports':
+                use_this_aspect = self.edgeSupports
+
+            if use_this_aspect is not None:
+                if type(use_this_aspect) is dict:
+                    for k, v in use_this_aspect.iteritems():
+                        if type(v) is list:
+                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF.value: [k], CX_CONSTANTS.CITATIONS.value: v})
+                        else:
+                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF.value: [k], CX_CONSTANTS.CITATIONS.value: [v]})
+                else:
+                    raise Exception('Citation was not in json format')
+            else:
+                return None
+
+
+        aspect = {aspect_name: aspect_element_array}
+
+        return aspect

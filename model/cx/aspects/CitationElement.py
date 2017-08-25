@@ -83,6 +83,9 @@ class CitationElement(object):
         if self._type is not None:
             return_json[CX_CONSTANTS.CITATION_TYPE.value] = self._type
 
+        if self._title is not None:
+            return_json[CX_CONSTANTS.CITATION_TITLE.value] = self._title
+
         if self._description is not None:
             return_json[CX_CONSTANTS.CITATION_DESCRIPTION.value] = self._description
 

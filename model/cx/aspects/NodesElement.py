@@ -53,8 +53,8 @@ class NodesElement(object):
             raise Exception('Edge element does not have a valid ID.  Unable to process this edge - ' + self._node_name)
 
         node_dict = {
-            CX_CONSTANTS.ID: self._id,
-            CX_CONSTANTS.NAME: self._node_name
+            CX_CONSTANTS.ID.value: self._id,
+            CX_CONSTANTS.NAME.value: self._node_name
         }
 
         if self._node_represents is not None:

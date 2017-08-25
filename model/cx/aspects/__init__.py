@@ -1,5 +1,9 @@
 __author__ = 'aarongary'
 from enum import Enum
+from six import string_types, integer_types
+from sys import version_info
+PY3 = version_info > (3,)
+
 
 CX_CONSTANTS = {
     'ID': '@id'
@@ -25,12 +29,7 @@ class ATTRIBUTE_DATA_TYPE(Enum):
     LIST_OF_SHORT = 'list_of_short'
     LIST_OF_STRING = 'list_of_string'
     
-    def __init__(self, name=None):
-        self._name = name
-
-    def __str__(self):
-        return self._name
-
+    @classmethod
     def toCxLabel(self, dt):
         if dt == ATTRIBUTE_DATA_TYPE.BOOLEAN:
             return 'boolean'
@@ -71,6 +70,7 @@ class ATTRIBUTE_DATA_TYPE(Enum):
         else:
             raise Exception('don\'t know type ' + dt)
 
+    @classmethod
     def fromCxLabel(self, s):
         if s == 'boolean':
             return ATTRIBUTE_DATA_TYPE.BOOLEAN
@@ -111,6 +111,7 @@ class ATTRIBUTE_DATA_TYPE(Enum):
         else:
             raise Exception('don\'t know type ' + s)
 
+    @classmethod
     def isSingleValueType(self, dt):
         if dt in [ATTRIBUTE_DATA_TYPE.BOOLEAN, ATTRIBUTE_DATA_TYPE.BYTE, ATTRIBUTE_DATA_TYPE.CHAR,
                   ATTRIBUTE_DATA_TYPE.DOUBLE, ATTRIBUTE_DATA_TYPE.FLOAT, ATTRIBUTE_DATA_TYPE.INTEGER,
@@ -118,3 +119,43 @@ class ATTRIBUTE_DATA_TYPE(Enum):
             return True
         else:
             return False
+
+    @classmethod
+    def convert_to_data_type(self, val):
+        if type(val) is list:
+            if isinstance(val[0], string_types):
+                return ATTRIBUTE_DATA_TYPE.fromCxLabel('list_of_string')
+            elif type(val[0]) is bool:
+                return ATTRIBUTE_DATA_TYPE.fromCxLabel('list_of_boolean')
+            elif isinstance(val[0], integer_types):
+                if PY3:
+                    return ATTRIBUTE_DATA_TYPE.fromCxLabel('list_of_integer')
+                else:
+                    if type(val[0]) is int:
+                        return ATTRIBUTE_DATA_TYPE.fromCxLabel('list_of_integer')
+                    else:
+                        return ATTRIBUTE_DATA_TYPE.fromCxLabel('list_of_long')
+            elif type(val[0]) is float:
+                return ATTRIBUTE_DATA_TYPE.fromCxLabel('list_of_double')
+            else:
+                return ATTRIBUTE_DATA_TYPE.fromCxLabel('list_of_string') #'list_of_unknown')
+
+        if isinstance(val, string_types):
+            return ATTRIBUTE_DATA_TYPE.fromCxLabel('string')
+        elif type(val) is bool:
+            return ATTRIBUTE_DATA_TYPE.fromCxLabel('boolean')
+        elif type(val) is int:
+            return ATTRIBUTE_DATA_TYPE.fromCxLabel('integer')
+        elif isinstance(val, integer_types):
+            if PY3:
+                return ATTRIBUTE_DATA_TYPE.fromCxLabel('integer')
+            else:
+                if type(val) is int:
+                    return ATTRIBUTE_DATA_TYPE.fromCxLabel('integer')
+                else:
+                    return ATTRIBUTE_DATA_TYPE.fromCxLabel('long')
+        elif type(val) is float:
+            return ATTRIBUTE_DATA_TYPE.fromCxLabel('double')
+        else:
+            return ATTRIBUTE_DATA_TYPE.fromCxLabel('string')  #'unknown')
+

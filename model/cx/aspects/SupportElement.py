@@ -1,88 +1,80 @@
 __author__ = 'aarongary'
 
 from NdexAspectElement import NdexAspectElement
-from . import CX_CONSTANTS
+from model.cx import CX_CONSTANTS
+import json
 
-class SupportElement(NdexAspectElement):
-    def __init__(self):
-        self.ID = CX_CONSTANTS.get('ID')
-        self.INTERACTION = 'i'
-        self.SOURCE_NODE_ID = 's'
-        self.TARGET_NODE_ID = 't'
+class SupportElement(object):
+    def __init__(self, id=None, text=None, citation_id=None, attributes=None, props=None, json_obj=None):
         self.ASPECT_NAME = 'supports'
-        self.text = None
-        self.id = None
-        self.citationId = 0
-        self.props = []
+
+        if json_obj is None:
+            self._text = text
+            self._id = id
+            self._citation_id = citation_id
+            self._attributes = attributes
+            self._props = props
+        else:
+            self._text = json_obj.get(CX_CONSTANTS.TEXT.value)
+            self._id = json_obj.get(CX_CONSTANTS.ID.value)
+            self._citation_id = json_obj.get(CX_CONSTANTS.CITATION.value)
+            self._attributes = json_obj.get(CX_CONSTANTS.ATTRIBUTES.value)
+            self._props = json_obj.get(CX_CONSTANTS.PROPERTIES.value)
 
         self.support_element = {}
 
-'''
-	public static final String ASPECT_NAME = "supports";
+    def getText(self):
+        return self._text
 
-	private static final String tField = "text";
+    def setText(self, text):
+        self._text = text
 
+    def getId(self):
+        return self._id
 
-	@JsonProperty ( tField )
-	private String text;
+    def setId(self, id):
+        self._id = id
 
-	@JsonProperty( "citation")
-	private Long citationId;
+    def getCitationId(self):
+        return self._citation_id
 
-	@JsonProperty( "@id")
-	private long id;
+    def setCitationId(self, citation_id):
+        self._citation_id = citation_id
 
-	@JsonProperty( "attributes")
-	private Collection<CXSimpleAttribute> props;
+    def getAttribute(self):
+        return self._attributes
 
-	public SupportElement() {
-		props = new LinkedList<> ();
-	}
+    def setAttributes(self, attibrutes):
+        self._attributes = attibrutes
 
+    def getProps(self):
+        return self._props
 
-	public String getText() {
-		return text;
-	}
+    def setProps(self, props):
+        self._props = props
 
+    def __str__(self):
+        return json.dumps(self.to_json())
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    def to_json(self):
+        return_json = {}
 
+        if self._id == -1:
+            raise Exception('Edge element does not have a valid ID.  Unable to process this edge - ' + self._node_name)
 
-	public Long getCitationId() {
-		return citationId;
-	}
+        return_json[CX_CONSTANTS.ID.value] = self._id
 
+        if self._text is not None:
+            return_json[CX_CONSTANTS.TEXT.value] = self._text
 
-	public void setCitationId(Long citationId) {
-		this.citationId = citationId;
-	}
+        if self._citation_id is not None:
+            return_json[CX_CONSTANTS.CITATION_IDENTIFIER.value] = self._citation_id
 
+        if self._attributes is not None and len(self._attributes) > 0:
+            return_json[CX_CONSTANTS.ATTRIBUTES.value] = self._attributes
 
-	@Override
-	@JsonIgnore
-	public String getAspectName() {
-		return ASPECT_NAME;
-	}
+        if self._props is not None and len(self._props) > 0:
+            return_json[CX_CONSTANTS.PROPERTIES.value] = self._props
 
+        return return_json
 
-	public long getId() {
-		return id;
-	}
-
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-
-	public Collection<CXSimpleAttribute> getProps() {
-		return props;
-	}
-
-
-	public void setProps(Collection<CXSimpleAttribute> props) {
-		this.props = props;
-	}
-'''

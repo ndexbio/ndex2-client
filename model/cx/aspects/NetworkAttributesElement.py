@@ -1,31 +1,34 @@
 __author__ = 'aarongary'
 
 import json
-from AbstractElementAttributesAspectElement import AbstractElementAttributesAspectElement
+#from AbstractElementAttributesAspectElement import AbstractElementAttributesAspectElement
+from AttributeCommon import AttributeCommon
 from DataModelsUtil import DatamodelsUtil
 from . import ATTRIBUTE_DATA_TYPE
 
-class NetworkAttributesElement(AbstractElementAttributesAspectElement):
+class NetworkAttributesElement(AttributeCommon):
     def __init__(self, subnetwork=None, name=None, values=None, type=None):
-        super(AbstractElementAttributesAspectElement, self).__init__(subnetwork=subnetwork, name=name, values=values, type=type)
+        super(NetworkAttributesElement.__class__, self).__init__(subnetwork=subnetwork, name=name, values=values, type=type)
         self.ASPECT_NAME = 'networkAttributes'
 
     def __str__(self):
-        aspect_name = self.getAspectName()
-        return_dict = {aspect_name: {}}
+        return json.dumps(self.to_json())
 
-        return_dict[aspect_name]['name'] = self._name
+    def to_json(self):
+        return_dict = {}
+
+        return_dict['name'] = self._name
         if self._subnetwork is not None:
-            return_dict[aspect_name]['subnetwork'] = self._property_of
+            return_dict['subnetwork'] = self._property_of
 
         if self.isSingleValue():
-            return_dict[self.getAspectName()]['value'] = self.getValues()
+            return_dict['value'] = self.getValues()
         else:
-            return_dict[self.getAspectName()]['value'] = self._values
+            return_dict['value'] = self._values
 
-        return_dict[self.getAspectName()]['data type'] = self._data_type.__str__()
+        return_dict['data type'] = self._data_type.__str__()
 
-        return json.dumps(return_dict)
+        return return_dict
 
     def createInstanceWithSingleValue(self, subnetwork, name, value, type):
         return NetworkAttributesElement(subnetwork, name, DatamodelsUtil.removeParenthesis(value, type), type)
@@ -34,8 +37,8 @@ class NetworkAttributesElement(AbstractElementAttributesAspectElement):
         return NetworkAttributesElement(subnetwork, name, DatamodelsUtil.parseStringToStringList(values, type), type)
 
     def createInstanceWithJsonValue(self, subnetwork, name, serializedValue, type):
-    	if ATTRIBUTE_DATA_TYPE.isSingleValueType(type):
-    		return NetworkAttributesElement(subnetwork, name, serializedValue, type)
+        if ATTRIBUTE_DATA_TYPE.isSingleValueType(type):
+            return NetworkAttributesElement(subnetwork, name, serializedValue, type)
         else:
             try:
                 sl = json.loads(serializedValue)

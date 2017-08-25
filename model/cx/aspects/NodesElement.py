@@ -1,13 +1,10 @@
 __author__ = 'aarongary'
 
 import json
-from . import CX_CONSTANTS
+from model.cx import CX_CONSTANTS
 
 class NodesElement(object):
-    def __init__(self, id=None, node_name=None, node_represents=None):
-        self.ID = CX_CONSTANTS.get('ID')
-        self.NODE_NAME = 'n'
-        self.NODE_REPRESENTS = 'r'
+    def __init__(self, id=None, node_name=None, node_represents=None, json_obj=None):
         self.ASPECT_NAME = 'nodes'
 
         if id is None:
@@ -17,6 +14,15 @@ class NodesElement(object):
 
         self._node_name = node_name
         self._node_represents = node_represents
+
+        if json_obj is not None:
+            if type(json_obj) is dict:
+                self._node_name = json_obj.get(CX_CONSTANTS.NAME.value)
+                self._node_represents = json_obj.get(CX_CONSTANTS.NODE_REPRESENTS.value)
+                if json_obj.get(CX_CONSTANTS.ID.value) is not None:
+                    self._id = json_obj.get(CX_CONSTANTS.ID.value)
+            else:
+                raise Exception('NodesElement json input provided was not of type json object.')
 
     def getAspectName(self):
         return self.ASPECT_NAME
@@ -40,11 +46,21 @@ class NodesElement(object):
         return self == other or self._id == other._id
 
     def __str__(self):
+        return json.dumps(self.to_json())
+
+    def to_json(self):
+        if self._id == -1:
+            raise Exception('Edge element does not have a valid ID.  Unable to process this edge - ' + self._node_name)
+
         node_dict = {
-            self.ID: self._id,
-            self.NODE_NAME: self._node_name,
-            self.NODE_REPRESENTS: self._node_represents
+            CX_CONSTANTS.ID: self._id,
+            CX_CONSTANTS.NAME: self._node_name
         }
 
-        return json.dumps(node_dict)
+        if self._node_represents is not None:
+            node_dict[CX_CONSTANTS.NODE_REPRESENTS.value] = self._node_represents
+
+        return node_dict
+
+
 

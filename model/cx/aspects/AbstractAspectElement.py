@@ -1,6 +1,6 @@
 __author__ = 'aarongary'
 
-class AbstractAspectElement():
+class AbstractAspectElement(object):
     def __init__(self):
 	    self.serialVersionUID = 1
 	    self.ASPECT_NAME = None

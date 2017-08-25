@@ -35,9 +35,6 @@ class NiceCXNetwork():
         #self.niceCX['node'] = self.nodes
         #self.niceCX['edges'] = self.edges
 
-    def handleCxElement(self, aspectName, element, niceCX):
-
-
     def addNode(self, node):
         if type(node) is NodesElement:
             self.nodes[node.getId()] = node

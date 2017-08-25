@@ -37,51 +37,6 @@ class NiceCXNetwork():
 
     def handleCxElement(self, aspectName, element, niceCX):
 
-        '''
-          var aspect = niceCX[aspectName];
-
-          if (!aspect) {
-              aspect = {};
-
-              niceCX[aspectName] = aspect;
-          }
-
-          switch (aspectName) {
-              case 'nodes':
-              case 'edges':
-              case 'citations':
-              case 'supports':
-                  aspect[element['@id']] = element;
-                  break;
-              case 'nodeAttributes':
-                  addElementToAspectValueMap(aspect, element);
-                  break;
-              case 'edgeAttributes':
-                  addElementToAspectValueMap(aspect, element);
-                  break;
-              case 'edgeCitations':
-              case 'nodeCitations':
-                  addRelationToRelationAspect(aspect,element, 'citations');
-                  break;
-              case 'edgeSupports':
-              case 'nodeSupports':
-                  addRelationToRelationAspect(aspect,element,'supports');
-                  break;
-              case 'functionTerms':
-                  aspect[element['po']] = element;
-                  break;
-              default:
-                  // opaque for now
-
-                  if (!aspect.elements) {
-                      aspect.elements = [];
-                  }
-
-                  aspect.elements.push(element);
-          }
-      };
-    '''
-
 
     def addNode(self, node):
         if type(node) is NodesElement:

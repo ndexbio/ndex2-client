@@ -160,7 +160,8 @@ class MyTestCase(unittest.TestCase):
 #        print 'Serialized memory:', sys.getsizeof(serialized)
 
 
-
+        print 'starting to_pandas'
+        niceCx.to_pandas()
         parser = ijson.parse(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/nodes'))
 
         node_id, node_n, node_r = '', '', ''

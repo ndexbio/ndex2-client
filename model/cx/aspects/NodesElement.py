@@ -39,6 +39,9 @@ class NodesElement(object):
     def setNodeRepresents(self, represents):
         self._node_represents = represents
 
+    def getName(self):
+        self._node_name
+
     def setNodeName(self, node_name ):
         self._node_name = node_name
 

@@ -1,6 +1,9 @@
 __author__ = 'aarongary'
 
 import json
+import pandas as pd
+import networkx as nx
+from StringIO import StringIO
 from model.metadata.MetaDataCollection import MetaDataCollection
 from model.metadata.MetaDataCollection import MetaDataElement
 from model.cx.aspects.NameSpaces import NameSpaces
@@ -206,6 +209,27 @@ class NiceCXNetwork():
 
     def setProvenance(self, provenance):
         self.provenance = provenance
+
+    def to_pandas(self):
+
+        #===================================================
+        # there are only a few possible keys in attributes.
+        #===================================================
+        my_list = ['po','n','d','v','s']
+
+        rows = [dict(it.to_json(), source=v.getSource(), target=v.getTarget())
+                            for k, v in self.edges.iteritems() if self.edgeAttributes.get(k) is not None
+                            for it in self.edgeAttributes.get(k)]
+
+        df_columns = ['source', 'target'] + my_list
+
+        return_df = pd.DataFrame(rows, columns=df_columns)
+
+        #output = StringIO()
+        #return_df.to_csv(output)
+        #output.seek(0)
+        #print output.read()
+        return return_df
 
     def __str__(self):
         return json.dumps(self.to_json())

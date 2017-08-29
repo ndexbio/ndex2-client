@@ -36,6 +36,7 @@ class NiceCXNetwork():
         self.edgeAssociatedAspects = {}
         self.opaqueAspects = {}
         self.provenance = None
+        self.missingNodes = {}
         #self.niceCX = {}
         #self.niceCX['nodes'] = self.nodes
         #self.niceCX['edges'] = self.edges
@@ -45,12 +46,20 @@ class NiceCXNetwork():
     def addNode(self, node):
         if type(node) is NodesElement:
             self.nodes[node.getId()] = node
+            if self.missingNodes.get(node.getId()) is not None:
+                self.missingNodes.pop(node.getId(), None)
         else:
             raise Exception('Provided input was not of type NodesElement.')
 
     def addEdge(self, edge):
         if type(edge) is EdgesElement:
             self.edges[edge.getId()] = edge
+
+            if self.nodes.get(edge.getSource()) is None:
+                self.missingNodes[edge.getSource()] = 1
+
+            if self.nodes.get(edge.getTarget()) is None:
+                self.missingNodes[edge.getTarget()] = 1
         else:
             raise Exception('Provided input was not of type EdgesElement.')
 
@@ -206,6 +215,9 @@ class NiceCXNetwork():
 
     def getProvenance(self):
         return self.provenance
+
+    def getMissingNodes(self):
+        return self.missingNodes
 
     def setProvenance(self, provenance):
         self.provenance = provenance

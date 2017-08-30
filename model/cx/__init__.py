@@ -2,6 +2,25 @@ __author__ = 'aarongary'
 
 from enum import Enum
 
+known_aspects = [
+    'nodes',
+    'edges',
+    'nodeAttributes',
+    'edgeAttributes',
+    'networkAttributes',
+    'provenanceHistory',
+    'citations',
+    'nodeCitations',
+    'edgeCitations',
+    'supports',
+    'nodeSupports',
+    'edgeSupports',
+    'cartesianLayout',
+    '@context',
+    'cyVisualProperties',
+    'visualProperties'
+    ]
+
 class CX_CONSTANTS(str, Enum):
     ID = '@id'
     NAME = 'n'

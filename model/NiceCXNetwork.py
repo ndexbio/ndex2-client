@@ -4,8 +4,7 @@ import json
 import pandas as pd
 import networkx as nx
 from StringIO import StringIO
-from model.metadata.MetaDataCollection import MetaDataCollection
-from model.metadata.MetaDataCollection import MetaDataElement
+from model.metadata.MetaDataElement import MetaDataElement
 from model.cx.aspects.NameSpaces import NameSpaces
 from model.cx.aspects.NodesElement import NodesElement
 from model.cx.aspects.EdgesElement import EdgesElement
@@ -19,7 +18,7 @@ from model.cx import CX_CONSTANTS
 
 class NiceCXNetwork():
     def __init__(self):
-        self.metadata = MetaDataCollection()
+        self.metadata = {}
         self.namespaces = NameSpaces()
         self.nodes = {}
         self.edges = {}
@@ -37,15 +36,11 @@ class NiceCXNetwork():
         self.opaqueAspects = {}
         self.provenance = None
         self.missingNodes = {}
-        #self.niceCX = {}
-        #self.niceCX['nodes'] = self.nodes
-        #self.niceCX['edges'] = self.edges
-        #self.niceCX['node'] = self.nodes
-        #self.niceCX['edges'] = self.edges
 
     def addNode(self, node):
         if type(node) is NodesElement:
             self.nodes[node.getId()] = node
+
             if self.missingNodes.get(node.getId()) is not None:
                 self.missingNodes.pop(node.getId(), None)
         else:
@@ -128,7 +123,7 @@ class NiceCXNetwork():
         elif aspect_name == 'edgeSupports':
             aspect = self.edgeSupports
         else:
-            raise Exception('Only nodeCitations and edgeCitations are supported. ' + aspect_name + ' was supplied')
+            raise Exception('Only nodeCitations, edgeCitations and edgeSupports are supported. ' + aspect_name + ' was supplied')
 
         for po in element.get(CX_CONSTANTS.PROPERTY_OF):
             po_id = aspect.get(po)
@@ -154,6 +149,19 @@ class NiceCXNetwork():
     def addEdgeAssociatedAspectElement(self, edgeId, elmt):
         self.addAssciatatedAspectElement(self.edgeAssociatedAspects, edgeId, elmt)
 
+
+#    self.edgeAssociatedAspects = {
+#        "cartesianLayout":
+#            {
+#                '1':
+#                  {
+#                    "node": 1,
+#                    "x": 415.535802925717,
+#                    "y": 257.93015713560766
+#                  }
+#            }
+#    }
+
     def addAssciatatedAspectElement(self, table, id, elmt):
         aspectElements = table.get(elmt.getAspectName())
         if aspectElements is None:
@@ -171,8 +179,18 @@ class NiceCXNetwork():
     def getMetadata(self):
         return self.metadata
 
-    def setMetadata(self, metadata):
-        self.metadata = metadata
+    def setMetadata(self, metadata_obj):
+        if type(metadata_obj) is dict:
+            self.metadata = metadata_obj
+        else:
+            raise Exception('Set metadata input was not of type <dict>')
+
+    def addMetadata(self, md):
+        if type(md) is MetaDataElement:
+            #  TODO - alter metadata to match the element counts
+            self.metadata[md.getName()] = md
+        else:
+            raise Exception('Provided input was not of type <MetaDataElement>')
 
     def addNameSpace(self, prefix, uri):
         self.namespaces[prefix] = uri
@@ -222,6 +240,12 @@ class NiceCXNetwork():
     def setProvenance(self, provenance):
         self.provenance = provenance
 
+    def getEdgeCitations(self):
+        return self.edgeCitations
+
+    def getNodeCitations(self):
+        return self.nodeCitations
+
     def to_pandas(self):
 
         #===================================================
@@ -249,6 +273,8 @@ class NiceCXNetwork():
     def to_json(self):
         output_cx = []
 
+        if self.metadata:
+            output_cx.append(self.generateAspect('metaData'))
         if self.nodes:
             output_cx.append(self.generateAspect('nodes'))
         if self.edges:
@@ -289,6 +315,8 @@ class NiceCXNetwork():
             use_this_aspect = self.edgeAttributes
         elif aspect_name == 'citations':
             use_this_aspect = self.citations
+        elif aspect_name == 'metaData':
+            use_this_aspect = self.metadata
 
         if use_this_aspect is not None:
             if type(use_this_aspect) is list:

@@ -2,7 +2,7 @@ __author__ = 'aarongary'
 import json
 from model.cx import CX_CONSTANTS
 
-class MetaDataElement():
+class MetaDataElement(object):
     def __init__(self, elementCount=None, idCounter=None, properties=None, version=None, consistencyGroup=None, lastUpdate=None, name=None, json_obj=None):
         if json_obj is not None:
             self.element_count = json_obj.get(CX_CONSTANTS.ELEMENT_COUNT)
@@ -60,19 +60,31 @@ class MetaDataElement():
     def setVersion(self, v):
         self.version = v
 
-    def toString(self):
-        return json.dumps(self._data)
+    def __str__(self):
+        return json.dumps(self.to_json())
 
+    def to_json(self):
+        node_dict = {}
 
-'''
+        if self.element_count:
+            node_dict[CX_CONSTANTS.ELEMENT_COUNT] = self.element_count
 
-    /**
-     * Convenience method to set the name from an AspectElement.
-     *
-     * @param e an AspectElement (to get the name from)
-     */
-    public final void setName(final AspectElement e) {
-        self._data.put(self.NAME, e.getAspectName());
-    }
+        if self.properties:
+            node_dict[CX_CONSTANTS.PROPERTIES] = self.properties
 
-'''
+        if self.version:
+            node_dict[CX_CONSTANTS.VERSION] = self.version
+
+        if self.consistencyGroup:
+            node_dict[CX_CONSTANTS.CONSISTENCY_GROUP] = self.consistencyGroup
+
+        if self.name:
+            node_dict[CX_CONSTANTS.METADATA_NAME] = self.name
+
+        if self.id_counter:
+            node_dict[CX_CONSTANTS.ID_COUNTER] = self.id_counter
+
+        if self.last_update:
+            node_dict[CX_CONSTANTS.LAST_UPDATE] = self.last_update
+
+        return node_dict

@@ -26,11 +26,11 @@ class EdgesElement(object):
 
         if json_obj is not None:
             if type(json_obj) is dict:
-                self._source = json_obj.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID.value)
-                self._target = json_obj.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID.value)
-                self._interaction = json_obj.get(CX_CONSTANTS.EDGE_INTERACTION.value)
-                if json_obj.get(CX_CONSTANTS.ID.value) is not None:
-                    self._id = json_obj.get(CX_CONSTANTS.ID.value)
+                self._source = json_obj.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID)
+                self._target = json_obj.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID)
+                self._interaction = json_obj.get(CX_CONSTANTS.EDGE_INTERACTION)
+                if json_obj.get(CX_CONSTANTS.ID) is not None:
+                    self._id = json_obj.get(CX_CONSTANTS.ID)
             else:
                 raise Exception('EdgesElement json input provided was not of type json object.')
 
@@ -72,17 +72,17 @@ class EdgesElement(object):
             raise Exception('Edge element does not have a valid ID.  Unable to process this edge')
 
         node_dict = {
-            CX_CONSTANTS.ID.value: self._id,
+            CX_CONSTANTS.ID: self._id,
         }
 
         if self._source is not None:
-            node_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID.value] = self._source
+            node_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID] = self._source
 
         if self._target is not None:
-            node_dict[CX_CONSTANTS.EDGE_TARGET_NODE_ID.value] = self._target
+            node_dict[CX_CONSTANTS.EDGE_TARGET_NODE_ID] = self._target
 
         if self._interaction is not None:
-            node_dict[CX_CONSTANTS.EDGE_INTERACTION.value] = self._interaction
+            node_dict[CX_CONSTANTS.EDGE_INTERACTION] = self._interaction
 
         return node_dict
 

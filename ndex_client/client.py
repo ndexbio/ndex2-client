@@ -2,7 +2,7 @@
 
 import requests
 import json
-import ndex
+import ndex_client
 from requests_toolbelt import MultipartEncoder
 import os
 import io
@@ -65,7 +65,7 @@ class Ndex:
                         self.host = host + "/rest"
 
             except req_except.HTTPError as he:
-                ndex.get_logger('CLIENT').warning('Can''t determine server version.' + host + ' Server returned error -- '  + he.message)
+                ndex_client.get_logger('CLIENT').warning('Can''t determine server version.' + host + ' Server returned error -- '  + he.message)
                 self.version = "1.3"
                 self.host = host + "/rest"
                 #TODO - how to handle errors getting server version...

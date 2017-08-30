@@ -130,7 +130,7 @@ class NiceCXNetwork():
         else:
             raise Exception('Only nodeCitations and edgeCitations are supported. ' + aspect_name + ' was supplied')
 
-        for po in element.get(CX_CONSTANTS.PROPERTY_OF.value):
+        for po in element.get(CX_CONSTANTS.PROPERTY_OF):
             po_id = aspect.get(po)
             if po_id is None:
                 aspect[po] = element.get(relation_name)
@@ -314,9 +314,9 @@ class NiceCXNetwork():
                 if type(use_this_aspect) is dict:
                     for k, v in use_this_aspect.iteritems():
                         if type(v) is list:
-                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF.value: [k], CX_CONSTANTS.CITATIONS.value: v})
+                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: v})
                         else:
-                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF.value: [k], CX_CONSTANTS.CITATIONS.value: [v]})
+                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: [v]})
                 else:
                     raise Exception('Citation was not in json format')
             else:

@@ -2,7 +2,7 @@ __author__ = 'aarongary'
 
 from enum import Enum
 
-class CX_CONSTANTS(Enum):
+class CX_CONSTANTS(str, Enum):
     ID = '@id'
     NAME = 'n'
     VALUE = 'v'
@@ -24,3 +24,12 @@ class CX_CONSTANTS(Enum):
     CITATIONS = 'citations'
     PROPERTIES = 'properties'
 
+    #======================
+    # METADATA CONSTANTS
+    #======================
+    CONSISTENCY_GROUP = 'consistencyGroup'
+    ELEMENT_COUNT = 'elementCount'
+    ID_COUNTER = 'idCounter'
+    LAST_UPDATE = 'lastUpdate'
+    METADATA_NAME = 'name'
+    VERSION = 'version'

@@ -17,10 +17,10 @@ class NodesElement(object):
 
         if json_obj is not None:
             if type(json_obj) is dict:
-                self._node_name = json_obj.get(CX_CONSTANTS.NAME.value)
-                self._node_represents = json_obj.get(CX_CONSTANTS.NODE_REPRESENTS.value)
-                if json_obj.get(CX_CONSTANTS.ID.value) is not None:
-                    self._id = json_obj.get(CX_CONSTANTS.ID.value)
+                self._node_name = json_obj.get(CX_CONSTANTS.NAME)
+                self._node_represents = json_obj.get(CX_CONSTANTS.NODE_REPRESENTS)
+                if json_obj.get(CX_CONSTANTS.ID) is not None:
+                    self._id = json_obj.get(CX_CONSTANTS.ID)
             else:
                 raise Exception('NodesElement json input provided was not of type json object.')
 
@@ -56,12 +56,12 @@ class NodesElement(object):
             raise Exception('Edge element does not have a valid ID.  Unable to process this edge - ' + self._node_name)
 
         node_dict = {
-            CX_CONSTANTS.ID.value: self._id,
-            CX_CONSTANTS.NAME.value: self._node_name
+            CX_CONSTANTS.ID: self._id,
+            CX_CONSTANTS.NAME: self._node_name
         }
 
         if self._node_represents is not None:
-            node_dict[CX_CONSTANTS.NODE_REPRESENTS.value] = self._node_represents
+            node_dict[CX_CONSTANTS.NODE_REPRESENTS] = self._node_represents
 
         return node_dict
 

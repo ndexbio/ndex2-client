@@ -19,6 +19,7 @@ from model.cx.aspects.SupportElement import SupportElement
 from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 from model.cx.aspects.SimpleNode import SimpleNode
 from model.cx import CX_CONSTANTS
+from ndex_client.NetworkQuery import NetworkQuery
 
 def get_nodes():
     for number in range(0, 10000):
@@ -58,7 +59,17 @@ class MyTestCase(unittest.TestCase):
         niceCx = NiceCXNetwork()
         #main_map = NdexGraph(server='http://dev2.ndexbio.org', username='scratch', password='scratch', uuid='7246d8cf-c644-11e6-b48c-0660b7976219')
 
-        uuid = '7246d8cf-c644-11e6-b48c-0660b7976219'
+        uuid = '6b968fd2-02a4-11e6-b550-06603eb7f303'
+
+        #====================
+        # NETWORK QUERY
+        #====================
+
+        networkQuery = NetworkQuery()
+        networkQuery.query_network('40f1def0-3aa4-11e7-b12f-0660b7976219', 'HSPA5,HSPA4')
+
+
+
 
         my_na = NodeAttributesElement(subnetwork=1, property_of=11, name=22, values=33, type=ATTRIBUTE_DATA_TYPE.convert_to_data_type('string'))
 

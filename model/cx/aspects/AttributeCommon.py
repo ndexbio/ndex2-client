@@ -7,11 +7,11 @@ from model.cx import CX_CONSTANTS
 class AttributeCommon(object):
     def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
         if json_obj is not None:
-            data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(json_obj.get(CX_CONSTANTS.VALUE.value))
-            self._property_of = json_obj.get(CX_CONSTANTS.PROPERTY_OF.value)
-            self._subnetwork = json_obj.get(CX_CONSTANTS.SUBNETWORK.value)
-            self._name = json_obj.get(CX_CONSTANTS.NAME.value)
-            self._values = json_obj.get(CX_CONSTANTS.VALUE.value)
+            data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(json_obj.get(CX_CONSTANTS.VALUE))
+            self._property_of = json_obj.get(CX_CONSTANTS.PROPERTY_OF)
+            self._subnetwork = json_obj.get(CX_CONSTANTS.SUBNETWORK)
+            self._name = json_obj.get(CX_CONSTANTS.NAME)
+            self._values = json_obj.get(CX_CONSTANTS.VALUE)
             self._data_type = data_type
         else:
             self._property_of = property_of
@@ -71,20 +71,20 @@ class AttributeCommon(object):
         return_dict = {}
 
         if self._property_of is not None:
-            return_dict[CX_CONSTANTS.PROPERTY_OF.value] = self._property_of
+            return_dict[CX_CONSTANTS.PROPERTY_OF] = self._property_of
 
         if self._name is not None:
-            return_dict[CX_CONSTANTS.NAME.value] = self._name
+            return_dict[CX_CONSTANTS.NAME] = self._name
 
         if self._data_type:
-            return_dict[CX_CONSTANTS.DATA_TYPE.value] = self._data_type.value
+            return_dict[CX_CONSTANTS.DATA_TYPE] = self._data_type.value
 
         if self._subnetwork:
-            return_dict[CX_CONSTANTS.SUBNETWORK.value] = self._subnetwork
+            return_dict[CX_CONSTANTS.SUBNETWORK] = self._subnetwork
 
         if self.isSingleValue():
-            return_dict[CX_CONSTANTS.VALUE.value] = self.getValues()
+            return_dict[CX_CONSTANTS.VALUE] = self.getValues()
         else:
-            return_dict[CX_CONSTANTS.VALUE.value] = self._values
+            return_dict[CX_CONSTANTS.VALUE] = self._values
 
         return return_dict

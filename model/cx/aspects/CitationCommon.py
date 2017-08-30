@@ -8,9 +8,9 @@ from model.cx import CX_CONSTANTS
 class CitationCommon(object):
     def __init__(self, subnetwork=None, citations=None, property_of=None, json_obj=None):
         if json_obj is not None:
-            self._property_of = json_obj.get(CX_CONSTANTS.PROPERTY_OF.value)
-            self._subnetwork = json_obj.get(CX_CONSTANTS.SUBNETWORK.value)
-            self._citations = json_obj.get(CX_CONSTANTS.CITATIONS.value)
+            self._property_of = json_obj.get(CX_CONSTANTS.PROPERTY_OF)
+            self._subnetwork = json_obj.get(CX_CONSTANTS.SUBNETWORK)
+            self._citations = json_obj.get(CX_CONSTANTS.CITATIONS)
         else:
             self._property_of = property_of
             self._subnetwork = subnetwork
@@ -43,12 +43,12 @@ class CitationCommon(object):
         return_dict = {}
 
         if self._property_of is not None:
-            return_dict[CX_CONSTANTS.PROPERTY_OF.value] = self._property_of
+            return_dict[CX_CONSTANTS.PROPERTY_OF] = self._property_of
 
         if self._subnetwork:
-            return_dict[CX_CONSTANTS.SUBNETWORK.value] = self._subnetwork
+            return_dict[CX_CONSTANTS.SUBNETWORK] = self._subnetwork
 
         if self._citations:
-            return_dict[CX_CONSTANTS.CITATIONS.value] = self._citations
+            return_dict[CX_CONSTANTS.CITATIONS] = self._citations
 
         return return_dict

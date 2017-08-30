@@ -28,7 +28,7 @@ class ATTRIBUTE_DATA_TYPE(Enum):
     LIST_OF_LONG = 'list_of_long'
     LIST_OF_SHORT = 'list_of_short'
     LIST_OF_STRING = 'list_of_string'
-    
+
     @classmethod
     def toCxLabel(self, dt):
         if dt == ATTRIBUTE_DATA_TYPE.BOOLEAN:

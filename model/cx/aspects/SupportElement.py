@@ -1,6 +1,5 @@
 __author__ = 'aarongary'
 
-from NdexAspectElement import NdexAspectElement
 from model.cx import CX_CONSTANTS
 import json
 

@@ -2,7 +2,7 @@
 
 import requests
 import json
-import ndex_client
+import ndex
 from requests_toolbelt import MultipartEncoder
 import os
 import io
@@ -15,8 +15,9 @@ else:
 
 from requests import exceptions as req_except
 import time
+import base64
 
-userAgent = 'NDEx-Python/2.0'
+userAgent = 'NDEx-Python/3.0'
 
 class Ndex:
 
@@ -65,7 +66,7 @@ class Ndex:
                         self.host = host + "/rest"
 
             except req_except.HTTPError as he:
-                ndex_client.get_logger('CLIENT').warning('Can''t determine server version.' + host + ' Server returned error -- '  + he.message)
+                ndex.get_logger('CLIENT').warning('Can''t determine server version.' + host + ' Server returned error -- '  + he.message)
                 self.version = "1.3"
                 self.host = host + "/rest"
                 #TODO - how to handle errors getting server version...
@@ -75,6 +76,8 @@ class Ndex:
         if username and password:
             # add credentials to the session, if available
             self.s.auth = (username, password)
+            self.user_base64 = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+
         if update_status:
             self.update_status()
 

@@ -6,6 +6,7 @@ root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 log_path = os.path.join(root, 'logs')
 #solr_url = 'http://localhost:8983/solr/'
 solr_url = 'http://dev2.ndexbio.org:8983/solr/'
+deprecation_message = 'This function is now deprecated'
 
 def get_logger(name, level=logging.DEBUG):
     logger = logging.getLogger(name)

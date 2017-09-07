@@ -45,6 +45,13 @@ class MetaDataElement(object):
     def setConsistencyGroup(self, cg):
         self.consistencyGroup = cg
 
+    def incrementConsistencyGroup(self):
+        if self.consistencyGroup:
+            if type(self.consistencyGroup) is int:
+                self.consistencyGroup += 1
+            else:
+                self.consistencyGroup = int(self.consistencyGroup) + 1
+
     def setElementCount(self, ec):
         self.element_count = ec
 

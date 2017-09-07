@@ -17,7 +17,7 @@ from model.cx.aspects.AspectElement import AspectElement
 from model.cx import CX_CONSTANTS
 
 class NiceCXNetwork():
-    def __init__(self):
+    def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, data=None, **attr):
         self.metadata = {}
         self.namespaces = NameSpaces()
         self.nodes = {}
@@ -139,7 +139,7 @@ class NiceCXNetwork():
                 aspectElmts = []
                 self.opaqueAspects[opaque_element.getAspectName()] = aspectElmts
 
-            aspectElmts.append(opaque_element)
+            aspectElmts.append(opaque_element.getAspectElement())
         else:
             raise Exception('Provided input was not of type AspectElement.')
 
@@ -267,6 +267,36 @@ class NiceCXNetwork():
         #print output.read()
         return return_df
 
+    def to_networkx(self):
+        G = nx.Graph()
+        '''
+        node_id = 0
+        node_dict = {}
+        G.max_edge_id = 0
+        for node_name, node_attr in G_nx.nodes_iter(data=True):
+            if discard_null:
+                node_attr = {k:v for k,v in node_attr.items() if not pd.isnull(v)}
+
+            if node_attr.has_key('name'):
+                G.add_node(node_id, node_attr)
+            else:
+                G.add_node(node_id, node_attr, name=node_name)
+            node_dict[node_name] = node_id
+            node_id += 1
+        for s, t, edge_attr in G_nx.edges_iter(data=True):
+            if discard_null:
+                edge_attr = {k:v for k,v in edge_attr.items() if not pd.isnull(v)}
+            G.add_edge(node_dict[s], node_dict[t], G.max_edge_id, edge_attr)
+            G.max_edge_id += 1
+
+        if hasattr(G_nx, 'pos'):
+            G.pos = {node_dict[a] : b for a, b in G_nx.pos.items()}
+            # G.subnetwork_id = 1
+            # G.view_id = 1
+        '''
+
+        return G
+
     def __str__(self):
         return json.dumps(self.to_json())
 
@@ -295,48 +325,55 @@ class NiceCXNetwork():
             output_cx.append(self.generateAspect('edgeSupports'))
         if self.nodeSupports:
             output_cx.append(self.generateAspect('nodeSupports'))
+        if self.metadata:
+            output_cx.append(self.generateAspect('metaData'))
 
         return output_cx
 
     def generateAspect(self, aspect_name):
-
+        core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'citations', 'metaData']
         aspect_element_array = []
+        element_count = 0
+        element_id_max = 0
 
         use_this_aspect = None
-        if aspect_name == 'nodes':
-            use_this_aspect = self.nodes
-        elif aspect_name == 'edges':
-            use_this_aspect = self.edges
-        elif aspect_name == 'networkAttributes':
-            use_this_aspect = self.networkAttributes
-        elif aspect_name == 'nodeAttributes':
-            use_this_aspect = self.nodeAttributes
-        elif aspect_name == 'edgeAttributes':
-            use_this_aspect = self.edgeAttributes
-        elif aspect_name == 'citations':
-            use_this_aspect = self.citations
-        elif aspect_name == 'metaData':
-            use_this_aspect = self.metadata
+        #=============================
+        # PROCESS CORE ASPECTS FIRST
+        #=============================
+        if aspect_name in core_aspect:
+            use_this_aspect = self.string_to_aspect_object(aspect_name)
 
         if use_this_aspect is not None:
             if type(use_this_aspect) is list:
                 for item in use_this_aspect:
-                    aspect_element_array.append(item.to_json())
+                    add_this_element = item.to_json()
+                    id = add_this_element.get(CX_CONSTANTS.ID)
+                    if id > element_id_max:
+                        element_id_max = id
+                    aspect_element_array.append(add_this_element)
+                    element_count +=1
             else:
                 for k, v in use_this_aspect.iteritems():
                     if type(v) is list:
                         for v_item in v:
-                            aspect_element_array.append(v_item.to_json())
+                            add_this_element = v_item.to_json()
+                            id = add_this_element.get(CX_CONSTANTS.ID)
+                            if id > element_id_max:
+                                element_id_max = id
+                            aspect_element_array.append(add_this_element)
+                            element_count +=1
                     else:
-                        aspect_element_array.append(v.to_json())
-
+                        add_this_element = v.to_json()
+                        id = add_this_element.get(CX_CONSTANTS.ID)
+                        if id > element_id_max:
+                            element_id_max = id
+                        aspect_element_array.append(add_this_element)
+                        element_count +=1
         else:
-            if aspect_name == 'nodeCitations':
-                use_this_aspect = self.nodeCitations
-            elif aspect_name == 'edgeCitations':
-                use_this_aspect = self.edgeCitations
-            elif aspect_name == 'edgeSupports':
-                use_this_aspect = self.edgeSupports
+            #===========================
+            # PROCESS NON-CORE ASPECTS
+            #===========================
+            use_this_aspect = self.string_to_aspect_object(aspect_name)
 
             if use_this_aspect is not None:
                 if type(use_this_aspect) is dict:
@@ -345,12 +382,377 @@ class NiceCXNetwork():
                             aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: v})
                         else:
                             aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: [v]})
+                        element_count +=1
                 else:
                     raise Exception('Citation was not in json format')
             else:
                 return None
 
-
         aspect = {aspect_name: aspect_element_array}
+        #============================================
+        # UPDATE METADATA ELEMENT COUNTS/ID COUNTER
+        #============================================
+        md = self.metadata.get(aspect_name)
+        if md is not None:
+            md.setElementCount(element_count)
+            md.setIdCounter(element_id_max)
+            md.incrementConsistencyGroup()
+        else:
+            mde = MetaDataElement(elementCount=element_count, properties=[], version='1.0', consistencyGroup=0, name=aspect_name)
 
+            if element_id_max != 0:
+                mde.setIdCounter(element_id_max)
+
+            self.addMetadata(mde)
+
+        print '%s ELEMENT COUNT: %s, MAX ID: %s' % (aspect_name, str(element_count), str(element_id_max))
         return aspect
+
+    def handleMetadataUpdate(self, aspect_name):
+        aspect = self.string_to_aspect_object(aspect_name)
+
+
+        return_metadata = {
+            CX_CONSTANTS.CONSISTENCY_GROUP: consistency_group,
+            CX_CONSTANTS.ELEMENT_COUNT: 1,
+            CX_CONSTANTS.METADATA_NAME: "@context",
+            CX_CONSTANTS.PROPERTIES: [],
+            CX_CONSTANTS.VERSION: "1.0"
+        }
+
+
+    def generate_metadata(self, G, unclassified_cx):
+        #if self.metadata:
+        #    for k, v in self.metadata.iteritems():
+
+
+        return_metadata = []
+        consistency_group = 1
+        if(self.metadata_original is not None):
+            for mi in self.metadata_original:
+                if(mi.get("consistencyGroup") is not None):
+                    if(mi.get("consistencyGroup") > consistency_group):
+                        consistency_group = mi.get("consistencyGroup")
+
+            consistency_group += 1 # bump the consistency group up by one
+
+            print("consistency group max: " + str(consistency_group))
+
+        # ========================
+        # @context metadata
+        # ========================
+        if  self.namespaces:
+            return_metadata.append(
+                {
+                    "consistencyGroup": consistency_group,
+                    "elementCount": 1,
+                    "name": "@context",
+                    "properties": [],
+                    "version": "1.0"
+                }
+            )
+
+        #========================
+        # Nodes metadata
+        #========================
+        node_ids = [n[0] for n in G.nodes_iter(data=True)]
+        if(len(node_ids) < 1):
+            node_ids = [0]
+        return_metadata.append(
+            {
+                "consistencyGroup" : consistency_group,
+                "elementCount" : len(node_ids),
+                "idCounter": max(node_ids),
+                "name" : "nodes",
+                "properties" : [ ],
+                "version" : "1.0"
+            }
+        )
+
+        #========================
+        # Edges metadata
+        #========================
+        edge_ids = [e[2]for e in G.edges_iter(data=True, keys=True)]
+        if(len(edge_ids) < 1):
+            edge_ids = [0]
+        return_metadata.append(
+            {
+                "consistencyGroup" : consistency_group,
+                "elementCount" : len(edge_ids),
+                "idCounter": max(edge_ids),
+                "name" : "edges",
+                "properties" : [ ],
+                "version" : "1.0"
+            }
+        )
+
+        #=============================
+        # Network Attributes metadata
+        #=============================
+        if(len(G.graph) > 0):
+            return_metadata.append(
+                {
+                    "consistencyGroup" : consistency_group,
+                    "elementCount" : len(G.graph),
+                    "name" : "networkAttributes",
+                    "properties" : [ ],
+                    "version" : "1.0"
+                }
+            )
+
+        #===========================
+        # Node Attributes metadata
+        #===========================
+        #id_max = 0
+        attr_count = 0
+        for node_id , attributes in G.nodes_iter(data=True):
+            for attribute_name in attributes:
+                if attribute_name != "name" and attribute_name != "represents":
+                    attr_count += 1
+
+
+
+        #
+        # for n, nattr in G.nodes(data=True):
+        #     if(bool(nattr)):
+        #         attr_count += len(nattr.keys())
+        #
+        #     if(n > id_max):
+        #         id_max = n
+
+        if(attr_count > 0):
+            return_metadata.append(
+                {
+                    "consistencyGroup" : consistency_group,
+                    "elementCount" : attr_count,
+                    #"idCounter": id_max,
+                    "name" : "nodeAttributes",
+                    "properties" : [ ],
+                    "version" : "1.0"
+                }
+            )
+
+        #===========================
+        # Edge Attributes metadata
+        #===========================
+        #id_max = 0
+        attr_count = 0
+        for s, t, id, a in G.edges(data=True, keys=True):
+            if(bool(a)):
+                for attribute_name in a:
+                    if attribute_name != "interaction":
+                        attr_count += 1
+                #attr_count += len(a.keys())
+
+            # if(id > id_max):
+            #     id_max = id
+
+        if(attr_count > 0):
+            return_metadata.append(
+                {
+                    "consistencyGroup" : consistency_group,
+                    "elementCount" : attr_count,
+                    #"idCounter": id_max,
+                    "name" : "edgeAttributes",
+                    "properties" : [ ],
+                    "version" : "1.0"
+                }
+            )
+
+        #===========================
+        # cyViews metadata
+        #===========================
+        if self.view_id != None:
+            return_metadata.append(
+                {
+                    "elementCount": 1,
+                    "name": "cyViews",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        #===========================
+        # subNetworks metadata
+        #===========================
+        if self.subnetwork_id != None:
+            return_metadata.append(
+                {
+                    "elementCount": 1,
+                    "name": "subNetworks",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        #===========================
+        # networkRelations metadata
+        #===========================
+        if self.subnetwork_id != None and self.view_id != None:
+            return_metadata.append(
+                {
+                    "elementCount": 2,
+                    "name": "networkRelations",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        #===========================
+        # citations and supports metadata
+        #===========================
+        if len(self.support_map) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.support_map),
+                    "name": "supports",
+                    "properties": [],
+                    "idCounter": max(self.support_map.keys()),
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        if len(self.node_support_map) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.node_support_map),
+                    "name": "nodeSupports",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+        if len(self.edge_support_map) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.edge_support_map),
+                    "name": "edgeSupports",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        if len(self.citation_map) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.citation_map),
+                    "name": "citations",
+                    "properties": [],
+                    "idCounter": max(self.citation_map.keys()),
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        if len(self.node_citation_map) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.node_citation_map),
+                    "name": "nodeCitations",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        if len(self.edge_citation_map) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.edge_citation_map),
+                    "name": "edgeCitations",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        if len(self.function_term_map) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.function_term_map),
+                    "name": "functionTerms",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        if len(self.reified_edges) > 0:
+            return_metadata.append(
+                {
+                    "elementCount": len(self.reified_edges),
+                    "name": "reifiedEdges",
+                    "properties": [],
+                    "consistencyGroup" : consistency_group
+                }
+            )
+
+        #===========================
+        # ndexStatus metadata
+        #===========================
+        return_metadata.append(
+            {
+                "consistencyGroup": consistency_group,
+                "elementCount": 1,
+                "name": "ndexStatus",
+                "properties": [],
+                "version": "1.0"
+            }
+        )
+
+        #===========================
+        # cartesianLayout metadata
+        #===========================
+        if self.pos and len(self.pos) > 0:
+            return_metadata.append(
+                {
+                    "consistencyGroup": consistency_group,
+                    "elementCount": len(self.pos),
+                    "name": "cartesianLayout",
+                    "properties": [],
+                    "version": "1.0"
+                }
+            )
+
+        #===========================
+        # OTHER metadata
+        #===========================
+        for asp in self.unclassified_cx:
+            try:
+                aspect_type = asp.iterkeys().next()
+                if(aspect_type == "visualProperties"
+                   or aspect_type == "cyVisualProperties"
+                   or aspect_type == "@context"):
+                    return_metadata.append(
+                        {
+                            "consistencyGroup" : consistency_group,
+                            "elementCount":len(asp[aspect_type]),
+                            "name":aspect_type,
+                            "properties":[]
+                         }
+                    )
+            except Exception as e:
+                print(e.message)
+
+
+        #print {'metaData': return_metadata}
+
+        return [{'metaData': return_metadata}]
+
+    def string_to_aspect_object(self, aspect_name):
+        if aspect_name == 'metaData':
+            return self.metadata
+        elif aspect_name == 'nodes':
+            return self.nodes
+        elif aspect_name == 'edges':
+            return self.edges
+        elif aspect_name == 'networkAttributes':
+            return self.networkAttributes
+        elif aspect_name == 'nodeAttributes':
+            return self.nodeAttributes
+        elif aspect_name == 'edgeAttributes':
+            return self.edgeAttributes
+        elif aspect_name == 'citations':
+            return self.citations
+        elif aspect_name == 'nodeCitations':
+            return self.nodeCitations
+        elif aspect_name == 'edgeCitations':
+            return self.edgeCitations
+        elif aspect_name == 'edgeSupports':
+            return self.edgeSupports
+

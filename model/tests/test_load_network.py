@@ -19,7 +19,9 @@ from model.cx.aspects.SupportElement import SupportElement
 from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 from model.cx.aspects.SimpleNode import SimpleNode
 from model.cx import CX_CONSTANTS
-from ndex_client.NetworkQuery import NetworkQuery
+from ndex.NetworkQuery import NetworkQuery
+from ndex.client import Ndex
+from ndex.NiceCXBuilder import NiceCXBuilder
 
 def get_nodes():
     for number in range(0, 10000):
@@ -54,6 +56,16 @@ def loadAspect(aspect_name):
 #print loadAspect('nodes')
 
 class MyTestCase(unittest.TestCase):
+    def test_ndex_load_cx_model(self):
+        niceCxBuilder = NiceCXBuilder()
+        nice_cx_from_builder = niceCxBuilder.create_from_server('http://dev2.ndexbio.org', 'scratch', 'scratch', '94766028-934d-11e7-9743-0660b7976219')
+        print nice_cx_from_builder
+        #ndex = Ndex(server='http://dev2.ndexbio.org', username='scratch', password='scratch', uuid='94766028-934d-11e7-9743-0660b7976219')
+        #cx = ndex.get_network_as_cx_stream(uuid).json()
+        #if not cx:
+
+
+    @unittest.skip("Temporary skipping")
     def test_nice_cx_model(self):
 
         niceCx = NiceCXNetwork()
@@ -67,9 +79,6 @@ class MyTestCase(unittest.TestCase):
 
         networkQuery = NetworkQuery()
         networkQuery.query_network('40f1def0-3aa4-11e7-b12f-0660b7976219', 'HSPA5,HSPA4')
-
-
-
 
         my_na = NodeAttributesElement(subnetwork=1, property_of=11, name=22, values=33, type=ATTRIBUTE_DATA_TYPE.convert_to_data_type('string'))
 

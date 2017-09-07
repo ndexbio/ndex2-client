@@ -3,7 +3,7 @@ __author__ = 'aarongary'
 import json
 #from AbstractElementAttributesAspectElement import AbstractElementAttributesAspectElement
 from . import ATTRIBUTE_DATA_TYPE
-from AttributeCommon import AttributeCommon
+from model.cx.aspects.AttributeCommon import AttributeCommon
 
 class NodeAttributesElement(AttributeCommon):
     def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):

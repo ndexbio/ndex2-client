@@ -2,7 +2,7 @@ __author__ = 'aarongary'
 
 import ndex
 import ijson
-from urllib import urlopen
+import sys
 import pysolr
 import requests
 from pysolr import SolrError
@@ -21,6 +21,12 @@ from model.cx.aspects.SimpleNode import SimpleNode
 from model.cx import CX_CONSTANTS
 from model.cx import known_aspects
 import time
+
+if sys.version_info.major == 3:
+    from urllib.request import urlopen
+else:
+    from urllib import urlopen
+
 
 class NetworkQuery():
     def __init__(self):
@@ -43,7 +49,7 @@ class NetworkQuery():
             if(not search_terms_array):
                 return {'message': 'No nodes found'}
 
-            print 'starting nodes 1'
+            print('starting nodes 1')
             #===================
             # METADATA
             #===================
@@ -55,7 +61,7 @@ class NetworkQuery():
 
             opaque_aspects = set(available_aspects).difference(known_aspects)
 
-            print opaque_aspects
+            print(opaque_aspects)
 
             #===================
             # EDGES
@@ -77,7 +83,7 @@ class NetworkQuery():
                 if(event == 'end_map'):
                     e_count += 1
                     if e_count % 5000 == 0:
-                        print e_count
+                        print(e_count)
                     if edge_found:
                         edge_keepers.add(edge_id)
                         node_keepers.update([edge_s, edge_t])
@@ -106,9 +112,9 @@ class NetworkQuery():
                 elif (prefix) == ('item.@id'):
                     edge_id = value
 
-            print 'Response time (Edge search): ' + str(time.time() - start_time)
-            print node_keepers
-            print edge_keepers
+            print('Response time (Edge search): ' + str(time.time() - start_time))
+            print(node_keepers)
+            print(edge_keepers)
 
             '''
             if 'edges' in available_aspects:
@@ -118,7 +124,7 @@ class NetworkQuery():
                         node_keepers.update([ae.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID), ae.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID)])
 
                     if edge_count % 5000 == 0:
-                        print edge_count
+                        print(edge_count)
 
                     if added_edges > max_edges:
                         raise StopIteration('Max edges reached')
@@ -156,7 +162,7 @@ class NetworkQuery():
             if(not search_terms_array):
                 return {'message': 'No nodes found'}
 
-            print 'starting nodes 1'
+            print('starting nodes 1')
             #===================
             # METADATA
             #===================
@@ -169,7 +175,7 @@ class NetworkQuery():
             available_aspects = ['edges', 'nodes'] # TODO - remove this
             opaque_aspects = set(available_aspects).difference(known_aspects)
 
-            print opaque_aspects
+            print(opaque_aspects)
 
             #===================
             # NODES
@@ -182,7 +188,7 @@ class NetworkQuery():
             else:
                 raise Exception('Network does not contain any nodes.  Cannot query')
 
-            print 'starting edges 1'
+            print('starting edges 1')
             #===================
             # EDGES
             #===================
@@ -196,7 +202,7 @@ class NetworkQuery():
                         niceCx.addEdge(add_this_edge)
                         added_edges += 1
                     if edge_count % 5000 == 0:
-                        print edge_count
+                        print(edge_count)
 
                     #if edge_count > 30000:
                     #    break
@@ -207,8 +213,8 @@ class NetworkQuery():
             else:
                 raise Exception('Network does not contain any nodes.  Cannot query')
 
-            print 'Response time (Edge search): ' + str(time.time() - start_time)
-            print 'starting nodes 2'
+            print('Response time (Edge search): ' + str(time.time() - start_time))
+            print('starting nodes 2')
             #===================
             # NODES
             #===================
@@ -263,7 +269,7 @@ class NetworkQuery():
                             niceCx.addEdgeCitationsFromCX(ae)
                     ec_count += 1
                     if ec_count % 500 == 0:
-                        print ec_count
+                        print(ec_count)
 
             #===================
             # CITATIONS
@@ -295,7 +301,7 @@ class NetworkQuery():
 
     def streamAspect(self, uuid, aspect_name):
         if aspect_name == 'metaData':
-            print 'http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect'
+            print('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
             md_response = requests.get('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
             json_respone = md_response.json()
             return json_respone.get('metaData')

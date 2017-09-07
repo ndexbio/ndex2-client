@@ -53,10 +53,10 @@ class AttributeCommon(object):
         self._data_type = data_type
 
     def getValueAsJsonString(self):
-    	return json.dumps(self._values)
+        return json.dumps(self._values)
 
     def isSingleValue(self):
-	  return ATTRIBUTE_DATA_TYPE.isSingleValueType(self._data_type)
+        return ATTRIBUTE_DATA_TYPE.isSingleValueType(self._data_type)
 
     def getAspectName(self):
         return self.ASPECT_NAME

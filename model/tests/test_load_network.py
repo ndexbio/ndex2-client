@@ -7,7 +7,6 @@ import time
 import ijson
 import pickle
 import json
-from urllib import urlopen
 from model.NiceCXNetwork import NiceCXNetwork
 from model.cx.aspects.NodesElement import NodesElement
 from model.cx.aspects.EdgesElement import EdgesElement
@@ -22,6 +21,12 @@ from model.cx import CX_CONSTANTS
 from ndex.NetworkQuery import NetworkQuery
 from ndex.client import Ndex
 from ndex.NiceCXBuilder import NiceCXBuilder
+
+if sys.version_info.major == 3:
+    from urllib.request import urlopen
+else:
+    from urllib import urlopen
+
 
 def get_nodes():
     for number in range(0, 10000):
@@ -39,10 +44,10 @@ if False:
         node_array.append(node)
 
     serialized = pickle.dumps(node_array, protocol=0)
-    print 'Serialized memory:', sys.getsizeof(serialized)
+    print('Serialized memory:', sys.getsizeof(serialized))
 
 
-    print len(node_array)
+    print(len(node_array))
 
 
 def loadAspect(aspect_name):
@@ -53,13 +58,12 @@ def loadAspect(aspect_name):
             if aspect.get(aspect_name) is not None:
                 return aspect.get(aspect_name)
 
-#print loadAspect('nodes')
 
 class MyTestCase(unittest.TestCase):
     def test_ndex_load_cx_model(self):
         niceCxBuilder = NiceCXBuilder()
         nice_cx_from_builder = niceCxBuilder.create_from_server('http://dev2.ndexbio.org', 'scratch', 'scratch', '94766028-934d-11e7-9743-0660b7976219')
-        print nice_cx_from_builder
+        print(nice_cx_from_builder)
         #ndex = Ndex(server='http://dev2.ndexbio.org', username='scratch', password='scratch', uuid='94766028-934d-11e7-9743-0660b7976219')
         #cx = ndex.get_network_as_cx_stream(uuid).json()
         #if not cx:
@@ -180,7 +184,7 @@ class MyTestCase(unittest.TestCase):
 #        print 'Serialized memory:', sys.getsizeof(serialized)
 
 
-        print 'starting to_pandas'
+        print('starting to_pandas')
         niceCx.to_pandas()
         parser = ijson.parse(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/nodes'))
 
@@ -199,14 +203,12 @@ class MyTestCase(unittest.TestCase):
         for prefix, event, value in parser:
             if (prefix) == ('item.@id'):
                 if count % 10000 == 0:
-                    print count
+                    print(count)
                 count += 1
                 node_id = value
-                #print value
             elif (prefix) == ('item.n'):
                 node_n = value
                 node_found = True
-                #print value
             elif (prefix) == ('item.r'):
                 node_r = value
                 if node_found:
@@ -214,7 +216,6 @@ class MyTestCase(unittest.TestCase):
                     add_this_node = NodesElement(id=node_id, node_name=node_n, node_represents=node_r)
                     niceCx.addNode(add_this_node)
                     node_found = False
-                #print value
             else:
                 # No represents found
                 if node_found:
@@ -223,29 +224,23 @@ class MyTestCase(unittest.TestCase):
                     niceCx.addNode(add_this_node)
                     node_found = False
 
-        print 'Response time (Node search): ' + str(time.time() - start_time)
+        print('Response time (Node search): ' + str(time.time() - start_time))
         start_time = time.time()
 
-        print edge_matches
-        print node_matches
+        print(edge_matches)
+        print(node_matches)
 
         parser = ijson.parse(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/edges'))
 
         for prefix, event, value in parser:
             if (prefix) == ('item.@id'):
-                #if count % 10000 == 0:
-                #    print count
-                #count += 1
                 edge_id = value
-                #print value
             elif (prefix) == ('item.s'):
                 edge_s = value
                 edge_found = True
-                #print value
             elif (prefix) == ('item.t'):
                 edge_t = value
                 edge_found = True
-                #print value
             elif (prefix) == ('item.i'):
                 edge_i = value
                 if edge_found:
@@ -265,11 +260,11 @@ class MyTestCase(unittest.TestCase):
                     edge_connected[edge_t] = 1
                     edge_found = False
 
-        print 'Response time (Edge search): ' + str(time.time() - start_time)
+        print('Response time (Edge search): ' + str(time.time() - start_time))
         start_time = time.time()
 
-        print edge_matches
-        print node_matches
+        print(edge_matches)
+        print(node_matches)
 
         self.assertTrue(niceCx is not None)
 

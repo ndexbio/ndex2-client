@@ -1,8 +1,8 @@
 __author__ = 'aarongary'
 
 import json
-from AttributeCommon import AttributeCommon
-from DataModelsUtil import DatamodelsUtil
+from model.cx.aspects.AttributeCommon import AttributeCommon
+from model.cx.aspects.DataModelsUtil import DatamodelsUtil
 from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 
 class NetworkAttributesElement(AttributeCommon):

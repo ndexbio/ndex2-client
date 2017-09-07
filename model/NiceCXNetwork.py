@@ -1,9 +1,9 @@
 __author__ = 'aarongary'
 
 import json
+import sys
 import pandas as pd
 import networkx as nx
-from StringIO import StringIO
 from model.metadata.MetaDataElement import MetaDataElement
 from model.cx.aspects.NameSpaces import NameSpaces
 from model.cx.aspects.NodesElement import NodesElement
@@ -15,6 +15,11 @@ from model.cx.aspects.SupportElement import SupportElement
 from model.cx.aspects.CitationElement import CitationElement
 from model.cx.aspects.AspectElement import AspectElement
 from model.cx import CX_CONSTANTS
+from io import StringIO
+
+#if sys.version_info.major == 3:
+#else:
+
 
 class NiceCXNetwork():
     def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, data=None, **attr):
@@ -331,6 +336,7 @@ class NiceCXNetwork():
         return output_cx
 
     def generateAspect(self, aspect_name):
+        print(aspect_name)
         core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'citations', 'metaData']
         aspect_element_array = []
         element_count = 0
@@ -348,24 +354,30 @@ class NiceCXNetwork():
                 for item in use_this_aspect:
                     add_this_element = item.to_json()
                     id = add_this_element.get(CX_CONSTANTS.ID)
-                    if id > element_id_max:
+                    if id is not None and id > element_id_max:
                         element_id_max = id
                     aspect_element_array.append(add_this_element)
                     element_count +=1
             else:
-                for k, v in use_this_aspect.iteritems():
+                items = None
+                if sys.version_info.major == 3:
+                    items = use_this_aspect.items()
+                else:
+                    items = use_this_aspect.iteritems()
+
+                for k, v in items:
                     if type(v) is list:
                         for v_item in v:
                             add_this_element = v_item.to_json()
                             id = add_this_element.get(CX_CONSTANTS.ID)
-                            if id > element_id_max:
+                            if id is not None and id > element_id_max:
                                 element_id_max = id
                             aspect_element_array.append(add_this_element)
                             element_count +=1
                     else:
                         add_this_element = v.to_json()
                         id = add_this_element.get(CX_CONSTANTS.ID)
-                        if id > element_id_max:
+                        if id is not None and id > element_id_max:
                             element_id_max = id
                         aspect_element_array.append(add_this_element)
                         element_count +=1
@@ -377,7 +389,13 @@ class NiceCXNetwork():
 
             if use_this_aspect is not None:
                 if type(use_this_aspect) is dict:
-                    for k, v in use_this_aspect.iteritems():
+                    items = None
+                    if sys.version_info.major == 3:
+                        items = use_this_aspect.items()
+                    else:
+                        items = use_this_aspect.iteritems()
+
+                    for k, v in items:
                         if type(v) is list:
                             aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: v})
                         else:
@@ -405,21 +423,19 @@ class NiceCXNetwork():
 
             self.addMetadata(mde)
 
-        print '%s ELEMENT COUNT: %s, MAX ID: %s' % (aspect_name, str(element_count), str(element_id_max))
+        print('%s ELEMENT COUNT: %s, MAX ID: %s' % (aspect_name, str(element_count), str(element_id_max)))
         return aspect
 
     def handleMetadataUpdate(self, aspect_name):
         aspect = self.string_to_aspect_object(aspect_name)
 
-
-        return_metadata = {
-            CX_CONSTANTS.CONSISTENCY_GROUP: consistency_group,
-            CX_CONSTANTS.ELEMENT_COUNT: 1,
-            CX_CONSTANTS.METADATA_NAME: "@context",
-            CX_CONSTANTS.PROPERTIES: [],
-            CX_CONSTANTS.VERSION: "1.0"
-        }
-
+        #return_metadata = {
+        #    CX_CONSTANTS.CONSISTENCY_GROUP: consistency_group,
+        #    CX_CONSTANTS.ELEMENT_COUNT: 1,
+        #    CX_CONSTANTS.METADATA_NAME: "@context",
+        #    CX_CONSTANTS.PROPERTIES: [],
+        #    CX_CONSTANTS.VERSION: "1.0"
+        #}
 
     def generate_metadata(self, G, unclassified_cx):
         #if self.metadata:

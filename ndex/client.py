@@ -7,6 +7,7 @@ from requests_toolbelt import MultipartEncoder
 import os
 import io
 import sys
+import decimal
 
 if sys.version_info.major == 3:
     from urllib.parse import urljoin
@@ -76,7 +77,6 @@ class Ndex:
         if username and password:
             # add credentials to the session, if available
             self.s.auth = (username, password)
-            self.user_base64 = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 
         if update_status:
             self.update_status()
@@ -247,6 +247,7 @@ class Ndex:
 # Network methods
 
     def save_new_network (self, cx):
+        print type(cx)
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):
                 if(cx[len(cx) - 1].get('status') is None):
@@ -260,7 +261,7 @@ class Ndex:
             if sys.version_info.major == 3:
                 stream = io.BytesIO(json.dumps(cx).encode('utf-8'))
             else:
-                stream = io.BytesIO(json.dumps(cx))
+                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 
             return self.save_cx_stream_as_new_network(stream)
         else:
@@ -679,5 +680,9 @@ class Ndex:
 
 
 
-
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
 

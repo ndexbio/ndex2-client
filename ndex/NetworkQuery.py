@@ -18,8 +18,9 @@ from model.metadata.MetaDataElement import MetaDataElement
 from model.cx.aspects.SupportElement import SupportElement
 from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 from model.cx.aspects.SimpleNode import SimpleNode
+from model.cx.aspects.AspectElement import AspectElement
 from model.cx import CX_CONSTANTS
-from model.cx import known_aspects
+from model.cx import known_aspects, known_aspects_min
 import time
 
 if sys.version_info.major == 3:
@@ -32,7 +33,7 @@ class NetworkQuery():
     def __init__(self):
         self.query = ''
 
-    def query_network1(self, uuid, search_string, max_edges):
+    def query_network_fast(self, uuid, search_string, max_edges):
         niceCx = NiceCXNetwork()
         #uuid = '7246d8cf-c644-11e6-b48c-0660b7976219'
         search_terms_dict = {k:1 for k in search_string.split(',')}
@@ -59,7 +60,7 @@ class NetworkQuery():
                 mde = MetaDataElement(json_obj=ae)
                 niceCx.addMetadata(mde)
 
-            opaque_aspects = set(available_aspects).difference(known_aspects)
+            opaque_aspects = set(available_aspects).difference(known_aspects_min)
 
             print(opaque_aspects)
 
@@ -80,6 +81,8 @@ class NetworkQuery():
             parser = self.streamAspectRaw(uuid, 'edges')
 
             for prefix, event, value in parser:
+                # process event, prefix and value
+
                 if(event == 'end_map'):
                     e_count += 1
                     if e_count % 5000 == 0:
@@ -172,8 +175,8 @@ class NetworkQuery():
                 mde = MetaDataElement(json_obj=ae)
                 niceCx.addMetadata(mde)
 
-            available_aspects = ['edges', 'nodes'] # TODO - remove this
-            opaque_aspects = set(available_aspects).difference(known_aspects)
+            #available_aspects = ['edges', 'nodes'] # TODO - remove this
+            opaque_aspects = set(available_aspects).difference(known_aspects_min)
 
             print(opaque_aspects)
 
@@ -197,7 +200,7 @@ class NetworkQuery():
             start_time = time.time()
             if 'edges' in available_aspects:
                 for ae in (o for o in self.streamAspect(uuid, 'edges')):
-                    if niceCx.nodes.get(ae.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID)) is not None or niceCx.nodes.get(ae.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID)) is not None:
+                    if niceCx.nodes.get(ae.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)) is not None or niceCx.nodes.get(ae.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID)) is not None:
                         add_this_edge = EdgesElement(json_obj=ae)
                         niceCx.addEdge(add_this_edge)
                         added_edges += 1
@@ -282,6 +285,16 @@ class NetworkQuery():
                 for ae in (o for o in self.streamAspect(uuid, 'citations')):
                     add_this_citation = CitationElement(json_obj=ae)
                     niceCx.addCitation(add_this_citation)
+
+            #===================
+            # OPAQUE ASPECTS
+            #===================
+            for oa in opaque_aspects:
+                objects = self.streamAspect(uuid, oa)
+                obj_items = (o for o in objects)
+                for oa_item in obj_items:
+                    aspect_element = AspectElement(oa_item, oa)
+                    niceCx.addOpapqueAspect(aspect_element)
 
         except SolrError as se:
             if('404' in se.message):

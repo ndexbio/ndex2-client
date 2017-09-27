@@ -21,16 +21,30 @@ known_aspects = [
     'visualProperties'
     ]
 
+known_aspects_min = [
+    'nodes',
+    'edges',
+    'nodeAttributes',
+    'edgeAttributes',
+    'networkAttributes',
+    'provenanceHistory',
+    'citations',
+    'nodeCitations',
+    'edgeCitations',
+    'supports',
+    'nodeSupports',
+    'edgeSupports'
+    ]
+
 class CX_CONSTANTS(str, Enum):
     ID = '@id'
     NAME = 'n'
     VALUE = 'v'
     NODE_REPRESENTS = 'r'
     EDGE_INTERACTION = 'i'
-    EDGE_SOURCE_NODE_ID = 's'
+    EDGE_SOURCE_NODE_ID_OR_SUBNETWORK = 's'
     EDGE_TARGET_NODE_ID = 't'
     PROPERTY_OF = 'po'
-    SUBNETWORK = 's'
     DATA_TYPE = 'd'
     CITATION_TITLE = "dc:title"
     CITATION_CONTRIBUTOR = "dc:contributor"

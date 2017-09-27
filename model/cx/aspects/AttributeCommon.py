@@ -9,7 +9,7 @@ class AttributeCommon(object):
         if json_obj is not None:
             data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(json_obj.get(CX_CONSTANTS.VALUE))
             self._property_of = json_obj.get(CX_CONSTANTS.PROPERTY_OF)
-            self._subnetwork = json_obj.get(CX_CONSTANTS.SUBNETWORK)
+            self._subnetwork = json_obj.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)
             self._name = json_obj.get(CX_CONSTANTS.NAME)
             self._values = json_obj.get(CX_CONSTANTS.VALUE)
             self._data_type = data_type
@@ -80,7 +80,7 @@ class AttributeCommon(object):
             return_dict[CX_CONSTANTS.DATA_TYPE] = self._data_type.value
 
         if self._subnetwork:
-            return_dict[CX_CONSTANTS.SUBNETWORK] = self._subnetwork
+            return_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK] = self._subnetwork
 
         if self.isSingleValue():
             return_dict[CX_CONSTANTS.VALUE] = self.getValues()

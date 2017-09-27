@@ -26,7 +26,7 @@ class EdgesElement(object):
 
         if json_obj is not None:
             if type(json_obj) is dict:
-                self._source = json_obj.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID)
+                self._source = json_obj.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)
                 self._target = json_obj.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID)
                 self._interaction = json_obj.get(CX_CONSTANTS.EDGE_INTERACTION)
                 if json_obj.get(CX_CONSTANTS.ID) is not None:
@@ -76,7 +76,7 @@ class EdgesElement(object):
         }
 
         if self._source is not None:
-            node_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID] = self._source
+            node_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK] = self._source
 
         if self._target is not None:
             node_dict[CX_CONSTANTS.EDGE_TARGET_NODE_ID] = self._target

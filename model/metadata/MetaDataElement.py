@@ -3,7 +3,8 @@ import json
 from model.cx import CX_CONSTANTS
 
 class MetaDataElement(object):
-    def __init__(self, elementCount=None, idCounter=None, properties=None, version=None, consistencyGroup=None, lastUpdate=None, name=None, json_obj=None):
+    def __init__(self, elementCount=None, idCounter=None, properties=None, version=None, consistencyGroup=1, lastUpdate=None, name=None, json_obj=None):
+        print consistencyGroup
         if json_obj is not None:
             self.element_count = json_obj.get(CX_CONSTANTS.ELEMENT_COUNT)
             self.properties = json_obj.get(CX_CONSTANTS.PROPERTIES)
@@ -46,11 +47,14 @@ class MetaDataElement(object):
         self.consistencyGroup = cg
 
     def incrementConsistencyGroup(self):
+        raise Exception('metadata should not be incremented')
         if self.consistencyGroup:
             if type(self.consistencyGroup) is int:
                 self.consistencyGroup += 1
             else:
                 self.consistencyGroup = int(self.consistencyGroup) + 1
+        else:
+            self.consistencyGroup = 0
 
     def setElementCount(self, ec):
         self.element_count = ec
@@ -82,8 +86,8 @@ class MetaDataElement(object):
         if self.version:
             node_dict[CX_CONSTANTS.VERSION] = self.version
 
-        if self.consistencyGroup:
-            node_dict[CX_CONSTANTS.CONSISTENCY_GROUP] = self.consistencyGroup
+        #if self.consistencyGroup is not None:
+        node_dict[CX_CONSTANTS.CONSISTENCY_GROUP] = self.consistencyGroup
 
         if self.name:
             node_dict[CX_CONSTANTS.METADATA_NAME] = self.name

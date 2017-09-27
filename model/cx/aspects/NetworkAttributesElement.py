@@ -7,7 +7,7 @@ from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 
 class NetworkAttributesElement(AttributeCommon):
     def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
-        super(NetworkAttributesElement, self).__init__(subnetwork=subnetwork, property_of=property_of, name=None, values=values, type=type, json_obj=json_obj)
+        super(NetworkAttributesElement, self).__init__(subnetwork=subnetwork, property_of=property_of, name=name, values=values, type=type, json_obj=json_obj)
         self.ASPECT_NAME = 'networkAttributes'
 
     def __str__(self):

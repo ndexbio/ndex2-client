@@ -20,13 +20,14 @@ from model.metadata.MetaDataElement import MetaDataElement
 from model.cx.aspects import ATTRIBUTE_DATA_TYPE
 from model.cx.aspects.SimpleNode import SimpleNode
 from model.cx import CX_CONSTANTS
-from model.cx import known_aspects
+from model.cx import known_aspects, known_aspects_min
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
         build_opener, install_opener, HTTPError, URLError
 else:
-    from urllib2 import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, build_opener, install_opener
+    from urllib2 import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
+        build_opener, install_opener, HTTPError, URLError
 
 
 class NiceCXBuilder():
@@ -51,14 +52,17 @@ class NiceCXBuilder():
             #===================
             # METADATA
             #===================
-            #available_aspects = []
-            #for ae in (o for o in self.streamAspect(uuid, 'metaData')):
-            #    available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
-            #    mde = MetaDataElement(json_obj=ae)
-            #    niceCx.addMetadata(mde)
+            available_aspects = []
+            for ae in (o for o in self.streamAspect(uuid, 'metaData')):
+                available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
+                mde = MetaDataElement(json_obj=ae)
+                niceCx.addMetadata(mde)
+
             #available_aspects = ['edges', 'nodes'] # TODO - remove this
-            #opaque_aspects = set(available_aspects).difference(known_aspects)
-            opaque_aspects = set([])
+            opaque_aspects = set(available_aspects).difference(known_aspects_min)
+
+            print(opaque_aspects)
+
             #====================
             # NETWORK ATTRIBUTES
             #====================
@@ -146,7 +150,7 @@ class NiceCXBuilder():
                 niceCx.addEdgeCitationsFromCX(edge_cit)
 
             #===================
-            # OPAQUE CITATIONS
+            # OPAQUE ASPECTS
             #===================
             for oa in opaque_aspects:
                 objects = self.streamAspect(uuid, oa)
@@ -229,39 +233,40 @@ class NiceCXBuilder():
             json_respone = md_response.json()
             return json_respone.get('metaData')
         else:
-            # create a password manager
-            password_mgr = HTTPPasswordMgrWithDefaultRealm()
+            #password_mgr = HTTPPasswordMgrWithDefaultRealm()
 
-            # Add the username and password.
-            # If we knew the realm, we could use it instead of None.
-            top_level_url = 'http://dev2.ndexbio.org/v2/'
-            password_mgr.add_password(None, top_level_url, self.username, self.password)
+            #top_level_url = 'http://dev2.ndexbio.org'
+            #password_mgr.add_password(None, top_level_url, self.username, self.password)
+            #handler = HTTPBasicAuthHandler(password_mgr)
+            #opener = build_opener(handler)
+            #install_opener(opener)
 
-            handler = HTTPBasicAuthHandler(password_mgr)
 
-            # create "opener" (OpenerDirector instance)
-            opener = build_opener(handler)
 
-            # use the opener to fetch a URL
-            #opener.open('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
 
-            # Install the opener.
-            # Now all calls to urllib.request.urlopen use our opener.
-            install_opener(opener)
+
+            # Create an OpenerDirector with support for Basic HTTP Authentication...
+            #auth_handler = HTTPBasicAuthHandler()
+            #auth_handler.add_password(None, 'http://dev2.ndexbio.org', 'scratch', 'scratch')
+            #opener = build_opener(auth_handler)
+            # ...and install it globally so it can be used with urlopen.
+            #install_opener(opener)
+
+
+            request = Request('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
+            base64string = base64.b64encode('%s:%s' % ('scratch', 'scratch'))
+            request.add_header("Authorization", "Basic %s" % base64string)
+            #result = urllib2.urlopen(request)
+
 
             urlopen_result = None
             try:
-                request = Request('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
-                # request.add_header('Authorization', 'Basic %s' % self.user_base64)
-                urlopen_result = urlopen(request)
+                urlopen_result = urlopen(request) #'http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
             except HTTPError as e:
-                if e.code == 404:
-                    print('404 Error')
-                    return []
-                else:
-                    return []
-
+                print(e.code)
+                return []
             except URLError as e:
+                print('Other error')
                 print('URL Error %s' % e.message())
                 return []
 

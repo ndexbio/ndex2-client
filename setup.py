@@ -23,7 +23,7 @@ if __name__ == '__main__':
         # Versions should comply with PEP440.  For a discussion on single-sourcing
         # the version across setup.py and the project code, see
         # https://packaging.python.org/en/latest/single_source_version.html
-        version='0.0.1a.5',
+        version='0.0.1b.2',
 
         description='Nice CX Python includes a client and a data model.',
         long_description=long_description,
@@ -44,7 +44,7 @@ if __name__ == '__main__':
             #   3 - Alpha
             #   4 - Beta
             #   5 - Production/Stable
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Beta',
 
             # Indicate who your project is intended for
             'Intended Audience :: Science/Research',
@@ -72,7 +72,7 @@ if __name__ == '__main__':
             'enum',
             'requests',
             'requests_toolbelt',
-            'networkx',
+            'networkx==1.11',
             'urllib3>=1.16',
             'pandas',
             'networkx'

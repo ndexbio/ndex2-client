@@ -355,7 +355,7 @@ class NiceCXNetwork(object):
         else:
             raise Exception(', '.join(error_message) + 'not specified in apply_template')
 
-    def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[]):
+    def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[], edge_interaction=None):
         """
         Constructor that uses a pandas dataframe to build niceCX
         :param df: dataframe
@@ -376,7 +376,7 @@ class NiceCXNetwork(object):
         if source_field and target_field:
             for index, row in df.iterrows():
                 if count % 10000 == 0:
-                    print count
+                    print(count)
                 count += 1
                 #=============
                 # ADD NODES
@@ -387,7 +387,7 @@ class NiceCXNetwork(object):
                 #=============
                 # ADD EDGES
                 #=============
-                self.addEdge(id=index, edge_source=row[source_field], edge_target=row[target_field], edge_interaction='interacts-with')
+                self.addEdge(id=index, edge_source=row[source_field], edge_target=row[target_field], edge_interaction=row[edge_interaction])
 
                 #==============================
                 # ADD SOURCE NODE ATTRIBUTES
@@ -869,11 +869,11 @@ class NiceCXNetwork(object):
             try:
                 return_bytes = io.BytesIO(json.dumps(cx))
             except UnicodeDecodeError as err1:
-                print "Detected invalid encoding. Trying latin-1 encoding."
+                print("Detected invalid encoding. Trying latin-1 encoding.")
                 return_bytes = io.BytesIO(json.dumps(cx, encoding="latin-1"))
-                print "Success"
+                print("Success")
             except Exception as err2:
-                print err2.message
+                print(err2.message)
 
             return return_bytes
 
@@ -903,7 +903,7 @@ class NiceCXNetwork(object):
     def upload_new_network_stream(self, server, username, password):
         response = ncs.postNiceCxStream(self)
 
-        print response
+        print(response)
 
     def update_to(self, uuid, server, username, password):
         """ Upload this network to the specified server to the account specified by username and password.
@@ -967,7 +967,7 @@ class NiceCXNetwork(object):
             if n_a:
                 for na_item in n_a:
                     node_attrs[na_item.getName()] = na_item.getValues()
-                    print v
+                    #print(v)
                     my_name = v.getName()
                 G.add_node(k, node_attrs, name=v.getName())
 
@@ -998,7 +998,7 @@ class NiceCXNetwork(object):
         return G
 
     def __str__(self):
-        return json.dumps(self.to_json())
+        return json.dumps(self.to_json(), cls=DecimalEncoder)
 
     def to_json(self):
         output_cx = [{"numberVerification": [{"longNumber": 281474976710655}]}]
@@ -1589,7 +1589,11 @@ class NiceCXNetwork(object):
             return ijson.items(urlopen_result, 'item')
 
 class DecimalEncoder(json.JSONEncoder):
+
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return float(o)
+        if sys.version_info.major == 3:
+            if isinstance(o, np.int64):
+                return int(o)
         return super(DecimalEncoder, self).default(o)

@@ -247,7 +247,7 @@ class Ndex2:
 # Network methods
 
     def save_new_network (self, cx):
-        print type(cx)
+        #print type(cx)
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):
                 if(cx[len(cx) - 1].get('status') is None):

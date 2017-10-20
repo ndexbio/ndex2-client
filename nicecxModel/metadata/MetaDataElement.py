@@ -4,7 +4,6 @@ from nicecxModel.cx import CX_CONSTANTS
 
 class MetaDataElement(object):
     def __init__(self, elementCount=None, idCounter=None, properties=None, version=None, consistencyGroup=1, lastUpdate=None, name=None, json_obj=None):
-        print consistencyGroup
         if json_obj is not None:
             self.element_count = json_obj.get(CX_CONSTANTS.ELEMENT_COUNT)
             self.properties = json_obj.get(CX_CONSTANTS.PROPERTIES)

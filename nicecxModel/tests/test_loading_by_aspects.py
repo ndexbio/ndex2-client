@@ -252,7 +252,21 @@ class TestLoadByAspects(unittest.TestCase):
             {"status":[{"error":"","success":True}]}
         ]
 
-        niceCx = NiceCXNetwork(cx=my_cx)
+        #niceCx = NiceCXNetwork(cx=my_cx)
 
-        upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+        #data = [('Source', 'Target', 'interaction', 'EdgeProp'), ('ABC', 'DEF', 'interacts-with', 'Edge property 1'), ('DEF', 'XYZ', 'neighbor-of', 'Edge property 2')]
+        #df = pd.DataFrame.from_records(data)
+        #niceCx = NiceCXNetwork(pandas_df=df)
+
+        df = pd.DataFrame.from_items([('Source', ['ABC', 'DEF']),
+                                        ('Target', ['DEF', 'XYZ']),
+                                        ('Interaction', ['interacts-with', 'neighbor-of']),
+                                        ('EdgeProp', ['Edge property 1', 'Edge property 2'])])
+
+        niceCx = NiceCXNetwork()
+        niceCx.create_from_pandas(df, source_field='Source', target_field='Target', edge_attr=['EdgeProp'], edge_interaction='Interaction')
+
+        niceCx = NiceCXNetwork(server='public.ndexbio.org', uuid='f1dd6cc3-0007-11e6-b550-06603eb7f303')
+
+        #upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         print niceCx

@@ -2,9 +2,11 @@ __author__ = 'aarongary'
 
 import json
 import sys
+import os
+import errno
 import pandas as pd
 import networkx as nx
-import nicecxNdex.client as nc
+import ndex2.client as nc
 import io
 import decimal
 import numpy as np
@@ -36,11 +38,12 @@ else:
         build_opener, install_opener, HTTPError, URLError
 
 class NiceCXNetwork(object):
-    def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, data=None, **attr):
+    def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, pandas_df=None, filename=None, data=None, **attr):
         self.metadata = {}
         self.namespaces = NameSpaces()
         self.nodes = {}
         self.node_int_id_generator = set([])
+        self.edge_int_id_generator = set([])
         self.node_id_lookup = []
         self.edges = {}
         self.citations = {}
@@ -52,6 +55,7 @@ class NiceCXNetwork(object):
         self.nodeAttributes = {}
         self.edgeAttributes = {}
         self.edgeAttributeHeader = set([])
+        self.nodeAttributeHeader = set([])
         self.networkAttributes = []
         self.nodeAssociatedAspects = {}
         self.edgeAssociatedAspects = {}
@@ -59,58 +63,93 @@ class NiceCXNetwork(object):
         self.provenance = None
         self.missingNodes = {}
 
-    def addNode(self, node):
-        if type(node) is NodesElement:
-            self.nodes[node.getId()] = node
+        if cx:
+            self.create_from_cx(cx)
+        elif networkx_G:
+            self.create_from_networkx(networkx_G)
+        elif pandas_df is not None:
+            self.create_from_pandas(pandas_df)
+        elif filename is not None:
+            if os.path.isfile(filename):
+                with open(filename, 'rU') as file_cx:
+                    #====================================
+                    # BUILD NICECX FROM FILE
+                    #====================================
+                    self.create_from_cx(json.load(file_cx))
+            else:
+                raise Exception('Input provided is not a valid file')
+        else:
+            if server and uuid:
+                self.create_from_server(server, username, password, uuid)
 
-            if type(node.getId()) is str:
-                self.node_int_id_generator.add(node.getId())
+    def addNode(self, node_element=None, id=None, node_name=None, node_represents=None, json_obj=None):
+        if node_element is None:
+            node_element = NodesElement(id=id, node_name=node_name, node_represents=node_represents, json_obj=json_obj)
 
-            if self.missingNodes.get(node.getId()) is not None:
-                self.missingNodes.pop(node.getId(), None)
+        if type(node_element) is NodesElement:
+            self.nodes[node_element.getId()] = node_element
+
+            if type(node_element.getId()) is str:
+                self.node_int_id_generator.add(node_element.getId())
+
+            if self.missingNodes.get(node_element.getId()) is not None:
+                self.missingNodes.pop(node_element.getId(), None)
+
+            return node_element.getId()
         else:
             raise Exception('Provided input was not of type NodesElement.')
 
-    def addEdge(self, edge):
-        if type(edge) is EdgesElement:
-            self.edges[edge.getId()] = edge
+    def addEdge(self, edge_element=None, id=None, edge_source=None, edge_target=None, edge_interaction=None, json_obj=None):
+        if edge_element is None:
+            edge_element = EdgesElement(id=id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction, json_obj=json_obj)
 
-            if self.nodes.get(edge.getSource()) is None:
-                self.missingNodes[edge.getSource()] = 1
+        if type(edge_element) is EdgesElement:
+            if edge_element.getId() < 0:
+                edge_element.setId(len(self.edges.keys()))
+            self.edges[edge_element.getId()] = edge_element
 
-            if self.nodes.get(edge.getTarget()) is None:
-                self.missingNodes[edge.getTarget()] = 1
+            if self.nodes.get(edge_element.getSource()) is None:
+                self.missingNodes[edge_element.getSource()] = 1
+
+            if self.nodes.get(edge_element.getTarget()) is None:
+                self.missingNodes[edge_element.getTarget()] = 1
+
+            return edge_element.getId()
         else:
             raise Exception('Provided input was not of type EdgesElement.')
 
-    def addNetworkAttribute(self, network_attribute):
-        if type(network_attribute) is NetworkAttributesElement:
-            self.networkAttributes.append(network_attribute)
-        else:
-            raise Exception('Provided input was not of type NetworkAttributesElement.')
+    def addNetworkAttribute(self, network_attribute_element=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
+        if network_attribute_element is None:
+            network_attribute_element = NetworkAttributesElement(subnetwork=subnetwork, property_of=property_of,
+                                                                 name=name, values=values, type=type, json_obj=json_obj)
 
-    def addNodeAttribute(self, node_attribute, i=None):
-        if type(node_attribute) is NodeAttributesElement:
-            nodeAttrs = self.nodeAttributes.get(node_attribute.getPropertyOf())
-            if nodeAttrs is None:
-                nodeAttrs = []
-                self.nodeAttributes[node_attribute.getPropertyOf()] = nodeAttrs
+        self.networkAttributes.append(network_attribute_element)
 
-            nodeAttrs.append(node_attribute)
-        else:
-            raise Exception('Provided input was not of type NodeAttributesElement.')
+    def addNodeAttribute(self, node_attribute_element=None, i=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
+        if node_attribute_element is None:
+            node_attribute_element = NodeAttributesElement(subnetwork=subnetwork, property_of=property_of, name=name,
+                                                           values=values, type=type, json_obj=json_obj)
 
-    def addEdgeAttribute(self, edge_attribute, i=None):
-        if type(edge_attribute) is EdgeAttributesElement:
-            self.edgeAttributeHeader.add(edge_attribute.getName())
-            edgeAttrs = self.edgeAttributes.get(edge_attribute.getPropertyOf())
-            if edgeAttrs is None:
-                    edgeAttrs = []
-                    self.edgeAttributes[edge_attribute.getPropertyOf()] = edgeAttrs
+        self.nodeAttributeHeader.add(node_attribute_element.getName())
+        nodeAttrs = self.nodeAttributes.get(node_attribute_element.getPropertyOf())
+        if nodeAttrs is None:
+            nodeAttrs = []
+            self.nodeAttributes[node_attribute_element.getPropertyOf()] = nodeAttrs
 
-            edgeAttrs.append(edge_attribute)
-        else:
-            raise Exception('Provided input was not of type EdgeAttributesElement.')
+        nodeAttrs.append(node_attribute_element)
+
+    def addEdgeAttribute(self, edge_attribute_element=None, i=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
+        if edge_attribute_element is None:
+            edge_attribute_element = EdgeAttributesElement(subnetwork=subnetwork, property_of=property_of, name=name,
+                                                           values=values, type=type, json_obj=json_obj)
+
+        self.edgeAttributeHeader.add(edge_attribute_element.getName())
+        edgeAttrs = self.edgeAttributes.get(edge_attribute_element.getPropertyOf())
+        if edgeAttrs is None:
+                edgeAttrs = []
+                self.edgeAttributes[edge_attribute_element.getPropertyOf()] = edgeAttrs
+
+        edgeAttrs.append(edge_attribute_element)
 
     def addSupport(self, support_element):
         if type(support_element) is SupportElement:
@@ -189,10 +228,17 @@ class NiceCXNetwork(object):
 
         elmts.append(elmt)
 
-    def set_name(self, network_name):
+    def setName(self, network_name):
         add_this_network_attribute = NetworkAttributesElement(name='name', values=network_name, type=ATTRIBUTE_DATA_TYPE.STRING)
 
-        self.addNetworkAttribute(add_this_network_attribute)
+        self.addNetworkAttribute(name='name', values=network_name, type=ATTRIBUTE_DATA_TYPE.STRING)
+
+    def getName(self):
+        for net_a in self.networkAttributes:
+            if net_a.getName() == 'name':
+                return net_a.getValues()
+
+        return None
 
     def getMetadata(self):
         return self.metadata
@@ -236,6 +282,9 @@ class NiceCXNetwork(object):
 
     def getEdgeAttributes(self):
         return self.edgeAttributes
+
+    def getEdgeAttributesById(self, id):
+        return self.edgeAttributes.get(id)
 
     def getNodeAssociatedAspects(self):
         return self.nodeAssociatedAspects
@@ -321,7 +370,7 @@ class NiceCXNetwork(object):
         # IF NODE FIELD NAME (SOURCE AND TARGET) IS PROVIDED
         # THEN USE THOSE FIELDS OTHERWISE USE INDEX 0 & 1
         #====================================================
-        self.set_name('Pandas Upload')
+        self.setName('Pandas Upload')
         self.add_metadata_stub('networkAttributes')
         count = 0
         if source_field and target_field:
@@ -332,53 +381,69 @@ class NiceCXNetwork(object):
                 #=============
                 # ADD NODES
                 #=============
-                self.addNode(NodesElement(id=row[source_field], node_name=row[source_field], node_represents=row[source_field]))
-                self.addNode(NodesElement(id=row[target_field], node_name=row[target_field], node_represents=row[target_field]))
+                self.addNode(id=row[source_field], node_name=row[source_field], node_represents=row[source_field])
+                self.addNode(id=row[target_field], node_name=row[target_field], node_represents=row[target_field])
 
                 #=============
                 # ADD EDGES
                 #=============
-                self.addEdge(EdgesElement(id=index, edge_source=row[source_field], edge_target=row[target_field], edge_interaction='interacts-with'))
+                self.addEdge(id=index, edge_source=row[source_field], edge_target=row[target_field], edge_interaction='interacts-with')
 
                 #==============================
                 # ADD SOURCE NODE ATTRIBUTES
                 #==============================
                 for sp in source_node_attr:
+                    attr_type = None
                     if type(row[sp]) is float and math.isnan(row[sp]):
                         row[sp] = ''
-                    self.addNodeAttribute(NodeAttributesElement(property_of=row[source_field], name=sp, values=row[sp], type=None))
+                        attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                    elif type(row[sp]) is float and math.isinf(row[sp]):
+                        row[sp] = 'Inf'
+                        attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                    self.addNodeAttribute(property_of=row[source_field], name=sp, values=row[sp], type=attr_type)
 
                 #==============================
                 # ADD TARGET NODE ATTRIBUTES
                 #==============================
                 for tp in target_node_attr:
+                    attr_type = None
                     if type(row[tp]) is float and math.isnan(row[tp]):
                         row[tp] = ''
-                    self.addNodeAttribute(NodeAttributesElement(property_of=row[target_field], name=tp, values=row[tp], type=None))
+                        attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                    elif type(row[tp]) is float and math.isinf(row[tp]):
+                        row[tp] = 'Inf'
+                        attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                    self.addNodeAttribute(property_of=row[target_field], name=tp, values=row[tp], type=attr_type)
 
                 #==============================
                 # ADD EDGE ATTRIBUTES
                 #==============================
                 for ep in edge_attr:
+                    attr_type = None
                     if type(row[ep]) is float and math.isnan(row[ep]):
                         row[ep] = ''
-                    self.addEdgeAttribute(EdgeAttributesElement(property_of=index, name=ep, values=row[ep], type=None))
+                        attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                    elif type(row[ep]) is float and math.isinf(row[ep]):
+                        row[ep] = 'INFINITY'
+                        attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+
+                    self.addEdgeAttribute(property_of=index, name=ep, values=row[ep], type=attr_type)
 
         else:
             for index, row in df.iterrows():
                 #=============
                 # ADD NODES
                 #=============
-                self.addNode(NodesElement(id=row[0], node_name=row[0], node_represents=row[0]))
-                self.addNode(NodesElement(id=row[1], node_name=row[1], node_represents=row[1]))
+                self.addNode(id=row[0], node_name=row[0], node_represents=row[0])
+                self.addNode(id=row[1], node_name=row[1], node_represents=row[1])
 
                 #=============
                 # ADD EDGES
                 #=============
                 if len(row) > 2:
-                    self.addEdge(EdgesElement(id=index, edge_source=row[0], edge_target=row[1], edge_interaction=row[2]))
+                    self.addEdge(id=index, edge_source=row[0], edge_target=row[1], edge_interaction=row[2])
                 else:
-                    self.addEdge(EdgesElement(id=index, edge_source=row[0], edge_target=row[1], edge_interaction='interacts-with'))
+                    self.addEdge(id=index, edge_source=row[0], edge_target=row[1], edge_interaction='interacts-with')
 
         self.add_metadata_stub('nodes')
         self.add_metadata_stub('edges')
@@ -395,32 +460,32 @@ class NiceCXNetwork(object):
         :return: none
         :rtype: none
         """
-        self.set_name('Networkx Upload')
+        self.setName('Networkx Upload')
         self.add_metadata_stub('networkAttributes')
         for n, d in G.nodes_iter(data=True):
             #=============
             # ADD NODES
             #=============
-            self.addNode(NodesElement(id=n, node_name=n, node_represents=n))
+            self.addNode(id=n, node_name=n, node_represents=n)
 
             #======================
             # ADD NODE ATTRIBUTES
             #======================
             for k,v in d.items():
-                self.addNodeAttribute(NodeAttributesElement(property_of=n, name=k, values=v))
+                self.addNodeAttribute(property_of=n, name=k, values=v)
 
         index = 0
         for u, v, d in G.edges_iter(data=True):
             #=============
             # ADD EDGES
             #=============
-            self.addEdge(EdgesElement(id=index, edge_source=u, edge_target=v, edge_interaction=d.get('interaction')))
+            self.addEdge(id=index, edge_source=u, edge_target=v, edge_interaction=d.get('interaction'))
 
             #==============================
             # ADD EDGE ATTRIBUTES
             #==============================
             for k,v in d.items():
-                self.addEdgeAttribute(EdgeAttributesElement(property_of=index, name=k, values=v))
+                self.addEdgeAttribute(property_of=index, name=k, values=v)
 
             index += 1
 
@@ -452,9 +517,9 @@ class NiceCXNetwork(object):
                 objects = self.streamAspect(uuid, 'networkAttributes', server, username, password)
                 obj_items = (o for o in objects)
                 for network_item in obj_items:
-                    add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
+                    #add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
 
-                    self.addNetworkAttribute(add_this_network_attribute)
+                    self.addNetworkAttribute(json_obj=network_item)
                 self.add_metadata_stub('networkAttributes')
 
             #===================
@@ -464,9 +529,9 @@ class NiceCXNetwork(object):
                 objects = self.streamAspect(uuid, 'nodes', server, username, password)
                 obj_items = (o for o in objects)
                 for node_item in obj_items:
-                    add_this_node = NodesElement(json_obj=node_item)
+                    #add_this_node = NodesElement(json_obj=node_item)
 
-                    self.addNode(add_this_node)
+                    self.addNode(json_obj=node_item)
                 self.add_metadata_stub('nodes')
 
             #===================
@@ -476,9 +541,9 @@ class NiceCXNetwork(object):
                 objects = self.streamAspect(uuid, 'edges', server, username, password)
                 obj_items = (o for o in objects)
                 for edge_item in obj_items:
-                    add_this_edge = EdgesElement(json_obj=edge_item)
+                    #add_this_edge = EdgesElement(json_obj=edge_item)
 
-                    self.addEdge(add_this_edge)
+                    self.addEdge(json_obj=edge_item)
                 self.add_metadata_stub('edges')
 
             #===================
@@ -488,9 +553,9 @@ class NiceCXNetwork(object):
                 objects = self.streamAspect(uuid, 'nodeAttributes', server, username, password)
                 obj_items = (o for o in objects)
                 for att in obj_items:
-                    add_this_node_att = NodeAttributesElement(json_obj=att)
+                    #add_this_node_att = NodeAttributesElement(json_obj=att)
 
-                    self.addNodeAttribute(add_this_node_att)
+                    self.addNodeAttribute(json_obj=att)
                 self.add_metadata_stub('nodeAttributes')
 
             #===================
@@ -500,9 +565,9 @@ class NiceCXNetwork(object):
                 objects = self.streamAspect(uuid, 'edgeAttributes', server, username, password)
                 obj_items = (o for o in objects)
                 for att in obj_items:
-                    add_this_edge_att = EdgeAttributesElement(json_obj=att)
+                    #add_this_edge_att = EdgeAttributesElement(json_obj=att)
 
-                    self.addEdgeAttribute(add_this_edge_att)
+                    self.addEdgeAttribute(json_obj=att)
                 self.add_metadata_stub('edgeAttributes')
 
             #===================
@@ -528,6 +593,17 @@ class NiceCXNetwork(object):
 
                     self.addSupport(add_this_supports)
                 self.add_metadata_stub('supports')
+
+            #===================
+            # EDGE SUPPORTS
+            #===================
+            if 'edgeSupports' in available_aspects:
+                objects = self.streamAspect(uuid, 'edgeSupports', server, username, password)
+                obj_items = (o for o in objects)
+                for add_this_edge_sup in obj_items:
+                    self.addEdgeSupports(add_this_edge_sup)
+
+                self.add_metadata_stub('edgeSupports')
 
             #===================
             # NODE CITATIONS
@@ -562,24 +638,210 @@ class NiceCXNetwork(object):
         else:
             raise Exception('Server and uuid not specified')
 
+    def create_from_cx(self, cx):
+        if cx:
+            #===================
+            # METADATA
+            #===================
+            available_aspects = []
+            for ae in (o for o in self.get_frag_from_list_by_key(cx, 'metaData')):
+                available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
+                mde = MetaDataElement(json_obj=ae)
+                self.addMetadata(mde)
+
+            opaque_aspects = set(available_aspects).difference(known_aspects_min)
+
+            #====================
+            # NETWORK ATTRIBUTES
+            #====================
+            if 'networkAttributes' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'networkAttributes')
+                obj_items = (o for o in objects)
+                for network_item in obj_items:
+                    add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
+
+                    self.addNetworkAttribute(network_attribute_element=add_this_network_attribute)
+                self.add_metadata_stub('networkAttributes')
+
+            #===================
+            # NODES
+            #===================
+            if 'nodes' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'nodes')
+                obj_items = (o for o in objects)
+                for node_item in obj_items:
+                    #add_this_node = NodesElement(json_obj=node_item)
+
+                    self.addNode(json_obj=node_item)
+                self.add_metadata_stub('nodes')
+
+            #===================
+            # EDGES
+            #===================
+            if 'edges' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'edges')
+                obj_items = (o for o in objects)
+                for edge_item in obj_items:
+                    #add_this_edge = EdgesElement(json_obj=edge_item)
+
+                    self.addEdge(json_obj=edge_item)
+                self.add_metadata_stub('edges')
+
+            #===================
+            # NODE ATTRIBUTES
+            #===================
+            if 'nodeAttributes' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'nodeAttributes')
+                obj_items = (o for o in objects)
+                for att in obj_items:
+                    #add_this_node_att = NodeAttributesElement(json_obj=att)
+
+                    self.addNodeAttribute(json_obj=att)
+                self.add_metadata_stub('nodeAttributes')
+
+            #===================
+            # EDGE ATTRIBUTES
+            #===================
+            if 'edgeAttributes' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'edgeAttributes')
+                obj_items = (o for o in objects)
+                for att in obj_items:
+                    #add_this_edge_att = EdgeAttributesElement(json_obj=att)
+
+                    self.addEdgeAttribute(json_obj=att)
+                self.add_metadata_stub('edgeAttributes')
+
+            #===================
+            # CITATIONS
+            #===================
+            if 'citations' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'citations')
+                obj_items = (o for o in objects)
+                for cit in obj_items:
+                    add_this_citation = CitationElement(json_obj=cit)
+
+                    self.addCitation(add_this_citation)
+                self.add_metadata_stub('citations')
+
+            #===================
+            # SUPPORTS
+            #===================
+            if 'supports' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'supports')
+                obj_items = (o for o in objects)
+                for sup in obj_items:
+                    add_this_supports = SupportElement(json_obj=sup)
+
+                    self.addSupport(add_this_supports)
+                self.add_metadata_stub('supports')
+
+            #===================
+            # EDGE SUPPORTS
+            #===================
+            if 'edgeSupports' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'edgeSupports')
+                obj_items = (o for o in objects)
+                for add_this_edge_sup in obj_items:
+                    self.addEdgeSupports(add_this_edge_sup)
+
+                self.add_metadata_stub('edgeSupports')
+
+            #===================
+            # NODE CITATIONS
+            #===================
+            if 'nodeCitations' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'nodeCitations')
+                obj_items = (o for o in objects)
+                for node_cit in obj_items:
+                    self.addNodeCitationsFromCX(node_cit)
+                self.add_metadata_stub('nodeCitations')
+
+            #===================
+            # EDGE CITATIONS
+            #===================
+            if 'edgeCitations' in available_aspects:
+                objects = self.get_frag_from_list_by_key(cx, 'edgeCitations')
+                obj_items = (o for o in objects)
+                for edge_cit in obj_items:
+                    self.addEdgeCitationsFromCX(edge_cit)
+                self.add_metadata_stub('edgeCitations')
+
+            #===================
+            # OPAQUE ASPECTS
+            #===================
+            for oa in opaque_aspects:
+                objects = self.get_frag_from_list_by_key(cx, oa)
+                obj_items = (o for o in objects)
+                for oa_item in obj_items:
+                    aspect_element = AspectElement(oa_item, oa)
+                    self.addOpapqueAspect(aspect_element)
+                    self.add_metadata_stub(oa)
+        else:
+            raise Exception('CX is empty')
+
+    def get_frag_from_list_by_key(self, cx, key):
+        for aspect in cx:
+            if key in aspect:
+                return aspect[key]
+
+        return []
+
     def to_pandas(self):
         rows = []
+        edge_items = None
+        if sys.version_info.major == 3:
+            edge_items = self.edges.items()
+        else:
+            edge_items = self.edges.iteritems()
 
-        for k, v in self.edges.iteritems():
+        for k, v in edge_items:
             e_a = self.edgeAttributes.get(k)
+            #==========================
+            # PROCESS EDGE ATTRIBUTES
+            #==========================
+            add_this_dict = {}
             if e_a is not None:
-                add_this_dict = {}
                 for e_a_item in e_a:
                     if type(e_a_item.getValues()) is list:
                         add_this_dict[e_a_item.getName()] = ','.join(str(e) for e in e_a_item.getValues())
                         add_this_dict[e_a_item.getName()] = '"' + add_this_dict[e_a_item.getName()] + '"'
                     else:
                         add_this_dict[e_a_item.getName()] = e_a_item.getValues()
+            #================================
+            # PROCESS SOURCE NODE ATTRIBUTES
+            #================================
+            s_a = self.nodeAttributes.get(v.getSource())
+            if s_a is not None:
+                for s_a_item in s_a:
+                    if type(s_a_item.getValues()) is list:
+                        add_this_dict['source_' + s_a_item.getName()] = ','.join(str(e) for e in s_a_item.getValues())
+                        add_this_dict['source_' + s_a_item.getName()] = '"' + add_this_dict['source_' + s_a_item.getName()] + '"'
+                    else:
+                        add_this_dict['source_' + s_a_item.getName()] = s_a_item.getValues()
+
+            #================================
+            # PROCESS TARGET NODE ATTRIBUTES
+            #================================
+            t_a = self.nodeAttributes.get(v.getTarget())
+            if t_a is not None:
+                for t_a_item in t_a:
+                    if type(t_a_item.getValues()) is list:
+                        add_this_dict['target_' + t_a_item.getName()] = ','.join(str(e) for e in t_a_item.getValues())
+                        add_this_dict['target_' + t_a_item.getName()] = '"' + add_this_dict['target_' + t_a_item.getName()] + '"'
+                    else:
+                        add_this_dict['target_' + t_a_item.getName()] = t_a_item.getValues()
+
+            if add_this_dict:
                 rows.append(dict(add_this_dict, source=self.nodes.get(v.getSource())._node_name, target=self.nodes.get(v.getTarget())._node_name, interaction=v._interaction))
             else:
                 rows.append(dict(source=self.nodes.get(v.getSource())._node_name, target=self.nodes.get(v.getTarget())._node_name, interaction=v._interaction))
 
-        df_columns = ['source', 'interaction', 'target'] + list(self.edgeAttributeHeader)  # my_list
+        nodeAttributeSourceTarget = []
+        for n_a in self.nodeAttributeHeader:
+            nodeAttributeSourceTarget.append('source_' + n_a)
+            nodeAttributeSourceTarget.append('target_' + n_a)
+
+        df_columns = ['source', 'interaction', 'target'] + list(self.edgeAttributeHeader) + nodeAttributeSourceTarget
 
         return_df = pd.DataFrame(rows, columns=df_columns)
 
@@ -634,7 +896,7 @@ class NiceCXNetwork(object):
         if server and 'http' not in server:
             server = 'http://' + server
 
-        ndex = nc.Ndex(server,username,password)
+        ndex = nc.Ndex2(server,username,password)
         save_this_cx = self.to_json()
         return ndex.save_new_network(save_this_cx)
 
@@ -659,7 +921,7 @@ class NiceCXNetwork(object):
             ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
         """
         cx = self.to_json()
-        ndex = nc.Ndex(server,username,password)
+        ndex = nc.Ndex2(server,username,password)
 
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):
@@ -682,31 +944,56 @@ class NiceCXNetwork(object):
 
     def to_networkx(self):
         G = nx.Graph()
-        '''
-        node_id = 0
-        node_dict = {}
-        G.max_edge_id = 0
-        for node_name, node_attr in G_nx.nodes_iter(data=True):
-            if discard_null:
-                node_attr = {k:v for k,v in node_attr.items() if not pd.isnull(v)}
 
-            if node_attr.has_key('name'):
-                G.add_node(node_id, node_attr)
+        if sys.version_info.major == 3:
+            node_items = self.nodes.items()
+            edge_items = self.edges.items()
+        else:
+            node_items = self.nodes.iteritems()
+            edge_items = self.edges.iteritems()
+
+        #============================
+        # PROCESS NETWORK ATTRIBUTES
+        #============================
+        for net_a in self.networkAttributes:
+            G.graph[net_a.getName()] = net_a.getValues()
+
+        #================================
+        # PROCESS NODE & NODE ATTRIBUTES
+        #================================
+        for k, v in node_items:
+            node_attrs = {}
+            n_a = self.nodeAttributes.get(k)
+            if n_a:
+                for na_item in n_a:
+                    node_attrs[na_item.getName()] = na_item.getValues()
+                    print v
+                    my_name = v.getName()
+                G.add_node(k, node_attrs, name=v.getName())
+
+        #================================
+        # PROCESS EDGE & EDGE ATTRIBUTES
+        #================================
+        for k, v in edge_items:
+            e_a = self.edgeAttributes.get(k)
+            add_this_dict = {}
+            if e_a is not None:
+                for e_a_item in e_a:
+                    if type(e_a_item.getValues()) is list:
+                        add_this_dict[e_a_item.getName()] = ','.join(str(e) for e in e_a_item.getValues())
+                        add_this_dict[e_a_item.getName()] = '"' + add_this_dict[e_a_item.getName()] + '"'
+                    else:
+                        add_this_dict[e_a_item.getName()] = e_a_item.getValues()
+
+                G.add_edge(v.getSource(), v.getTarget(), add_this_dict)
             else:
-                G.add_node(node_id, node_attr, name=node_name)
-            node_dict[node_name] = node_id
-            node_id += 1
-        for s, t, edge_attr in G_nx.edges_iter(data=True):
-            if discard_null:
-                edge_attr = {k:v for k,v in edge_attr.items() if not pd.isnull(v)}
-            G.add_edge(node_dict[s], node_dict[t], G.max_edge_id, edge_attr)
-            G.max_edge_id += 1
+                G.add_edge(v.getSource(), v.getTarget())
 
-        if hasattr(G_nx, 'pos'):
-            G.pos = {node_dict[a] : b for a, b in G_nx.pos.items()}
-            # G.subnetwork_id = 1
-            # G.view_id = 1
-        '''
+        #================
+        # PROCESS LAYOUT
+        #================
+        #if hasattr(networkx_G, 'pos'):
+        #    G.pos = {node_dict[a] : b for a, b in networkx_G.pos.items()}
 
         return G
 
@@ -742,6 +1029,8 @@ class NiceCXNetwork(object):
             output_cx.append(self.generateAspect('nodeCitations'))
         if self.edgeCitations:
             output_cx.append(self.generateAspect('edgeCitations'))
+        if self.supports:
+            output_cx.append(self.generateAspect('supports'))
         if self.edgeSupports:
             output_cx.append(self.generateAspect('edgeSupports'))
         if self.nodeSupports:
@@ -764,7 +1053,7 @@ class NiceCXNetwork(object):
         return output_cx
 
     def generateAspect(self, aspect_name):
-        core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'citations', 'metaData']
+        core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'citations', 'metaData', 'supports']
         aspect_element_array = []
         element_count = 0
         element_id_max = 0
@@ -841,10 +1130,16 @@ class NiceCXNetwork(object):
                         items = use_this_aspect.iteritems()
 
                     for k, v in items:
-                        if type(v) is list:
-                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: v})
+                        if aspect_name == 'edgeSupports':
+                            if type(v) is list:
+                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.SUPPORTS: v})
+                            else:
+                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.SUPPORTS: [v]})
                         else:
-                            aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: [v]})
+                            if type(v) is list:
+                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: v})
+                            else:
+                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: [v]})
                         element_count +=1
                 else:
                     raise Exception('Citation was not in json format')
@@ -1259,6 +1554,8 @@ class NiceCXNetwork(object):
             return self.edgeCitations
         elif aspect_name == 'edgeSupports':
             return self.edgeSupports
+        elif aspect_name == 'supports':
+            return self.supports
 
     def streamAspect(self, uuid, aspect_name, server, username, password):
         if 'http' not in server:

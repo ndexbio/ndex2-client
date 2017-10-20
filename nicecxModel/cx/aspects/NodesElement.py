@@ -7,13 +7,9 @@ class NodesElement(object):
     def __init__(self, id=None, node_name=None, node_represents=None, json_obj=None):
         self.ASPECT_NAME = 'nodes'
 
-        if id is None:
-            self._id = -1
-        else:
-            self._id = id
-
         self._node_name = node_name
         self._node_represents = node_represents
+        self._id = None
 
         if json_obj is not None:
             if type(json_obj) is dict:
@@ -21,8 +17,15 @@ class NodesElement(object):
                 self._node_represents = json_obj.get(CX_CONSTANTS.NODE_REPRESENTS)
                 if json_obj.get(CX_CONSTANTS.ID) is not None:
                     self._id = json_obj.get(CX_CONSTANTS.ID)
+                else:
+                    self._id = self._node_name
             else:
                 raise Exception('NodesElement json input provided was not of type json object.')
+        else:
+            if id is None:
+                self._id = node_name
+            else:
+                self._id = id
 
     def getAspectName(self):
         return self.ASPECT_NAME
@@ -40,7 +43,7 @@ class NodesElement(object):
         self._node_represents = represents
 
     def getName(self):
-        self._node_name
+        return self._node_name
 
     def setNodeName(self, node_name ):
         self._node_name = node_name

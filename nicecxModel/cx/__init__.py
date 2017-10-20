@@ -55,6 +55,7 @@ class CX_CONSTANTS(str, Enum):
     TEXT = 'text'
     CITATION = 'citation'
     CITATIONS = 'citations'
+    SUPPORTS = 'supports'
     PROPERTIES = 'properties'
 
     #======================

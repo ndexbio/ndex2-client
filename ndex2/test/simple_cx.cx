@@ -1,0 +1,172 @@
+[
+  {
+    "numberVerification": [
+      {
+        "longNumber": 281474976710655
+      }
+    ]
+  },
+  {
+    "metaData": [
+      {
+        "consistencyGroup": 1,
+        "elementCount": 1,
+        "lastUpdate": 1493145228606,
+        "name": "ndexStatus",
+        "properties": [],
+        "version": "1.0"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 1,
+        "lastUpdate": 1493145229028,
+        "name": "provenanceHistory",
+        "properties": [],
+        "version": "1.0"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 3,
+        "idCounter": 3,
+        "name": "nodes",
+        "properties": [],
+        "version": "1.0"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 2,
+        "idCounter": 2,
+        "name": "edges",
+        "properties": [],
+        "version": "1.0"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 1,
+        "name": "networkAttributes",
+        "properties": [],
+        "version": "1.0"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 1,
+        "name": "edgeAttributes",
+        "properties": [],
+        "version": "1.0"
+      }
+    ]
+  },
+  {
+    "ndexStatus": [
+      {
+        "externalId": "b8fedefb-29e5-11e7-b3a1-06832d634f41",
+        "creationTime": 1493145228606,
+        "modificationTime": 1493145228606,
+        "visibility": "PRIVATE",
+        "published": false,
+        "nodeCount": 3,
+        "edgeCount": 2,
+        "owner": "scratch",
+        "ndexServerURI": "http://dev.ndexbio.org",
+        "readOnly": false
+      }
+    ]
+  },
+  {
+    "provenanceHistory": [
+      {
+        "entity": {
+          "uri": "http://dev.ndexbio.org/v2/network/b8fedefb-29e5-11e7-b3a1-06832d634f41/summary",
+          "creationEvent": {
+            "startedAtTime": 1493145228606,
+            "endedAtTime": 1493145228606,
+            "inputs": null,
+            "eventType": "Program Upload in CX",
+            "properties": [
+              {
+                "name": "user",
+                "value": "scratch scratch"
+              },
+              {
+                "name": "user name",
+                "value": "scratch"
+              }
+            ]
+          },
+          "properties": [
+            {
+              "name": "edge count",
+              "value": "2"
+            },
+            {
+              "name": "node count",
+              "value": "3"
+            },
+            {
+              "name": "dc:title",
+              "value": "create_from_edge_list"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "nodes": [
+      {
+        "@id": 1,
+        "n": "Ax"
+      },
+      {
+        "@id": 2,
+        "n": "Bx"
+      },
+      {
+        "@id": 3,
+        "n": "Cx"
+      }
+    ]
+  },
+  {
+    "edges": [
+      {
+        "@id": 1,
+        "s": 1,
+        "t": 2,
+        "i": "A-B"
+      },
+      {
+        "@id": 2,
+        "s": 2,
+        "t": 3,
+        "i": "B-C"
+      }
+    ]
+  },
+  {
+    "networkAttributes": [
+      {
+        "n": "name",
+        "v": "create_from_edge_list"
+      }
+    ]
+  },
+  {
+    "edgeAttributes": [
+      {
+        "po": 1,
+        "n": "w",
+        "v": "1.2399",
+        "d": "double"
+      }
+    ]
+  },
+  {
+    "status": [
+      {
+        "error": "",
+        "success": true
+      }
+    ]
+  }
+]

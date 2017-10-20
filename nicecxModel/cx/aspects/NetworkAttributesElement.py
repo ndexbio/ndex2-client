@@ -8,8 +8,8 @@ from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
 class NetworkAttributesElement(AttributeCommon):
     def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
         super(NetworkAttributesElement, self).__init__(subnetwork=subnetwork, property_of=property_of, name=name, values=values, type=type, json_obj=json_obj)
-        self.ASPECT_NAME = 'networkAttributes'
-
+        self.setAspectName('networkAttributes')
+    '''
     def __str__(self):
         return json.dumps(self.to_json())
 
@@ -29,5 +29,6 @@ class NetworkAttributesElement(AttributeCommon):
                 return NetworkAttributesElement(subnetwork, name, sl, type)
             except Exception as e:
                 raise Exception('Failed to load json string to json object %s %s %s' % (str(subnetwork), str(name), str(sl)))
+    '''
 
 

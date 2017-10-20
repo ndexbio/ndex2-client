@@ -1,6 +1,6 @@
 __author__ = 'aarongary'
 
-from model.NiceCXNetwork import NiceCXNetwork
+from nicecxModel.NiceCXNetwork import NiceCXNetwork
 
 niceCx = NiceCXNetwork()
 
@@ -9,14 +9,14 @@ niceCx = NiceCXNetwork()
 #================================
 niceCx.create_from_server('public.ndexbio.org', None, None, 'dfba0dfb-6192-11e5-8ac5-06603eb7f303')
 
-#================================
+#=============================
 # convert to pandas dataframe
-#================================
+#=============================
 my_pd = niceCx.to_pandas()
 
-#================================
+#=====================
 # Export to csv file
-#================================
+#=====================
 my_pd.to_csv('CXExport.csv', sep=',')
 
 print 'Done'

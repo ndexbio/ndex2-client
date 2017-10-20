@@ -18,12 +18,12 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 if __name__ == '__main__':
     setup(
-        name='nicecx-dev',
+        name='ndex2-dev',
 
         # Versions should comply with PEP440.  For a discussion on single-sourcing
         # the version across setup.py and the project code, see
         # https://packaging.python.org/en/latest/single_source_version.html
-        version='0.0.1b.2',
+        version='0.0.1b.10',
 
         description='Nice CX Python includes a client and a data model.',
         long_description=long_description,

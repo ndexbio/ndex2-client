@@ -18,9 +18,9 @@ from nicecxModel.cx.aspects.SupportElement import SupportElement
 from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
 from nicecxModel.cx.aspects.SimpleNode import SimpleNode
 from nicecxModel.cx import CX_CONSTANTS
-from nicecxNdex.NetworkQuery import NetworkQuery
-from nicecxNdex.client import Ndex
-from nicecxNdex.NiceCXBuilder import NiceCXBuilder
+from ndex2.NetworkQuery import NetworkQuery
+from ndex2.client import Ndex2
+from ndex2.NiceCXBuilder import NiceCXBuilder
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen

@@ -40,7 +40,7 @@ class TestLoadByAspects(unittest.TestCase):
             niceCx = NiceCXNetwork()
             niceCx.create_from_pandas(df, source_field='GeneSymbol', target_field='PathwayName', source_node_attr=['GeneID'], target_node_attr=['Pathway Source'], edge_attr=[])
             my_cx_json = niceCx.to_json()
-            print json.dumps(my_cx_json)
+            print(json.dumps(my_cx_json))
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
@@ -55,7 +55,7 @@ class TestLoadByAspects(unittest.TestCase):
 
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
-        print niceCx.to_json()
+        print(niceCx.to_json())
 
     @unittest.skip("Temporary skipping")
     def test_load_edges(self):
@@ -89,7 +89,7 @@ class TestLoadByAspects(unittest.TestCase):
                 niceCx.add_metadata_stub('edgeAttributes')
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
 
-            print df
+            print(df)
 
         my_df = pd.DataFrame(data=[(4,14),(5,15),(6,16),(7,17)], index=range(0,4), columns=['A','B'])
         self.assertIsNotNone(my_df)
@@ -114,7 +114,7 @@ class TestLoadByAspects(unittest.TestCase):
             niceCx = NiceCXNetwork()
             niceCx.create_from_pandas(df, source_field='Bait', target_field='Prey', source_node_attr=['AvePSM'], target_node_attr=['WD'], edge_attr=['Z', 'Entropy'])
             my_cx_json = niceCx.to_json()
-            print json.dumps(my_cx_json)
+            print(json.dumps(my_cx_json))
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
@@ -239,7 +239,7 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx.getEdgeAttributesById(fox_mouse_edge_attr.getId())
         '''
 
-        print niceCx
+        print(niceCx)
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_small_cx(self):
@@ -269,4 +269,4 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx = NiceCXNetwork(server='public.ndexbio.org', uuid='f1dd6cc3-0007-11e6-b550-06603eb7f303')
 
         #upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
-        print niceCx
+        print(niceCx)

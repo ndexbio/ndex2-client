@@ -8,7 +8,10 @@ class MetaDataElement(object):
             self.element_count = json_obj.get(CX_CONSTANTS.ELEMENT_COUNT)
             self.properties = json_obj.get(CX_CONSTANTS.PROPERTIES)
             self.version = json_obj.get(CX_CONSTANTS.VERSION)
-            self.consistencyGroup = json_obj.get(CX_CONSTANTS.CONSISTENCY_GROUP)
+            if json_obj.get(CX_CONSTANTS.CONSISTENCY_GROUP):
+                self.consistencyGroup = json_obj.get(CX_CONSTANTS.CONSISTENCY_GROUP)
+            else:
+                self.consistencyGroup = 1
             self.name = json_obj.get(CX_CONSTANTS.METADATA_NAME)
             self.id_counter = json_obj.get(CX_CONSTANTS.ID_COUNTER)
             self.last_update = json_obj.get(CX_CONSTANTS.LAST_UPDATE)

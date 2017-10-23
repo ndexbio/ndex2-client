@@ -259,7 +259,7 @@ class Ndex2:
                         cx[len(cx) - 1].get('status').append({"error" : "","success" : True})
 
             if sys.version_info.major == 3:
-                stream = io.BytesIO(json.dumps(cx).encode('utf-8'))
+                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
             else:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 

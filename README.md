@@ -2,11 +2,11 @@
 
 ## **Overview**
 
-The NDEx2 Client v1.0 Python module provides methods to access NDEx via the NDEx Server API. It also provides methods for common operations on networks. It includes the NiceCX network object class for convenient NDEx access and a data model for applications.
+The NDEx2 Client v1.0 Python module provides methods to access NDEx via the NDEx Server API. It also provides methods for common operations on networks. It includes the NiceCX network object class for convenient NDEx access and as a data model for applications.
 
 ## **Jupyter Notebook Tutorials**
 * Basic Use of the NDEx2 Client:[NDEx2 Client v1.0 Tutorial](https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDex%20Client%20tutorial.ipynb)
-* Working with the NiceCX Network Class: [NDEx2 Client v1.0 Tutorial](https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDex%20Client%20tutorial.ipynb)
+* Working with the NiceCX Network Class: [NiceCX v1.0 Tutorial](https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDex%20Client%20tutorial.ipynb)
 
 ## **Requirements**
 

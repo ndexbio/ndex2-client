@@ -514,14 +514,6 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 ## **NiceCX Objects**
 
-#### **NiceCx**
-
-##### **get_task_by_id(task_id)**
-
-* Returns a JSON task object for the task specified by task_id.
-
-* Errors if no task found or if the authenticated user does not own the specified task.
-
 **addCitation(citation_element)**
 
 * Add a citation to the network

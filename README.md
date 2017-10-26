@@ -514,3 +514,265 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 ## **NiceCX Objects**
 
+#### **NiceCx**
+
+##### **get_task_by_id(task_id)**
+
+* Returns a JSON task object for the task specified by task_id.
+
+* Errors if no task found or if the authenticated user does not own the specified task.
+
+**addCitation(citation_element)**
+
+* Add a citation to the network
+
+**addEdge(id=None, edge_source=None, edge_target=None, edge_interaction=None, json_obj=None, edge_element=None)**
+
+* Add an edge to the network.  
+
+* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
+
+* **edge_source**: Id of the source node for this edge
+
+* **edge_target**: Id of the target node for this edge
+
+* **edge_interaction**: The interaction that describes the relationship between the source and target nodes
+
+* **json_obj**: The cx representation of an edge
+
+* **edge_element**: The niceCx model representation for an edge (nicecxModel.cx.aspects.EdgesElement)
+
+**addEdgeAttribute(property_of=None, name=None, values=None, type=None, subnetwork=None, json_obj=None, edge_attribute_element=None)**
+
+* Add an attribute to the given edge
+
+* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
+
+* **edge_source**: Id of the source node for this edge
+
+* **edge_target**: Id of the target node for this edge
+
+* **edge_interaction**: The interaction that describes the relationship between the source and target nodes
+
+* **json_obj**: The cx representation of an edge attribute
+
+* **edge_attribute_element**: The niceCx model representation for an edge attribute (nicecxModel.cx.aspects.EdgeAttributesElement)
+
+**addEdgeCitations(edge_id, citation_id)**
+
+* Connect a citation to the given edge
+
+**addEdgeCitationsFromCX(edge_citation_cx)**
+
+* Add a citation to the network
+
+**addEdgeSupports(edge_supports_element)**
+
+* Used to add 
+
+**addNameSpace(prefix, uri)**
+
+* Used to add a name space to the network
+
+**addNetworkAttribute(network_attribute_element=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None)**
+
+* Used to add an attribute to the network
+
+**addNode(id=None, node_name=None, node_represents=None, json_obj=None, node_element=None)**
+
+* Used to add a node to the network.
+
+* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
+
+* **node_name**: Name for the node
+
+* **node_represents**: The representation for the node.  This can be used to store the normalized id for the node
+
+* **json_obj**: The cx representation of a node
+
+* **node_element**: The niceCx model representation for a node (nicecxModel.cx.aspects.NodesElement)
+
+**addNodeAssociatedAspectElement(nodeId, elmt)**
+
+* Used to associate an element with the specified node 
+
+**addEdgeAssociatedAspect(aspectName)**
+
+* Used to associate an element with the specified edge 
+
+**addNodeAttribute(subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None, node_attribute_element=None)**
+
+* Used to add a node attribute to the network.
+
+* **subnetwork**: Optional subnetwork id
+
+* **property_of**: Id of the node this attribute will be associated with
+
+* **name**: The name of the attribute
+
+* **values**: The value(s) of the attribute
+
+* **type**: The type of the value(s)
+
+* **json_obj**: The cx representation of the node attribute
+
+* **node_attribute_element**: The niceCx model representation for a node attribute (nicecxModel.cx.aspects.NodeAttributesElement)
+
+**addNodeCitations(node_id, citation_id)**
+
+* Used to associate a citation with a node
+
+* **node_id**: The id of the node
+
+* **citation_id**: The id of the citation
+
+**addOpapqueAspect(opaque_element)**
+
+* Used to add an opaque aspect (nicecxModel.cx.aspects.AspectElement)
+
+**addSupport(support_element)**
+
+* Add a support element (nicecxModel.cx.aspects.SupportElement)
+
+**apply_template(server, username, password, uuid)**
+
+* Used to add a layout template to the network
+
+* **server**: The ndex server host of the network from which the layout will be copied
+
+* **username**: Optional username to enable access to a private network
+
+* **password**: Optional password to enable access to a private network
+
+* **uuid**: The unique identifier of the network from which the layout will be copied
+
+**getEdgeAssociatedAspect(aspectName)**
+
+* Get the edge associated aspect specified
+
+**getEdgeAssociatedAspects()**
+
+* Get all edge associated apsects
+
+**getEdgeAttributes()**
+
+* Get all edge attributes
+
+**getEdgeAttributesById(id)**
+
+* Get the specified edge attribute
+
+**getEdgeCitations()**
+
+* Get all edge citations
+
+**getEdges()**
+
+* Get all edges
+
+**getMetadata()**
+
+* Get the network metadata
+
+**getName()**
+
+* Get the network name
+
+**getNamespaces()**
+
+* Get the network name spaces
+
+**getNetworkAttributes()**
+
+* Get all network attributes
+
+**getNodeAssociatedAspect(aspectName)**
+
+* Get the specified node associated aspect
+
+**getNodeAssociatedAspects()**
+
+* Get all node associated aspects
+
+**getNodeAttributes()**
+
+* Get all node attributes
+
+**getNodeCitations()**
+
+* Get all node citations
+
+**getNodes()**
+
+* Get all nodes
+
+**getOpaqueAspectTable()**
+
+* Get all opaque aspects
+
+**getProvenance()**
+
+* Get the network provenance
+
+**getSummary()**
+
+* Get a simple network summary 
+
+**setName(network_name)**
+
+* Set the network name
+
+**setNamespaces(ns)**
+
+* Set the network name spaces
+
+**setProvenance(provenance)**
+
+* Set the network provenance
+
+**stream_cx()**
+
+* returns the CX stream representation of the network.
+
+**to_json()**
+
+* Marshal the network into a cx - json structure
+
+**to_networkx()**
+
+* Export the network as a networkx graph
+
+**to_pandas()**
+
+* Export the network as a Pandas DataFrame
+
+**update_to(uuid, server, username, password)**
+
+* Upload this network to the specified server to the account specified by username and password.
+
+* **uuid**: The uuid of the network being updated.
+
+* **server**: The NDEx server to upload the network to.
+
+* **username**: The username of the account to store the network.
+
+* **password**: The password for the account.
+
+* returns: The UUID of the network on NDEx.
+
+* Example: my_niceCx.upload_to(uuid=’34f29fd1-884b-11e7-a10d-0ac135e8bacf’, server='http://test.ndexbio.org', username='myusername', password='mypassword')
+
+**upload_to(server, username, password)**
+
+* Upload this network to the specified server to the account specified by username and password.
+
+* server: The NDEx server to upload the network to.
+
+* username: The username of the account to store the network.
+
+* password: The password for the account.
+
+* return: The UUID of the network on NDEx.
+
+* Example: my_niceCx.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
+

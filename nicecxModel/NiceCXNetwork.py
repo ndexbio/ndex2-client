@@ -6,7 +6,6 @@ import os
 import errno
 import pandas as pd
 import networkx as nx
-import ndex2.client as nc
 import io
 import decimal
 import numpy as np
@@ -197,7 +196,7 @@ class NiceCXNetwork(object):
             else:
                 aspect[po] += element.get(relation_name)
 
-    def addOpapqueAspect(self, opaque_element):
+    def addOpaqueAspect(self, opaque_element):
         if type(opaque_element) is AspectElement:
             aspectElmts = self.opaqueAspects.get(opaque_element.getAspectName())
             if aspectElmts is None:
@@ -337,7 +336,7 @@ class NiceCXNetwork(object):
                     obj_items = (o for o in objects)
                     for oa_item in obj_items:
                         aspect_element = AspectElement(oa_item, oa)
-                        self.addOpapqueAspect(aspect_element)
+                        self.addOpaqueAspect(aspect_element)
                     vis_prop_size = len(self.opaqueAspects.get('visualProperties'))
                     mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='visualProperties')
                     self.addMetadata(mde)
@@ -348,7 +347,7 @@ class NiceCXNetwork(object):
                     obj_items = (o for o in objects)
                     for oa_item in obj_items:
                         aspect_element = AspectElement(oa_item, oa)
-                        self.addOpapqueAspect(aspect_element)
+                        self.addOpaqueAspect(aspect_element)
                     vis_prop_size = len(self.opaqueAspects.get('cyVisualProperties'))
                     mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='cyVisualProperties')
                     self.addMetadata(mde)
@@ -633,7 +632,7 @@ class NiceCXNetwork(object):
                 obj_items = (o for o in objects)
                 for oa_item in obj_items:
                     aspect_element = AspectElement(oa_item, oa)
-                    self.addOpapqueAspect(aspect_element)
+                    self.addOpaqueAspect(aspect_element)
                     self.add_metadata_stub(oa)
         else:
             raise Exception('Server and uuid not specified')
@@ -774,7 +773,7 @@ class NiceCXNetwork(object):
                 obj_items = (o for o in objects)
                 for oa_item in obj_items:
                     aspect_element = AspectElement(oa_item, oa)
-                    self.addOpapqueAspect(aspect_element)
+                    self.addOpaqueAspect(aspect_element)
                     self.add_metadata_stub(oa)
         else:
             raise Exception('CX is empty')
@@ -996,6 +995,28 @@ class NiceCXNetwork(object):
         #    G.pos = {node_dict[a] : b for a, b in networkx_G.pos.items()}
 
         return G
+
+    def getSummary(self):
+        n_a_count = 0
+        for k, v in self.nodeAttributes.items():
+            n_a_count += len(v)
+
+        e_a_count = 0
+        for k, v in self.edgeAttributes.items():
+            e_a_count += len(v)
+
+        network_name = self.getName()
+        if not network_name:
+            network_name = 'Untitled'
+
+        summary_string = \
+            'Name: ' + network_name + '\n'\
+            'Nodes: ' + str(len(self.nodes)) + '\n'\
+            + 'Edges: ' + str(len(self.edges)) + '\n'\
+            + 'Node Attributes: ' + str(n_a_count) + '\n'\
+            + 'Edge Attributes: ' + str(e_a_count) + '\n'
+
+        return summary_string
 
     def __str__(self):
         return json.dumps(self.to_json(), cls=DecimalEncoder)
@@ -1597,3 +1618,5 @@ class DecimalEncoder(json.JSONEncoder):
             if isinstance(o, np.int64):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
+
+import ndex2.client as nc

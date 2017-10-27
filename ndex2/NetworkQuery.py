@@ -294,7 +294,7 @@ class NetworkQuery():
                 obj_items = (o for o in objects)
                 for oa_item in obj_items:
                     aspect_element = AspectElement(oa_item, oa)
-                    niceCx.addOpapqueAspect(aspect_element)
+                    niceCx.addOpaqueAspect(aspect_element)
 
         except SolrError as se:
             if('404' in se.message):

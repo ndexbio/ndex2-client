@@ -618,7 +618,7 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 * **citation_id**: The id of the citation
 
-**addOpapqueAspect(opaque_element)**
+**addOpaqueAspect(opaque_element)**
 
 * Used to add an opaque aspect (nicecxModel.cx.aspects.AspectElement)
 

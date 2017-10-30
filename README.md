@@ -516,9 +516,9 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 ### **Nodes**
 
-**create_node(name=None, represents=None, node=None)**
+**create_node(name, represents=None)**
 
-Create a new node in the network, specifying the node's name and the id of the entity that it represents.
+Create a new node in the network, specifying the node's name and optionally the id of the entity that it represents.
 
 * **name**: Name for the node
 * **represents**: The ID of the entity represented by the node. Best practice is to use IDs from standard namespaces and to define namespace prefixes in the network context. 
@@ -535,31 +535,38 @@ Set the value(s) of an attribute of a node, where the node may be specified by i
 
 * **node**: node object or node id
 * **attribute_name**: attribute name
-* **values**: the values of the attribute
+* **values**: A value or list of values of the attribute
 * **type**: the datatype of the attribute values, defaults to the python datatype of the values.
 * **subnetwork**: the id of the subnetwork to which this attribute applies.
 
 **get_node_attribute(node, attribute_name, subnetwork=None)**
 
-Get the values of an attribute of a node, where the node may be specified by its id or passed in as an object.
+Get the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
 
 * **node**: node object or node id
 * **attribute_name**: attribute name
 * **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
+**get_node_attribute_objects(node, attribute_name)**
+
+Get the attribute objects for a node attribute name, where the node may be specified by its id or passed in as an object. The node attribute objects include datatype and subnetwork information. An example of networks that include subnetworks are Cytoscape collections stored in NDEx.
+
+* **node**: node object or node id
+* **attribute_name**: attribute name
+
 **get_node_attributes(node)**
 
-Get the attributes of a node, where the node may be specified by its id or passed in as an object.
+Get the attribute objects of a node, where the node may be specified by its id or passed in as an object.
 
 * **node**: node object or node id
 
 **get_nodes()**
 
-Returns an iteratable structure containing the objects for all nodes in the network
+Returns an iterator over node ids as keys and node objects as values.
 
 ### **Edges**
 
-**create_edge(source, target, interaction, edge=None)**
+**create_edge(source, target, interaction)**
 
 Create a new edge in the network by specifying source-interaction-target
 
@@ -584,21 +591,28 @@ Set the value(s) of attribute of an edge, where the edge may be specified by its
 
 **get_edge_attribute(edge, attribute_name, subnetwork=None)**
 
-Get the values of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
+Get the value(s) of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
 
 * **edge**: edge object or edge id
 * **attribute_name**: attribute name
-* **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute was applied.
+
+**get_edge_attribute_objects(edge, attribute_name)**
+
+Get the attribute objects for an edge attribute name, where the edge may be specified by its id or passed in as an object. The edge attribute objects include datatype and subnetwork information. An example of networks that include subnetworks are Cytoscape collections stored in NDEx.
+
+* **edge**: node object or node id
+* **attribute_name**: attribute name
 
 **get_edge_attributes(edge)**
 
-Get the attributes of an edge, where the edge may be specified by its id or passed in as an object.
+Get the attribute objects of an edge, where the edge may be specified by its id or passed in as an object.
 
 * **edge**: edge object or edge id
 
 **get_edges()**
 
-* Return an iteratable structure containing the objects for all edges in the network.
+Returns an iterator over edge ids as keys and edge objects as values.
 
 ### **Network**
 
@@ -623,13 +637,20 @@ Set an attribute of the network
 * **type**: the datatype of the attribute values
 * **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
-**get_network_attribute(name=None, type=None, subnetwork_id=None)**
+**get_network_attribute(attribute_name, subnetwork_id=None)**
 
 Get the value of a network attribute
 
+* **attribute_name**: attribute name
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute was applied.
+
+**get_network_attribute_objects(attribute_name)**
+
+Get the attribute objects for the network. The attribute objects include datatype and subnetwork information. An example of networks that include subnetworks are Cytoscape collections stored in NDEx.
+
 **get_network_attributes()**
 
-* Returns an iteratable structure of network attribute objects.
+Get the attribute objects of the network.
 
 **get_metadata()**
 
@@ -641,7 +662,7 @@ Get the value of a network attribute
 
 **getProvenance()**
 
-* Get the network provenance
+* Get the network provenance as a Python dictionary having the CX provenance schema.
 
 **set_provenance(provenance)**
 
@@ -659,7 +680,8 @@ Set the @context aspect of the network, the aspect that maps namespace prefixes 
 
 Get the elements of the aspect specified by aspect_name
 (nicecxModel.cx.aspects.AspectElement)
-* **aspect_name**: the name of the aspect
+
+* **aspect_name**: the name of the aspect to retrieve.
 
 **set_opaque_aspect(aspect_name, aspect_elements)**
 
@@ -678,23 +700,21 @@ Set the aspect specified by aspect_name to the list of aspect elements. If aspec
 
 **to_cx_stream()**
 
-* Returns a stream of the CX corresponding to the network. 
-* Can be used to post to endpoints that can accept streaming inputs
+Returns a stream of the CX corresponding to the network. Can be used to post to endpoints that can accept streaming inputs
 
 **to_networkx()**
 
-* Return a NetworkX graph based on the network
-* Elements in the CartesianCoordinates aspect of the network are transformed to the NetworkX pos attribute.
+Return a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect of the network are transformed to the NetworkX **pos** attribute.
 
 **to_pandas_dataframe()**
 
-* Export the network as a Pandas DataFrame
+Export the network as a Pandas DataFrame. 
 
-* Example: my_niceCx.upload_to(uuid=’34f29fd1-884b-11e7-a10d-0ac135e8bacf’, server='http://test.ndexbio.org', username='myusername', password='mypassword')
+Example: my_niceCx.upload_to(uuid=’34f29fd1-884b-11e7-a10d-0ac135e8bacf’, server='http://test.ndexbio.org', username='myusername', password='mypassword')
 
-**upload_to(server, username, password, update_uuid=None)**
+**upload(ndex_server, username, password, update_uuid=None)**
 
-Upload the network to the specified server to the account specified by username and password, return the UUID of the network on NDEx
+Upload the network to the specified NDEx server to the account specified by username and password, return the UUID of the network on NDEx.
 
 Example: my_niceCx.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
 

@@ -722,39 +722,27 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 * Set the network provenance
 
-**stream_cx()**
+**to_stream_cx()**
 
-* returns the CX stream representation of the network.
+* Returns a stream of the CX corresponding to the network. 
+* Can be used to post to endpoints that can accept streaming input.s
 
-**to_json()**
+**to_cx()**
 
-* Marshal the network into a cx - json structure
+* Return the CX corresponding to the network. 
 
 **to_networkx()**
 
-* Export the network as a networkx graph
+* Return a NetworkX graph based on the network
+* Elements in the CartesianCoordinates aspect of the network are transformed to the NetworkX pos attribute.
 
-**to_pandas()**
+**to_pandas_dataframe()**
 
 * Export the network as a Pandas DataFrame
 
-**update_to(uuid, server, username, password)**
-
-* Upload this network to the specified server to the account specified by username and password.
-
-* **uuid**: The uuid of the network being updated.
-
-* **server**: The NDEx server to upload the network to.
-
-* **username**: The username of the account to store the network.
-
-* **password**: The password for the account.
-
-* returns: The UUID of the network on NDEx.
-
 * Example: my_niceCx.upload_to(uuid=’34f29fd1-884b-11e7-a10d-0ac135e8bacf’, server='http://test.ndexbio.org', username='myusername', password='mypassword')
 
-**upload_to(server, username, password)**
+**upload_to(server, username, password, update_uuid=None)**
 
 * Upload this network to the specified server to the account specified by username and password.
 
@@ -763,6 +751,8 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 * username: The username of the account to store the network.
 
 * password: The password for the account.
+
+* update_uuid: Instead of creating a new network, update the network that has this UUID with the content of this NiceCX object.
 
 * return: The UUID of the network on NDEx.
 

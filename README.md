@@ -516,180 +516,142 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 ### **Nodes**
 
+**add_node(name=None, represents=None, node=None)**
+
+Add a node to the network, either by specifying the node's name and the id of the entity that it represents  **or** by supplying a node object.
+
+* **name**: Name for the node
+* **represents**: The ID of the entity represented by the node. Best practice is to use IDs from standard namespaces and to define namespace prefixes in the network context. 
+* **node**: The niceCx model representation for a node (nicecxModel.cx.aspects.NodesElement)
+
+**set_node_attribute(node, name=None, values=None, type=None, subnetwork=None)**
+
+Set an attribute of a node, where the node may be specified by its id or passed in as an object.
+
+* **node**: node object or node id
+* **name**: attribute name
+* **values**: the values of the attribute
+* **type**: the datatype of the attribute values
+* **subnetwork**: the id of the subnetwork to which this attribute applies.
+
+**get_node_attributes(node)**
+
+Get the attributes of a node, where the node may be specified by its id or passed in as an object.
+
+* **node**: node object or node id
+
+**get_nodes()**
+
+Returns an iteratable structure containing the objects for all nodes in the network
+
 ### **Edges**
 
-**add_edge(source=None, source_id=none, target=None, target_id=none, edge_interaction=None, edge=None)**
-Add an edge to the network, either by specifying source-interaction-target **or** by supplying an Edge object.
+**add_edge(source=None, source_id=none, target=None, interaction=None, edge=None)**
+
+Add an edge to the network, either by specifying source-interaction-target **or** by supplying an edge object.
+
 * **source**: The source node this edge, either its id or the node object itself.
 * **target**: The target node this edge, either its id or the node object itself.
 * **interaction**: The interaction that describes the relationship between the source and target nodes
 * **edge**: An edge object (nicecxModel.cx.aspects.EdgesElement)
 
+**set_edge_attribute(edge=None, name=None, values=None, type=None, subnetwork=None)**
 
-**addEdgeAttribute(edge_id=None, name=None, values=None, type=None, subnetwork=None, json_obj=None, edge=None)**
-Add an attribute to the an edge, where the edge may be specified by its id or passed in an object.
-* **name**: Id of the source node for this edge
+Set an attribute of an edge, where the edge may be specified by its id or passed in an object.
 
-* **edge_target**: Id of the target node for this edge
+* **name**: attribute name
+* **values**: the values of the attribute
+* **type**: the datatype of the attribute values
+* **subnetwork**: the id of the subnetwork to which this attribute applies.
 
-* **edge_interaction**: The interaction that describes the relationship between the source and target nodes
+**get_edges()**
 
-* **json_obj**: The cx representation of an edge attribute
+* Return an iteratable structure containing the objects for all edges in the network
 
-* **edge_attribute_element**: The niceCx model representation for an edge attribute (nicecxModel.cx.aspects.EdgeAttributesElement)
+**get_edge_attributes(edge)**
+
+Get the attributes of an edge, where the edge may be specified by its id or passed in as an object.
 
 ### **Network**
-**addNameSpace(prefix, uri)**
 
-* Used to add a name space to the network
+**get_name()**
 
-**addNetworkAttribute(network_attribute_element=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None)**
+Get the network name
 
-* Used to add an attribute to the network
+**set_name(network_name)**
 
-### **I/O**
+Set the network name
 
+**getSummary()**
 
+Get a network summary 
 
+**set_network_attribute(name=None, values=None, type=None, subnetwork_id=None)**
 
+Set an attribute of the network
 
+* **name**: attribute name
+* **values**: the values of the attribute
+* **type**: the datatype of the attribute values
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
+**get_network_attribute(name=None, type=None, subnetwork_id=None)**
 
+Get the value of a network attribute
 
-**addNode(id=None, node_name=None, node_represents=None, json_obj=None, node_element=None)**
+**get_network_attributes()**
 
-* Used to add a node to the network.
+* Returns an iteratable structure of network attribute objects.
 
-* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
-
-* **node_name**: Name for the node
-
-* **node_represents**: The representation for the node.  This can be used to store the normalized id for the node
-
-* **json_obj**: The cx representation of a node
-
-* **node_element**: The niceCx model representation for a node (nicecxModel.cx.aspects.NodesElement)
-
-**addNodeAttribute(subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None, node_attribute_element=None)**
-
-* Used to add a node attribute to the network.
-
-* **subnetwork**: Optional subnetwork id
-
-* **property_of**: Id of the node this attribute will be associated with
-
-* **name**: The name of the attribute
-
-* **values**: The value(s) of the attribute
-
-* **type**: The type of the value(s)
-
-* **json_obj**: The cx representation of the node attribute
-
-* **node_attribute_element**: The niceCx model representation for a node attribute (nicecxModel.cx.aspects.NodeAttributesElement)
-
-
-
-**set_opaque_aspect(aspect_name, aspect_elements)**
-* Set the aspect specified by aspect_name to the list of aspect elements
-* (nicecxModel.cx.aspects.AspectElement)
-
-
-
-
-
-**getEdgeAssociatedAspect(aspectName)**
-
-* Get the edge associated aspect specified
-
-**getEdgeAssociatedAspects()**
-
-* Get all edge associated aspects
-
-**getEdgeAttributes()**
-
-* Get all edge attributes
-
-**getEdgeAttributesById(id)**
-
-* Get the specified edge attribute
-
-**getEdgeCitations()**
-
-* Get all edge citations
-
-**getEdges()**
-
-* Get all edges
-
-**getMetadata()**
+**get_metadata()**
 
 * Get the network metadata
 
-**getName()**
+**set_metadata()**
 
-* Get the network name
-
-**getNamespaces()**
-
-* Get the network name spaces
-
-**getNetworkAttributes()**
-
-* Get all network attributes
-
-**getNodeAssociatedAspect(aspectName)**
-
-* Get the specified node associated aspect
-
-**getNodeAssociatedAspects()**
-
-* Get all node associated aspects
-
-**getNodeAttributes()**
-
-* Get all node attributes
-
-**getNodeCitations()**
-
-* Get all node citations
-
-**getNodes()**
-
-* Get all nodes
-
-**getOpaqueAspectTable()**
-
-* Get all opaque aspects
+* Set the network metadata
 
 **getProvenance()**
 
 * Get the network provenance
 
-**getSummary()**
-
-* Get a simple network summary 
-
-**setName(network_name)**
-
-* Set the network name
-
-**setNamespaces(ns)**
-
-* Set the network name spaces
-
-**setProvenance(provenance)**
+**set_provenance(provenance)**
 
 * Set the network provenance
 
-**to_stream_cx()**
+**get_context(context)**
 
-* Returns a stream of the CX corresponding to the network. 
-* Can be used to post to endpoints that can accept streaming input.s
+Get the @context aspect of the network, the aspect that maps namespace prefixes to their defining URIs
+
+**set_context()**
+
+Set the @context aspect of the network, the aspect that maps namespace prefixes to their defining URIs
+
+**get_opaque_aspect(aspect_name)**
+
+Get the elements of the aspect specified by aspect_name
+(nicecxModel.cx.aspects.AspectElement)
+* **aspect_name**: the name of the aspect
+
+**set_opaque_aspect(aspect_name, aspect_elements)**
+
+Set the aspect specified by aspect_name to the list of aspect elements. If aspect_elements is None, the aspect is removed.
+(nicecxModel.cx.aspects.AspectElement)
+
+**get_opaque_aspect_names()**
+
+* Get the names of all opaque aspects
+
+### **I/O**
 
 **to_cx()**
 
 * Return the CX corresponding to the network. 
+
+**to_cx_stream()**
+
+* Returns a stream of the CX corresponding to the network. 
+* Can be used to post to endpoints that can accept streaming inputs
 
 **to_networkx()**
 
@@ -704,21 +666,17 @@ Add an attribute to the an edge, where the edge may be specified by its id or pa
 
 **upload_to(server, username, password, update_uuid=None)**
 
-* Upload this network to the specified server to the account specified by username and password.
+Upload the network to the specified server to the account specified by username and password, return the UUID of the network on NDEx
+
+Example: my_niceCx.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
 
 * server: The NDEx server to upload the network to.
-
-* username: The username of the account to store the network.
-
+* username: The username of the account to store the network
 * password: The password for the account.
-
 * update_uuid: Instead of creating a new network, update the network that has this UUID with the content of this NiceCX object.
 
-* return: The UUID of the network on NDEx.
-
-* Example: my_niceCx.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
-
 **apply_template(server, username, password, uuid)**
+
 Get a network from NDEx, copy its cytoscapeVisualProperties aspect to this network.
 
 * **server**: The ndex server host of the network from which the layout will be copied
@@ -728,8 +686,20 @@ Get a network from NDEx, copy its cytoscapeVisualProperties aspect to this netwo
 
 # to be undocumented...
 
+**any method that works with CX JSON will be an undocumented function for internal use
+
+**addNode(json_obj=None)**
+
+Used to add a node to the network.
+
+* **name**: Name for the node
+
+* **represents**: The representation for the node.  This can be used to store the normalized id for the node
+
+* **json_obj**: The cx representation of a node
 
 **add_edge_element(json_obj=None, edge)**
 Low level function
 * **json_obj**: The cx representation of an edge
 
+**addNetworkAttribute(json_obj=None)**

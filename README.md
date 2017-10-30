@@ -518,14 +518,14 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 **create_node(name=None, represents=None, node=None)**
 
-Add a node to the network, specifying the node's name and the id of the entity that it represents.
+Create a new node in the network, specifying the node's name and the id of the entity that it represents.
 
 * **name**: Name for the node
 * **represents**: The ID of the entity represented by the node. Best practice is to use IDs from standard namespaces and to define namespace prefixes in the network context. 
 
 **add_node(node)**
 
-Add a node object to the network
+Add a node object to the network.
 
 * **node**: A node object (nicecxModel.cx.aspects.NodesElement)
 
@@ -573,7 +573,7 @@ Add an edge object to the network.
 
 * **edge**: An edge object (nicecxModel.cx.aspects.EdgesElement)
 
-**set_edge_attribute(edge=None, name=None, values=None, type=None, subnetwork=None)**
+**set_edge_attribute(edge, attribute_name, values, type=None, subnetwork=None)**
 
 Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
 
@@ -582,11 +582,11 @@ Set the value(s) of attribute of an edge, where the edge may be specified by its
 * **type**: the datatype of the attribute values, defaults to the python datatype of the values.
 * **subnetwork**: the id of the subnetwork to which this attribute applies.
 
-**get_node_attribute(node, attribute_name, subnetwork=None)**
+**get_edge_attribute(edge, attribute_name, subnetwork=None)**
 
 Get the values of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
 
-* **node**: edge object or edge id
+* **edge**: edge object or edge id
 * **attribute_name**: attribute name
 * **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
@@ -594,9 +594,11 @@ Get the values of an attribute of an edge, where the edge may be specified by it
 
 Get the attributes of an edge, where the edge may be specified by its id or passed in as an object.
 
+* **edge**: edge object or edge id
+
 **get_edges()**
 
-* Return an iteratable structure containing the objects for all edges in the network
+* Return an iteratable structure containing the objects for all edges in the network.
 
 ### **Network**
 

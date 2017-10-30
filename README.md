@@ -514,33 +514,21 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 ## **NiceCX Objects**
 
-**addCitation(citation_element)**
+### **Nodes**
 
-* Add a citation to the network
+### **Edges**
 
-**addEdge(id=None, edge_source=None, edge_target=None, edge_interaction=None, json_obj=None, edge_element=None)**
+**add_edge(source=None, source_id=none, target=None, target_id=none, edge_interaction=None, edge=None)**
+Add an edge to the network, either by specifying source-interaction-target **or** by supplying an Edge object.
+* **source**: The source node this edge, either its id or the node object itself.
+* **target**: The target node this edge, either its id or the node object itself.
+* **interaction**: The interaction that describes the relationship between the source and target nodes
+* **edge**: An edge object (nicecxModel.cx.aspects.EdgesElement)
 
-* Add an edge to the network.  
 
-* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
-
-* **edge_source**: Id of the source node for this edge
-
-* **edge_target**: Id of the target node for this edge
-
-* **edge_interaction**: The interaction that describes the relationship between the source and target nodes
-
-* **json_obj**: The cx representation of an edge
-
-* **edge_element**: The niceCx model representation for an edge (nicecxModel.cx.aspects.EdgesElement)
-
-**addEdgeAttribute(property_of=None, name=None, values=None, type=None, subnetwork=None, json_obj=None, edge_attribute_element=None)**
-
-* Add an attribute to the given edge
-
-* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
-
-* **edge_source**: Id of the source node for this edge
+**addEdgeAttribute(edge_id=None, name=None, values=None, type=None, subnetwork=None, json_obj=None, edge=None)**
+Add an attribute to the an edge, where the edge may be specified by its id or passed in an object.
+* **name**: Id of the source node for this edge
 
 * **edge_target**: Id of the target node for this edge
 
@@ -550,18 +538,7 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 * **edge_attribute_element**: The niceCx model representation for an edge attribute (nicecxModel.cx.aspects.EdgeAttributesElement)
 
-**addEdgeCitations(edge_id, citation_id)**
-
-* Connect a citation to the given edge
-
-**addEdgeCitationsFromCX(edge_citation_cx)**
-
-* Add a citation to the network
-
-**addEdgeSupports(edge_supports_element)**
-
-* Used to add 
-
+### **Network**
 **addNameSpace(prefix, uri)**
 
 * Used to add a name space to the network
@@ -569,6 +546,15 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 **addNetworkAttribute(network_attribute_element=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None)**
 
 * Used to add an attribute to the network
+
+### **I/O**
+
+
+
+
+
+
+
 
 **addNode(id=None, node_name=None, node_represents=None, json_obj=None, node_element=None)**
 
@@ -583,14 +569,6 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 * **json_obj**: The cx representation of a node
 
 * **node_element**: The niceCx model representation for a node (nicecxModel.cx.aspects.NodesElement)
-
-**addNodeAssociatedAspectElement(nodeId, elmt)**
-
-* Used to associate an element with the specified node 
-
-**addEdgeAssociatedAspect(aspectName)**
-
-* Used to associate an element with the specified edge 
 
 **addNodeAttribute(subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None, node_attribute_element=None)**
 
@@ -610,33 +588,15 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 * **node_attribute_element**: The niceCx model representation for a node attribute (nicecxModel.cx.aspects.NodeAttributesElement)
 
-**addNodeCitations(node_id, citation_id)**
 
-* Used to associate a citation with a node
 
-* **node_id**: The id of the node
+**set_opaque_aspect(aspect_name, aspect_elements)**
+* Set the aspect specified by aspect_name to the list of aspect elements
+* (nicecxModel.cx.aspects.AspectElement)
 
-* **citation_id**: The id of the citation
 
-**addOpaqueAspect(opaque_element)**
 
-* Used to add an opaque aspect (nicecxModel.cx.aspects.AspectElement)
 
-**addSupport(support_element)**
-
-* Add a support element (nicecxModel.cx.aspects.SupportElement)
-
-**apply_template(server, username, password, uuid)**
-
-* Used to add a layout template to the network
-
-* **server**: The ndex server host of the network from which the layout will be copied
-
-* **username**: Optional username to enable access to a private network
-
-* **password**: Optional password to enable access to a private network
-
-* **uuid**: The unique identifier of the network from which the layout will be copied
 
 **getEdgeAssociatedAspect(aspectName)**
 
@@ -757,4 +717,19 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 * return: The UUID of the network on NDEx.
 
 * Example: my_niceCx.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
+
+**apply_template(server, username, password, uuid)**
+Get a network from NDEx, copy its cytoscapeVisualProperties aspect to this network.
+
+* **server**: The ndex server host of the network from which the layout will be copied
+* **username**: Optional username to enable access to a private network
+* **password**: Optional password to enable access to a private network
+* **uuid**: The unique identifier of the network from which the layout will be copied
+
+# to be undocumented...
+
+
+**add_edge_element(json_obj=None, edge)**
+Low level function
+* **json_obj**: The cx representation of an edge
 

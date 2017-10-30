@@ -516,23 +516,36 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 ### **Nodes**
 
-**add_node(name=None, represents=None, node=None)**
+**create_node(name=None, represents=None, node=None)**
 
-Add a node to the network, either by specifying the node's name and the id of the entity that it represents  **or** by supplying a node object.
+Add a node to the network, specifying the node's name and the id of the entity that it represents.
 
 * **name**: Name for the node
 * **represents**: The ID of the entity represented by the node. Best practice is to use IDs from standard namespaces and to define namespace prefixes in the network context. 
-* **node**: The niceCx model representation for a node (nicecxModel.cx.aspects.NodesElement)
 
-**set_node_attribute(node, name=None, values=None, type=None, subnetwork=None)**
+**add_node(node)**
 
-Set an attribute of a node, where the node may be specified by its id or passed in as an object.
+Add a node object to the network
+
+* **node**: A node object (nicecxModel.cx.aspects.NodesElement)
+
+**set_node_attribute(node, attribute_name, values, type=None, subnetwork=None)**
+
+Set the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
 
 * **node**: node object or node id
-* **name**: attribute name
+* **attribute_name**: attribute name
 * **values**: the values of the attribute
-* **type**: the datatype of the attribute values
+* **type**: the datatype of the attribute values, defaults to the python datatype of the values.
 * **subnetwork**: the id of the subnetwork to which this attribute applies.
+
+**get_node_attribute(node, attribute_name, subnetwork=None)**
+
+Get the values of an attribute of a node, where the node may be specified by its id or passed in as an object.
+
+* **node**: node object or node id
+* **attribute_name**: attribute name
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
 **get_node_attributes(node)**
 
@@ -546,31 +559,44 @@ Returns an iteratable structure containing the objects for all nodes in the netw
 
 ### **Edges**
 
-**add_edge(source=None, source_id=none, target=None, interaction=None, edge=None)**
+**create_edge(source, target, interaction, edge=None)**
 
-Add an edge to the network, either by specifying source-interaction-target **or** by supplying an edge object.
+Create a new edge in the network by specifying source-interaction-target
 
 * **source**: The source node this edge, either its id or the node object itself.
 * **target**: The target node this edge, either its id or the node object itself.
 * **interaction**: The interaction that describes the relationship between the source and target nodes
+
+**add_edge(edge)**
+
+Add an edge object to the network.
+
 * **edge**: An edge object (nicecxModel.cx.aspects.EdgesElement)
 
 **set_edge_attribute(edge=None, name=None, values=None, type=None, subnetwork=None)**
 
-Set an attribute of an edge, where the edge may be specified by its id or passed in an object.
+Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
 
 * **name**: attribute name
 * **values**: the values of the attribute
-* **type**: the datatype of the attribute values
+* **type**: the datatype of the attribute values, defaults to the python datatype of the values.
 * **subnetwork**: the id of the subnetwork to which this attribute applies.
 
-**get_edges()**
+**get_node_attribute(node, attribute_name, subnetwork=None)**
 
-* Return an iteratable structure containing the objects for all edges in the network
+Get the values of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
+
+* **node**: edge object or edge id
+* **attribute_name**: attribute name
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
 **get_edge_attributes(edge)**
 
 Get the attributes of an edge, where the edge may be specified by its id or passed in as an object.
+
+**get_edges()**
+
+* Return an iteratable structure containing the objects for all edges in the network
 
 ### **Network**
 

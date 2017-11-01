@@ -8,6 +8,7 @@ import os
 import io
 import sys
 import decimal
+import numpy
 
 if sys.version_info.major == 3:
     from urllib.parse import urljoin
@@ -681,5 +682,7 @@ class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return float(o)
+        elif isinstance(o, numpy.int64):
+            return int(o)
         return super(DecimalEncoder, self).default(o)
 

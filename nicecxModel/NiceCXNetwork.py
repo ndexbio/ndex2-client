@@ -351,7 +351,7 @@ class NiceCXNetwork(object):
     #=============================
     def set_node_attribute(self, node, attribute_name, values, type=None, subnetwork=None):
         if node is not None:
-            node_attrs = self.get_node_attribute(node)
+            node_attrs = self.get_node_attributes(node)
             if node_attrs:
                 for n_a in node_attrs:
                     if n_a.get_name() == attribute_name:
@@ -379,6 +379,27 @@ class NiceCXNetwork(object):
                     self.nodeAttributes[node_attribute_element.get_property_of()] = nodeAttrs
 
                 nodeAttrs.append(node_attribute_element)
+
+    def get_node_attribute_objects(self, node, attribute_name):
+        node_attrs = self.get_node_attributes(node)
+
+        if node_attrs:
+            for n_a in node_attrs:
+                if n_a.get_name() == attribute_name:
+                    return n_a
+
+        return None
+
+    def get_node_attribute(self, node, attribute_name):
+        n_a = self.get_node_attribute_objects(node, attribute_name)
+        if n_a:
+            return n_a.get_values()
+
+    def get_node_attributes(self, node):
+        if type(node) is NodeElement:
+            return self.nodeAttributes.get(node.get_id())
+        else:
+            return self.nodeAttributes.get(node)
 
     #==================================
     # SET_EDGE_ATTRIBUTE
@@ -417,26 +438,6 @@ class NiceCXNetwork(object):
                         self.edgeAttributes[edge_attribute_element.get_property_of()] = edgeAttrs
 
                 edgeAttrs.append(edge_attribute_element)
-
-    def get_node_attribute(self, node):
-        if type(node) is NodeElement:
-            return self.nodeAttributes.get(node.get_id())
-        else:
-            return self.nodeAttributes.get(node)
-
-    def get_node_attribute_object(self, node, attribute_name):
-        node_attrs = []
-        if type(node) is NodeElement:
-            node_attrs = self.nodeAttributes.get(node.get_id())
-        else:
-            node_attrs = self.nodeAttributes.get(node)
-
-        if node_attrs:
-            for n_a in node_attrs:
-                if n_a.get_name() == attribute_name:
-                    return n_a
-
-        return None
 
     def get_node_attributes(self):
         return self.nodeAttributes.items()
@@ -523,7 +524,7 @@ class NiceCXNetwork(object):
             # METADATA
             #===================
             available_aspects = []
-            for ae in (o for o in self.stream_aspect(uuid, 'metaData', server, username, password)):
+            for ae in (o for o in self.get_aspect(uuid, 'metaData', server, username, password)):
                 available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
 
             #=======================
@@ -531,7 +532,7 @@ class NiceCXNetwork(object):
             #=======================
             for oa in available_aspects:
                 if 'visualProperties' in oa:
-                    objects = self.stream_aspect(uuid, 'visualProperties', server, username, password)
+                    objects = self.get_aspect(uuid, 'visualProperties', server, username, password)
                     obj_items = (o for o in objects)
                     for oa_item in obj_items:
                         aspect_element = AspectElement(oa_item, oa)
@@ -542,7 +543,7 @@ class NiceCXNetwork(object):
 
 
                 if 'cyVisualProperties' in oa:
-                    objects = self.stream_aspect(uuid, 'cyVisualProperties', server, username, password)
+                    objects = self.get_aspect(uuid, 'cyVisualProperties', server, username, password)
                     obj_items = (o for o in objects)
                     for oa_item in obj_items:
                         aspect_element = AspectElement(oa_item, oa)
@@ -1817,7 +1818,7 @@ class NiceCXNetwork(object):
             return json_response.get('metaData')
         else:
             if username and password:
-                base64string = base64.b64encode('%s:%s' % (username, password))
+                #base64string = base64.b64encode('%s:%s' % (username, password))
                 request = Request(server + '/v2/network/' + uuid + '/aspect/' + aspect_name, headers={"Authorization": "Basic " + base64.encodestring(username + ':' + password).replace('\n', '')})
             else:
                 request = Request(server + '/v2/network/' + uuid + '/aspect/' + aspect_name)

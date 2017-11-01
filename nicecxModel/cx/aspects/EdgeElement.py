@@ -2,7 +2,7 @@ __author__ = 'aarongary'
 
 from nicecxModel.cx import CX_CONSTANTS
 import json
-from ndex2.client import DecimalEncoder
+from nicecxModel.DecimalEncoder import DecimalEncoder
 
 class EdgeElement(object):
     def __init__(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
@@ -86,4 +86,5 @@ class EdgeElement(object):
             node_dict[CX_CONSTANTS.EDGE_INTERACTION] = self._interaction
 
         return node_dict
+
 

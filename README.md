@@ -514,257 +514,240 @@ my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
 
 ## **NiceCX Objects**
 
-**addCitation(citation_element)**
+### **Nodes**
 
-* Add a citation to the network
+**create_node(name, represents=None)**
 
-**addEdge(id=None, edge_source=None, edge_target=None, edge_interaction=None, json_obj=None, edge_element=None)**
+Create a new node in the network, specifying the node's name and optionally the id of the entity that it represents.
 
-* Add an edge to the network.  
+* **name**: Name for the node
+* **represents**: The ID of the entity represented by the node. Best practice is to use IDs from standard namespaces and to define namespace prefixes in the network context. 
 
-* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
+**add_node(node)**
 
-* **edge_source**: Id of the source node for this edge
+Add a node object to the network.
 
-* **edge_target**: Id of the target node for this edge
+* **node**: A node object (nicecxModel.cx.aspects.NodesElement)
 
-* **edge_interaction**: The interaction that describes the relationship between the source and target nodes
+**set_node_attribute(node, attribute_name, values, type=None, subnetwork=None)**
 
-* **json_obj**: The cx representation of an edge
+Set the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
 
-* **edge_element**: The niceCx model representation for an edge (nicecxModel.cx.aspects.EdgesElement)
+* **node**: node object or node id
+* **attribute_name**: attribute name
+* **values**: A value or list of values of the attribute
+* **type**: the datatype of the attribute values, defaults to the python datatype of the values.
+* **subnetwork**: the id of the subnetwork to which this attribute applies.
 
-**addEdgeAttribute(property_of=None, name=None, values=None, type=None, subnetwork=None, json_obj=None, edge_attribute_element=None)**
+**get_node_attribute(node, attribute_name, subnetwork=None)**
 
-* Add an attribute to the given edge
+Get the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
 
-* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
+* **node**: node object or node id
+* **attribute_name**: attribute name
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
-* **edge_source**: Id of the source node for this edge
+**get_node_attribute_objects(node, attribute_name)**
 
-* **edge_target**: Id of the target node for this edge
+Get the attribute objects for a node attribute name, where the node may be specified by its id or passed in as an object. The node attribute objects include datatype and subnetwork information. An example of networks that include subnetworks are Cytoscape collections stored in NDEx.
 
-* **edge_interaction**: The interaction that describes the relationship between the source and target nodes
+* **node**: node object or node id
+* **attribute_name**: attribute name
 
-* **json_obj**: The cx representation of an edge attribute
+**get_node_attributes(node)**
 
-* **edge_attribute_element**: The niceCx model representation for an edge attribute (nicecxModel.cx.aspects.EdgeAttributesElement)
+Get the attribute objects of a node, where the node may be specified by its id or passed in as an object.
 
-**addEdgeCitations(edge_id, citation_id)**
+* **node**: node object or node id
 
-* Connect a citation to the given edge
+**get_nodes()**
 
-**addEdgeCitationsFromCX(edge_citation_cx)**
+Returns an iterator over node ids as keys and node objects as values.
 
-* Add a citation to the network
+### **Edges**
 
-**addEdgeSupports(edge_supports_element)**
+**create_edge(source, target, interaction)**
 
-* Used to add 
+Create a new edge in the network by specifying source-interaction-target
 
-**addNameSpace(prefix, uri)**
+* **source**: The source node this edge, either its id or the node object itself.
+* **target**: The target node this edge, either its id or the node object itself.
+* **interaction**: The interaction that describes the relationship between the source and target nodes
 
-* Used to add a name space to the network
+**add_edge(edge)**
 
-**addNetworkAttribute(network_attribute_element=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None)**
+Add an edge object to the network.
 
-* Used to add an attribute to the network
+* **edge**: An edge object (nicecxModel.cx.aspects.EdgesElement)
 
-**addNode(id=None, node_name=None, node_represents=None, json_obj=None, node_element=None)**
+**set_edge_attribute(edge, attribute_name, values, type=None, subnetwork=None)**
 
-* Used to add a node to the network.
+Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
 
-* **id**: Optional identifier.  If one is not provided niceCx will generate one internally
+* **name**: attribute name
+* **values**: the values of the attribute
+* **type**: the datatype of the attribute values, defaults to the python datatype of the values.
+* **subnetwork**: the id of the subnetwork to which this attribute applies.
 
-* **node_name**: Name for the node
+**get_edge_attribute(edge, attribute_name, subnetwork=None)**
 
-* **node_represents**: The representation for the node.  This can be used to store the normalized id for the node
+Get the value(s) of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
 
-* **json_obj**: The cx representation of a node
+* **edge**: edge object or edge id
+* **attribute_name**: attribute name
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute was applied.
 
-* **node_element**: The niceCx model representation for a node (nicecxModel.cx.aspects.NodesElement)
+**get_edge_attribute_objects(edge, attribute_name)**
 
-**addNodeAssociatedAspectElement(nodeId, elmt)**
+Get the attribute objects for an edge attribute name, where the edge may be specified by its id or passed in as an object. The edge attribute objects include datatype and subnetwork information. An example of networks that include subnetworks are Cytoscape collections stored in NDEx.
 
-* Used to associate an element with the specified node 
+* **edge**: node object or node id
+* **attribute_name**: attribute name
 
-**addEdgeAssociatedAspect(aspectName)**
+**get_edge_attributes(edge)**
 
-* Used to associate an element with the specified edge 
+Get the attribute objects of an edge, where the edge may be specified by its id or passed in as an object.
 
-**addNodeAttribute(subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None, node_attribute_element=None)**
+* **edge**: edge object or edge id
 
-* Used to add a node attribute to the network.
+**get_edges()**
 
-* **subnetwork**: Optional subnetwork id
+Returns an iterator over edge ids as keys and edge objects as values.
 
-* **property_of**: Id of the node this attribute will be associated with
+### **Network**
 
-* **name**: The name of the attribute
+**get_name()**
 
-* **values**: The value(s) of the attribute
+Get the network name
 
-* **type**: The type of the value(s)
+**set_name(network_name)**
 
-* **json_obj**: The cx representation of the node attribute
-
-* **node_attribute_element**: The niceCx model representation for a node attribute (nicecxModel.cx.aspects.NodeAttributesElement)
-
-**addNodeCitations(node_id, citation_id)**
-
-* Used to associate a citation with a node
-
-* **node_id**: The id of the node
-
-* **citation_id**: The id of the citation
-
-**addOpaqueAspect(opaque_element)**
-
-* Used to add an opaque aspect (nicecxModel.cx.aspects.AspectElement)
-
-**addSupport(support_element)**
-
-* Add a support element (nicecxModel.cx.aspects.SupportElement)
-
-**apply_template(server, username, password, uuid)**
-
-* Used to add a layout template to the network
-
-* **server**: The ndex server host of the network from which the layout will be copied
-
-* **username**: Optional username to enable access to a private network
-
-* **password**: Optional password to enable access to a private network
-
-* **uuid**: The unique identifier of the network from which the layout will be copied
-
-**getEdgeAssociatedAspect(aspectName)**
-
-* Get the edge associated aspect specified
-
-**getEdgeAssociatedAspects()**
-
-* Get all edge associated aspects
-
-**getEdgeAttributes()**
-
-* Get all edge attributes
-
-**getEdgeAttributesById(id)**
-
-* Get the specified edge attribute
-
-**getEdgeCitations()**
-
-* Get all edge citations
-
-**getEdges()**
-
-* Get all edges
-
-**getMetadata()**
-
-* Get the network metadata
-
-**getName()**
-
-* Get the network name
-
-**getNamespaces()**
-
-* Get the network name spaces
-
-**getNetworkAttributes()**
-
-* Get all network attributes
-
-**getNodeAssociatedAspect(aspectName)**
-
-* Get the specified node associated aspect
-
-**getNodeAssociatedAspects()**
-
-* Get all node associated aspects
-
-**getNodeAttributes()**
-
-* Get all node attributes
-
-**getNodeCitations()**
-
-* Get all node citations
-
-**getNodes()**
-
-* Get all nodes
-
-**getOpaqueAspectTable()**
-
-* Get all opaque aspects
-
-**getProvenance()**
-
-* Get the network provenance
+Set the network name
 
 **getSummary()**
 
-* Get a simple network summary 
+Get a network summary 
 
-**setName(network_name)**
+**set_network_attribute(name=None, values=None, type=None, subnetwork_id=None)**
 
-* Set the network name
+Set an attribute of the network
 
-**setNamespaces(ns)**
+* **name**: attribute name
+* **values**: the values of the attribute
+* **type**: the datatype of the attribute values
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute applies.
 
-* Set the network name spaces
+**get_network_attribute(attribute_name, subnetwork_id=None)**
 
-**setProvenance(provenance)**
+Get the value of a network attribute
+
+* **attribute_name**: attribute name
+* **subnetwork**: the id of the subnetwork (if any) to which this attribute was applied.
+
+**get_network_attribute_objects(attribute_name)**
+
+Get the attribute objects for the network. The attribute objects include datatype and subnetwork information. An example of networks that include subnetworks are Cytoscape collections stored in NDEx.
+
+**get_network_attributes()**
+
+Get the attribute objects of the network.
+
+**get_metadata()**
+
+* Get the network metadata
+
+**set_metadata()**
+
+* Set the network metadata
+
+**getProvenance()**
+
+* Get the network provenance as a Python dictionary having the CX provenance schema.
+
+**set_provenance(provenance)**
 
 * Set the network provenance
 
-**stream_cx()**
+**get_context(context)**
 
-* returns the CX stream representation of the network.
+Get the @context aspect of the network, the aspect that maps namespace prefixes to their defining URIs
 
-**to_json()**
+**set_context()**
 
-* Marshal the network into a cx - json structure
+Set the @context aspect of the network, the aspect that maps namespace prefixes to their defining URIs
+
+**get_opaque_aspect(aspect_name)**
+
+Get the elements of the aspect specified by aspect_name
+(nicecxModel.cx.aspects.AspectElement)
+
+* **aspect_name**: the name of the aspect to retrieve.
+
+**set_opaque_aspect(aspect_name, aspect_elements)**
+
+Set the aspect specified by aspect_name to the list of aspect elements. If aspect_elements is None, the aspect is removed.
+(nicecxModel.cx.aspects.AspectElement)
+
+**get_opaque_aspect_names()**
+
+* Get the names of all opaque aspects
+
+### **I/O**
+
+**to_cx()**
+
+* Return the CX corresponding to the network. 
+
+**to_cx_stream()**
+
+Returns a stream of the CX corresponding to the network. Can be used to post to endpoints that can accept streaming inputs
 
 **to_networkx()**
 
-* Export the network as a networkx graph
+Return a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect of the network are transformed to the NetworkX **pos** attribute.
 
-**to_pandas()**
+**to_pandas_dataframe()**
 
-* Export the network as a Pandas DataFrame
+Export the network as a Pandas DataFrame. 
 
-**update_to(uuid, server, username, password)**
+Example: my_niceCx.upload_to(uuid=’34f29fd1-884b-11e7-a10d-0ac135e8bacf’, server='http://test.ndexbio.org', username='myusername', password='mypassword')
 
-* Upload this network to the specified server to the account specified by username and password.
+**upload(ndex_server, username, password, update_uuid=None)**
 
-* **uuid**: The uuid of the network being updated.
+Upload the network to the specified NDEx server to the account specified by username and password, return the UUID of the network on NDEx.
 
-* **server**: The NDEx server to upload the network to.
-
-* **username**: The username of the account to store the network.
-
-* **password**: The password for the account.
-
-* returns: The UUID of the network on NDEx.
-
-* Example: my_niceCx.upload_to(uuid=’34f29fd1-884b-11e7-a10d-0ac135e8bacf’, server='http://test.ndexbio.org', username='myusername', password='mypassword')
-
-**upload_to(server, username, password)**
-
-* Upload this network to the specified server to the account specified by username and password.
+Example: my_niceCx.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
 
 * server: The NDEx server to upload the network to.
-
-* username: The username of the account to store the network.
-
+* username: The username of the account to store the network
 * password: The password for the account.
+* update_uuid: Instead of creating a new network, update the network that has this UUID with the content of this NiceCX object.
 
-* return: The UUID of the network on NDEx.
+**apply_template(server, username, password, uuid)**
 
-* Example: my_niceCx.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
+Get a network from NDEx, copy its cytoscapeVisualProperties aspect to this network.
 
+* **server**: The ndex server host of the network from which the layout will be copied
+* **username**: Optional username to enable access to a private network
+* **password**: Optional password to enable access to a private network
+* **uuid**: The unique identifier of the network from which the layout will be copied
+
+# to be undocumented...
+
+**any method that works with CX JSON will be an undocumented function for internal use
+
+**addNode(json_obj=None)**
+
+Used to add a node to the network.
+
+* **name**: Name for the node
+
+* **represents**: The representation for the node.  This can be used to store the normalized id for the node
+
+* **json_obj**: The cx representation of a node
+
+**add_edge_element(json_obj=None, edge)**
+Low level function
+* **json_obj**: The cx representation of an edge
+
+**addNetworkAttribute(json_obj=None)**

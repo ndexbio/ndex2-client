@@ -112,7 +112,7 @@ def create_nice_cx_from_cx(cx):
         available_aspects = []
         for ae in (o for o in my_nicecx.get_frag_from_list_by_key(cx, 'metaData')):
             available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
-            mde = MetaDataElement(json_obj=ae)
+            mde = MetaDataElement(cx_fragment=ae)
             my_nicecx.add_metadata(mde)
 
         opaque_aspects = set(available_aspects).difference(known_aspects_min)
@@ -429,7 +429,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             for att in obj_items:
                 #add_this_node_att = NodeAttributesElement(json_obj=att)
 
-                my_nicecx.set_node_attribute(att.get('po'), att.get('n'), att.get('v'))
+                my_nicecx.set_node_attribute(att.get('po'), att.get('n'), att.get('v'), type=att.get('d'))
             my_nicecx.add_metadata_stub('nodeAttributes')
 
         #===================
@@ -441,7 +441,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             for att in obj_items:
                 #add_this_edge_att = EdgeAttributesElement(json_obj=att)
 
-                my_nicecx.set_edge_attribute(att.get('po'), att.get('n'), att.get('v'))
+                my_nicecx.set_edge_attribute(att.get('po'), att.get('n'), att.get('v'), type=att.get('d'))
             my_nicecx.add_metadata_stub('edgeAttributes')
 
         #===================

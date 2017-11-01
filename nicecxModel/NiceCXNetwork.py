@@ -125,16 +125,8 @@ class NiceCXNetwork(object):
 
         nodeAttrs.append(node_attribute_element)
 
-    def set_node_attribute(self, node, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
-        property_of = None
-        if not cx_fragment:
-            if type(node) is NodeElement:
-                property_of = node.get_id()
-            else:
-                property_of = node
-
-        node_attribute_element = NodeAttributesElement(subnetwork=subnetwork, property_of=property_of, name=attribute_name,
-                                                           values=values, type=type, cx_fragment=cx_fragment)
+    def set_node_attribute_from_cx_fragment(self,cx_fragment):
+        node_attribute_element = NodeAttributesElement(cx_fragment=cx_fragment)
 
         self.nodeAttributeHeader.add(node_attribute_element.get_name())
         nodeAttrs = self.nodeAttributes.get(node_attribute_element.get_property_of())
@@ -143,6 +135,17 @@ class NiceCXNetwork(object):
             self.nodeAttributes[node_attribute_element.get_property_of()] = nodeAttrs
 
         nodeAttrs.append(node_attribute_element)
+
+    def set_edge_attribute_from_cx_fragment(self,cx_fragment):
+        edge_attribute_element = EdgeAttributesElement(cx_fragment=cx_fragment)
+
+        self.edgeAttributeHeader.add(edge_attribute_element.get_name())
+        edgeAttrs = self.edgeAttributes.get(edge_attribute_element.get_property_of())
+        if edgeAttrs is None:
+            edgeAttrs = []
+            self.edgeAttributes[edge_attribute_element.get_property_of()] = edgeAttrs
+
+        edgeAttrs.append(edge_attribute_element)
 
     def set_node_attribute_delete_me(self, node_attribute_element=None, i=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
         if node_attribute_element is None:
@@ -349,36 +352,39 @@ class NiceCXNetwork(object):
     #=============================
     # NODE ATTRIBUTES OPERATIONS
     #=============================
-    def set_node_attribute(self, node, attribute_name, values, type=None, subnetwork=None):
-        if node is not None:
-            node_attrs = self.get_node_attributes(node)
-            if node_attrs:
-                for n_a in node_attrs:
-                    if n_a.get_name() == attribute_name:
-                        n_a.set_values(values)
-                        if type:
-                            n_a.set_data_type(type)
+    def set_node_attribute(self, node, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
+        if cx_fragment:
+            self.set_node_attribute_from_cx_fragment(cx_fragment)
+        else:
+            if node is not None:
+                node_attrs = self.get_node_attributes(node)
+                if node_attrs:
+                    for n_a in node_attrs:
+                        if n_a.get_name() == attribute_name:
+                            n_a.set_values(values)
+                            if type:
+                                n_a.set_data_type(type)
 
-                        if subnetwork:
-                            n_a.set_subnetwork(subnetwork)
+                            if subnetwork:
+                                n_a.set_subnetwork(subnetwork)
 
-                        break
-            else:
-                if isinstance(node, NodeElement):#type(node) is NodeElement:
-                    po = node.get_id()
+                            break
                 else:
-                    po = node
+                    if isinstance(node, NodeElement):#type(node) is NodeElement:
+                        po = node.get_id()
+                    else:
+                        po = node
 
-                node_attribute_element = NodeAttributesElement(subnetwork=subnetwork,
-                                                               property_of=po, name=attribute_name,
-                                                               values=values, type=type)
-                self.nodeAttributeHeader.add(node_attribute_element.get_name())
-                nodeAttrs = self.nodeAttributes.get(node_attribute_element.get_property_of())
-                if nodeAttrs is None:
-                    nodeAttrs = []
-                    self.nodeAttributes[node_attribute_element.get_property_of()] = nodeAttrs
+                    node_attribute_element = NodeAttributesElement(subnetwork=subnetwork,
+                                                                   property_of=po, name=attribute_name,
+                                                                   values=values, type=type)
+                    self.nodeAttributeHeader.add(node_attribute_element.get_name())
+                    nodeAttrs = self.nodeAttributes.get(node_attribute_element.get_property_of())
+                    if nodeAttrs is None:
+                        nodeAttrs = []
+                        self.nodeAttributes[node_attribute_element.get_property_of()] = nodeAttrs
 
-                nodeAttrs.append(node_attribute_element)
+                    nodeAttrs.append(node_attribute_element)
 
     def get_node_attribute_objects(self, node, attribute_name):
         node_attrs = self.get_node_attributes(node)
@@ -404,40 +410,43 @@ class NiceCXNetwork(object):
     #==================================
     # SET_EDGE_ATTRIBUTE
     #==================================
-    def set_edge_attribute(self, edge, attribute_name, values, type=None, subnetwork=None):
-        if edge is not None:
-            edge_attrs = self.get_edge_attribute(edge)
-            if edge_attrs:
-                for e_a in edge_attrs:
-                    if e_a.get_name() == attribute_name:
-                        e_a.set_values(values)
-                        if type:
-                            if type(type) is ATTRIBUTE_DATA_TYPE:
-                                e_a.set_data_type(type)
-                            else:
-                                raise Exception('The supplied type is not of type: ATTRIBUTE_DATA_TYPE')
+    def set_edge_attribute(self, edge, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
+        if cx_fragment:
+            self.set_edge_attribute_from_cx_fragment(cx_fragment)
+        else:
+            if edge is not None:
+                edge_attrs = self.get_edge_attribute(edge)
+                if edge_attrs:
+                    for e_a in edge_attrs:
+                        if e_a.get_name() == attribute_name:
+                            e_a.set_values(values)
+                            if type:
+                                if type(type) is ATTRIBUTE_DATA_TYPE:
+                                    e_a.set_data_type(type)
+                                else:
+                                    raise Exception('The supplied type is not of type: ATTRIBUTE_DATA_TYPE')
 
-                        if subnetwork:
-                            e_a.set_subnetwork(subnetwork)
+                            if subnetwork:
+                                e_a.set_subnetwork(subnetwork)
 
-                        break
-            else:
-                property_of = None
-                if isinstance(edge, EdgeElement):
-                    property_of = edge.get_id()
+                            break
                 else:
-                    property_of = edge
+                    property_of = None
+                    if isinstance(edge, EdgeElement):
+                        property_of = edge.get_id()
+                    else:
+                        property_of = edge
 
-                edge_attribute_element = EdgeAttributesElement(subnetwork=subnetwork, property_of=property_of, name=attribute_name,
-                                                                   values=values, type=type, cx_fragment=None)
+                    edge_attribute_element = EdgeAttributesElement(subnetwork=subnetwork, property_of=property_of, name=attribute_name,
+                                                                       values=values, type=type, cx_fragment=None)
 
-                self.edgeAttributeHeader.add(edge_attribute_element.get_name())
-                edgeAttrs = self.edgeAttributes.get(edge_attribute_element.get_property_of())
-                if edgeAttrs is None:
-                        edgeAttrs = []
-                        self.edgeAttributes[edge_attribute_element.get_property_of()] = edgeAttrs
+                    self.edgeAttributeHeader.add(edge_attribute_element.get_name())
+                    edgeAttrs = self.edgeAttributes.get(edge_attribute_element.get_property_of())
+                    if edgeAttrs is None:
+                            edgeAttrs = []
+                            self.edgeAttributes[edge_attribute_element.get_property_of()] = edgeAttrs
 
-                edgeAttrs.append(edge_attribute_element)
+                    edgeAttrs.append(edge_attribute_element)
 
     def get_node_attributesx(self):
         return self.nodeAttributes.items()

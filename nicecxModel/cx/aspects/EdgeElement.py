@@ -2,6 +2,7 @@ __author__ = 'aarongary'
 
 from nicecxModel.cx import CX_CONSTANTS
 import json
+from ndex2.client import DecimalEncoder
 
 class EdgeElement(object):
     def __init__(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
@@ -65,7 +66,7 @@ class EdgeElement(object):
         return self == other or self._id == other._id
 
     def __str__(self):
-        return json.dumps(self.to_cx())
+        return json.dumps(self.to_cx(), cls=DecimalEncoder)
 
     def to_cx(self):
         if self._id == -1:

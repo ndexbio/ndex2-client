@@ -18,7 +18,10 @@ class AttributeCommon(object):
             self._subnetwork = subnetwork
             self._name = name
             self._values = values
-            self._data_type = type
+            if isinstance(type, str):
+                self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(type)
+            else:
+                self._data_type = type
 
         self.ASPECT_NAME = None
 

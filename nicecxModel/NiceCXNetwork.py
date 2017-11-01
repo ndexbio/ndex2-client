@@ -358,6 +358,7 @@ class NiceCXNetwork(object):
         else:
             if node is not None:
                 node_attrs = self.get_node_attributes(node)
+                found_attr = False
                 if node_attrs:
                     for n_a in node_attrs:
                         if n_a.get_name() == attribute_name:
@@ -368,8 +369,11 @@ class NiceCXNetwork(object):
                             if subnetwork:
                                 n_a.set_subnetwork(subnetwork)
 
+                            found_attr = True
+
                             break
-                else:
+
+                if not node_attrs or not found_attr:
                     if isinstance(node, NodeElement):#type(node) is NodeElement:
                         po = node.get_id()
                     else:
@@ -416,37 +420,42 @@ class NiceCXNetwork(object):
         else:
             if edge is not None:
                 edge_attrs = self.get_edge_attribute(edge)
+                found_attr = False
                 if edge_attrs:
                     for e_a in edge_attrs:
                         if e_a.get_name() == attribute_name:
-                            e_a.set_values(values)
-                            if type:
-                                if type(type) is ATTRIBUTE_DATA_TYPE:
-                                    e_a.set_data_type(type)
-                                else:
-                                    raise Exception('The supplied type is not of type: ATTRIBUTE_DATA_TYPE')
+                            found_attr = True
 
-                            if subnetwork:
-                                e_a.set_subnetwork(subnetwork)
+                            e_a.set_values(values)
+                            e_a.set_subnetwork(subnetwork)
+                            if type:
+                                if type(type) is str:
+                                    e_a.set_data_type(ATTRIBUTE_DATA_TYPE.fromCxLabel(type))
+                                else:
+                                    e_a.set_data_type(type)
 
                             break
-                else:
+
+                if not edge_attrs or not found_attr:
                     property_of = None
                     if isinstance(edge, EdgeElement):
                         property_of = edge.get_id()
                     else:
                         property_of = edge
 
-                    edge_attribute_element = EdgeAttributesElement(subnetwork=subnetwork, property_of=property_of, name=attribute_name,
-                                                                       values=values, type=type, cx_fragment=None)
+                    edge_attribute_element = EdgeAttributesElement(subnetwork=subnetwork,
+                                                                   property_of=property_of,
+                                                                   name=attribute_name,
+                                                                   values=values,
+                                                                   type=type,
+                                                                   cx_fragment=None)
 
                     self.edgeAttributeHeader.add(edge_attribute_element.get_name())
-                    edgeAttrs = self.edgeAttributes.get(edge_attribute_element.get_property_of())
-                    if edgeAttrs is None:
-                            edgeAttrs = []
-                            self.edgeAttributes[edge_attribute_element.get_property_of()] = edgeAttrs
+                    if edge_attrs is None:
+                        edge_attrs = []
+                        self.edgeAttributes[edge_attribute_element.get_property_of()] = edge_attrs
 
-                    edgeAttrs.append(edge_attribute_element)
+                    edge_attrs.append(edge_attribute_element)
 
     def get_node_attributesx(self):
         return self.nodeAttributes.items()
@@ -456,6 +465,30 @@ class NiceCXNetwork(object):
             return self.nodes.pop(node.get_id(), None)
         else:
             return self.nodes.pop(node, None)
+
+    def remove_node_attribute(self, node, attribute_name):
+        node_attrs = self.get_node_attributes(node)
+
+        if node_attrs:
+            for n_a in node_attrs:
+                if n_a.get_name() == attribute_name:
+                    node_attrs.remove(n_a)
+                    break
+
+    def remove_edge(self, edge):
+        if type(edge) is EdgeElement:
+            return self.edges.pop(edge.get_id(), None)
+        else:
+            return self.edges.pop(edge, None)
+
+    def remove_edge_attribute(self, edge, attribute_name):
+        edge_attrs = self.get_edge_attributes(edge)
+
+        if edge_attrs:
+            for e_a in edge_attrs:
+                if e_a.get_name() == attribute_name:
+                    edge_attrs.remove(e_a)
+                    break
 
     #==================
     # OTHER OPERATIONS

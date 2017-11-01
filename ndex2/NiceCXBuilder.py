@@ -8,8 +8,8 @@ import sys
 #from urllib import urlopen
 from ndex2.client import Ndex2
 from nicecxModel.NiceCXNetwork import NiceCXNetwork
-from nicecxModel.cx.aspects.NodesElement import NodesElement
-from nicecxModel.cx.aspects.EdgesElement import EdgesElement
+from nicecxModel.cx.aspects.NodeElement import NodeElement
+from nicecxModel.cx.aspects.EdgeElement import EdgeElement
 from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
 from nicecxModel.cx.aspects.NodeAttributesElement import NodeAttributesElement
 from nicecxModel.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
@@ -53,10 +53,10 @@ class NiceCXBuilder():
             # METADATA
             #===================
             available_aspects = []
-            for ae in (o for o in self.streamAspect(uuid, 'metaData')):
+            for ae in (o for o in self.stream_aspect(uuid, 'metaData')):
                 available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
                 mde = MetaDataElement(json_obj=ae)
-                niceCx.addMetadata(mde)
+                niceCx.add_metadata(mde)
 
             #available_aspects = ['edges', 'nodes'] # TODO - remove this
             opaque_aspects = set(available_aspects).difference(known_aspects_min)
@@ -66,98 +66,98 @@ class NiceCXBuilder():
             #====================
             # NETWORK ATTRIBUTES
             #====================
-            objects = self.streamAspect(uuid, 'networkAttributes')
+            objects = self.stream_aspect(uuid, 'networkAttributes')
             obj_items = (o for o in objects)
             for network_item in obj_items:
                 add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
 
-                niceCx.addNetworkAttribute(add_this_network_attribute)
+                niceCx.add_network_attribute(add_this_network_attribute)
 
             #===================
             # NODES
             #===================
-            objects = self.streamAspect(uuid, 'nodes')
+            objects = self.stream_aspect(uuid, 'nodes')
             obj_items = (o for o in objects)
             for node_item in obj_items:
-                add_this_node = NodesElement(json_obj=node_item)
+                add_this_node = NodeElement(cx_fragment=node_item)
 
-                niceCx.addNode(add_this_node)
+                niceCx.create_node(add_this_node)
 
             #===================
             # EDGES
             #===================
-            objects = self.streamAspect(uuid, 'edges')
+            objects = self.stream_aspect(uuid, 'edges')
             obj_items = (o for o in objects)
             for edge_item in obj_items:
-                add_this_edge = EdgesElement(json_obj=edge_item)
+                add_this_edge = EdgeElement(cx_fragment=edge_item)
 
-                niceCx.addEdge(add_this_edge)
+                niceCx.create_edge(add_this_edge)
 
             #===================
             # NODE ATTRIBUTES
             #===================
-            objects = self.streamAspect(uuid, 'nodeAttributes')
+            objects = self.stream_aspect(uuid, 'nodeAttributes')
             obj_items = (o for o in objects)
             for att in obj_items:
                 add_this_node_att = NodeAttributesElement(json_obj=att)
 
-                niceCx.addNodeAttribute(add_this_node_att)
+                niceCx.add_node_attribute(add_this_node_att)
 
             #===================
             # EDGE ATTRIBUTES
             #===================
-            objects = self.streamAspect(uuid, 'edgeAttributes')
+            objects = self.stream_aspect(uuid, 'edgeAttributes')
             obj_items = (o for o in objects)
             for att in obj_items:
                 add_this_edge_att = EdgeAttributesElement(json_obj=att)
 
-                niceCx.addEdgeAttribute(add_this_edge_att)
+                niceCx.add_edge_attribute(add_this_edge_att)
 
             #===================
             # CITATIONS
             #===================
-            objects = self.streamAspect(uuid, 'citations')
+            objects = self.stream_aspect(uuid, 'citations')
             obj_items = (o for o in objects)
             for cit in obj_items:
-                add_this_citation = CitationElement(json_obj=cit)
+                add_this_citation = CitationElement(cx_fragment=cit)
 
-                niceCx.addCitation(add_this_citation)
+                niceCx.add_citation(add_this_citation)
 
             #===================
             # SUPPORTS
             #===================
-            objects = self.streamAspect(uuid, 'supports')
+            objects = self.stream_aspect(uuid, 'supports')
             obj_items = (o for o in objects)
             for sup in obj_items:
-                add_this_supports = SupportElement(json_obj=sup)
+                add_this_supports = SupportElement(cx_fragment=sup)
 
-                niceCx.addSupport(add_this_supports)
+                niceCx.add_support(add_this_supports)
 
             #===================
             # NODE CITATIONS
             #===================
-            objects = self.streamAspect(uuid, 'nodeCitations')
+            objects = self.stream_aspect(uuid, 'nodeCitations')
             obj_items = (o for o in objects)
             for node_cit in obj_items:
-                niceCx.addNodeCitationsFromCX(node_cit)
+                niceCx.add_node_citations_from_cx(node_cit)
 
             #===================
             # EDGE CITATIONS
             #===================
-            objects = self.streamAspect(uuid, 'edgeCitations')
+            objects = self.stream_aspect(uuid, 'edgeCitations')
             obj_items = (o for o in objects)
             for edge_cit in obj_items:
-                niceCx.addEdgeCitationsFromCX(edge_cit)
+                niceCx.add_edge_citations_from_cx(edge_cit)
 
             #===================
             # OPAQUE ASPECTS
             #===================
             for oa in opaque_aspects:
-                objects = self.streamAspect(uuid, oa)
+                objects = self.stream_aspect(uuid, oa)
                 obj_items = (o for o in objects)
                 for oa_item in obj_items:
                     aspect_element = AspectElement(oa_item, oa)
-                    niceCx.addOpaqueAspect(aspect_element)
+                    niceCx.add_opaque_aspect(aspect_element)
 
             return niceCx
         else:
@@ -191,7 +191,7 @@ class NiceCXBuilder():
                 for ae in (o for o in aspect.get('metaData')):
                     available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
                     mde = MetaDataElement(json_obj=ae)
-                    niceCx.addMetadata(mde)
+                    niceCx.add_metadata(mde)
                 opaque_aspects = set(available_aspects).difference(known_aspects)
 
                 continue
@@ -215,7 +215,7 @@ class NiceCXBuilder():
 
             cx = self.unclassified_cx
 
-    def loadAspect(self, aspect_name):
+    def load_aspect(self, aspect_name):
         #with open('Signal1.cx', mode='r') as cx_f:
         with open('network1.cx', mode='r') as cx_f:
             aspect_json = json.loads(cx_f.read())
@@ -223,10 +223,10 @@ class NiceCXBuilder():
                 if aspect.get(aspect_name) is not None:
                     return aspect.get(aspect_name)
 
-    def streamAllAspects(self, uuid):
+    def stream_all_aspects(self, uuid):
         return ijson.items(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid), 'item')
 
-    def streamAspect(self, uuid, aspect_name):
+    def stream_aspect(self, uuid, aspect_name):
         if aspect_name == 'metaData':
             print('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
             md_response = requests.get('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
@@ -272,7 +272,7 @@ class NiceCXBuilder():
 
             return ijson.items(urlopen_result, 'item')
 
-    def streamAspectRaw(self, uuid, aspect_name):
+    def stream_aspect_raw(self, uuid, aspect_name):
         return ijson.parse(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name))
 
 

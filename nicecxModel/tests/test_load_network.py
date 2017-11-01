@@ -8,8 +8,8 @@ import ijson
 import pickle
 import json
 from nicecxModel.NiceCXNetwork import NiceCXNetwork
-from nicecxModel.cx.aspects.NodesElement import NodesElement
-from nicecxModel.cx.aspects.EdgesElement import EdgesElement
+from nicecxModel.cx.aspects.NodesElement import NodeElement
+from nicecxModel.cx.aspects.EdgesElement import EdgeElement
 from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
 from nicecxModel.cx.aspects.NodeAttributesElement import NodeAttributesElement
 from nicecxModel.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
@@ -95,7 +95,7 @@ class MyTestCase(unittest.TestCase):
         for network_item in obj_items:
             add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
 
-            niceCx.addNetworkAttribute(add_this_network_attribute)
+            niceCx.add_network_attribute(add_this_network_attribute)
 
         #===================
         # NODES
@@ -104,9 +104,9 @@ class MyTestCase(unittest.TestCase):
         objects = loadAspect('nodes')
         obj_items = (o for o in objects)
         for node_item in obj_items:
-            add_this_node = NodesElement(json_obj=node_item)
+            add_this_node = NodeElement(json_obj=node_item)
 
-            niceCx.addNode(add_this_node)
+            niceCx.create_node(add_this_node)
 
         #===================
         # EDGES
@@ -116,9 +116,9 @@ class MyTestCase(unittest.TestCase):
         objects = loadAspect('edges')
         obj_items = (o for o in objects)
         for edge_item in obj_items:
-            add_this_edge = EdgesElement(json_obj=edge_item)
+            add_this_edge = EdgeElement(json_obj=edge_item)
 
-            niceCx.addEdge(add_this_edge)
+            niceCx.create_edge(add_this_edge)
 
         #===================
         # NODE ATTRIBUTES
@@ -129,7 +129,7 @@ class MyTestCase(unittest.TestCase):
         for att in obj_items:
             add_this_node_att = NodeAttributesElement(json_obj=att)
 
-            niceCx.addNodeAttribute(add_this_node_att)
+            niceCx.add_node_attribute(add_this_node_att)
 
         #===================
         # EDGE ATTRIBUTES
@@ -140,7 +140,7 @@ class MyTestCase(unittest.TestCase):
         for att in obj_items:
             add_this_edge_att = EdgeAttributesElement(json_obj=att)
 
-            niceCx.addEdgeAttribute(add_this_edge_att)
+            niceCx.add_edge_attribute(add_this_edge_att)
 
         #===================
         # CITATIONS
@@ -149,9 +149,9 @@ class MyTestCase(unittest.TestCase):
         objects = loadAspect('citations')
         obj_items = (o for o in objects)
         for cit in obj_items:
-            add_this_citation = CitationElement(json_obj=cit)
+            add_this_citation = CitationElement(cx_fragment=cit)
 
-            niceCx.addCitation(add_this_citation)
+            niceCx.add_citation(add_this_citation)
 
         #===================
         # SUPPORTS
@@ -159,9 +159,9 @@ class MyTestCase(unittest.TestCase):
         objects = loadAspect('supports')
         obj_items = (o for o in objects)
         for sup in obj_items:
-            add_this_supports = SupportElement(json_obj=sup)
+            add_this_supports = SupportElement(cx_fragment=sup)
 
-            niceCx.addSupport(add_this_supports)
+            niceCx.add_support(add_this_supports)
 
         #===================
         # NODE CITATIONS
@@ -169,7 +169,7 @@ class MyTestCase(unittest.TestCase):
         objects = loadAspect('nodeCitations')
         obj_items = (o for o in objects)
         for node_cit in obj_items:
-            niceCx.addNodeCitationsFromCX(node_cit)
+            niceCx.add_node_citations_from_cx(node_cit)
 
         #===================
         # EDGE CITATIONS
@@ -177,16 +177,16 @@ class MyTestCase(unittest.TestCase):
         objects = loadAspect('edgeCitations')
         obj_items = (o for o in objects)
         for edge_cit in obj_items:
-            niceCx.addEdgeCitationsFromCX(edge_cit)
+            niceCx.add_edge_citations_from_cx(edge_cit)
 
-        nice_cx_json = niceCx.to_json()
+        nice_cx_json = niceCx.to_cx()
 
 #        serialized = pickle.dumps(niceCx, protocol=0)
 #        print 'Serialized memory:', sys.getsizeof(serialized)
 
 
-        print('starting to_pandas')
-        niceCx.to_pandas()
+        print('starting to_pandas_dataframe')
+        niceCx.to_pandas_dataframe()
         parser = ijson.parse(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/nodes'))
 
         node_id, node_n, node_r = '', '', ''
@@ -214,15 +214,15 @@ class MyTestCase(unittest.TestCase):
                 node_r = value
                 if node_found:
                     node_matches[node_id] = {'n': node_n, 'r': node_r}
-                    add_this_node = NodesElement(id=node_id, node_name=node_n, node_represents=node_r)
-                    niceCx.addNode(add_this_node)
+                    add_this_node = NodeElement(id=node_id, node_name=node_n, node_represents=node_r)
+                    niceCx.create_node(add_this_node)
                     node_found = False
             else:
                 # No represents found
                 if node_found:
                     node_matches[node_id] = {'n': node_n}
-                    add_this_node = NodesElement(id=node_id, node_name=node_n)
-                    niceCx.addNode(add_this_node)
+                    add_this_node = NodeElement(id=node_id, node_name=node_n)
+                    niceCx.create_node(add_this_node)
                     node_found = False
 
         print('Response time (Node search): ' + str(time.time() - start_time))
@@ -246,8 +246,8 @@ class MyTestCase(unittest.TestCase):
                 edge_i = value
                 if edge_found:
                     edge_matches[edge_id] = {'s': edge_s, 't': edge_t, 'i': edge_i}
-                    add_this_edge = EdgesElement(id=edge_id, edge_source=edge_s, edge_target=edge_t, edge_interaction=edge_i)
-                    niceCx.addEdge(add_this_edge)
+                    add_this_edge = EdgeElement(id=edge_id, edge_source=edge_s, edge_target=edge_t, edge_interaction=edge_i)
+                    niceCx.create_edge(add_this_edge)
                     edge_connected[edge_s] = 1
                     edge_connected[edge_t] = 1
                     edge_found = False
@@ -255,8 +255,8 @@ class MyTestCase(unittest.TestCase):
                 # No interaction found
                 if edge_found:
                     edge_matches[edge_id] = {'s': edge_s, 't': edge_t}
-                    add_this_edge = EdgesElement(id=edge_id, edge_source=edge_s, edge_target=edge_t)
-                    niceCx.addEdge(add_this_edge)
+                    add_this_edge = EdgeElement(id=edge_id, edge_source=edge_s, edge_target=edge_t)
+                    niceCx.create_edge(add_this_edge)
                     edge_connected[edge_s] = 1
                     edge_connected[edge_t] = 1
                     edge_found = False

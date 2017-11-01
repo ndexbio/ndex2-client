@@ -3,8 +3,8 @@ import pandas as pd
 import csv
 import networkx as nx
 from nicecxModel.NiceCXNetwork import NiceCXNetwork
-from nicecxModel.cx.aspects.NodesElement import NodesElement
-from nicecxModel.cx.aspects.EdgesElement import EdgesElement
+from nicecxModel.cx.aspects.NodesElement import NodeElement
+from nicecxModel.cx.aspects.EdgesElement import EdgeElement
 
 #with open('CTD_genes_pathways.txt', 'rU') as tsvfile:
 #with open('CTD_chem_path_enriched.txt', 'rU') as tsvfile:
@@ -21,7 +21,7 @@ with open('SIMPLE3.txt', 'rU') as tsvfile:
     #niceCx.create_from_pandas(df, source_field='GeneSymbol', target_field='PathwayName', source_node_attr=['GeneID'], target_node_attr=['Pathway Source'], edge_attr=[])
     #niceCx.create_from_pandas(df, source_field='ChemicalName', target_field='PathwayName', source_node_attr=['Chemical ID (MeSH)'], target_node_attr=['Pathway Source'], edge_attr=[])
     niceCx.create_from_pandas(df)
-    #my_cx_json = niceCx.to_json()
+    #my_cx_json = niceCx.to_cx()
     print 'nx created'
     niceCx.apply_template('dev2.ndexbio.org', 'scratch', 'scratch', '3daff7cd-9a6b-11e7-9743-0660b7976219')
     print 'template applied'

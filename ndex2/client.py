@@ -677,9 +677,6 @@ class Ndex2:
         route = "/networkset"
         return self.post(route, json.dumps( { "name": name, "description": description}))
 
-
-
-
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):

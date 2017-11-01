@@ -53,11 +53,11 @@ class CXSimpleAttribute():
 		dataType = p.getDataType();
 	}
 
-	public String getName() {
+	public String get_name() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void set_name(String name) {
 		this.name = name;
 	}
 

@@ -4,58 +4,58 @@ from nicecxModel.cx import CX_CONSTANTS
 import json
 
 class SupportElement(object):
-    def __init__(self, id=None, text=None, citation_id=None, attributes=None, props=None, json_obj=None):
+    def __init__(self, id=None, text=None, citation_id=None, attributes=None, props=None, cx_fragment=None):
         self.ASPECT_NAME = 'supports'
 
-        if json_obj is None:
+        if cx_fragment is None:
             self._text = text
             self._id = id
             self._citation_id = citation_id
             self._attributes = attributes
             self._props = props
         else:
-            self._text = json_obj.get(CX_CONSTANTS.TEXT.value)
-            self._id = json_obj.get(CX_CONSTANTS.ID.value)
-            self._citation_id = json_obj.get(CX_CONSTANTS.CITATION.value)
-            self._attributes = json_obj.get(CX_CONSTANTS.ATTRIBUTES.value)
-            self._props = json_obj.get(CX_CONSTANTS.PROPERTIES.value)
+            self._text = cx_fragment.get(CX_CONSTANTS.TEXT.value)
+            self._id = cx_fragment.get(CX_CONSTANTS.ID.value)
+            self._citation_id = cx_fragment.get(CX_CONSTANTS.CITATION.value)
+            self._attributes = cx_fragment.get(CX_CONSTANTS.ATTRIBUTES.value)
+            self._props = cx_fragment.get(CX_CONSTANTS.PROPERTIES.value)
 
         self.support_element = {}
 
-    def getText(self):
+    def get_text(self):
         return self._text
 
-    def setText(self, text):
+    def set_text(self, text):
         self._text = text
 
-    def getId(self):
+    def get_id(self):
         return self._id
 
-    def setId(self, id):
+    def set_id(self, id):
         self._id = id
 
-    def getCitationId(self):
+    def get_citation_id(self):
         return self._citation_id
 
-    def setCitationId(self, citation_id):
+    def set_citation_id(self, citation_id):
         self._citation_id = citation_id
 
-    def getAttribute(self):
+    def get_attribute(self):
         return self._attributes
 
-    def setAttributes(self, attibrutes):
+    def set_attributes(self, attibrutes):
         self._attributes = attibrutes
 
     def getProps(self):
         return self._props
 
-    def setProps(self, props):
+    def set_props(self, props):
         self._props = props
 
     def __str__(self):
-        return json.dumps(self.to_json())
+        return json.dumps(self.to_cx())
 
-    def to_json(self):
+    def to_cx(self):
         return_json = {}
 
         if self._id == -1:

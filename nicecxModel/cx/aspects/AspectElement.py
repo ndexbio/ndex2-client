@@ -8,14 +8,14 @@ class AspectElement(object):
         self.ASPECT_NAME = aspect_name
         self.aspect_element = element
 
-    def getAspectName(self):
+    def get_aspect_name(self):
         return self.ASPECT_NAME
 
-    def setAspectName(self, name):
+    def set_aspect_name(self, name):
         self.ASPECT_NAME = name
 
-    def getAspectElement(self):
+    def get_aspect_element(self):
         return self.aspect_element
 
-    def setAspectElement(self, ae):
+    def set_aspect_element(self, ae):
         self.aspect_element = ae

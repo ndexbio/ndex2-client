@@ -5,13 +5,13 @@ from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
 from nicecxModel.cx import CX_CONSTANTS
 
 class AttributeCommon(object):
-    def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
-        if json_obj is not None:
-            data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(json_obj.get(CX_CONSTANTS.VALUE))
-            self._property_of = json_obj.get(CX_CONSTANTS.PROPERTY_OF)
-            self._subnetwork = json_obj.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)
-            self._name = json_obj.get(CX_CONSTANTS.NAME)
-            self._values = json_obj.get(CX_CONSTANTS.VALUE)
+    def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, cx_fragment=None):
+        if cx_fragment is not None:
+            data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(cx_fragment.get(CX_CONSTANTS.VALUE))
+            self._property_of = cx_fragment.get(CX_CONSTANTS.PROPERTY_OF)
+            self._subnetwork = cx_fragment.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)
+            self._name = cx_fragment.get(CX_CONSTANTS.NAME)
+            self._values = cx_fragment.get(CX_CONSTANTS.VALUE)
             self._data_type = data_type
         else:
             self._property_of = property_of
@@ -22,52 +22,52 @@ class AttributeCommon(object):
 
         self.ASPECT_NAME = None
 
-    def getPropertyOf(self):
+    def get_property_of(self):
         return self._property_of
 
-    def setPropertyOf(self, id):
+    def set_property_of(self, id):
         self._property_of = id
 
-    def getSubnetwork(self):
+    def get_subnetwork(self):
         return self._subnetwork
 
-    def setSubnetwork(self, subnetwork):
+    def set_subnetwork(self, subnetwork):
         self._subnetwork = subnetwork
 
-    def getName(self):
+    def get_name(self):
         return self._name
 
-    def setName(self, name):
+    def set_name(self, name):
         self.name = name
 
-    def getValues(self):
+    def get_values(self):
         return self._values
 
-    def setValues(self, values):
+    def set_values(self, values):
         self._values = values
 
-    def getDataType(self):
+    def get_data_type(self):
         return self._data_type
 
-    def setDataType(self, data_type):
+    def set_data_type(self, data_type):
         self._data_type = data_type
 
-    def getValueAsJsonString(self):
+    def get_value_as_json_string(self):
         return json.dumps(self._values)
 
-    def isSingleValue(self):
+    def is_single_value(self):
         return ATTRIBUTE_DATA_TYPE.isSingleValueType(self._data_type)
 
-    def getAspectName(self):
+    def get_aspect_name(self):
         return self.ASPECT_NAME
 
-    def setAspectName(self, aspect_name):
+    def set_aspect_name(self, aspect_name):
         self.ASPECT_NAME = aspect_name
 
     def __str__(self):
-        return json.dumps(self.to_json())
+        return json.dumps(self.to_cx())
 
-    def to_json(self):
+    def to_cx(self):
         return_dict = {}
 
         if self._property_of is not None:
@@ -82,8 +82,8 @@ class AttributeCommon(object):
         if self._subnetwork:
             return_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK] = self._subnetwork
 
-        if self.isSingleValue():
-            return_dict[CX_CONSTANTS.VALUE] = self.getValues()
+        if self.is_single_value():
+            return_dict[CX_CONSTANTS.VALUE] = self.get_values()
         else:
             return_dict[CX_CONSTANTS.VALUE] = self._values
 

@@ -70,28 +70,28 @@ class MultipartCXEncoder(object):
             self.nice_cx.node_id_lookup = list(self.nice_cx.node_int_id_generator)
 
         if self.nice_cx.metadata:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateMetadataAspect())))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_metadata_aspect())))
         '''
         if self.nice_cx.nodes:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('nodes'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('nodes'))))
         if self.nice_cx.edges:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('edges'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('edges'))))
         if self.nice_cx.networkAttributes:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('networkAttributes'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('networkAttributes'))))
         if self.nice_cx.nodeAttributes:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('nodeAttributes'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('nodeAttributes'))))
         if self.nice_cx.edgeAttributes:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('edgeAttributes'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('edgeAttributes'))))
         if self.nice_cx.citations:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('citations'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('citations'))))
         if self.nice_cx.nodeCitations:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('nodeCitations'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('nodeCitations'))))
         if self.nice_cx.edgeCitations:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('edgeCitations'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('edgeCitations'))))
         if self.nice_cx.edgeSupports:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('edgeSupports'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('edgeSupports'))))
         if self.nice_cx.nodeSupports:
-            yield encoder(self.u(json.dumps(self.nice_cx.generateAspect('nodeSupports'))))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_aspect('nodeSupports'))))
         if self.nice_cx.opaqueAspects:
             for oa in self.nice_cx.opaqueAspects:
                 yield encoder(self.u(json.dumps({oa: self.nice_cx.opaqueAspects[oa]})))
@@ -99,7 +99,7 @@ class MultipartCXEncoder(object):
             #===========================
             # UPDATE CONSISTENCY GROUP
             #===========================
-            yield encoder(self.u(json.dumps(self.nice_cx.generateMetadataAspect())))
+            yield encoder(self.u(json.dumps(self.nice_cx.generate_metadata_aspect())))
         '''
 
         yield encoder('\r\n')

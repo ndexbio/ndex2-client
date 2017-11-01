@@ -26,7 +26,7 @@ class NetworkNConstructorTests(unittest.TestCase):
             self.assertEqual(len(G.reified_edges), 2)
             self.assertEqual(len(G.edge_citation_map),37)
             self.assertEqual(len(G.edge_support_map),37)
-            self.assertEqual(len(G.namespaces),39)'''
+            self.assertEqual(len(G.context),39)'''
 
             G.update_to('b8fedefb-29e5-11e7-b3a1-06832d634f41', 'http://dev.ndexbio.org', 'scratch', 'scratch')
         print "done"

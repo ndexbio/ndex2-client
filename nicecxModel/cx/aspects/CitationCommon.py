@@ -18,28 +18,28 @@ class CitationCommon(object):
 
         self.ASPECT_NAME = None
 
-    def getPropertyOf(self):
+    def get_property_of(self):
         return self._property_of
 
-    def setPropertyOf(self, id):
+    def set_property_of(self, id):
         self._property_of = id
 
-    def getSubnetwork(self):
+    def get_subnetwork(self):
         return self._subnetwork
 
-    def setSubnetwork(self, subnetwork):
+    def set_subnetwork(self, subnetwork):
         self._subnetwork = subnetwork
 
-    def getCitations(self):
+    def get_citations(self):
         return self._citations
 
-    def setCitations(self, citations):
+    def set_citations(self, citations):
         self._citations = citations
 
     def __str__(self):
-        return json.dumps(self.to_json())
+        return json.dumps(self.to_cx())
 
-    def to_json(self):
+    def to_cx(self):
         return_dict = {}
 
         if self._property_of is not None:

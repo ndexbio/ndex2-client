@@ -12,7 +12,7 @@ niceCx.create_from_server('public.ndexbio.org', None, None, 'dfba0dfb-6192-11e5-
 #=============================
 # convert to pandas dataframe
 #=============================
-my_pd = niceCx.to_pandas()
+my_pd = niceCx.to_pandas_dataframe()
 
 #=====================
 # Export to csv file

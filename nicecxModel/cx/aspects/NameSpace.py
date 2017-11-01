@@ -2,7 +2,7 @@ __author__ = 'aarongary'
 
 import json
 
-class NameSpaces():
+class NameSpace():
     def __init__(self):
 	    self.serialVersionUID = 1
 	    self.ASPECT_NAME = '@context'
@@ -11,10 +11,10 @@ class NameSpaces():
         return self.ASPECT_NAME
 
     def compareTo(self, o):
-        if o is not None and o.getAspectName() is not None and self.getAspectName() is not None:
-            if self.getAspectName() > o.getAspectName():
+        if o is not None and o.get_aspect_name() is not None and self.getAspectName() is not None:
+            if self.getAspectName() > o.get_aspect_name():
                 return 1
-            elif self.getAspectName() < o.getAspectName():
+            elif self.getAspectName() < o.get_aspect_name():
                 return -1
             else:
                 return 0

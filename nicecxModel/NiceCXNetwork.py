@@ -439,7 +439,7 @@ class NiceCXNetwork(object):
 
                 edgeAttrs.append(edge_attribute_element)
 
-    def get_node_attributes(self):
+    def get_node_attributesx(self):
         return self.nodeAttributes.items()
 
     def remove_node(self, node):

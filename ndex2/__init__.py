@@ -100,6 +100,12 @@ def create_nice_cx_from_networkx(G):
     if my_nicecx.edgeAttributes:
         my_nicecx.add_metadata_stub('edgeAttributes')
 
+    if hasattr(G, 'pos'):
+        G_pos = create_cartesian_coordinates_aspect_from_networkx(G)
+
+        my_nicecx.set_opaque_aspect('cartesianLayout', G_pos.get('cartesianLayout'))
+        my_nicecx.add_metadata_stub('cartesianLayout')
+
     return my_nicecx
 
 def create_nice_cx_from_cx(cx):
@@ -123,7 +129,7 @@ def create_nice_cx_from_cx(cx):
         if 'networkAttributes' in available_aspects:
             objects = my_nicecx.get_frag_from_list_by_key(cx, 'networkAttributes')
             for network_item in objects:
-                add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
+                add_this_network_attribute = NetworkAttributesElement(cx_fragment=network_item)
 
                 my_nicecx.add_network_attribute(network_attribute_element=add_this_network_attribute)
             my_nicecx.add_metadata_stub('networkAttributes')
@@ -517,5 +523,10 @@ def create_nice_cx_from_filename(filename):
             return my_nicecx
     else:
         raise Exception('The file provided does not exist.')
+
+def create_cartesian_coordinates_aspect_from_networkx(G):
+    return {'cartesianLayout': [
+        {'node': n, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])} for n in G.pos
+    ]}
 
 from nicecxModel.NiceCXNetwork import NiceCXNetwork

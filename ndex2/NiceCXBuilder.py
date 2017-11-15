@@ -69,7 +69,7 @@ class NiceCXBuilder():
             objects = self.stream_aspect(uuid, 'networkAttributes')
             obj_items = (o for o in objects)
             for network_item in obj_items:
-                add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
+                add_this_network_attribute = NetworkAttributesElement(cx_fragment=network_item)
 
                 niceCx.add_network_attribute(add_this_network_attribute)
 

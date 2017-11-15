@@ -61,7 +61,7 @@ class NiceCXNetwork(object):
         self.nodeAssociatedAspects = {}
         self.edgeAssociatedAspects = {}
         self.opaqueAspects = {}
-        self.provenance = None
+        self.provenance = []
         self.missingNodes = {}
         self.s = None
 
@@ -89,6 +89,8 @@ class NiceCXNetwork(object):
 
         self.add_edge(edge_element)
 
+        return edge_element.get_id()
+
     def add_edge(self, edge_element):
         if type(edge_element) is EdgeElement:
             if edge_element.get_id() < 0:
@@ -108,7 +110,7 @@ class NiceCXNetwork(object):
     def add_network_attribute(self, network_attribute_element=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
         if network_attribute_element is None:
             network_attribute_element = NetworkAttributesElement(subnetwork=subnetwork, property_of=property_of,
-                                                                 name=name, values=values, type=type, json_obj=json_obj)
+                                                                 name=name, values=values, type=type, cx_fragment=json_obj)
 
         self.networkAttributes.append(network_attribute_element)
 
@@ -264,22 +266,6 @@ class NiceCXNetwork(object):
 
         return None
 
-    def get_metadata(self):
-        return self.metadata
-
-    def set_metadata(self, metadata_obj):
-        if type(metadata_obj) is dict:
-            self.metadata = metadata_obj
-        else:
-            raise Exception('Set metadata input was not of type <dict>')
-
-    def add_metadata(self, md):
-        if type(md) is MetaDataElement:
-            #  TODO - alter metadata to match the element counts
-            self.metadata[md.get_name()] = md
-        else:
-            raise Exception('Provided input was not of type <MetaDataElement>')
-
     def add_name_space(self, prefix, uri):
         self.context[prefix] = uri
 
@@ -312,6 +298,47 @@ class NiceCXNetwork(object):
 
         return None
 
+    #==============================
+    # NETWORK PROPERTY OPERATIONS
+    #==============================
+    def set_network_attribute(self, name=None, values=None, type=None, subnetwork=None, cx_fragment=None):
+        if cx_fragment:
+            self.networkAttributes.append(NetworkAttributesElement(cx_fragment=cx_fragment))
+        else:
+            found_attr = False
+            for n_a in self.networkAttributes:
+                if n_a.get_name() == name:
+                    n_a.set_values(values)
+                    if type:
+                        n_a.set_data_type(type)
+
+                    if subnetwork:
+                        n_a.set_subnetwork(subnetwork)
+
+                    found_attr = True
+
+                    break
+
+            if not found_attr:
+                self.networkAttributes.append(NetworkAttributesElement(subnetwork=subnetwork, name=name, values=values, type=type))
+
+    def get_network_attribute_objects(self, attribute_name):
+        for n_a in self.networkAttributes:
+            if n_a.get_name() == attribute_name:
+                return n_a
+
+        return None
+
+    def get_network_attribute(self, attribute_name, subnetwork_id=None):
+        net_attr = self.get_network_attribute_objects(attribute_name)
+        if net_attr:
+            return net_attr.get_values()
+        else:
+            return None
+
+    def get_network_attributes(self):
+        return self.networkAttributes
+
     #==================
     # NODE OPERATIONS
     #==================
@@ -319,6 +346,8 @@ class NiceCXNetwork(object):
         node_element = NodeElement(id=id, node_name=node_name, node_represents=node_represents, cx_fragment=cx_fragment)
 
         self.add_node(node_element)
+
+        return node_element.get_id()
 
     def add_node(self, node_element):
         if type(node_element) is NodeElement:
@@ -365,6 +394,9 @@ class NiceCXNetwork(object):
                             n_a.set_values(values)
                             if type:
                                 n_a.set_data_type(type)
+                            #elif not isinstance(values, str):
+                            #    if values:
+                            #        print type(values)
 
                             if subnetwork:
                                 n_a.set_subnetwork(subnetwork)
@@ -378,6 +410,13 @@ class NiceCXNetwork(object):
                         po = node.get_id()
                     else:
                         po = node
+
+                    if values and not isinstance(values, str):
+                        if isinstance(values, list):
+                            if isinstance(values[0], basestring):
+                                type = ATTRIBUTE_DATA_TYPE.LIST_OF_STRING
+                            else:
+                                type = ATTRIBUTE_DATA_TYPE.LIST_OF_FLOAT
 
                     node_attribute_element = NodeAttributesElement(subnetwork=subnetwork,
                                                                    property_of=po, name=attribute_name,
@@ -404,6 +443,8 @@ class NiceCXNetwork(object):
         n_a = self.get_node_attribute_objects(node, attribute_name)
         if n_a:
             return n_a.get_values()
+        else:
+            return None
 
     def get_node_attributes(self, node):
         if type(node) is NodeElement:
@@ -412,14 +453,14 @@ class NiceCXNetwork(object):
             return self.nodeAttributes.get(node)
 
     #==================================
-    # SET_EDGE_ATTRIBUTE
+    # EDGE ATTRIBUTE OPERATIONS
     #==================================
     def set_edge_attribute(self, edge, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
         if cx_fragment:
             self.set_edge_attribute_from_cx_fragment(cx_fragment)
         else:
             if edge is not None:
-                edge_attrs = self.get_edge_attribute(edge)
+                edge_attrs = self.get_edge_attributes(edge)
                 found_attr = False
                 if edge_attrs:
                     for e_a in edge_attrs:
@@ -457,6 +498,30 @@ class NiceCXNetwork(object):
 
                     edge_attrs.append(edge_attribute_element)
 
+    def get_edge_attributes(self, edge):
+        if edge and isinstance(edge, EdgeElement):
+            return self.edgeAttributes.get(edge.get_id())
+        else:
+            return self.edgeAttributes.get(edge)
+
+    def get_edge_attribute_objects(self, edge, attribute_name):
+        edge_attrs = self.get_edge_attributes(edge)
+
+        if edge_attrs:
+            for e_a in edge_attrs:
+                if e_a.get_name() == attribute_name:
+                    return e_a
+
+        return None
+
+    # TODO - return the element as the appropriate type (cast)
+    def get_edge_attribute(self, edge, attribute_name, subnetwork=None):
+        edge_attr = self.get_edge_attribute_object(edge, attribute_name)
+        if edge_attr:
+            return edge_attr.get_values()
+        else:
+            return None
+
     def get_node_attributesx(self):
         return self.nodeAttributes.items()
 
@@ -493,27 +558,60 @@ class NiceCXNetwork(object):
     #==================
     # OTHER OPERATIONS
     #==================
+
+    def get_context(self):
+        return self.context
+
+    def set_context(self, context):
+        if isinstance(context, list):
+            self.context = context
+        else:
+            raise Exception('Context provided is not of type list')
+
+    def get_metadata(self):
+        return self.metadata
+
+    def set_metadata(self, metadata_obj):
+        if isinstance(metadata_obj, dict):
+            self.metadata = metadata_obj
+        else:
+            raise Exception('Set metadata input was not of type <dict>')
+
+    def add_metadata(self, md):
+        if isinstance(md, MetaDataElement):
+            #  TODO - alter metadata to match the element counts
+            self.metadata[md.get_name()] = md
+        else:
+            raise Exception('Provided input was not of type <MetaDataElement>')
+
+    def getProvenance(self):
+        return self.provenance
+
+    def set_provenance(self, provenance):
+        if isinstance(provenance, list):
+            self.provenance = provenance
+        else:
+            raise Exception('Provided provenance was not of type <list>')
+
     def get_opaque_aspect_table(self):
         return self.opaqueAspects
 
-    def get_network_attributes(self):
-        return self.networkAttributes
+    def get_opaque_aspect(self, aspect_name):
+        return self.opaqueAspects.get(aspect_name)
 
-    #def get_edge_attributes(self):
-    #    return self.edgeAttributes
-
-    def get_edge_attributes(self, edge):
-        if edge and isinstance(edge, EdgeElement):
-            return self.edgeAttributes.get(edge.get_id())
+    def set_opaque_aspect(self, aspect_name, aspect_elements):
+        if aspect_elements is None:
+            self.opaqueAspects.pop(aspect_name, None)
         else:
-            return self.edgeAttributes.get(edge)
+            if isinstance(aspect_elements, list):
+                self.opaqueAspects[aspect_name] = aspect_elements
+            else:
+                if aspect_name is None:
+                    aspect_name = 'unknown'
+                raise Exception('Provided aspect for ' + aspect_name + ' is not of type <list>')
 
-    # TODO - return the element as the appropriate type (cast)
-    def get_edge_attribute(self, edge):
-        if isinstance(edge, EdgeElement):
-            return  self.edgeAttributes.get(edge.get_id())
-        else:
-            return self.edgeAttributes.get(edge)
+    def get_opaque_aspect_names(self):
+        return self.opaqueAspects.keys()
 
     # TODO - determine if this is useful
     def get_edge_attribute_element(self, edge, attr_name):
@@ -555,6 +653,19 @@ class NiceCXNetwork(object):
         return self.nodeCitations
 
     def apply_template(self, server, username, password, uuid):
+        '''
+        Addes the style template from the network identified by uuid
+        :param server: server host name (i.e. public.ndexbio.org)
+        :type server: basestring
+        :param username: username
+        :type username: basestring
+        :param password: password
+        :type password:  basestring
+        :param uuid: uuid of the styled network
+        :type uuid: basestring
+        :return: none
+        :rtype:
+        '''
         error_message = []
         if not server:
             error_message.append('server')
@@ -595,6 +706,28 @@ class NiceCXNetwork(object):
                     self.add_metadata(mde)
         else:
             raise Exception(', '.join(error_message) + 'not specified in apply_template')
+
+    def merge_node_attributes(self, source_attribute1, source_attribute2, target_attribute):
+        '''
+        Checks 2 attribute fields for values and merges them into one attribute.  The best use is when one attribute
+        is empty which occurs when loading from an edge file.  Use with caution
+        :param source_attribute1: The name of the first attribute
+        :type source_attribute1: basestring
+        :param source_attribute2: The name of the second attribute
+        :type source_attribute2: basestring
+        :param target_attribute: The desired name for the merged data
+        :type target_attribute: basestring
+        :return:
+        :rtype:
+        '''
+        for node_id, node in self.nodes.items():
+            value1 = self.get_node_attribute(node, source_attribute1)
+            value2 = self.get_node_attribute(node, source_attribute2)
+            merged_value = value1 or value2
+            if merged_value:
+                self.set_node_attribute(node, target_attribute, merged_value)
+                self.remove_node_attribute(node, source_attribute1)
+                self.remove_node_attribute(node, source_attribute2)
 
     def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[], edge_interaction=None):
         """
@@ -1233,6 +1366,18 @@ class NiceCXNetwork(object):
         #================
         # PROCESS LAYOUT
         #================
+        cartesian_layout = self.opaqueAspects.get('cartesianLayout')
+        if cartesian_layout:
+            G.pos = {}
+            for x_y_pos in cartesian_layout:
+                G.pos[x_y_pos.get('node')] = (x_y_pos.get('x'), x_y_pos.get('y'))
+
+        #def create_cartesian_coordinates_aspect_from_networkx(G):
+        #    return {'cartesianLayout': [
+        #        {'node': n, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])} for n in G.pos
+        #    ]}
+
+
         #if hasattr(networkx_G, 'pos'):
         #    G.pos = {node_dict[a] : b for a, b in networkx_G.pos.items()}
 
@@ -1301,6 +1446,9 @@ class NiceCXNetwork(object):
         if self.opaqueAspects:
             for oa in self.opaqueAspects:
                 output_cx.append({oa: self.opaqueAspects[oa]})
+                oa_md = self.metadata.get(oa)
+                if oa_md:
+                    oa_md.set_element_count(len(self.opaqueAspects[oa]))
         if self.metadata:
             #===========================
             # UPDATE CONSISTENCY GROUP

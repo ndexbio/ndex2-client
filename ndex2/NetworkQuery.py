@@ -231,7 +231,7 @@ class NetworkQuery():
             #====================
             if 'networkAttributes' in available_aspects:
                 for ae in (o for o in self.stream_aspect(uuid, 'networkAttributes')):
-                    add_this_network_attribute = NetworkAttributesElement(json_obj=ae)
+                    add_this_network_attribute = NetworkAttributesElement(cx_fragment=ae)
                     niceCx.add_network_attribute(add_this_network_attribute)
 
             #===================

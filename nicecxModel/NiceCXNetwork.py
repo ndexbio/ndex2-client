@@ -652,7 +652,7 @@ class NiceCXNetwork(object):
     def get_node_citations(self):
         return self.nodeCitations
 
-    def apply_template(self, server, username, password, uuid):
+    def apply_template(self, server, uuid, username=None, password=None):
         '''
         Addes the style template from the network identified by uuid
         :param server: server host name (i.e. public.ndexbio.org)
@@ -1351,6 +1351,7 @@ class NiceCXNetwork(object):
         for k, v in edge_items:
             e_a = self.edgeAttributes.get(k)
             add_this_dict = {}
+            add_this_dict['interaction'] = v.get_interaction()
             if e_a is not None:
                 for e_a_item in e_a:
                     if type(e_a_item.get_values()) is list:
@@ -1359,9 +1360,7 @@ class NiceCXNetwork(object):
                     else:
                         add_this_dict[e_a_item.get_name()] = e_a_item.get_values()
 
-                G.add_edge(v.get_source(), v.get_target(), add_this_dict)
-            else:
-                G.add_edge(v.get_source(), v.get_target())
+            G.add_edge(v.get_source(), v.get_target(), add_this_dict)
 
         #================
         # PROCESS LAYOUT

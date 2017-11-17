@@ -21,11 +21,13 @@ import base64
 
 userAgent = 'NDEx-Python/3.0'
 
+DEFAULT_SERVER = "http://public.ndexbio.org"
+
 class Ndex2:
 
 
     '''A class to facilitate communication with an NDEx server.'''
-    def __init__(self, host = "http://public.ndexbio.org", username = None, password = None, update_status=False, debug = False):
+    def __init__(self, host=None, username=None, password=None, update_status=False, debug=False):
         '''Creates a connection to a particular NDEx server.
 
                 :param host: The URL of the server.
@@ -40,6 +42,10 @@ class Ndex2:
         self.status = {}
         self.username = username
         self.password = password
+
+        if host is None:
+            host = DEFAULT_SERVER
+
         if "localhost" in host:
             self.host = "http://localhost:8080/ndexbio-rest"
         else:
@@ -224,8 +230,11 @@ class Ndex2:
         return result
 
     # The Request is streamed, not the Response
-    def post_multipart(self, route, fields):
-        url = self.host + route
+    def post_multipart(self, route, fields, query_string=None):
+        if query_string:
+            url = self.host + route + '?' + query_string
+        else:
+            url = self.host + route
         multipart_data = MultipartEncoder(fields=fields)
         if self.debug:
             print("POST route: " + url)
@@ -247,7 +256,7 @@ class Ndex2:
 
 # Network methods
 
-    def save_new_network (self, cx):
+    def save_new_network (self, cx, visibility=None, indexed_fields=None):
         #print type(cx)
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):
@@ -264,13 +273,13 @@ class Ndex2:
             else:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 
-            return self.save_cx_stream_as_new_network(stream)
+            return self.save_cx_stream_as_new_network(stream, visibility=visibility, indexed_fields=indexed_fields)
         else:
             raise IndexError("Cannot save empty CX.  Please provide a non-empty CX document.")
 
     # CX Methods
     # Create a network based on a stream from a source CX format
-    def save_cx_stream_as_new_network (self, cx_stream):
+    def save_cx_stream_as_new_network (self, cx_stream, visibility=None, indexed_fields=None):
         ''' Create a new network from a CX stream, optionally providing a provenance history object to be included in the new network.
 
         :param cx_stream: The network stream.
@@ -280,6 +289,15 @@ class Ndex2:
         self.require_auth()
         route = ''
         fields = {}
+        query_string = None
+        if indexed_fields:
+            if visibility:
+                query_string = 'indexedfields=' + ','.join(indexed_fields)
+            else:
+                query_string = 'visibility=' + visibility + '&indexedfields=' + ','.join(indexed_fields)
+        elif visibility:
+                query_string = 'visibility=' + visibility
+
         if(self.version == "2.0"):
             route = '/network'
             fields = {
@@ -291,7 +309,7 @@ class Ndex2:
                 'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
             }
 
-        return self.post_multipart(route, fields)
+        return self.post_multipart(route, fields, query_string=query_string)
 
     # Create a network based on a JSON string or Dict in CX format
     def update_cx_network(self, cx_stream, network_id):
@@ -435,6 +453,16 @@ class Ndex2:
         post_json = json.dumps(post_data)
         return self.post(route, post_json)
 
+    def search_network_nodes(self, network_id, search_string='', account_name=None, limit=5):
+        post_data = {"searchString" : search_string}
+        if self.version == "2.0":
+            route = "/search/network/%s/nodes?limit=%s" % (network_id, limit)
+        else:
+            route = "/network/%s/nodes/%s" % (network_id, limit)
+
+        post_json = json.dumps(post_data)
+        return self.post(route, post_json)
+
     def find_networks(self, search_string="", account_name=None, skip_blocks=0, block_size=100):
         print("find_networks is deprecated, please use search_networks")
         return self.search_networks(search_string, account_name, skip_blocks, block_size)
@@ -558,6 +586,16 @@ class Ndex2:
         else:
             raise Exception("network_properties must be a string or a list of NdexPropertyValuePair objects")
         return self.put(route, putJson)
+
+    def get_sample_network(self, network_id):
+        route = "/network/%s/sample" % (network_id)
+        return self.get(route)
+
+    def set_network_sample(self, network_id, sample_cx_network_str):
+        self.require_auth()
+        route = "/network/%s/sample" % (network_id)
+    #    putJson = json.dumps(sample_cx_network_str)
+        return self.put(route, sample_cx_network_str)
 
     def set_network_system_properties(self, network_id, network_properties):
         self.require_auth()

@@ -66,7 +66,10 @@ def create_nice_cx_from_networkx(G):
         #=============
         # ADD NODES
         #=============
-        my_nicecx.create_node(id=n, node_name=n, node_represents=n)
+        if d and d.get('name'):
+            my_nicecx.create_node(id=n, node_name=d.get('name'), node_represents=d.get('name'))
+        else:
+            my_nicecx.create_node(id=n, node_name=n, node_represents=n)
 
         #======================
         # ADD NODE ATTRIBUTES

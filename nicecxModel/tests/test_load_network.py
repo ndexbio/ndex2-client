@@ -8,8 +8,8 @@ import ijson
 import pickle
 import json
 from nicecxModel.NiceCXNetwork import NiceCXNetwork
-from nicecxModel.cx.aspects.NodesElement import NodeElement
-from nicecxModel.cx.aspects.EdgesElement import EdgeElement
+from nicecxModel.cx.aspects.NodeElement import NodeElement
+from nicecxModel.cx.aspects.EdgeElement import EdgeElement
 from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
 from nicecxModel.cx.aspects.NodeAttributesElement import NodeAttributesElement
 from nicecxModel.cx.aspects.EdgeAttributesElement import EdgeAttributesElement

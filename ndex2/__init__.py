@@ -88,7 +88,8 @@ def create_nice_cx_from_networkx(G):
         # ADD EDGE ATTRIBUTES
         #==============================
         for k,v in d.items():
-            my_nicecx.set_edge_attribute(index, k, v)
+            if k != 'interaction':
+                my_nicecx.set_edge_attribute(index, k, v)
 
         index += 1
 

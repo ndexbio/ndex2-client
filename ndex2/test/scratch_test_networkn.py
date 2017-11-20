@@ -2,8 +2,8 @@
 from ndex2.networkn import NdexGraph
 import sys
 
-
 def test_types():
+    global long
     G = NdexGraph()
     n = G.add_new_node('Node with Types')
     n1 = G.add_new_node('A')

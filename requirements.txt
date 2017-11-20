@@ -5,3 +5,5 @@ networkx==1.11
 urllib3>=1.16
 pandas
 networkx
+pysolr
+enum; python_version == '2.6' or python_version=='2.7'

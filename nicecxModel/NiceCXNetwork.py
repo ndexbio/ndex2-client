@@ -1343,7 +1343,7 @@ class NiceCXNetwork(object):
                     node_attrs[na_item.get_name()] = na_item.get_values()
                     #print(v)
                     my_name = v.get_name()
-                G.add_node(k, node_attrs, name=v.get_name())
+            G.add_node(k, node_attrs, name=v.get_name())
 
         #================================
         # PROCESS EDGE & EDGE ATTRIBUTES

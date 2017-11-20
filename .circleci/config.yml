@@ -44,7 +44,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            python ~/ndex2-client/nicecxModel/tests/test_loading_by_aspects.py
+            python nicecxModel/tests/test_loading_by_aspects.py
 
       - store_artifacts:
           path: test-reports

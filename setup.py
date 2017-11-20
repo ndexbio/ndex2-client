@@ -74,8 +74,7 @@ if __name__ == '__main__':
             'networkx==1.11',
             'urllib3>=1.16',
             'pandas',
-            'networkx',
-            'pysolr'
+            'networkx'
         ],
 
         include_package_data=True

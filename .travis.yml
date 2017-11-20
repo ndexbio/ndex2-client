@@ -7,4 +7,4 @@ install:
   - pip install coverage
 script:
   - export PYTHONPATH=$PYTHONPATH:$TRAVIS_BUILD_DIR
-  - nosetests tests -v --with-coverage --cover-inclusive --cover-package=ndex2
+  - nosetests -v --with-coverage --cover-inclusive --cover-package=ndex2

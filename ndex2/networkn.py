@@ -175,9 +175,14 @@ class NdexGraph (MultiDiGraph):
             if not cx:
                 raise RuntimeError("Failed to retrieve network with uuid " + uuid + " from " + server)
             else:
-                metadata_temp = (item for item in cx if item.get("metaData") is not None).next()
-                if(metadata_temp is not None):
-                    self.metadata_original = metadata_temp["metaData"]
+                if sys.version_info.major == 3:
+                    metadata_temp = next((item for item in cx if item.get("metaData") is not None))
+                    if(metadata_temp is not None):
+                        self.metadata_original = metadata_temp["metaData"]
+                else:
+                    metadata_temp = (item for item in cx if item.get("metaData") is not None).next()
+                    if(metadata_temp is not None):
+                        self.metadata_original = metadata_temp["metaData"]
 
         # If there is no CX to process, just return.
         if cx == None:

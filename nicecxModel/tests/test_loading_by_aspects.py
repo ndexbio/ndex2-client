@@ -24,9 +24,6 @@ path_this = os.path.dirname(os.path.abspath(__file__))
 class TestLoadByAspects(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
     def test_create_from_pandas_with_headers2(self):
-        cx_file = os.path.join(os.getcwd(), 'SimpleNetwork.cx')
-        #print(cx_file)
-        niceCx_from_cx_file = ndex2.create_nice_cx_from_filename(cx_file)
         path_to_network = os.path.join(path_this, 'CTD_genes_pathways.txt')
 
         with open(path_to_network, 'rU') as tsvfile:

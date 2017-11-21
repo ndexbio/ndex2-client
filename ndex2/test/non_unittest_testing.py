@@ -47,7 +47,7 @@ def update_network_properties(ndex, network_summary, property_dict):
             if sid != subnetwork_id:
                 raise Exception("existing property on subnetwork %s but subnetwork %s is the only one specified in the network summary" % (sid, subnetworkId))
 
-    for name, value in property_dict.iteritems():
+    for name, value in property_dict.items():
         update_cx_property_list(name, value, subnetwork_id, property_list)
 
     ndex.set_network_properties(network_id, property_list)

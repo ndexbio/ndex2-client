@@ -22,12 +22,12 @@ with open('SIMPLE3.txt', 'rU') as tsvfile:
     #niceCx.create_from_pandas(df, source_field='ChemicalName', target_field='PathwayName', source_node_attr=['Chemical ID (MeSH)'], target_node_attr=['Pathway Source'], edge_attr=[])
     niceCx.create_from_pandas(df)
     #my_cx_json = niceCx.to_cx()
-    print 'nx created'
+    print('nx created')
     niceCx.apply_template('dev2.ndexbio.org', 'scratch', 'scratch', '3daff7cd-9a6b-11e7-9743-0660b7976219')
-    print 'template applied'
+    print('template applied')
 
     niceCx.upload_new_network_stream('dev2.ndexbio.org', 'scratch', 'scratch')
 
     #niceCx.upload_to('dev2.ndexbio.org', 'scratch', 'scratch')
-    print 'Done!'
+    print('Done!')
 

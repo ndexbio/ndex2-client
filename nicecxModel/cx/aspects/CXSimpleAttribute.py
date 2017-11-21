@@ -18,62 +18,62 @@ class CXSimpleAttribute():
     def getName(self):
         return self.name
 
-	def setName(self,name):
-		self.name = name
+    def setName(self,name):
+        self.name = name
 
-	def getValue(self):
-		return self.value
+    def getValue(self):
+        return self.value
 
-	def setValue(self, value):
-		self.value = value
+    def setValue(self, value):
+        self.value = value
 
-	def getDataType(self):
-		return self.dataType
+    def getDataType(self):
+        return self.dataType
 
-	def setDataType(self, dataType):
-		self.dataType = dataType
+    def setDataType(self, dataType):
+        self.dataType = dataType
 
 
 '''
-	@JsonProperty("n")
-	private String name;
+    @JsonProperty("n")
+    private String name;
 
-	@JsonProperty("v")
-	private String value;
+    @JsonProperty("v")
+    private String value;
 
-	@JsonProperty("t")
-	private String dataType;
+    @JsonProperty("t")
+    private String dataType;
 
-	public CXSimpleAttribute() {
-	}
+    public CXSimpleAttribute() {
+    }
 
-	public CXSimpleAttribute(NdexPropertyValuePair p ) {
-		name = p.getPredicateString();
-		value = p.getValue();
-		dataType = p.getDataType();
-	}
+    public CXSimpleAttribute(NdexPropertyValuePair p ) {
+        name = p.getPredicateString();
+        value = p.getValue();
+        dataType = p.getDataType();
+    }
 
-	public String get_name() {
-		return name;
-	}
+    public String get_name() {
+        return name;
+    }
 
-	public void set_name(String name) {
-		this.name = name;
-	}
+    public void set_name(String name) {
+        this.name = name;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	public String getDataType() {
-		return dataType;
-	}
+    public String getDataType() {
+        return dataType;
+    }
 
-	public void setDataType(String dataType) {
-		this.dataType = dataType
+    public void setDataType(String dataType) {
+        this.dataType = dataType
 
 '''

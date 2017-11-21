@@ -26,7 +26,7 @@ def test_set_edge_attribute():
     #network_id = G.upload_to("http://dev.ndexbio.org", "scratch", "scratch")
     #print(network_id)
 
-    print G.to_cx()
+    print(G.to_cx())
 
 def test_create_from_edge_list():
     G = NdexGraph()
@@ -41,7 +41,7 @@ def test_create_from_edge_list():
     network_id = G.upload_to("http://dev.ndexbio.org", "scratch", "scratch")
     print(network_id)
 
-    print G.to_cx()
+    print(G.to_cx())
 
     #ndex = Ndex("http://dev.ndexbio.org", "scratch", "scratch")
     #ndex.make_network_public(network_id)
@@ -97,7 +97,7 @@ def test_layout():
 
 def test_filter_sub():
     repo_directory = '/Users/aarongary/Development/DataSets/NDEx/server2/data/'
-    print inspect.getfile(FilterSub)
+    print(inspect.getfile(FilterSub))
     read_this_aspect = os.path.join(repo_directory, 'NCI_Style.cx') #'Diffusion1.cx') #'subnetwork_ex1.cx')
 
     with open(read_this_aspect, 'rt') as fid:
@@ -105,7 +105,7 @@ def test_filter_sub():
         if(data is not None):
             my_filter_sub = FilterSub(data, subnet_index=0)
             ndexGraph = NdexGraph(my_filter_sub.get_cx())
-            print ndexGraph.to_cx()
+            print(ndexGraph.to_cx())
 
 
 def scratch_test():

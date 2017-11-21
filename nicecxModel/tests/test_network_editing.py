@@ -71,13 +71,13 @@ class TestLoadByAspects(unittest.TestCase):
                 node_attr = niceCx.get_node_attribute_object(k, 'NODEATTR')
                 if node_attr:
                     niceCx.set_node_attribute(k, 'NODEATTR', node_attr.get_values() + 'xyz')
-                print node_attr
+                print(node_attr)
 
             for k, v in niceCx.get_edges():
                 edge_attr = niceCx.get_edge_attribute_object(k, 'EDGEATTR')
                 if edge_attr:
                     niceCx.set_edge_attribute(k, 'EDGEATTR', edge_attr.get_values() + 'abc')
-                print edge_attr
+                print(edge_attr)
 
 
             my_cx_json = niceCx.to_cx()

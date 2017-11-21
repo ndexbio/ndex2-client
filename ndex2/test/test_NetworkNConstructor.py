@@ -29,7 +29,7 @@ class NetworkNConstructorTests(unittest.TestCase):
             self.assertEqual(len(G.context),39)'''
 
             G.update_to('b8fedefb-29e5-11e7-b3a1-06832d634f41', 'http://dev.ndexbio.org', 'scratch', 'scratch')
-        print "done"
+        print("done")
 
     def test2(self):
         with open (path.join(HERE,'filtered.cx'),'r') as cx_file:

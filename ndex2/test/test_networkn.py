@@ -51,7 +51,7 @@ class NetworkNTests(unittest.TestCase):
         e_4 = G.add_edge(n_b, n_c, 13, {'weight': 2.011})
         e_5 = G.add_edge(n_b, n_d, 14, {'weight': 7.788})
 
-        print json.dumps(G.to_cx())
+        print(json.dumps(G.to_cx()))
         G.upload_to('http://dev.ndexbio.org', 'scratch', 'scratch')
 
 

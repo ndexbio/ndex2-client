@@ -551,7 +551,7 @@ class Ndex2:
                     time.sleep(1)
                 else:
                     raise inst
-        raise Exception("Network is locked after " + retry + " retry.")
+        raise Exception("Network is locked after " + str(retry) + " retry.")
 
     def get_provenance(self, network_id):
         route = "/network/%s/provenance" % (network_id)

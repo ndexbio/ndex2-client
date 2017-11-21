@@ -32,20 +32,11 @@
                 "name": "networkAttributes"
             }, 
             {
-                "idCounter": 3, 
-                "name": "nodeAttributes", 
-                "consistencyGroup": 1, 
-                "elementCount": 13, 
+                "elementCount": 10, 
+                "properties": [], 
                 "version": "1.0", 
-                "properties": []
-            }, 
-            {
-                "idCounter": 2, 
-                "name": "edgeAttributes", 
                 "consistencyGroup": 1, 
-                "elementCount": 2, 
-                "version": "1.0", 
-                "properties": []
+                "name": "nodeAttributes"
             }, 
             {
                 "elementCount": 1, 
@@ -61,30 +52,6 @@
             {
                 "v": "Test Types", 
                 "n": "name"
-            }
-        ]
-    }, 
-    {
-        "subNetworks": [
-            {
-                "nodes": [
-                    1, 
-                    2, 
-                    3
-                ], 
-                "edges": [
-                    1, 
-                    2
-                ], 
-                "@id": 0
-            }
-        ]
-    }, 
-    {
-        "cyViews": [
-            {
-                "s": 0, 
-                "@id": 0
             }
         ]
     }, 
@@ -207,24 +174,6 @@
                 "v": "mystring", 
                 "po": 1, 
                 "n": "string"
-            }
-        ]
-    }, 
-    {
-        "edgeAttributes": [
-            {
-                "v": "interacts_with", 
-                "po": 1, 
-                "n": "interaction"
-            }
-        ]
-    }, 
-    {
-        "edgeAttributes": [
-            {
-                "v": "interacts_with", 
-                "po": 2, 
-                "n": "interaction"
             }
         ]
     }, 

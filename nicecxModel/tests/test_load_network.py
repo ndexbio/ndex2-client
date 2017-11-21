@@ -17,9 +17,8 @@ from nicecxModel.cx.aspects.CitationElement import CitationElement
 from nicecxModel.cx.aspects.SupportElement import SupportElement
 from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
 from nicecxModel.cx.aspects.SimpleNode import SimpleNode
-from nicecxModel.cx import CX_CONSTANTS
 from ndex2.NetworkQuery import NetworkQuery
-from ndex2.client import Ndex2
+import ndex2
 from ndex2.NiceCXBuilder import NiceCXBuilder
 
 if sys.version_info.major == 3:
@@ -62,8 +61,9 @@ def loadAspect(aspect_name):
 class MyTestCase(unittest.TestCase):
     def test_ndex_load_cx_model(self):
         niceCxBuilder = NiceCXBuilder()
-        nice_cx_from_builder = niceCxBuilder.create_from_server('http://dev2.ndexbio.org', 'scratch', 'scratch', '94766028-934d-11e7-9743-0660b7976219')
-        print(nice_cx_from_builder)
+        #nice_cx_from_builder = niceCxBuilder.create_from_server('http://dev2.ndexbio.org', 'scratch', 'scratch', '94766028-934d-11e7-9743-0660b7976219')
+        nice_cx = ndex2.create_nice_cx_from_server(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='94766028-934d-11e7-9743-0660b7976219')
+        print(nice_cx)
         #ndex = Ndex(server='http://dev2.ndexbio.org', username='scratch', password='scratch', uuid='94766028-934d-11e7-9743-0660b7976219')
         #cx = ndex.get_network_as_cx_stream(uuid).json()
         #if not cx:

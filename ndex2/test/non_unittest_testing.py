@@ -2,6 +2,7 @@ import ndex2.client as nc
 from ndex2.create_aspect import domain
 import json
 import time
+import sys
 
 ndex_host = "http://dev2.ndexbio.org"
 username_1 = "drh"
@@ -68,69 +69,64 @@ def update_cx_property_list(name, value, subnetwork_id, property_list):
         "dataType": data_type
     })
 
-example_network_1_id = "b612d677-c714-11e6-b48c-0660b7976219"
+if sys.version_info.major != 3: # Client tests are only for python 2.7
+    example_network_1_id = "b612d677-c714-11e6-b48c-0660b7976219"
 
-ndex = nc.Ndex2(host=ndex_host, username=username_1, password=password_1,debug=True)
+    ndex = nc.Ndex2(host=ndex_host, username=username_1, password=password_1,debug=True)
 
-example_network_1_summary = ndex.get_network_summary(example_network_1_id)
+    example_network_1_summary = ndex.get_network_summary(example_network_1_id)
 
-print(json.dumps(example_network_1_summary, indent=4))
+    print(json.dumps(example_network_1_summary, indent=4))
 
-# Get the network
+    # Get the network
 
-example_network_1 = get_network(ndex, example_network_1_id)
+    example_network_1 = get_network(ndex, example_network_1_id)
 
-# Save it as a new network
+    # Save it as a new network
 
-test_network_1_uri = ndex.save_new_network(example_network_1)
+    test_network_1_uri = ndex.save_new_network(example_network_1)
 
-test_network_1_id = network_id_from_uri(test_network_1_uri)
+    test_network_1_id = network_id_from_uri(test_network_1_uri)
 
-test_network_1_summary = ndex.get_network_summary(test_network_1_id)
+    test_network_1_summary = ndex.get_network_summary(test_network_1_id)
 
-print(json.dumps(test_network_1_summary, indent=4))
+    print(json.dumps(test_network_1_summary, indent=4))
 
-#----------------------------
-# Update visibility
+    #----------------------------
+    # Update visibility
 
-time.sleep(3)
-ndex.make_network_public(test_network_1_id)
-print("network is public")
-
-
-#----------------------------
-#  Update Properties
-
-test_property_dict = {"string_test": "bar", "int_test": 23, "float_test": 1.001}
-
-update_network_properties(ndex, test_network_1_summary, test_property_dict)
-
-#ndex.set_network_properties(test_network_1_id, test_properties)
+    time.sleep(3)
+    ndex.make_network_public(test_network_1_id)
+    print("network is public")
 
 
-# Get the summary
-time.sleep(5)
-test_network_1_summary = ndex.get_network_summary(test_network_1_id)
+    #----------------------------
+    #  Update Properties
 
-print(json.dumps(test_network_1_summary, indent=4))
+    test_property_dict = {"string_test": "bar", "int_test": 23, "float_test": 1.001}
 
-#----------------------------
-# Update the profile
+    update_network_properties(ndex, test_network_1_summary, test_property_dict)
 
-test_profile = {"version": "3.69",
-               "name": "test - The Heart Machine",
-               "description": "<h1>TEST</h1><div>The Heart Machine reads new publications on the molecular mechanisms governing cardiac cells automatically and assembles a model from them using INDRA.<br/></div>"}
-
-ndex.update_network_profile(test_network_1_id, test_profile)
-
-# Get the summary
-
-test_network_1_summary = ndex.get_network_summary(test_network_1_id)
-
-print(json.dumps(test_network_1_summary, indent=4))
+    #ndex.set_network_properties(test_network_1_id, test_properties)
 
 
+    # Get the summary
+    time.sleep(5)
+    test_network_1_summary = ndex.get_network_summary(test_network_1_id)
 
-# Get the
+    print(json.dumps(test_network_1_summary, indent=4))
 
-# Clean up
+    #----------------------------
+    # Update the profile
+
+    test_profile = {"version": "3.69",
+                   "name": "test - The Heart Machine",
+                   "description": "<h1>TEST</h1><div>The Heart Machine reads new publications on the molecular mechanisms governing cardiac cells automatically and assembles a model from them using INDRA.<br/></div>"}
+
+    ndex.update_network_profile(test_network_1_id, test_profile)
+
+    # Get the summary
+
+    test_network_1_summary = ndex.get_network_summary(test_network_1_id)
+
+    print(json.dumps(test_network_1_summary, indent=4))

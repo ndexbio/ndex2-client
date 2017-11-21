@@ -18,7 +18,8 @@ from ndex2.client import DecimalEncoder
 upload_server = 'dev.ndexbio.org'
 upload_username = 'scratch'
 upload_password = 'scratch'
-here = os.path.dirname(__file__)
+
+path_this = os.path.dirname(os.path.abspath(__file__))
 
 class TestLoadByAspects(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
@@ -26,8 +27,9 @@ class TestLoadByAspects(unittest.TestCase):
         cx_file = os.path.join(os.getcwd(), 'SimpleNetwork.cx')
         #print(cx_file)
         niceCx_from_cx_file = ndex2.create_nice_cx_from_filename(cx_file)
+        path_to_network = os.path.join(path_this, 'CTD_genes_pathways.txt')
 
-        with open('CTD_genes_pathways.txt', 'rU') as tsvfile:
+        with open(path_to_network, 'rU') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
@@ -69,7 +71,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_pandas_loading(self):
-        with open('MDA1.txt', 'rU') as tsvfile:
+        path_to_network = os.path.join(path_this, 'MDA1.txt')
+
+        with open(path_to_network, 'rU') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
@@ -97,7 +101,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_pandas_no_headers(self):
-        with open('SIMPLE.txt', 'rU') as tsvfile:
+        path_to_network = os.path.join(path_this, 'SIMPLE.txt')
+
+        with open(path_to_network, 'rU') as tsvfile:
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',header=None)
 
             niceCx = ndex2.create_nice_cx_from_pandas(df) #NiceCXNetwork(pandas_df=df)
@@ -106,7 +112,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_pandas_with_headers(self):
-        with open('MDA1.txt', 'rU') as tsvfile:
+        path_to_network = os.path.join(path_this, 'MDA1.txt')
+
+        with open(path_to_network, 'rU') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
@@ -129,7 +137,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_pandas_no_headers_3_columns(self):
-        with open('SIMPLE3.txt', 'rU') as tsvfile:
+        path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
+
+        with open(path_to_network, 'rU') as tsvfile:
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',header=None)
 
             #====================================
@@ -142,7 +152,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") #PASS
     def test_create_from_networkx(self):
-        with open('SIMPLE3.txt', 'rU') as tsvfile:
+        path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
+
+        with open(path_to_network, 'rU') as tsvfile:
             reader = csv.DictReader(filter(lambda row: row[0] != '#', tsvfile), dialect='excel-tab', fieldnames=['s','t','e'])
 
             #===========================
@@ -164,7 +176,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_cx_file(self):
-        with open('MEDIUM_NETWORK.cx', 'rU') as ras_cx:
+        path_to_network = os.path.join(path_this, 'MEDIUM_NETWORK.cx')
+
+        with open(path_to_network, 'rU') as ras_cx:
             #====================================
             # BUILD NICECX FROM PANDAS DATAFRAME
             #====================================
@@ -185,7 +199,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_export_to_cx_file(self):
-        with open('MEDIUM_NETWORK.cx', 'rU') as ras_cx:
+        path_to_network = os.path.join(path_this, 'MEDIUM_NETWORK.cx')
+
+        with open(path_to_network, 'rU') as ras_cx:
             #====================================
             # BUILD NICECX FROM PANDAS DATAFRAME
             #====================================
@@ -198,7 +214,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_cx_file_with_position(self):
-        with open('network_with_position.cx', 'rU') as ras_cx:
+        path_to_network = os.path.join(path_this, 'network_with_position.cx')
+
+        with open(path_to_network, 'rU') as ras_cx:
             #====================================
             # BUILD NICECX FROM PANDAS DATAFRAME
             #====================================
@@ -292,7 +310,9 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_tsv_manipulate_and_save(self):
-        with open('mgdb_mutations.txt', 'rU') as tsvfile:
+        path_to_network = os.path.join(path_this, 'mgdb_mutations.txt')
+
+        with open(path_to_network, 'rU') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)

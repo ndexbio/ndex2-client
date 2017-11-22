@@ -413,7 +413,7 @@ class NiceCXNetwork(object):
 
                     if values and not isinstance(values, str):
                         if isinstance(values, list):
-                            if isinstance(values[0], basestring):
+                            if isinstance(values[0], str): #basestring):
                                 type = ATTRIBUTE_DATA_TYPE.LIST_OF_STRING
                             else:
                                 type = ATTRIBUTE_DATA_TYPE.LIST_OF_FLOAT

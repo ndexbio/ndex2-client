@@ -10,7 +10,7 @@ The NDEx2 Client v1.0 Python module provides methods to access NDEx via the NDEx
 
 To use these tutorials, clone the [ndex-jupyter-notebooks repository](https://github.com/ndexbio/ndex-jupyter-notebooks) to your local machine and start Jupyter Notebooks in the project directory.
 
-For information on installing and using Jupyter Notebooks, go to [jupyter.org[(http://jupyter.org/)
+For information on installing and using Jupyter Notebooks, go to [jupyter.org](http://jupyter.org/)
 
 ## **Requirements**
 

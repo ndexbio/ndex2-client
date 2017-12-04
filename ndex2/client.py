@@ -682,14 +682,44 @@ class Ndex2:
         return self.get(route)
 
     def get_network_summaries_for_user(self, username):
-        network_summaries = self.search_networks("", username, size=1000)
+        network_summaries = self.get_user_network_summaries(username)
+        #self.search_networks("", username, size=1000)
 
-        if (network_summaries and network_summaries['networks']):
-            network_summaries_list = network_summaries['networks']
+        #if (network_summaries and network_summaries['networks']):
+        #    network_summaries_list = network_summaries['networks']
+        #else:
+        #    network_summaries_list = []
+
+        return network_summaries #network_summaries_list
+
+    def get_user_network_summaries(self, username, offset=0, size=1000):
+        '''  Get the user's list of network uuids
+        :param username: the username of the network owner
+        :type username: str
+        :param offset: the starting position of the network search
+        :type offset: int
+        :param size: the number of networks to retrieve
+        :type size: int
+        :return: list of uuids
+        :rtype: list
+        '''
+
+        route = ""
+        user = self.get_user_by_username(username)#.json
+        if(self.version == "2.0"):
+            route = "/user/%s/networksummary" % (user['externalId'])
         else:
-            network_summaries_list = []
+            route = "/user/%s/networksummary/asCX" % (user['externalId'])
 
-        return network_summaries_list
+        network_summaries = self.get_stream(route)
+
+        #uuids = None
+        #if network_summaries:
+        #    uuids = [d.get('externalId') for d in network_summaries.json()]
+        if network_summaries:
+            return network_summaries.json() #uuids
+        else:
+            return None
 
     def get_network_ids_for_user(self, username):
         network_summaries_list = self.get_network_summaries_for_user(username)

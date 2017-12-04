@@ -36,7 +36,7 @@ else:
     from urllib2 import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
         build_opener, install_opener, HTTPError, URLError
 
-userAgent = 'NDEx-Python/3.0'
+userAgent = 'NiceCX-Python/1.0'
 
 class NiceCXNetwork(object):
     def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, pandas_df=None, filename=None, data=None, **attr):

@@ -23,7 +23,7 @@ if __name__ == '__main__':
         # Versions should comply with PEP440.  For a discussion on single-sourcing
         # the version across setup.py and the project code, see
         # https://packaging.python.org/en/latest/single_source_version.html
-        version='0.2.0.19',
+        version='0.2.0.21',
 
         description='Nice CX Python includes a client and a data model.',
         long_description=long_description,
@@ -75,7 +75,8 @@ if __name__ == '__main__':
             'urllib3>=1.16',
             'pandas',
             'enum34',
-            'pysolr'
+            'pysolr',
+            'enum; python_version == "2.6" or python_version=="2.7"'
         ],
 
         include_package_data=True

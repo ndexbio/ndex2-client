@@ -92,7 +92,7 @@ class NiceCXNetwork(object):
         return edge_element.get_id()
 
     def add_edge(self, edge_element):
-        if type(edge_element) is EdgeElement:
+        if isinstance(edge_element, EdgeElement):
             if edge_element.get_id() < 0:
                 edge_element.set_id(len(self.edges.keys()))
             self.edges[edge_element.get_id()] = edge_element
@@ -176,13 +176,13 @@ class NiceCXNetwork(object):
         edgeAttrs.append(edge_attribute_element)
 
     def add_support(self, support_element):
-        if type(support_element) is SupportElement:
+        if isinstance(support_element, SupportElement):
             self.supports[support_element.get_id()] = support_element
         else:
             raise Exception('Provided input was not of type SupportElement.')
 
     def add_citation(self, citation_element):
-        if type(citation_element) is CitationElement:
+        if isinstance(citation_element, CitationElement):
             self.citations[citation_element.get_id()] = citation_element
         else:
             raise Exception('Provided input was not of type CitationElement.')
@@ -224,7 +224,7 @@ class NiceCXNetwork(object):
     # make opaque aspect into a one shot method to set the whole aspect.
     # i.e. not one element at a time
     def add_opaque_aspect(self, opaque_element):
-        if type(opaque_element) is AspectElement:
+        if isinstance(opaque_element, AspectElement):
             aspectElmts = self.opaqueAspects.get(opaque_element.get_aspect_name())
             if aspectElmts is None:
                 aspectElmts = []
@@ -279,14 +279,14 @@ class NiceCXNetwork(object):
         return self.edges.items()
 
     def get_edge(self, edge):
-        if type(edge) is EdgeElement:
+        if isinstance(edge, EdgeElement):
             return self.edges.get(edge.get_id())
         else:
             return self.edges.get(edge)
 
     def get_edge_attribute_object(self, edge, attribute_name):
         edge_attrs = []
-        if type(edge) is EdgeElement:
+        if isinstance(edge, EdgeElement):
             edge_attrs = self.edgeAttributes.get(edge.get_id())
         else:
             edge_attrs = self.edgeAttributes.get(edge)
@@ -350,10 +350,10 @@ class NiceCXNetwork(object):
         return node_element.get_id()
 
     def add_node(self, node_element):
-        if type(node_element) is NodeElement:
+        if isinstance(node_element, NodeElement):
             self.nodes[node_element.get_id()] = node_element
 
-            if type(node_element.get_id()) is str:
+            if isinstance(node_element.get_id(), str):
                 self.node_int_id_generator.add(node_element.get_id())
 
             if self.missingNodes.get(node_element.get_id()) is not None:
@@ -367,13 +367,13 @@ class NiceCXNetwork(object):
         return self.nodes.items()
 
     def get_node(self, node):
-        if type(node) is NodeElement:
+        if isinstance(node, NodeElement):
             return self.nodes.get(node.get_id())
         else:
             return self.nodes.get(node)
 
     def remove_node(self, node):
-        if type(node) is NodeElement:
+        if isinstance(node, NodeElement):
             return self.nodes.pop(node.get_id(), None)
         else:
             return self.nodes.pop(node, None)
@@ -447,7 +447,7 @@ class NiceCXNetwork(object):
             return None
 
     def get_node_attributes(self, node):
-        if type(node) is NodeElement:
+        if isinstance(node, NodeElement):
             return self.nodeAttributes.get(node.get_id())
         else:
             return self.nodeAttributes.get(node)
@@ -470,7 +470,7 @@ class NiceCXNetwork(object):
                             e_a.set_values(values)
                             e_a.set_subnetwork(subnetwork)
                             if type:
-                                if type(type) is str:
+                                if isinstance(type, str):
                                     e_a.set_data_type(ATTRIBUTE_DATA_TYPE.fromCxLabel(type))
                                 else:
                                     e_a.set_data_type(type)
@@ -526,7 +526,7 @@ class NiceCXNetwork(object):
         return self.nodeAttributes.items()
 
     def remove_node(self, node):
-        if type(node) is NodeElement:
+        if isinstance(node, NodeElement):
             return self.nodes.pop(node.get_id(), None)
         else:
             return self.nodes.pop(node, None)
@@ -541,7 +541,7 @@ class NiceCXNetwork(object):
                     break
 
     def remove_edge(self, edge):
-        if type(edge) is EdgeElement:
+        if isinstance(edge, EdgeElement):
             return self.edges.pop(edge.get_id(), None)
         else:
             return self.edges.pop(edge, None)
@@ -768,10 +768,10 @@ class NiceCXNetwork(object):
                 #==============================
                 for sp in source_node_attr:
                     attr_type = None
-                    if type(row[sp]) is float and math.isnan(row[sp]):
+                    if isinstance(row[sp], float) and math.isnan(row[sp]):
                         row[sp] = ''
                         attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
-                    elif type(row[sp]) is float and math.isinf(row[sp]):
+                    elif isinstance(row[sp], float) and math.isinf(row[sp]):
                         row[sp] = 'Inf'
                         attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
                     self.add_node_attribute(property_of=row[source_field], name=sp, values=row[sp], type=attr_type)
@@ -781,10 +781,10 @@ class NiceCXNetwork(object):
                 #==============================
                 for tp in target_node_attr:
                     attr_type = None
-                    if type(row[tp]) is float and math.isnan(row[tp]):
+                    if isinstance(row[tp], float) and math.isnan(row[tp]):
                         row[tp] = ''
                         attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
-                    elif type(row[tp]) is float and math.isinf(row[tp]):
+                    elif isinstance(row[tp], float) and math.isinf(row[tp]):
                         row[tp] = 'Inf'
                         attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
                     self.add_node_attribute(property_of=row[target_field], name=tp, values=row[tp], type=attr_type)
@@ -794,10 +794,10 @@ class NiceCXNetwork(object):
                 #==============================
                 for ep in edge_attr:
                     attr_type = None
-                    if type(row[ep]) is float and math.isnan(row[ep]):
+                    if isinstance(row[ep], float) and math.isnan(row[ep]):
                         row[ep] = ''
                         attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
-                    elif type(row[ep]) is float and math.isinf(row[ep]):
+                    elif isinstance(row[ep], float) and math.isinf(row[ep]):
                         row[ep] = 'INFINITY'
                         attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
 
@@ -1176,7 +1176,7 @@ class NiceCXNetwork(object):
             add_this_dict = {}
             if e_a is not None:
                 for e_a_item in e_a:
-                    if type(e_a_item.get_values()) is list:
+                    if isinstance(e_a_item.get_values(), list):
                         add_this_dict[e_a_item.get_name()] = ','.join(str(e) for e in e_a_item.get_values())
                         add_this_dict[e_a_item.get_name()] = '"' + add_this_dict[e_a_item.get_name()] + '"'
                     else:
@@ -1187,7 +1187,7 @@ class NiceCXNetwork(object):
             s_a = self.nodeAttributes.get(v.get_source())
             if s_a is not None:
                 for s_a_item in s_a:
-                    if type(s_a_item.get_values()) is list:
+                    if isinstance(s_a_item.get_values(), list):
                         add_this_dict['source_' + s_a_item.get_name()] = ','.join(str(e) for e in s_a_item.get_values())
                         add_this_dict['source_' + s_a_item.get_name()] = '"' + add_this_dict['source_' + s_a_item.get_name()] + '"'
                     else:
@@ -1199,7 +1199,7 @@ class NiceCXNetwork(object):
             t_a = self.nodeAttributes.get(v.get_target())
             if t_a is not None:
                 for t_a_item in t_a:
-                    if type(t_a_item.get_values()) is list:
+                    if isinstance(t_a_item.get_values(), list):
                         add_this_dict['target_' + t_a_item.get_name()] = ','.join(str(e) for e in t_a_item.get_values())
                         add_this_dict['target_' + t_a_item.get_name()] = '"' + add_this_dict['target_' + t_a_item.get_name()] + '"'
                     else:
@@ -1354,7 +1354,7 @@ class NiceCXNetwork(object):
             add_this_dict['interaction'] = v.get_interaction()
             if e_a is not None:
                 for e_a_item in e_a:
-                    if type(e_a_item.get_values()) is list:
+                    if isinstance(e_a_item.get_values(), list):
                         add_this_dict[e_a_item.get_name()] = ','.join(str(e) for e in e_a_item.get_values())
                         add_this_dict[e_a_item.get_name()] = '"' + add_this_dict[e_a_item.get_name()] + '"'
                     else:
@@ -1476,7 +1476,7 @@ class NiceCXNetwork(object):
             use_this_aspect = self.string_to_aspect_object(aspect_name)
 
         if use_this_aspect is not None:
-            if type(use_this_aspect) is list:
+            if isinstance(use_this_aspect, list):
                 for item in use_this_aspect:
                     add_this_element = item.to_cx()
                     id = add_this_element.get(CX_CONSTANTS.ID)
@@ -1492,7 +1492,7 @@ class NiceCXNetwork(object):
                     items = use_this_aspect.iteritems()
 
                 for k, v in items:
-                    if type(v) is list:
+                    if isinstance(v, list):
                         for v_item in v:
                             add_this_element = v_item.to_cx()
                             id = add_this_element.get(CX_CONSTANTS.ID)
@@ -1509,15 +1509,15 @@ class NiceCXNetwork(object):
                     else:
                         add_this_element = v.to_cx()
                         id = add_this_element.get(CX_CONSTANTS.ID)
-                        if aspect_name == 'nodes' and type(id) is str:
+                        if aspect_name == 'nodes' and isinstance(id, str):
                             # CONVERT TO INT
                             id = self.node_id_lookup.index(id)
                             add_this_element[CX_CONSTANTS.ID] = id
-                        if aspect_name == 'edges' and type(add_this_element.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)) is str:
+                        if aspect_name == 'edges' and isinstance(add_this_element.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK), str):
                             s_id = self.node_id_lookup.index(add_this_element.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK))
                             add_this_element[CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK] = s_id
 
-                        if aspect_name == 'edges' and type(add_this_element.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID)) is str:
+                        if aspect_name == 'edges' and isinstance(add_this_element.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID), str):
                             t_id = self.node_id_lookup.index(add_this_element.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID))
                             add_this_element[CX_CONSTANTS.EDGE_TARGET_NODE_ID] = t_id
 
@@ -1532,7 +1532,7 @@ class NiceCXNetwork(object):
             use_this_aspect = self.string_to_aspect_object(aspect_name)
 
             if use_this_aspect is not None:
-                if type(use_this_aspect) is dict:
+                if isinstance(use_this_aspect, dict):
                     items = None
                     if sys.version_info.major == 3:
                         items = use_this_aspect.items()
@@ -1541,12 +1541,12 @@ class NiceCXNetwork(object):
 
                     for k, v in items:
                         if aspect_name == 'edgeSupports':
-                            if type(v) is list:
+                            if isinstance(v, list):
                                 aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.SUPPORTS: v})
                             else:
                                 aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.SUPPORTS: [v]})
                         else:
-                            if type(v) is list:
+                            if isinstance(v, list):
                                 aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: v})
                             else:
                                 aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: [v]})

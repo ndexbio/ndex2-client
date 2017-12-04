@@ -692,7 +692,7 @@ class Ndex2:
 
         return network_summaries #network_summaries_list
 
-    def get_user_network_summaries(self, username, offset=0, size=1000):
+    def get_user_network_summaries(self, username, offset=0, limit=1000):
         '''  Get the user's list of network uuids
         :param username: the username of the network owner
         :type username: str
@@ -707,9 +707,9 @@ class Ndex2:
         route = ""
         user = self.get_user_by_username(username)#.json
         if(self.version == "2.0"):
-            route = "/user/%s/networksummary" % (user['externalId'])
+            route = "/user/%s/networksummary?offset=%s&limit=%s" % (user['externalId'], offset, limit)
         else:
-            route = "/user/%s/networksummary/asCX" % (user['externalId'])
+            route = "/user/%s/networksummary/asCX?offset=%s&limit=%s" % (user['externalId'], offset, limit)
 
         network_summaries = self.get_stream(route)
 

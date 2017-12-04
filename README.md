@@ -31,13 +31,13 @@ If you already have an older version of the ndex2 module installed, you can use 
 The NDEx2 Client provides an interface to an NDEx server that is managed via a client object class. An NDEx2 Client object can be used to access an NDEx server either anonymously or using a specific user account. For each NDEx server and user account that you want to use in your script or application, you create an NDEx2 Client instance. In this example, a client object is created to access the public NDEx server.
 ```
 import ndex2.client
-anon_ndex=ndex2.client.Ndex("http://public.ndexbio.org")
+anon_ndex=ndex2.client.Ndex2("http://public.ndexbio.org")
 ```
 A client object using a specific user account can perform operations requiring authentication, such as saving networks to that account.
 ```
 my_account="your account"
 my_password="your password"
-my_ndex=ndex2.client.Ndex("http://public.ndexbio.org", my_account, my_password)
+my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 ```
 
 ### **NDEx Client Object Methods:**

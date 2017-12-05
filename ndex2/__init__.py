@@ -376,10 +376,17 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         # METADATA
         #===================
         available_aspects = []
-        for ae in (o for o in my_nicecx.get_aspect(uuid, 'metaData', server, username, password)):
-            available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
-            mde = MetaDataElement(cx_fragment=ae)
-            my_nicecx.add_metadata(mde)
+        md_aspect_iter = my_nicecx.get_aspect(uuid, 'metaData', server, username, password)
+        if md_aspect_iter:
+            for ae in (o for o in md_aspect_iter):
+                available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
+                mde = MetaDataElement(cx_fragment=ae)
+                my_nicecx.add_metadata(mde)
+        else:
+            if not username or not password:
+                raise Exception('Network is not available.  Username and/or password not supplied')
+            else:
+                raise Exception('Network not available')
 
         opaque_aspects = set(available_aspects).difference(known_aspects_min)
 

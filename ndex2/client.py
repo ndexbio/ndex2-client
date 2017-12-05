@@ -45,6 +45,8 @@ class Ndex2:
 
         if host is None:
             host = DEFAULT_SERVER
+        elif 'http' not in host:
+            host = 'http://' + host
 
         if "localhost" in host:
             self.host = "http://localhost:8080/ndexbio-rest"

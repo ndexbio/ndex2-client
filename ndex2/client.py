@@ -151,13 +151,17 @@ class Ndex2:
         else :
             return response.text
 
-    def delete(self, route):
+    def delete(self, route, data=None):
         url = self.host + route
         if self.debug:
             print("DELETE route: " + url)
         headers = self.s.headers
         headers['User-Agent'] = userAgent
-        response = self.s.delete(url, headers = headers)
+
+        if data is not None:
+            response = self.s.delete(url, headers = headers, data=data)
+        else:
+            response = self.s.delete(url, headers=headers)
         self.debug_response(response)
         response.raise_for_status()
         if response.status_code == 204:
@@ -745,8 +749,56 @@ class Ndex2:
     # network set
 
     def create_networkset (self, name, description):
-        route = "/networkset"
+        route = '/networkset'
         return self.post(route, json.dumps( { "name": name, "description": description}))
+
+    def add_networks_to_networkset(self, set_id, networks):
+        '''
+        Add networks to a network set.  User must have visibility of all networks being added
+        :param set_id: network set id
+        :type set_id: basestring
+        :param networks: networks that will be added to the set
+        :type networks: list of strings
+        :return:
+        :rtype:
+        '''
+
+        route = '/networkset/%s/members' % (set_id)
+
+        post_json = json.dumps(networks)
+        return self.post(route, post_json)
+
+    def delete_networks_from_networkset(self, set_id, networks, retry=5):
+        '''
+        Removes network(s) from a network set.
+        :param set_id: network set id
+        :type set_id: basestring
+        :param networks: networks that will be removed from the set
+        :type networks: list of strings
+        :return:
+        :rtype:
+        '''
+
+        route = '/networkset/%s/members' % (set_id)
+        post_json = json.dumps(networks)
+        headers = self.s.headers
+        headers['Content-Type'] ='application/json;charset=UTF-8'
+        headers['Accept'] =  'application/json'
+        headers['User-Agent']= userAgent
+
+        count = 0
+        while count < retry:
+            try:
+                return self.delete(route, data=post_json)
+            except Exception as inst:
+                d = json.loads(inst.response.content)
+                if d.get('errorCode').startswith("NDEx_Concurrent_Modification"):
+                    print("retry deleting network in 1 second(" + str(count) + ")")
+                    count += 1
+                    time.sleep(1)
+                else:
+                    raise inst
+        raise Exception("Network is locked after " + str(retry) + " retry.")
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):

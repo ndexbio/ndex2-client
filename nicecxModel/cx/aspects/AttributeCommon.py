@@ -7,7 +7,11 @@ from nicecxModel.cx import CX_CONSTANTS
 class AttributeCommon(object):
     def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, cx_fragment=None):
         if cx_fragment is not None:
-            data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(cx_fragment.get(CX_CONSTANTS.VALUE))
+            if CX_CONSTANTS.DATA_TYPE in cx_fragment:
+                data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(cx_fragment.get(CX_CONSTANTS.DATA_TYPE))
+            else:
+                data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(cx_fragment.get(CX_CONSTANTS.VALUE))
+
             self._property_of = cx_fragment.get(CX_CONSTANTS.PROPERTY_OF)
             self._subnetwork = cx_fragment.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)
             self._name = cx_fragment.get(CX_CONSTANTS.NAME)

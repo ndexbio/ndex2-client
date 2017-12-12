@@ -748,9 +748,32 @@ class Ndex2:
 
     # network set
 
+
+
     def create_networkset (self, name, description):
+        '''
+
+        :param name:
+        :type name:
+        :param description:
+        :type description:
+        :return:
+        :rtype:
+        '''
         route = '/networkset'
         return self.post(route, json.dumps( { "name": name, "description": description}))
+
+    def get_network_set(self, set_id):
+        '''
+        Gets the network set information including the list of networks
+        :param set_id: network set id
+        :type set_id: basestring
+        :return: network set information
+        :rtype: dict
+        '''
+        route = '/networkset/%s' % (set_id)
+
+        return self.get(route)
 
     def add_networks_to_networkset(self, set_id, networks):
         '''

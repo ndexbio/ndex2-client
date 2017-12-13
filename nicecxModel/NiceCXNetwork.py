@@ -276,7 +276,7 @@ class NiceCXNetwork(object):
         return self.context
 
     def get_edges (self):
-        return list(self.edges.values())
+        return self.edges.items()
 
     def get_edge(self, edge):
         if isinstance(edge, EdgeElement):
@@ -364,7 +364,7 @@ class NiceCXNetwork(object):
             raise Exception('Provided input was not of type NodesElement.')
 
     def get_nodes(self):
-        return list(self.nodes.values())
+        return self.nodes.items()
 
     def get_node(self, node):
         if isinstance(node, NodeElement):

@@ -75,7 +75,13 @@ def create_nice_cx_from_networkx(G):
         # ADD NODE ATTRIBUTES
         #======================
         for k,v in d.items():
-            my_nicecx.set_node_attribute(n, k, v)
+            attr_type = None
+            if isinstance(v, float):
+                attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+            elif isinstance(v, int):
+                attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
+
+            my_nicecx.set_node_attribute(n, k, v, type=attr_type)
 
     index = 0
     for u, v, d in G.edges_iter(data=True):
@@ -89,7 +95,12 @@ def create_nice_cx_from_networkx(G):
         #==============================
         for k,v in d.items():
             if k != 'interaction':
-                my_nicecx.set_edge_attribute(index, k, v)
+                attr_type = None
+                if isinstance(v, float):
+                    attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                elif isinstance(v, int):
+                    attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
+                my_nicecx.set_edge_attribute(index, k, v, type=attr_type)
 
         index += 1
 
@@ -314,6 +325,10 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None, source_
                 elif type(row[sp]) is float and math.isinf(row[sp]):
                     row[sp] = 'Inf'
                     attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                elif type(row[sp]) is float:
+                    attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                elif isinstance(row[sp], int):
+                    attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
                 my_nicecx.set_node_attribute(row[source_field], sp, row[sp], type=attr_type)
 
             #==============================
@@ -327,6 +342,10 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None, source_
                 elif type(row[tp]) is float and math.isinf(row[tp]):
                     row[tp] = 'Inf'
                     attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                elif type(row[sp]) is float:
+                    attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
+                elif isinstance(row[tp], int):
+                    attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
                 my_nicecx.set_node_attribute(row[target_field], tp, row[tp], type=attr_type)
 
             #==============================

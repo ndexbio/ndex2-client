@@ -54,6 +54,9 @@ def create_nice_cx_from_networkx(G):
     :return: none
     :rtype: none
     """
+    if G is None:
+        raise Exception('Networkx input is empty')
+
     my_nicecx = NiceCXNetwork()
 
     if G.graph.get('name'):
@@ -417,6 +420,17 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             for network_item in objects:
                 my_nicecx.add_network_attribute(json_obj=network_item)
             my_nicecx.add_metadata_stub('networkAttributes')
+
+        #===================
+        # @CONTEXT
+        #===================
+        if '@context' in available_aspects:
+            objects = my_nicecx.get_aspect(uuid, '@context', server, username, password)
+            my_nicecx.set_context(objects)
+            if(my_nicecx.get_metadata().get('@context') is None):
+                my_nicecx.add_metadata_stub('@context')
+            else:
+                my_nicecx.get_metadata().get('@context').set_element_count(1)
 
         #===================
         # NODES

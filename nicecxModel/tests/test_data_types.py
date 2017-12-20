@@ -25,7 +25,7 @@ class TestLoadByAspects(unittest.TestCase):
     def test_node_data_types(self):
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='fc63173e-df66-11e7-adc1-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
         found_int_type = False
-        for node in niceCx.get_nodes():
+        for id, node in niceCx.get_nodes():
             abc_node_attrs = niceCx.get_node_attributes(node)
 
             if abc_node_attrs is not None:
@@ -49,7 +49,7 @@ class TestLoadByAspects(unittest.TestCase):
             niceCx = ndex2.create_nice_cx_from_pandas(df, source_field='CDS Mutation', target_field='Gene Symbol', source_node_attr=['Primary Tissue', 'Histology', 'Genomic Locus'], target_node_attr=['Gene ID'], edge_interaction='variant-gene-relationship') #NiceCXNetwork()
 
             found_int_type = False
-            for node in niceCx.get_nodes():
+            for id, node in niceCx.get_nodes():
                 abc_node_attrs = niceCx.get_node_attributes(node)
 
                 if abc_node_attrs is not None:
@@ -99,6 +99,12 @@ class TestLoadByAspects(unittest.TestCase):
         G['MNO']['XYZ']['weight'] = 0.987
 
         niceCx_full = ndex2.create_nice_cx_from_networkx(G)
+        context = [{'ncbigene': 'http://identifiers.org/ncbigene/',
+                   'hgnc.symbol': 'http://identifiers.org/hgnc.symbol/',
+                   'uniprot': 'http://identifiers.org/uniprot/'}]
+        niceCx_full.set_context(context)
+
+        #print(niceCx_full.__str__())
 
         abc_node_attrs = niceCx_full.get_node_attributes('ABC')
 
@@ -112,7 +118,7 @@ class TestLoadByAspects(unittest.TestCase):
                     found_float_type = True
 
         found_edge_float_type = False
-        for edge in niceCx_full.get_edges():
+        for id, edge in niceCx_full.get_edges():
             edge_attrs = niceCx_full.get_edge_attributes(edge)
             if edge_attrs is not None:
                 for edge_attr in edge_attrs:
@@ -123,7 +129,7 @@ class TestLoadByAspects(unittest.TestCase):
         self.assertTrue(found_float_type)
         self.assertTrue(found_edge_float_type)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_data_types_with_special_chars(self):
         path_to_network = os.path.join(path_this, 'Metabolism_of_RNA_data_types.cx')
 
@@ -134,7 +140,7 @@ class TestLoadByAspects(unittest.TestCase):
             niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(data_types_cx))
 
             found_list_of_strings_type = False
-            for node in niceCx.get_nodes():
+            for id, node in niceCx.get_nodes():
                 abc_node_attrs = niceCx.get_node_attributes(node)
 
                 if abc_node_attrs is not None:
@@ -143,3 +149,27 @@ class TestLoadByAspects(unittest.TestCase):
                             found_list_of_strings_type = True
 
             self.assertTrue(found_list_of_strings_type)
+
+    #@unittest.skip("Temporary skipping") # PASS
+    def test_data_types_with_special_chars2(self):
+        niceCx = ndex2.create_empty_nice_cx()
+
+        fox_node_id = niceCx.create_node(node_name='A#"')
+        mouse_node_id = niceCx.create_node(node_name='B!@#$%')
+        bird_node_id = niceCx.create_node(node_name='*&^%^$')
+
+        fox_bird_edge = niceCx.create_edge(edge_source=fox_node_id, edge_target=bird_node_id, edge_interaction='&"""""""')
+        fox_mouse_edge = niceCx.create_edge(edge_source=fox_node_id, edge_target=mouse_node_id, edge_interaction='//////\\\\\\')
+
+        niceCx.add_node_attribute(property_of=fox_node_id, name='Color', values='Red')
+        niceCx.add_node_attribute(property_of=mouse_node_id, name='Color', values='Gray')
+        niceCx.add_node_attribute(property_of=bird_node_id, name='Color', values='Blue')
+
+
+        upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+        spec_char_network_uuid = upload_message.split('\\')[-1]
+
+        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='fc63173e-df66-11e7-adc1-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
+
+        self.assertTrue(upload_message)
+

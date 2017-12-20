@@ -3,11 +3,12 @@ __author__ = 'aarongary'
 import ndex2.client as nc
 import os
 import unittest
+import ndex2
 
 here = os.path.dirname(__file__)
 
 class TestNdex2Client(unittest.TestCase):
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_get_set(self):
         username = 'scratch'
         password = 'scratch'
@@ -44,3 +45,18 @@ class TestNdex2Client(unittest.TestCase):
         set_response = ndex2_client.delete_networks_from_networkset(my_network_set, my_test_networks)
 
         self.assertTrue(len(set_response) == 0) # Empty response means no errors
+
+
+    #@unittest.skip("Temporary skipping")
+    def test_get_set(self):
+        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='b3dbbff0-e117-11e7-adc1-0ac135e8bacf')
+
+        context = [{'ncbigene': 'http://identifiers.org/ncbigene/',
+                   'hgnc.symbol': 'http://identifiers.org/hgnc.symbol/',
+                   'uniprot': 'http://identifiers.org/uniprot/'}]
+        niceCx.set_context(context)
+        niceCx.set_name('Testing Context')
+        upload_message = niceCx.upload_to('public.ndexbio.org', 'scratch', 'scratch')
+
+        print(niceCx.__str__())
+

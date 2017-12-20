@@ -3,9 +3,6 @@ __author__ = 'aarongary'
 import unittest
 
 import sys
-import time
-import ijson
-import pickle
 import json
 import pandas as pd
 import csv
@@ -14,6 +11,7 @@ import ndex2
 import os
 from nicecxModel.NiceCXNetwork import NiceCXNetwork
 from ndex2.client import DecimalEncoder
+from ndex.networkn import NdexGraph
 
 upload_server = 'dev.ndexbio.org'
 upload_username = 'scratch'
@@ -225,7 +223,6 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-
     #@unittest.skip("Temporary skipping")
     def test_manual_build(self):
         niceCx = ndex2.create_empty_nice_cx() #NiceCXNetwork()
@@ -294,6 +291,9 @@ class TestLoadByAspects(unittest.TestCase):
         print('public network')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='21106ea7-cbba-11e7-ad58-0ac135e8bacf')
 
+        #serialized = pickle.dumps(niceCx.to_cx(), protocol=0)
+        #print('Serialized memory:', sys.getsizeof(serialized))
+
         nice_networkx = niceCx.to_networkx()
 
         niceCx_from_netx   = ndex2.create_nice_cx_from_networkx(nice_networkx)
@@ -332,4 +332,36 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
+    @unittest.skip("Temporary skipping") # PASS
+    def test_netx_plot(self):
+        my_ndex=ndex2.client.Ndex2('http://test.ndexbio.org', 'scratch', 'scratch')
+        my_ndex.update_status()
+
+        test1 = my_ndex.get_network_ids_for_user('scratch')
+
+        nx_my_graph = nx.read_edgelist("edge_list_network_adrian.txt", nodetype=str)
+        cx_my_graph = NdexGraph(networkx_G=nx_my_graph)
+
+        cx_my_graph.upload_to('http://dev.ndexbio.org', 'scratch', 'scratch')
+
+        G = nx.Graph()
+        G.add_node('ABC')
+        G.add_node('DEF')
+        G.add_node('GHI')
+        G.add_node('JKL')
+        G.add_node('MNO')
+        G.add_node('PQR')
+        G.add_node('XYZ')
+        G.add_edges_from([('ABC','DEF'), ('DEF', 'GHI'),('GHI', 'JKL'),
+                          ('DEF', 'JKL'), ('JKL', 'MNO'), ('DEF', 'MNO'),
+                         ('MNO', 'XYZ'), ('DEF', 'PQR')])
+
+        niceCx_full = ndex2.create_nice_cx_from_networkx(G)
+        niceCx_full_networkx = niceCx_full.to_networkx()
+
+        names = nx.get_node_attributes(niceCx_full_networkx, 'name')
+        for n in niceCx_full_networkx.nodes():
+            print n
+        print(niceCx_full_networkx.nodes)
+        print(names)
 

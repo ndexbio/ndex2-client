@@ -43,16 +43,15 @@ def get_logger(name, level=logging.DEBUG):
 
 def create_empty_nice_cx():
     my_nicecx = NiceCXNetwork()
-
     return my_nicecx
 
 def create_nice_cx_from_networkx(G):
     """
-    Constructor that uses a networkx graph to build niceCX
+    Constructor that uses a networkx graph to build a NiceCXNetwork
     :param G: networkx graph
     :type G: networkx graph
-    :return: none
-    :rtype: none
+    :return: NiceCXNetwork
+    :rtype: NiceCXNetwork
     """
     if G is None:
         raise Exception('Networkx input is empty')
@@ -127,6 +126,11 @@ def create_nice_cx_from_networkx(G):
     return my_nicecx
 
 def create_nice_cx_from_cx(cx):
+    '''
+    Create a NiceCXNetwork from CX
+    :param cx: list
+    :return: NiceCXNetwork
+    '''
     my_nicecx = NiceCXNetwork()
 
     if cx:
@@ -282,7 +286,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None, source_
     :type df: Pandas Dataframe
     :param headers:
     :type headers:
-    :return: none
+    :return: NiceCXNetwork
     :rtype: n/a
     """
 

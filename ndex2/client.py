@@ -678,12 +678,21 @@ class Ndex2:
   #      return self.network_summaries_to_ids(self.get_network_summaries_for_group(group_name))
 
     def grant_networks_to_group(self, groupid, networkids, permission="READ"):
+        """
+
+        :rtype: object
+        """
         for networkid in networkids:
             self.update_network_group_permission(groupid, networkid, permission)
 
     # User methods
 
     def get_user_by_username(self, username):
+        """
+
+        :param username:
+        :return:
+        """
         route = "/user?username=%s" % (username)
         return self.get(route)
 
@@ -728,6 +737,11 @@ class Ndex2:
             return None
 
     def get_network_ids_for_user(self, username):
+        ''' Get the network uuids owned by the user
+        :param username: users NDEx username
+        :type username: str
+        :return: list of uuids
+        '''
         network_summaries_list = self.get_network_summaries_for_user(username)
 
         return self.network_summaries_to_ids(network_summaries_list)

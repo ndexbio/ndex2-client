@@ -213,7 +213,7 @@ def create_nice_cx_from_cx(cx):
             objects = my_nicecx.get_frag_from_list_by_key(cx, 'citations')
             for cit in objects:
                 aspect_element = AspectElement(cit, 'citations')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('citations')
 
@@ -224,7 +224,7 @@ def create_nice_cx_from_cx(cx):
             objects = my_nicecx.get_frag_from_list_by_key(cx, 'supports')
             for sup in objects:
                 aspect_element = AspectElement(sup, 'supports')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('supports')
 
@@ -235,7 +235,7 @@ def create_nice_cx_from_cx(cx):
             objects = my_nicecx.get_frag_from_list_by_key(cx, 'edgeSupports')
             for add_this_edge_sup in objects:
                 aspect_element = AspectElement(add_this_edge_sup, 'edgeSupports')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('edgeSupports')
 
@@ -246,7 +246,7 @@ def create_nice_cx_from_cx(cx):
             objects = my_nicecx.get_frag_from_list_by_key(cx, 'nodeCitations')
             for node_cit in objects:
                 aspect_element = AspectElement(node_cit, 'nodeCitations')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('nodeCitations')
 
@@ -257,7 +257,7 @@ def create_nice_cx_from_cx(cx):
             objects = my_nicecx.get_frag_from_list_by_key(cx, 'edgeCitations')
             for edge_cit in objects:
                 aspect_element = AspectElement(edge_cit, 'edgeCitations')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('edgeCitations')
 
@@ -268,7 +268,7 @@ def create_nice_cx_from_cx(cx):
             objects = my_nicecx.get_frag_from_list_by_key(cx, oa)
             for oa_item in objects:
                 aspect_element = AspectElement(oa_item, oa)
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
                 my_nicecx.add_metadata_stub(oa)
 
         return my_nicecx
@@ -494,7 +494,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             objects = my_nicecx.get_aspect(uuid, 'citations', server, username, password)
             for cit in objects:
                 aspect_element = AspectElement(cit, 'citations')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('citations')
 
@@ -505,7 +505,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             objects = my_nicecx.get_aspect(uuid, 'supports', server, username, password)
             for sup in objects:
                 aspect_element = AspectElement(sup, 'supports')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('supports')
 
@@ -516,7 +516,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             objects = my_nicecx.get_aspect(uuid, 'edgeSupports', server, username, password)
             for add_this_edge_sup in objects:
                 aspect_element = AspectElement(add_this_edge_sup, 'edgeSupports')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('edgeSupports')
 
@@ -527,7 +527,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             objects = my_nicecx.get_aspect(uuid, 'nodeCitations', server, username, password)
             for node_cit in objects:
                 aspect_element = AspectElement(node_cit, 'nodeCitations')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('nodeCitations')
 
@@ -538,7 +538,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             objects = my_nicecx.get_aspect(uuid, 'edgeCitations', server, username, password)
             for edge_cit in objects:
                 aspect_element = AspectElement(edge_cit, 'edgeCitations')
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
 
             my_nicecx.add_metadata_stub('edgeCitations')
 
@@ -549,7 +549,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             objects = my_nicecx.get_aspect(uuid, oa, server, username, password)
             for oa_item in objects:
                 aspect_element = AspectElement(oa_item, oa)
-                my_nicecx.add_opaque_aspect(aspect_element)
+                my_nicecx.add_opaque_aspect_element(aspect_element)
                 my_nicecx.add_metadata_stub(oa)
     else:
         raise Exception('Server and uuid not specified')

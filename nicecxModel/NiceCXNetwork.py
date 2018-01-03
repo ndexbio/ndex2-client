@@ -245,7 +245,16 @@ class NiceCXNetwork(object):
     # TODO
     # make opaque aspect into a one shot method to set the whole aspect.
     # i.e. not one element at a time
-    def add_opaque_aspect(self, opaque_element):
+    def add_opaque_aspect(self, aspect_name, aspect):
+        if isinstance(aspect, list):
+            for oa_item in aspect:
+                aspect_element = AspectElement(oa_item, aspect_name)
+                self.add_opaque_aspect_element(aspect_element)
+                self.add_metadata_stub(aspect_name)
+        else:
+            raise Exception('Provided input was not of type list.')
+
+    def add_opaque_aspect_element(self, opaque_element):
         if isinstance(opaque_element, AspectElement):
             aspectElmts = self.opaqueAspects.get(opaque_element.get_aspect_name())
             if aspectElmts is None:
@@ -916,7 +925,7 @@ class NiceCXNetwork(object):
                     obj_items = (o for o in objects)
                     for oa_item in obj_items:
                         aspect_element = AspectElement(oa_item, oa)
-                        self.add_opaque_aspect(aspect_element)
+                        self.add_opaque_aspect_element(aspect_element)
                     vis_prop_size = len(self.opaqueAspects.get('visualProperties'))
                     mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='visualProperties')
                     self.add_metadata(mde)
@@ -927,7 +936,7 @@ class NiceCXNetwork(object):
                     obj_items = (o for o in objects)
                     for oa_item in obj_items:
                         aspect_element = AspectElement(oa_item, oa)
-                        self.add_opaque_aspect(aspect_element)
+                        self.add_opaque_aspect_element(aspect_element)
                     vis_prop_size = len(self.opaqueAspects.get('cyVisualProperties'))
                     mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='cyVisualProperties')
                     self.add_metadata(mde)
@@ -1234,7 +1243,7 @@ class NiceCXNetwork(object):
                 obj_items = (o for o in objects)
                 for oa_item in obj_items:
                     aspect_element = AspectElement(oa_item, oa)
-                    self.add_opaque_aspect(aspect_element)
+                    self.add_opaque_aspect_element(aspect_element)
                     self.add_metadata_stub(oa)
         else:
             raise Exception('Server and uuid not specified')
@@ -1375,7 +1384,7 @@ class NiceCXNetwork(object):
                 obj_items = (o for o in objects)
                 for oa_item in obj_items:
                     aspect_element = AspectElement(oa_item, oa)
-                    self.add_opaque_aspect(aspect_element)
+                    self.add_opaque_aspect_element(aspect_element)
                     self.add_metadata_stub(oa)
         else:
             raise Exception('CX is empty')

@@ -150,7 +150,7 @@ class TestLoadByAspects(unittest.TestCase):
 
             self.assertTrue(found_list_of_strings_type)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_data_types_with_special_chars2(self):
         niceCx = ndex2.create_empty_nice_cx()
 
@@ -172,4 +172,18 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='fc63173e-df66-11e7-adc1-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
 
         self.assertTrue(upload_message)
+
+    #@unittest.skip("Temporary skipping")
+    def test_node_data_types(self):
+        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='f1dd6cc3-0007-11e6-b550-06603eb7f303')
+        my_aspect = []
+        my_aspect.append({'node': '1', 'value': 'test1'})
+        my_aspect.append({'node': '2', 'value': 'test2'})
+        my_aspect.append({'node': '3', 'value': 'test3'})
+        my_aspect.append({'node': '4', 'value': 'test4'})
+        my_aspect.append({'node': '5', 'value': 'test5'})
+        my_aspect.append({'node': '6', 'value': 'test6'})
+        niceCx.add_opaque_aspect('fakeAspect', my_aspect)
+        upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+        self.assertTrue(True)
 

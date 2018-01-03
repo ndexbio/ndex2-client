@@ -157,7 +157,7 @@ class NiceCXBuilder():
                 obj_items = (o for o in objects)
                 for oa_item in obj_items:
                     aspect_element = AspectElement(oa_item, oa)
-                    niceCx.add_opaque_aspect(aspect_element)
+                    niceCx.add_opaque_aspect_element(aspect_element)
 
             return niceCx
         else:

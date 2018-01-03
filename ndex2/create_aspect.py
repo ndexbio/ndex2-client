@@ -141,9 +141,9 @@ def edge_attributes(G, has_single_subnetwork):
     #     for k in e[3]]} for e in G.edges_iter(data=True, keys=True) if e[3]]
 
 
-def cartesian(G, id):
+def cartesian(G, view_id):
     return [{'cartesianLayout': [
-        {'node': n, 'view': id, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])}
+        {'node': n, 'view': view_id, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])}
         for n in G.pos
         ]}]
 

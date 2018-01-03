@@ -76,7 +76,8 @@ class Ndex2:
                         self.host = host + "/rest"
 
             except req_except.HTTPError as he:
-                ndex2.get_logger('CLIENT').warning('Can''t determine server version.' + host + ' Server returned error -- '  + he.message)
+                ndex2.get_logger('CLIENT').warning('Can''t determine server version. ' + host +
+                                                   ' Server returned error -- ' + str(he))
                 self.version = "1.3"
                 self.host = host + "/rest"
                 #TODO - how to handle errors getting server version...
@@ -300,9 +301,9 @@ class Ndex2:
             if visibility:
                 query_string = 'indexedfields=' + ','.join(indexed_fields)
             else:
-                query_string = 'visibility=' + visibility + '&indexedfields=' + ','.join(indexed_fields)
+                query_string = 'visibility=' + str(visibility) + '&indexedfields=' + ','.join(indexed_fields)
         elif visibility:
-                query_string = 'visibility=' + visibility
+                query_string = 'visibility=' + str(visibility)
 
         if(self.version == "2.0"):
             route = '/network'
@@ -587,7 +588,7 @@ class Ndex2:
         route = "/network/%s/properties" % (network_id)
         if isinstance(network_properties, list):
             putJson = json.dumps(network_properties)
-        elif isinstance(network_properties, basestring):
+        elif isinstance(network_properties, str):
             putJson = network_properties
         else:
             raise Exception("network_properties must be a string or a list of NdexPropertyValuePair objects")
@@ -608,7 +609,7 @@ class Ndex2:
         route = "/network/%s/systemproperty" % (network_id)
         if isinstance(network_properties, dict):
             putJson = json.dumps(network_properties)
-        elif isinstance(network_properties, basestring):
+        elif isinstance(network_properties, str):
             putJson = network_properties
         else:
             raise Exception("network_properties must be a string or a dict")
@@ -625,7 +626,7 @@ class Ndex2:
             if network_profile.get("visibility") and self.version.startswith("2."):
                 raise Exception("Ndex 2.x doesn't support setting visibility by this function. Please use make_network_public/private function to set network visibility.")
             json_data = json.dumps(network_profile)
-        elif isinstance(network_profile, basestring):
+        elif isinstance(network_profile, str):
             json_data = network_profile
         else:
             raise Exception("network_profile must be a string or a dict")

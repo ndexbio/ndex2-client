@@ -361,7 +361,7 @@ class TestLoadByAspects(unittest.TestCase):
 
         names = nx.get_node_attributes(niceCx_full_networkx, 'name')
         for n in niceCx_full_networkx.nodes():
-            print n
+            print(n)
         print(niceCx_full_networkx.nodes)
         print(names)
 

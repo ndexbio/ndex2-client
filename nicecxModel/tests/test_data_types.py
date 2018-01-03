@@ -11,7 +11,6 @@ import ndex2
 import os
 from nicecxModel.NiceCXNetwork import NiceCXNetwork
 from ndex2.client import DecimalEncoder
-from ndex.networkn import NdexGraph
 from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
 
 upload_server = 'dev.ndexbio.org'

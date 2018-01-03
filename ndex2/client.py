@@ -203,9 +203,9 @@ class Ndex2:
         headers = self.s.headers
 
         headers['Content-Type'] = 'application/json'
-        headers['Accept'] ='application/json'
+        headers['Accept'] = 'application/json'
         headers['User-Agent'] = userAgent
-        response = self.s.post(url, data=post_json, headers=headers, stream = True)
+        response = self.s.post(url, data=post_json, headers=headers, stream=True)
         self.debug_response(response)
         response.raise_for_status()
         if response.status_code == 204:
@@ -263,6 +263,17 @@ class Ndex2:
 # Network methods
 
     def save_new_network (self, cx, visibility=None, indexed_fields=None):
+        '''
+        Create a new network (cx) on the server
+        :param cx: Network cx
+        :type cx: list of dicts
+        :param visibility: Sets the visibility (PUBLIC or PRIVATE)
+        :type visibility: string
+        :param indexed_fields: Fields to be indexed
+        :type indexed_fields: list of strings
+        :return: Response data
+        :rtype: string or dict
+        '''
         #print type(cx)
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):
@@ -286,12 +297,18 @@ class Ndex2:
     # CX Methods
     # Create a network based on a stream from a source CX format
     def save_cx_stream_as_new_network (self, cx_stream, visibility=None, indexed_fields=None):
-        ''' Create a new network from a CX stream, optionally providing a provenance history object to be included in the new network.
-
-        :param cx_stream: The network stream.
-        :return: The response.
-        :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
         '''
+        Create a new network from a CX stream, optionally providing a provenance history object to be included in the new network.
+        :param cx_stream:  IO stream of cx
+        :type cx_stream: BytesIO
+        :param visibility: Sets the visibility (PUBLIC or PRIVATE)
+        :type visibility: string
+        :param indexed_fields: Fields to be indexed
+        :type indexed_fields: list of strings
+        :return: Response data
+        :rtype: string or dict
+        '''
+
         self.require_auth()
         route = ''
         fields = {}
@@ -319,7 +336,8 @@ class Ndex2:
 
     # Create a network based on a JSON string or Dict in CX format
     def update_cx_network(self, cx_stream, network_id):
-        '''Update the network specified by UUID network_id using the CX stream cx_stream.
+        '''
+        Update the network specified by UUID network_id using the CX stream cx_stream.
 
         :param cx_stream: The network stream.
         :param network_id: The UUID of the network.
@@ -342,7 +360,8 @@ class Ndex2:
 
     # Get a CX stream for a network
     def get_network_as_cx_stream(self, network_id):
-        '''Get the existing network with UUID network_id from the NDEx connection as a CX stream.
+        '''
+        Get the existing network with UUID network_id from the NDEx connection as a CX stream.
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -360,7 +379,8 @@ class Ndex2:
 
     # Get a CX stream for a aspect of a network
     def get_network_aspect_as_cx_stream(self, network_id, aspect_name):
-        '''Get the specified aspect of the existing network with UUID network_id from the NDEx connection as a CX stream.
+        '''
+        Get the specified aspect of the existing network with UUID network_id from the NDEx connection as a CX stream.
 
         :param network_id: The UUID of the network.
         :param aspect_name: The aspect NAME.
@@ -378,7 +398,8 @@ class Ndex2:
         return self.get_stream(route)
 
     def get_neighborhood_as_cx_stream(self, network_id, search_string, search_depth=1, edge_limit=2500):
-        ''' Get a CX stream for a subnetwork of the network specified by UUID network_id and a traversal of search_depth steps around the nodes found by search_string.
+        '''
+        Get a CX stream for a subnetwork of the network specified by UUID network_id and a traversal of search_depth steps around the nodes found by search_string.
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -405,7 +426,8 @@ class Ndex2:
 
 
     def get_neighborhood(self, network_id, search_string, search_depth=1, edge_limit=2500):
-        ''' Get the CX for a subnetwork of the network specified by UUID network_id and a traversal of search_depth steps around the nodes found by search_string.
+        '''
+        Get the CX for a subnetwork of the network specified by UUID network_id and a traversal of search_depth steps around the nodes found by search_string.
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -432,7 +454,8 @@ class Ndex2:
     # Search for networks by keywords
     #    network    POST    /network/search/{skipBlocks}/{blockSize}    SimpleNetworkQuery    NetworkSummary[]
     def search_networks(self, search_string="", account_name=None, start=0, size=100, include_groups=False):
-        ''' Search for networks based on the search_text, optionally limited to networks owned by the specified account_name.
+        '''
+        Search for networks based on the search_text, optionally limited to networks owned by the specified account_name.
 
         :param search_string: The text to search for.
         :type search_string: str
@@ -460,6 +483,19 @@ class Ndex2:
         return self.post(route, post_json)
 
     def search_network_nodes(self, network_id, search_string='', account_name=None, limit=5):
+        '''
+        Searches the network for nodes matching the provided search string
+        :param network_id:  Network id
+        :type network_id: string
+        :param search_string: Search string
+        :type search_string: string
+        :param account_name: Account name
+        :type account_name: string
+        :param limit: Number of results to return
+        :type limit: int
+        :return: Node results
+        :rtype: dict
+        '''
         post_data = {"searchString" : search_string}
         if self.version == "2.0":
             route = "/search/network/%s/nodes?limit=%s" % (network_id, limit)
@@ -470,10 +506,27 @@ class Ndex2:
         return self.post(route, post_json)
 
     def find_networks(self, search_string="", account_name=None, skip_blocks=0, block_size=100):
+        '''
+        Searches the server for networks that match the search string
+        :param search_string:  Search string
+        :type search_string: string
+        :param account_name: Account name
+        :type account_name: string
+        :param skip_blocks: Number of blocks to skip. Used for paging results
+        :type skip_blocks: int
+        :param block_size: Number of blocks to retrieve
+        :type block_size: int (default is 100)
+        :return: List of networks
+        :rtype: list
+        '''
         print("find_networks is deprecated, please use search_networks")
         return self.search_networks(search_string, account_name, skip_blocks, block_size)
 
     def search_networks_by_property_filter(self, search_parameter_dict={}, account_name=None, limit=100):
+        '''
+        Not yet implemented
+        :return: Exception
+        '''
         raise Exception("This function is not supported in NDEx 2.0")
      #   self.require_auth()
      #   route = "/network/searchByProperties"
@@ -484,6 +537,13 @@ class Ndex2:
      #   return self.post(route, post_json)
 
     def network_summaries_to_ids(self, network_summaries):
+        '''
+        Converts a list of network summaries to a list of network ids
+        :param network_summaries: Network summaries
+        :type network_summaries: list
+        :return: List of network ids
+        :rtype: list
+        '''
         network_ids = []
         for network in network_summaries:
             network_ids.append(network['externalId'] )
@@ -491,7 +551,8 @@ class Ndex2:
 
     #    network    GET    /network/{networkUUID}       NetworkSummary
     def get_network_summary(self, network_id):
-        ''' Gets information about a network.
+        '''
+        Gets information about a network.
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -507,7 +568,8 @@ class Ndex2:
         return self.get(route)
 
     def make_network_public(self, network_id):
-        ''' Makes the network specified by the network_id public.
+        '''
+        Makes the network specified by the network_id public.
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -522,7 +584,8 @@ class Ndex2:
             return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
 
     def make_network_private(self, network_id):
-        ''' Makes the network specified by the network_id private.
+        '''
+        Makes the network specified by the network_id private.
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -538,11 +601,27 @@ class Ndex2:
 
 
     def get_task_by_id (self, task_id):
+        '''
+        Retrieves a task by id
+        :param task_id: Task id
+        :type task_id: string
+        :return: Task
+        :rtype: dict
+        '''
         self.require_auth()
         route = "/task/%s" % (task_id)
         return self.get(route)
 
     def delete_network(self, network_id, retry=5):
+        '''
+        Deletes the specified network from the server
+        :param network_id: Network id
+        :type network_id: string
+        :param retry: Number of times to retry if deleting fails
+        :type retry: int
+        :return: Result
+        :rtype: string
+        '''
         self.require_auth()
         route = "/network/%s" % (network_id)
         count = 0
@@ -560,10 +639,26 @@ class Ndex2:
         raise Exception("Network is locked after " + str(retry) + " retry.")
 
     def get_provenance(self, network_id):
+        '''
+        Gets the network provenance
+        :param network_id: Network id
+        :type network_id: string
+        :return: Provenance
+        :rtype: dict
+        '''
         route = "/network/%s/provenance" % (network_id)
         return self.get(route)
 
     def set_provenance(self, network_id, provenance):
+        '''
+        Sets the network provenance
+        :param network_id: Network id
+        :type network_id: string
+        :param provenance: Network provcenance
+        :type provenance: dict
+        :return: Result
+        :rtype: dict
+        '''
         self.require_auth()
         route = "/network/%s/provenance" % (network_id)
         if isinstance(provenance, dict):
@@ -579,10 +674,28 @@ class Ndex2:
  #       return self.get(route)
 
     def set_read_only(self, network_id, value):
+        '''
+        Sets the read only flag on the specified network
+        :param network_id: Network id
+        :type network_id: string
+        :param value: Read only value
+        :type value: bool
+        :return: Result
+        :rtype: dict
+        '''
         self.require_auth()
         return self.set_network_system_properties(network_id, {"readOnly": value})
 
     def set_network_properties(self, network_id, network_properties):
+        '''
+        Sets network properties
+        :param network_id: Network id
+        :type network_id: string
+        :param network_properties:
+        :type network_properties:
+        :return:
+        :rtype:
+        '''
         self.require_auth()
         route = "/network/%s/properties" % (network_id)
         if isinstance(network_properties, list):
@@ -594,16 +707,41 @@ class Ndex2:
         return self.put(route, putJson)
 
     def get_sample_network(self, network_id):
+        '''
+        Gets the sample network
+        :param network_id: Network id
+        :type network_id: string
+        :return: Sample network
+        :rtype: dict
+        '''
         route = "/network/%s/sample" % (network_id)
         return self.get(route)
 
     def set_network_sample(self, network_id, sample_cx_network_str):
+        '''
+        Set the network sample
+        :param network_id: Network id
+        :type network_id: string
+        :param sample_cx_network_str: Network (cxO
+        :type sample_cx_network_str: string representation of dict
+        :return: Result
+        :rtype: dict
+        '''
         self.require_auth()
         route = "/network/%s/sample" % (network_id)
     #    putJson = json.dumps(sample_cx_network_str)
         return self.put(route, sample_cx_network_str)
 
     def set_network_system_properties(self, network_id, network_properties):
+        '''
+        Set network system properties
+        :param network_id: Network id
+        :type network_id: string
+        :param network_properties: Network property
+        :type network_properties: dict
+        :return: Result
+        :rtype: dict
+        '''
         self.require_auth()
         route = "/network/%s/systemproperty" % (network_id)
         if isinstance(network_properties, dict):
@@ -615,10 +753,19 @@ class Ndex2:
         return self.put(route, putJson)
 
     def update_network_profile(self, network_id, network_profile):
-        # network profile attributes that can be updated by this method:
-        #   name
-        #   description
-        #   version
+        '''
+        Updates the network profile
+        network profile attributes that can be updated by this method:
+            name
+            description
+            version
+        :param network_id:
+        :type network_id:
+        :param network_profile:
+        :type network_profile:
+        :return:
+        :rtype:
+        '''
 
         self.require_auth()
         if isinstance(network_profile, dict):
@@ -638,6 +785,10 @@ class Ndex2:
             return self.post(route, json_data)
 
     def upload_file(self, filename):
+        '''
+        This method has not been implemented yet
+        :return: Exception
+        '''
         raise Exception("This function is not supported in this release. Please use the save_new_network function to create new networks in NDEx server.")
  #       self.require_auth()
  #       fields = {
@@ -659,10 +810,32 @@ class Ndex2:
    #     self.post(route, postJson)
 
     def update_network_group_permission(self, groupid, networkid, permission):
+        '''
+        Updated group permissions
+        :param groupid: Group id
+        :type groupid: string
+        :param networkid: Network id
+        :type networkid: string
+        :param permission: Network permission
+        :type permission: string
+        :return: Result
+        :rtype: dict
+        '''
         route = "/network/%s/permission?groupid=%s&permission=%s" % (networkid, groupid, permission)
         self.put(route)
 
     def update_network_user_permission(self, userid, networkid, permission):
+        '''
+        Updated network user permission
+        :param userid: User id
+        :type userid: string
+        :param networkid: Network id
+        :type networkid: string
+        :param permission: Network permission
+        :type permission: string
+        :return: Result
+        :rtype: dict
+        '''
         route = "/network/%s/permission?userid=%s&permission=%s" % (networkid, userid, permission)
         self.put(route)
 
@@ -678,25 +851,41 @@ class Ndex2:
   #      return self.network_summaries_to_ids(self.get_network_summaries_for_group(group_name))
 
     def grant_networks_to_group(self, groupid, networkids, permission="READ"):
-        """
-
-        :rtype: object
-        """
+        '''
+        Set group permission for a set of networks
+        :param groupid: Group id
+        :type groupid: string
+        :param networkids: List of network ids
+        :type networkids: list
+        :param permission: Network permission
+        :type permission: string
+        :return: Result
+        :rtype: dict
+        '''
         for networkid in networkids:
             self.update_network_group_permission(groupid, networkid, permission)
 
     # User methods
 
     def get_user_by_username(self, username):
-        """
-
-        :param username:
-        :return:
-        """
+        '''
+        Gets the user id by user name
+        :param username: User name
+        :type username: string
+        :return: User id
+        :rtype: string
+        '''
         route = "/user?username=%s" % (username)
         return self.get(route)
 
     def get_network_summaries_for_user(self, username):
+        '''
+        Get network summaries for given user
+        :param username: User name
+        :type username: string`
+        :return: Network summaries
+        :rtype: list of dicts
+        '''
         network_summaries = self.get_user_network_summaries(username)
         #self.search_networks("", username, size=1000)
 
@@ -708,7 +897,8 @@ class Ndex2:
         return network_summaries #network_summaries_list
 
     def get_user_network_summaries(self, username, offset=0, limit=1000):
-        '''  Get the user's list of network uuids
+        '''
+        Get the user's list of network uuids
         :param username: the username of the network owner
         :type username: str
         :param offset: the starting position of the network search
@@ -737,7 +927,8 @@ class Ndex2:
             return None
 
     def get_network_ids_for_user(self, username):
-        ''' Get the network uuids owned by the user
+        '''
+        Get the network uuids owned by the user
         :param username: users NDEx username
         :type username: str
         :return: list of uuids
@@ -747,16 +938,43 @@ class Ndex2:
         return self.network_summaries_to_ids(network_summaries_list)
 
     def grant_network_to_user_by_username(self, username, network_id, permission):
+        '''
+        Grants permission to network for the given user name
+        :param username: User name
+        :type username: string
+        :param network_id: Network id
+        :type network_id: string
+        :param permission: Network permissions
+        :type permission: string
+        :return: Result
+        :rtype: dict
+        '''
         user = self.get_user_by_username(username).json
         self.update_network_user_permission(user["externalid"], network_id, permission)
 
     def grant_networks_to_user(self, userid, networkids, permission="READ"):
+        '''
+        Gives read permission to specified networks for the provided user
+        :param userid: User id
+        :type userid: string
+        :param networkids: Network ids
+        :type networkids: list of strings
+        :param permission: Network permissions
+        :type permission: string (default is READ)
+        :return: none
+        :rtype: none
+        '''
         for networkid in networkids:
             self.update_network_user_permission(userid, networkid, permission)
 
     # admin methods
 
     def update_status(self):
+        '''
+        Updates the admin status
+        :return: None (however the status is stored in the client object self.status)
+        :rtype:
+        '''
         route = "/admin/status"
         self.status = self.get(route)
 

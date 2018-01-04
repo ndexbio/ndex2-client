@@ -607,7 +607,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
 def create_nice_cx_from_file(path):
     """
     Create a NiceCXNetwork based on CX JSON from a file.
-    
+
     :param path: the path from which the CX will be loaded
     :return: NiceCXNetwork
     """
@@ -621,5 +621,6 @@ def create_nice_cx_from_file(path):
             return my_nicecx
     else:
         raise Exception('The file " + path + " does not exist.')
+
 
 from ndex2.niceCXNetwork import NiceCXNetwork

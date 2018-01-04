@@ -12,17 +12,14 @@ Submodules
 ndex2.niceCXNetwork module
 --------------------------
 
-.. automodule:: ndex2.niceCXNetwork
+.. autoclass:: ndex2.niceCXNetwork.NiceCXNetwork
     :members:
-    :undoc-members:
-    :show-inheritance:
 
 ndex2.client module
 -------------------
 
-.. automodule:: ndex2.client
+.. autoclass:: ndex2.client.Ndex2
     :members:
-    :show-inheritance:
 
 
 Module contents
@@ -30,5 +27,4 @@ Module contents
 
 .. automodule:: ndex2
     :members:
-    :undoc-members:
     :show-inheritance:

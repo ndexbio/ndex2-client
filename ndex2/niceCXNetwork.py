@@ -24,6 +24,7 @@ from cx.aspects.AspectElement import AspectElement
 from cx import CX_CONSTANTS
 from cx.aspects import ATTRIBUTE_DATA_TYPE
 from cx import known_aspects_min
+import client as nc
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPError, URLError
@@ -2290,4 +2291,3 @@ class DecimalEncoder(json.JSONEncoder):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
 
-import ndex2.client as nc

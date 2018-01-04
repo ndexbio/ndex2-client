@@ -5,4 +5,3 @@ ndex2
    :maxdepth: 4
 
    ndex2
-   nicecxModel

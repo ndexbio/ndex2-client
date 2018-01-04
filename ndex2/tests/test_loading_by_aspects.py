@@ -8,7 +8,7 @@ import csv
 import networkx as nx
 import ndex2
 import os
-from ndex2.NiceCXNetwork import NiceCXNetwork
+from ndex2.niceCXNetwork import NiceCXNetwork
 from ndex2.client import DecimalEncoder
 
 upload_server = 'dev.ndexbio.org'

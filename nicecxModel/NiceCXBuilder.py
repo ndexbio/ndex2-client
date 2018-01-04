@@ -6,7 +6,7 @@ import requests
 import base64
 import sys
 #from urllib import urlopen
-from ndex2.NiceCXNetwork import NiceCXNetwork
+from ndex2.niceCXNetwork import NiceCXNetwork
 from nicecxModel.cx.aspects.NodeElement import NodeElement
 from nicecxModel.cx.aspects.EdgeElement import EdgeElement
 from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement

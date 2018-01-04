@@ -1,16 +1,15 @@
-.. NDEx Python Client documentation master file, created by
-   sphinx-quickstart on Fri Dec 22 16:25:48 2017.
+.. ndex2 documentation master file, created by
+   sphinx-quickstart on Thu Jan  4 11:53:07 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-NDEx Python Client Documentation
-================================
+Welcome to ndex2's documentation!
+=================================
+
+Contents:
 
 .. toctree::
    :maxdepth: 2
-
-   ndex2
-   nicecxModel
 
 
 
@@ -20,3 +19,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+

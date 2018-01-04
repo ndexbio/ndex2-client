@@ -1,0 +1,22 @@
+ndex2.metadata package
+======================
+
+Submodules
+----------
+
+ndex2.metadata.MetaDataElement module
+-------------------------------------
+
+.. automodule:: ndex2.metadata.MetaDataElement
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: ndex2.metadata
+    :members:
+    :undoc-members:
+    :show-inheritance:

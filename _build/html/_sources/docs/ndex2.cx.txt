@@ -1,0 +1,17 @@
+ndex2.cx package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    ndex2.cx.aspects
+
+Module contents
+---------------
+
+.. automodule:: ndex2.cx
+    :members:
+    :undoc-members:
+    :show-inheritance:

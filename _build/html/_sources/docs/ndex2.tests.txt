@@ -1,0 +1,54 @@
+ndex2.tests package
+===================
+
+Submodules
+----------
+
+ndex2.tests.test_data_types module
+----------------------------------
+
+.. automodule:: ndex2.tests.test_data_types
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ndex2.tests.test_load_network module
+------------------------------------
+
+.. automodule:: ndex2.tests.test_load_network
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ndex2.tests.test_loading_by_aspects module
+------------------------------------------
+
+.. automodule:: ndex2.tests.test_loading_by_aspects
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ndex2.tests.test_ndex2_client module
+------------------------------------
+
+.. automodule:: ndex2.tests.test_ndex2_client
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ndex2.tests.test_network_editing module
+---------------------------------------
+
+.. automodule:: ndex2.tests.test_network_editing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: ndex2.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

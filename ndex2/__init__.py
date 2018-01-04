@@ -11,7 +11,6 @@ from nicecxModel.cx.aspects.AspectElement import AspectElement
 from nicecxModel.cx import CX_CONSTANTS
 from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
 from nicecxModel.cx import known_aspects_min
-from nicecxModel.NiceCXNetwork import NiceCXNetwork
 
 root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 log_path = os.path.join(root, 'logs')
@@ -471,10 +470,10 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if '@context' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, '@context', server, username, password)
             my_nicecx.set_context(objects)
-            if(my_nicecx.get_metadata().get('@context') is None):
+            if(my_nicecx.metadata.get('@context') is None):
                 my_nicecx.add_metadata_stub('@context')
             else:
-                my_nicecx.get_metadata().get('@context').set_element_count(1)
+                my_nicecx.metadata.get('@context').set_element_count(1)
 
         # ===================
         # NODES
@@ -618,7 +617,4 @@ def create_nice_cx_from_file(path):
     else:
         raise Exception('The file " + path + " does not exist.')
 
-
-
-
-
+from nicecxModel.NiceCXNetwork import NiceCXNetwork

@@ -1400,8 +1400,9 @@ class NiceCXNetwork(object):
         '''
         Export the network as a Pandas DataFrame.
 
-        Example: my_niceCx.upload_to(uuid="34f29fd1-884b-11e7-a10d-0ac135e8bacf", server="http://test.ndexbio.org",
-        username="myusername", password="mypassword")
+        Note: This method only processed nodes, edges, node attributes and edge attributes, but not network attributes
+        or other aspects
+
         :return: Pandas dataframe
         :rtype: Pandas dataframe
         '''

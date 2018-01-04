@@ -8,7 +8,6 @@ NDEx Python Client Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    ndex2
    nicecxModel

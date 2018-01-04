@@ -938,6 +938,7 @@ class Ndex2:
     def delete_networks_from_networkset(self, set_id, networks, retry=5):
         """
         Removes network(s) from a network set.
+
         :param set_id: network set id
         :type set_id: basestring
         :param networks: networks that will be removed from the set

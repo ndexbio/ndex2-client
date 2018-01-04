@@ -22,7 +22,6 @@ ndex2.client module
 
 .. automodule:: ndex2.client
     :members:
-    :undoc-members:
     :show-inheritance:
 
 

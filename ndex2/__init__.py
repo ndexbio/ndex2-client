@@ -56,6 +56,7 @@ def create_nice_cx_from_networkx(G):
     Create a NiceCXNetwork based on a networkx graph. The resulting NiceCXNetwork
     contains the nodes edges and their attributes from the networkx graph and also
     preserves the graph 'pos' attribute as a CX cartesian coordinates aspect.
+
     :param G: networkx graph
     :type G: networkx graph
     :return: NiceCXNetwork
@@ -132,6 +133,7 @@ def create_nice_cx_from_networkx(G):
 def create_nice_cx_from_cx(cx):
     """
     Create a NiceCXNetwork from a CX list.
+
     :param cx: a list in CX format
     :return: NiceCXNetwork
     """
@@ -300,6 +302,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     the attributes of nodes, and edges in the resulting NiceCXNetwork. If a header is not
     mapped the corresponding column is ignored. If the edge_interaction is not specified it
     defaults to "interacts-with"
+
     :param df: pandas dataframe to process
     :param source_field: header name specifying the name of the source node.
     :param target_field: header name specifying the name of the target node.
@@ -428,6 +431,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
     Create a NiceCXNetwork based on a network retrieved from NDEx, specified by its UUID.
     If the network is not public, then username and password arguments for an account on
     the server with permission to access the network must be supplied.
+
     :param server: the URL of the NDEx server hosting the network.
     :param username: the user name of an account with permission to access the network.
     :param password: the password of an account with permission to access the network.
@@ -603,6 +607,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
 def create_nice_cx_from_file(path):
     """
     Create a NiceCXNetwork based on CX JSON from a file.
+    
     :param path: the path from which the CX will be loaded
     :return: NiceCXNetwork
     """

@@ -82,6 +82,7 @@ class NiceCXNetwork(object):
     def create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
         """
         Create a new edge in the network by specifying source-interaction-target
+
         :param id:
         :type id:
         :param edge_source: The source node this edge, either its id or the node object itself.
@@ -104,6 +105,7 @@ class NiceCXNetwork(object):
     def add_edge(self, edge_element):
         """
         Add an edge object to the network. (For an easier method for adding edges use create_edge() )
+
         :param edge_element: An edge object
         :type edge_element: cx.aspects.EdgesElement
         :return: Edge ID
@@ -260,41 +262,21 @@ class NiceCXNetwork(object):
         else:
             raise Exception('Provided input was not of type AspectElement.')
 
-    #def add_node_associated_aspect_element(self, nodeId, elmt):
-    #    self.add_assciatated_aspect_element(self.nodeAssociatedAspects, nodeId, elmt)
-
-    #def add_edge_associated_aspect_element(self, edgeId, elmt):
-    #    self.add_assciatated_aspect_element(self.edgeAssociatedAspects, edgeId, elmt)
-
-    #def add_assciatated_aspect_element(self, table, id, elmt):
-    #    aspectElements = table.get(elmt.get_aspect_name())
-    #    if aspectElements is None:
-    #        aspectElements = {}
-    #        table.put(elmt.get_aspect_name(), aspectElements)
-
-    #    elmts = aspectElements.get(id)#
-
-    #    if (elmts is None):
-    #        elmts = []
-    #        aspectElements.put(id, elmts)
-
-    #    elmts.append(elmt)
-
     def set_name(self, network_name):
         """
         Set the network name
+
         :param network_name: Network name
         :type network_name: string
         :return: None
         :rtype:none
         """
-        #add_this_network_attribute = NetworkAttributesElement(name='name', values=network_name, type=ATTRIBUTE_DATA_TYPE.STRING)
-
         self.add_network_attribute(name='name', values=network_name, type=ATTRIBUTE_DATA_TYPE.STRING)
 
     def get_name(self):
         """
         Get the network name
+
         :return: Network name
         :rtype: string
         """
@@ -316,6 +298,7 @@ class NiceCXNetwork(object):
     def get_edges (self):
         """
         Returns an iterator over edge ids as keys and edge objects as values.
+
         :return: Edge iterator
         :rtype: iterator
         """
@@ -347,6 +330,7 @@ class NiceCXNetwork(object):
     def set_network_attribute(self, name=None, values=None, type=None, subnetwork=None, cx_fragment=None):
         """
         Set an attribute of the network
+
         :param name: Attribute name
         :type name: string
         :param values: The values of the attribute
@@ -383,6 +367,7 @@ class NiceCXNetwork(object):
     def get_network_attribute_objects(self, attribute_name):
         """
         Get the value of a network attribute
+
         :param attribute_name: Attribute name
         :type attribute_name: string
         :return: Network attribute object
@@ -404,6 +389,7 @@ class NiceCXNetwork(object):
     def get_network_attributes(self):
         """
         Get the attribute objects of the network.
+
         :return: List of NetworkAttributesElement objects
         :rtype: cx.aspects.NetworkAttributesElement
         """
@@ -422,6 +408,7 @@ class NiceCXNetwork(object):
     def add_node(self, node_element):
         """
         Add a node object to the network. (For an easier method for adding nodes use create_node() )
+
         :param node_element: A node object
         :type node_element: cx.aspects.NodesElement
         :return: Node ID
@@ -443,6 +430,7 @@ class NiceCXNetwork(object):
     def get_nodes(self):
         """
         Returns an iterator over node ids as keys and node objects as values.
+
         :return: iterator over nodes
         :rtype: iterator
         """
@@ -466,6 +454,7 @@ class NiceCXNetwork(object):
     def set_node_attribute(self, node, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
         """
         Set the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
+
         :param node: node object or node id
         :type node: cx.aspects.NodesElement or int
         :param attribute_name: attribute name
@@ -533,6 +522,7 @@ class NiceCXNetwork(object):
         Get the attribute objects for a node attribute name, where the node may be specified by its id or passed in
         as an object. The node attribute objects include datatype and subnetwork information. An example of networks
         that include subnetworks are Cytoscape collections stored in NDEx.
+
         :param node: node object or node id
         :type node: cx.aspects.NodesElement or int
         :param attribute_name: attribute name
@@ -552,6 +542,7 @@ class NiceCXNetwork(object):
     def get_node_attribute(self, node, attribute_name):
         """
         Get the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
+
         :param node: node object or node id
         :type node: cx.aspects.NodesElement or int
         :param attribute_name: attribute name
@@ -568,6 +559,7 @@ class NiceCXNetwork(object):
     def get_node_attributes(self, node):
         """
         Get the attribute objects of a node, where the node may be specified by its id or passed in as an object.
+
         :param node: node object or node id
         :type node: cx.aspects.NodesElement or int
         :return:
@@ -584,6 +576,7 @@ class NiceCXNetwork(object):
     def set_edge_attribute(self, edge, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
         """
         Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
+
         :param edge:
         :type edge:
         :param attribute_name: Attribute name
@@ -644,6 +637,7 @@ class NiceCXNetwork(object):
     def get_edge_attributes(self, edge):
         """
         Get the attribute objects of an edge, where the edge may be specified by its id or passed in as an object.
+
         :param edge: Edge object or edge id
         :type edge: cx.aspects.EdgeElement or int
         :return: Edge attribute objects
@@ -659,6 +653,7 @@ class NiceCXNetwork(object):
         Get the attribute objects for an edge attribute name, where the edge may be specified by its id or passed in
         as an object. The edge attribute objects include datatype and subnetwork information. An example of networks
         that include subnetworks are Cytoscape collections stored in NDEx.
+
         :param edge: Edge object or edge id
         :type edge: cx.aspects.EdgesElement or int
         :param attribute_name: Attribute name
@@ -679,6 +674,7 @@ class NiceCXNetwork(object):
     def get_edge_attribute(self, edge, attribute_name, subnetwork=None):
         """
         Get the value(s) of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
+
         :param edge: Edge object or edge id
         :type edge: cx.aspects.EdgesElement or int
         :param attribute_name: Attribute name
@@ -734,6 +730,7 @@ class NiceCXNetwork(object):
     def get_context(self):
         """
         Get the @context aspect of the network, the aspect that maps namespace prefixes to their defining URIs
+
         :return: List of context objects
         :rtype: list of json objects
         """
@@ -742,6 +739,7 @@ class NiceCXNetwork(object):
     def set_context(self, context):
         """
         Set the @context aspect of the network, the aspect that maps namespace prefixes to their defining URIs
+
         :param context: List of context objects
         :type context: List of dict (namespace string: URI)
         :return: None
@@ -755,6 +753,7 @@ class NiceCXNetwork(object):
     def get_metadata(self):
         """
         Get the network metadata
+
         :return: Network metadata
         :rtype: Iterator of metadata.MetaDataElement
         """
@@ -763,6 +762,7 @@ class NiceCXNetwork(object):
     def set_metadata(self, metadata_obj):
         """
         Set the network metadata
+
         :param metadata_obj: Dict of metadata objects
         :type metadata_obj: dict of metadata.MetaDataElement
         :return: None
@@ -783,6 +783,7 @@ class NiceCXNetwork(object):
     def getProvenance(self):
         """
         Get the network provenance as a Python dictionary having the CX provenance schema.
+
         :return: List of provenance
         :rtype: list of json objects
         """
@@ -801,6 +802,7 @@ class NiceCXNetwork(object):
     def get_opaque_aspect(self, aspect_name):
         """
         Get the elements of the aspect specified by aspect_name
+
         :param aspect_name: the name of the aspect to retrieve.
         :type aspect_name: string
         :return: Opaque aspect
@@ -812,6 +814,7 @@ class NiceCXNetwork(object):
         """
         Set the aspect specified by aspect_name to the list of aspect elements. If aspect_elements is None, the
         aspect is removed.
+
         :param aspect_name: Name of the aspect
         :type aspect_name: string
         :param aspect_elements: Aspect element
@@ -832,6 +835,7 @@ class NiceCXNetwork(object):
     def get_opaque_aspect_names(self):
         """
         Get the names of all opaque aspects
+
         :return: List of opaque aspect names
         :rtype: list of strings
         """
@@ -870,6 +874,7 @@ class NiceCXNetwork(object):
     def set_provenance(self, provenance):
         """
         Set the network provenance
+
         :param provenance: List of provenance objects
         :type provenance: list
         :return: None
@@ -886,6 +891,7 @@ class NiceCXNetwork(object):
     def apply_template(self, server, uuid, username=None, password=None):
         """
         Get a network from NDEx, copy its cytoscapeVisualProperties aspect to this network.
+
         :param server: server host name (i.e. public.ndexbio.org)
         :type server: string
         :param username: username (optional - used when accessing private networks)
@@ -942,6 +948,7 @@ class NiceCXNetwork(object):
         """
         Checks 2 attribute fields for values and merges them into one attribute.  The best use is when one attribute
         is empty which occurs when loading from an edge file.  Use with caution
+
         :param source_attribute1: The name of the first attribute
         :type source_attribute1: basestring
         :param source_attribute2: The name of the second attribute
@@ -963,6 +970,7 @@ class NiceCXNetwork(object):
     def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[], edge_interaction=None):
         """
         Constructor that uses a pandas dataframe to build niceCX
+
         :param df: dataframe
         :type df: Pandas Dataframe
         :param headers:
@@ -1058,13 +1066,6 @@ class NiceCXNetwork(object):
             self.add_metadata_stub('edgeAttributes')
 
     def create_from_networkx(self, G):
-        """
-        Constructor that uses a networkx graph to build niceCX
-        :param G: networkx graph
-        :type G: networkx graph
-        :return: none
-        :rtype: none
-        """
         self.set_name('Networkx Upload')
         self.add_metadata_stub('networkAttributes')
         for n, d in G.nodes_iter(data=True):
@@ -1394,7 +1395,6 @@ class NiceCXNetwork(object):
     def to_pandas_dataframe(self):
         """
         Export the network as a Pandas DataFrame.
-
         Note: This method only processed nodes, edges, node attributes and edge attributes, but not network attributes
         or other aspects
 
@@ -1471,6 +1471,7 @@ class NiceCXNetwork(object):
         """
         Returns a stream of the CX corresponding to the network. Can be used to post to endpoints that can accept
         streaming inputs
+
         :return: The CX stream representation of this network.
         :rtype: io.BytesIO
         """
@@ -1495,7 +1496,8 @@ class NiceCXNetwork(object):
         """
         Upload this network to the specified server to the account specified by username and password.
         Example:
-            ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
+        ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
+
         :param server: The NDEx server to upload the network to.
         :type server: string
         :param username: The username of the account to store the network.
@@ -1513,7 +1515,8 @@ class NiceCXNetwork(object):
         return ndex.save_new_network(save_this_cx)
 
     def update_to(self, uuid, server, username, password):
-        """ Upload this network to the specified server to the account specified by username and password.
+        """
+        Upload this network to the specified server to the account specified by username and password.
 
         :param server: The NDEx server to upload the network to.
         :type server: str
@@ -1551,7 +1554,9 @@ class NiceCXNetwork(object):
 
     def to_networkx(self):
         """
-        Return a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect of the network are transformed to the NetworkX pos attribute.
+        Return a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect of the network are
+        transformed to the NetworkX pos attribute.
+
         :return: Networkx graph
         :rtype: networkx Graph()
         """
@@ -1623,6 +1628,7 @@ class NiceCXNetwork(object):
     def get_summary(self):
         """
         Get a network summary
+
         :return: Network summary
         :rtype: string
         """
@@ -1653,6 +1659,7 @@ class NiceCXNetwork(object):
     def to_cx(self):
         """
         Return the CX corresponding to the network.
+
         :return: CX representation of the network
         :rtype: CX (list of dict aspects)
         """
@@ -1855,6 +1862,8 @@ class NiceCXNetwork(object):
         aspect = {'metaData': aspect_element_array}
 
         return aspect
+
+    # TODO - remove this if not used
 
     def handle_metadata_update(self, aspect_name):
         aspect = self.string_to_aspect_object(aspect_name)

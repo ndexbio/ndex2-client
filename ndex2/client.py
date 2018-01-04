@@ -259,6 +259,7 @@ class Ndex2:
     def save_new_network(self, cx, visibility=None, indexed_fields=None):
         """
         Create a new network (cx) on the server
+
         :param cx: Network cx
         :type cx: list of dicts
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
@@ -288,6 +289,7 @@ class Ndex2:
     def save_cx_stream_as_new_network(self, cx_stream, visibility=None, indexed_fields=None):
         """
         Create a new network from a CX stream.
+
         :param cx_stream:  IO stream of cx
         :type cx_stream: BytesIO
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
@@ -551,6 +553,7 @@ class Ndex2:
     def get_task_by_id(self, task_id):
         """
         Retrieves a task by id
+
         :param task_id: Task id
         :type task_id: string
         :return: Task
@@ -563,6 +566,7 @@ class Ndex2:
     def delete_network(self, network_id, retry=5):
         """
         Deletes the specified network from the server
+
         :param network_id: Network id
         :type network_id: string
         :param retry: Number of times to retry if deleting fails
@@ -589,6 +593,7 @@ class Ndex2:
     def get_provenance(self, network_id):
         """
         Gets the network provenance
+
         :param network_id: Network id
         :type network_id: string
         :return: Provenance
@@ -600,6 +605,7 @@ class Ndex2:
     def set_provenance(self, network_id, provenance):
         """
         Sets the network provenance
+
         :param network_id: Network id
         :type network_id: string
         :param provenance: Network provcenance
@@ -618,6 +624,7 @@ class Ndex2:
     def set_read_only(self, network_id, value):
         """
         Sets the read only flag on the specified network
+
         :param network_id: Network id
         :type network_id: string
         :param value: Read only value
@@ -631,6 +638,7 @@ class Ndex2:
     def set_network_properties(self, network_id, network_properties):
         """
         Sets network properties
+
         :param network_id: Network id
         :type network_id: string
         :param network_properties: List of NDEx property value pairs
@@ -651,6 +659,7 @@ class Ndex2:
     def get_sample_network(self, network_id):
         """
         Gets the sample network
+
         :param network_id: Network id
         :type network_id: string
         :return: Sample network
@@ -668,6 +677,7 @@ class Ndex2:
     def set_network_system_properties(self, network_id, network_properties):
         """
         Set network system properties
+
         :param network_id: Network id
         :type network_id: string
         :param network_properties: Network properties
@@ -719,10 +729,6 @@ class Ndex2:
             return self.post(route, json_data)
 
     def upload_file(self, filename):
-        """
-        This method has not been implemented yet
-        :return: Exception
-        """
         raise Exception("This function is not supported in this release. Please use the save_new_network "
                         "function to create new networks in NDEx server.")
         #       self.require_auth()
@@ -747,6 +753,7 @@ class Ndex2:
     def update_network_group_permission(self, groupid, networkid, permission):
         """
         Updated group permissions
+
         :param groupid: Group id
         :type groupid: string
         :param networkid: Network id
@@ -762,6 +769,7 @@ class Ndex2:
     def update_network_user_permission(self, userid, networkid, permission):
         """
         Updated network user permission
+
         :param userid: User id
         :type userid: string
         :param networkid: Network id
@@ -777,6 +785,7 @@ class Ndex2:
     def grant_networks_to_group(self, groupid, networkids, permission="READ"):
         """
         Set group permission for a set of networks
+
         :param groupid: Group id
         :type groupid: string
         :param networkids: List of network ids
@@ -792,6 +801,7 @@ class Ndex2:
     def get_user_by_username(self, username):
         """
         Gets the user id by user name
+
         :param username: User name
         :type username: string
         :return: User id
@@ -847,6 +857,7 @@ class Ndex2:
     def get_network_ids_for_user(self, username):
         """
         Get the network uuids owned by the user
+
         :param username: users NDEx username
         :type username: str
         :return: list of uuids
@@ -858,6 +869,7 @@ class Ndex2:
     def grant_network_to_user_by_username(self, username, network_id, permission):
         """
         Grants permission to network for the given user name
+
         :param username: User name
         :type username: string
         :param network_id: Network id
@@ -873,6 +885,7 @@ class Ndex2:
     def grant_networks_to_user(self, userid, networkids, permission="READ"):
         """
         Gives read permission to specified networks for the provided user
+
         :param userid: User id
         :type userid: string
         :param networkids: Network ids
@@ -888,6 +901,7 @@ class Ndex2:
     def update_status(self):
         """
         Updates the admin status
+
         :return: None (however the status is stored in the client object self.status)
         :rtype:
         """
@@ -897,6 +911,7 @@ class Ndex2:
     def create_networkset(self, name, description):
         """
         Creates a new network set
+
         :param name: Network set name
         :type name: string
         :param description: Network set description
@@ -910,6 +925,7 @@ class Ndex2:
     def get_network_set(self, set_id):
         """
         Gets the network set information including the list of networks
+
         :param set_id: network set id
         :type set_id: basestring
         :return: network set information
@@ -922,6 +938,7 @@ class Ndex2:
     def add_networks_to_networkset(self, set_id, networks):
         """
         Add networks to a network set.  User must have visibility of all networks being added
+
         :param set_id: network set id
         :type set_id: basestring
         :param networks: networks that will be added to the set

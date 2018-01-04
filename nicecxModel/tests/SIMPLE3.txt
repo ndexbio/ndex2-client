@@ -1,1 +1,0 @@
-A	C	controls-production-ofB	D	controls-production-ofC	E	controls-production-ofD	F	controls-production-ofE	G	controls-production-ofE	D	controls-production-ofC	B	controls-production-ofG	D	controls-production-of

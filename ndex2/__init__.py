@@ -3,14 +3,14 @@ import logging
 import logging.handlers
 import math
 import json
-from nicecxModel.metadata.MetaDataElement import MetaDataElement
-from nicecxModel.cx.aspects.NodeAttributesElement import NodeAttributesElement
-from nicecxModel.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
-from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
-from nicecxModel.cx.aspects.AspectElement import AspectElement
-from nicecxModel.cx import CX_CONSTANTS
-from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
-from nicecxModel.cx import known_aspects_min
+from metadata.MetaDataElement import MetaDataElement
+from cx.aspects.NodeAttributesElement import NodeAttributesElement
+from cx.aspects.EdgeAttributesElement import EdgeAttributesElement
+from cx.aspects.NetworkAttributesElement import NetworkAttributesElement
+from cx.aspects.AspectElement import AspectElement
+from cx import CX_CONSTANTS
+from cx.aspects import ATTRIBUTE_DATA_TYPE
+from cx import known_aspects_min
 
 root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 log_path = os.path.join(root, 'logs')
@@ -617,4 +617,4 @@ def create_nice_cx_from_file(path):
     else:
         raise Exception('The file " + path + " does not exist.')
 
-from nicecxModel.NiceCXNetwork import NiceCXNetwork
+from ndex2.NiceCXNetwork import NiceCXNetwork

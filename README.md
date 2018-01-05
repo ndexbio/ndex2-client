@@ -15,7 +15,7 @@ For information on installing and using Jupyter Notebooks, go to [jupyter.org](h
 
 ## **API Documentation**
 
-The methods of the Ndex2 and NiceCXNetwork objects are documented [here](http://home.ndexbio.org/ndex2-sphinx/docs/ndex2.html)
+Sphinx-generated documentation: [Ndex2 and NiceCXNetwork objects](http://home.ndexbio.org/ndex2-sphinx/docs/ndex2.html)
 
 ## **Requirements**
 

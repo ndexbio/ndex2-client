@@ -460,7 +460,7 @@ class Ndex2:
         """
         post_data = {"searchString": search_string}
         if self.version == "2.0":
-            route = "/search/network?start=%s&size=%s" % start, size
+            route = "/search/network?start=%s&size=%s" % (start, size)
             if include_groups:
                 post_data["includeGroups"] = True
         else:

@@ -13,17 +13,17 @@ import ijson
 import requests
 import base64
 from metadata.MetaDataElement import MetaDataElement
-from cx.aspects.NodeElement import NodeElement
-from cx.aspects.EdgeElement import EdgeElement
-from cx.aspects.NodeAttributesElement import NodeAttributesElement
-from cx.aspects.EdgeAttributesElement import EdgeAttributesElement
-from cx.aspects.NetworkAttributesElement import NetworkAttributesElement
-from cx.aspects.SupportElement import SupportElement
-from cx.aspects.CitationElement import CitationElement
-from cx.aspects.AspectElement import AspectElement
-from cx import CX_CONSTANTS
-from cx.aspects import ATTRIBUTE_DATA_TYPE
-from cx import known_aspects_min
+from ndex2.cx.aspects.NodeElement import NodeElement
+from ndex2.cx.aspects.EdgeElement import EdgeElement
+from ndex2.cx.aspects.NodeAttributesElement import NodeAttributesElement
+from ndex2.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
+from ndex2.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
+from ndex2.cx.aspects.SupportElement import SupportElement
+from ndex2.cx.aspects.CitationElement import CitationElement
+from ndex2.cx.aspects.AspectElement import AspectElement
+from ndex2.cx import CX_CONSTANTS
+from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
+from ndex2.cx import known_aspects_min
 import client as nc
 
 if sys.version_info.major == 3:

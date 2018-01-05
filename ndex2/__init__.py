@@ -620,7 +620,7 @@ def create_nice_cx_from_file(path):
             my_nicecx.create_from_cx(json.load(file_cx))
             return my_nicecx
     else:
-        raise Exception('The file " + path + " does not exist.')
+        raise Exception('The file ' + path + '  does not exist.')
 
 
 from ndex2.niceCXNetwork import NiceCXNetwork

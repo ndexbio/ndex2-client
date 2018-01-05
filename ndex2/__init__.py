@@ -3,14 +3,14 @@ import logging
 import logging.handlers
 import math
 import json
-from metadata.MetaDataElement import MetaDataElement
-from cx.aspects.NodeAttributesElement import NodeAttributesElement
-from cx.aspects.EdgeAttributesElement import EdgeAttributesElement
-from cx.aspects.NetworkAttributesElement import NetworkAttributesElement
-from cx.aspects.AspectElement import AspectElement
-from cx import CX_CONSTANTS
-from cx.aspects import ATTRIBUTE_DATA_TYPE
-from cx import known_aspects_min
+from ndex2.metadata.MetaDataElement import MetaDataElement
+from ndex2.cx.aspects.NodeAttributesElement import NodeAttributesElement
+from ndex2.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
+from ndex2.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
+from ndex2.cx.aspects.AspectElement import AspectElement
+from ndex2.cx import CX_CONSTANTS
+from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
+from ndex2.cx import known_aspects_min
 
 root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 log_path = os.path.join(root, 'logs')

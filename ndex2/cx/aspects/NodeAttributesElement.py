@@ -1,6 +1,6 @@
 __author__ = 'aarongary'
 
-from AttributeCommon import AttributeCommon
+from ndex2.cx.aspects.AttributeCommon import AttributeCommon
 
 class NodeAttributesElement(AttributeCommon):
     def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, cx_fragment=None):

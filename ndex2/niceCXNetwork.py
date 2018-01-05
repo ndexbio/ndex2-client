@@ -12,7 +12,7 @@ import json
 import ijson
 import requests
 import base64
-from metadata.MetaDataElement import MetaDataElement
+from ndex2.metadata.MetaDataElement import MetaDataElement
 from ndex2.cx.aspects.NodeElement import NodeElement
 from ndex2.cx.aspects.EdgeElement import EdgeElement
 from ndex2.cx.aspects.NodeAttributesElement import NodeAttributesElement
@@ -24,7 +24,7 @@ from ndex2.cx.aspects.AspectElement import AspectElement
 from ndex2.cx import CX_CONSTANTS
 from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
 from ndex2.cx import known_aspects_min
-import client as nc
+import ndex2.client as nc
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPError, URLError

@@ -822,15 +822,18 @@ class NiceCXNetwork(object):
         :return: None
         :rtype: none
         """
+        #print("calling set_opaque_aspect")
         if aspect_elements is None:
             self.opaqueAspects.pop(aspect_name, None)
         else:
             if isinstance(aspect_elements, list):
                 self.opaqueAspects[aspect_name] = aspect_elements
+                self.add_metadata_stub(aspect_name)
             else:
                 if aspect_name is None:
                     aspect_name = 'unknown'
                 raise Exception('Provided aspect for ' + aspect_name + ' is not of type <list>')
+
 
     def get_opaque_aspect_names(self):
         """

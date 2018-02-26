@@ -75,9 +75,13 @@ if __name__ == '__main__':
             'urllib3>=1.16',
             'pandas',
             'enum34',
-            'pysolr',
-            'enum; python_version == "2.6" or python_version=="2.7"'
+            'pysolr'
         ],
+
+        extras_require={
+            ':python_version=="2.6"': ['enum'],
+            ':python_version=="2.7"': ['enum']
+            },
 
         include_package_data=True
     )

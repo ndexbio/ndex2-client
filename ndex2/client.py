@@ -24,7 +24,7 @@ DEFAULT_SERVER = "http://public.ndexbio.org"
 
 class Ndex2:
     """ A class to facilitate communication with an NDEx server."""
-    def __init__(self, host=None, username=None, password=None, update_status=False, debug=False):
+    def __init__(self, host=None, username=None, password=None, update_status=False, debug=False, user_agent=''):
         """
         Creates a connection to a particular NDEx server.
 
@@ -40,6 +40,8 @@ class Ndex2:
         self.status = {}
         self.username = username
         self.password = password
+        self.user_agent = ' ' + user_agent if len(user_agent) > 0 else user_agent
+
 
         if host is None:
             host = DEFAULT_SERVER
@@ -54,7 +56,7 @@ class Ndex2:
             try:
                 version_url = urljoin(host, status_url)
 
-                response = requests.get(version_url, headers={'User-Agent': userAgent})
+                response = requests.get(version_url, headers={'User-Agent': userAgent + self.user_agent})
                 response.raise_for_status()
                 data = response.json()
 
@@ -113,7 +115,7 @@ class Ndex2:
         headers = self.s.headers
         headers['Content-Type'] = 'application/json;charset=UTF-8'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
 
         if put_json is not None:
             response = self.s.put(url, data=put_json, headers=headers)
@@ -136,7 +138,7 @@ class Ndex2:
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json,text/plain',
                    'Cache-Control': 'no-cache',
-                   'User-Agent':  userAgent,
+                   'User-Agent':  userAgent + self.user_agent,
                    }
         response = self.s.post(url, data=post_json, headers=headers)
         self.debug_response(response)
@@ -153,7 +155,7 @@ class Ndex2:
         if self.debug:
             print("DELETE route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
 
         if data is not None:
             response = self.s.delete(url, headers=headers, data=data)
@@ -170,7 +172,7 @@ class Ndex2:
         if self.debug:
             print("GET route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
         response = self.s.get(url, params=get_params, headers=headers)
         self.debug_response(response)
         response.raise_for_status()
@@ -184,7 +186,7 @@ class Ndex2:
         if self.debug:
             print("GET stream route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
         response = self.s.get(url, params=get_params, stream=True, headers=headers)
         self.debug_response(response)
         response.raise_for_status()
@@ -201,7 +203,7 @@ class Ndex2:
 
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
         response = self.s.post(url, data=post_json, headers=headers, stream=True)
         self.debug_response(response)
         response.raise_for_status()
@@ -218,7 +220,7 @@ class Ndex2:
 
         headers = {'Content-Type': multipart_data.content_type,
                    'Accept': 'application/json',
-                   'User-Agent': userAgent
+                   'User-Agent': userAgent + self.user_agent
                    }
         response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         self.debug_response(response)
@@ -241,7 +243,7 @@ class Ndex2:
         if self.debug:
             print("POST route: " + url)
         headers = {'Content-Type': multipart_data.content_type,
-                   'User-Agent': userAgent,
+                   'User-Agent': userAgent + self.user_agent,
                    }
         response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         self.debug_response(response)
@@ -530,6 +532,22 @@ class Ndex2:
         """
         if self.version == "2.0":
             return self.set_network_system_properties(network_id, {'visibility': 'PUBLIC'})
+
+        else:
+            return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
+
+    def _make_network_public_indexed(self, network_id):
+        """
+        Makes the network specified by the network_id public.
+
+        :param network_id: The UUID of the network.
+        :type network_id: str
+        :return: The response.
+        :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
+
+        """
+        if self.version == "2.0":
+            return self.set_network_system_properties(network_id, {'visibility': 'PUBLIC', 'index_level': 'ALL', 'showcase': True})
 
         else:
             return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
@@ -971,7 +989,7 @@ class Ndex2:
         headers = self.s.headers
         headers['Content-Type'] = 'application/json;charset=UTF-8'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
 
         count = 0
         while count < retry:

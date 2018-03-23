@@ -94,8 +94,16 @@ class MetaDataElement(object):
         if self.name:
             node_dict[CX_CONSTANTS.METADATA_NAME] = self.name
 
-        if self.id_counter:
+        if isinstance(self.id_counter, int) or isinstance(self.id_counter, str):
+            #print(self.id_counter)
             node_dict[CX_CONSTANTS.ID_COUNTER] = self.id_counter
+        else:
+            try:
+                if self.id_counter is not None and self.id_counter == 0:
+                    #print(self.id_counter)
+                    node_dict[CX_CONSTANTS.ID_COUNTER] = self.id_counter
+            except Exception:
+                print('Error processing metadata id counter')
 
         if self.last_update:
             node_dict[CX_CONSTANTS.LAST_UPDATE] = self.last_update

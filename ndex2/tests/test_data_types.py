@@ -16,7 +16,7 @@ upload_password = 'scratch'
 path_this = os.path.dirname(os.path.abspath(__file__))
 
 class TestLoadByAspects(unittest.TestCase):
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_node_data_types(self):
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='fc63173e-df66-11e7-adc1-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
         found_int_type = False
@@ -32,7 +32,7 @@ class TestLoadByAspects(unittest.TestCase):
 
         print(niceCx.__str__())
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_node_data_types_from_tsv(self):
         path_to_network = os.path.join(path_this, 'mgdb_mutations.txt')
 
@@ -54,7 +54,7 @@ class TestLoadByAspects(unittest.TestCase):
 
             self.assertTrue(found_int_type)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_data_types_from_networkx(self):
         G = nx.Graph()
         G.add_node('ABC')
@@ -124,7 +124,7 @@ class TestLoadByAspects(unittest.TestCase):
         self.assertTrue(found_float_type)
         self.assertTrue(found_edge_float_type)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_data_types_with_special_chars(self):
         path_to_network = os.path.join(path_this, 'Metabolism_of_RNA_data_types.cx')
 
@@ -145,7 +145,7 @@ class TestLoadByAspects(unittest.TestCase):
 
             self.assertTrue(found_list_of_strings_type)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_data_types_with_special_chars2(self):
         niceCx = ndex2.create_empty_nice_cx()
 
@@ -168,7 +168,7 @@ class TestLoadByAspects(unittest.TestCase):
 
         self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_node_data_types(self):
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='f1dd6cc3-0007-11e6-b550-06603eb7f303')
         my_aspect = []
@@ -180,5 +180,13 @@ class TestLoadByAspects(unittest.TestCase):
         my_aspect.append({'node': '6', 'value': 'test6'})
         niceCx.add_opaque_aspect('fakeAspect', my_aspect)
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+        self.assertTrue(True)
+
+    @unittest.skip("Temporary skipping")
+    def test_round_trip(self):
+        #niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='258f0156-f26f-11e7-adc1-0ac135e8bacf',
+        #                                          username='ndextutorials', password='ndextutorials2015')
+        #upload_message = niceCx.upload_to('public.ndexbio.org', 'ndextutorials', 'ndextutorials2015')
+        #niceCx.update_to('258f0156-f26f-11e7-adc1-0ac135e8bacf', 'public.ndexbio.org', 'ndextutorials', 'ndextutorials2015')
         self.assertTrue(True)
 

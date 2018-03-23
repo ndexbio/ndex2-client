@@ -34,7 +34,8 @@ else:
 userAgent = 'NiceCX-Python/1.0'
 
 class NiceCXNetwork(object):
-    def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, pandas_df=None, filename=None, data=None, **attr):
+    def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, pandas_df=None,
+                 filename=None, data=None, user_agent='', **attr):
         self.metadata = {}
         self.context = []
         self.nodes = {}
@@ -59,6 +60,7 @@ class NiceCXNetwork(object):
         self.provenance = []
         self.missingNodes = {}
         self.s = None
+        self.user_agent = user_agent
 
         if cx:
             self.create_from_cx(cx)
@@ -916,6 +918,8 @@ class NiceCXNetwork(object):
             #===================
             # METADATA
             #===================
+            asp = self.get_aspect(uuid, 'metaData', server, username, password)
+
             available_aspects = []
             for ae in (o for o in self.get_aspect(uuid, 'metaData', server, username, password)):
                 available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
@@ -931,7 +935,7 @@ class NiceCXNetwork(object):
                         aspect_element = AspectElement(oa_item, oa)
                         self.add_opaque_aspect_element(aspect_element)
                     vis_prop_size = len(self.opaqueAspects.get('visualProperties'))
-                    mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='visualProperties')
+                    mde = MetaDataElement(elementCount=vis_prop_size, version='1.0', consistencyGroup=1, name='visualProperties')
                     self.add_metadata(mde)
 
 
@@ -942,25 +946,15 @@ class NiceCXNetwork(object):
                         aspect_element = AspectElement(oa_item, oa)
                         self.add_opaque_aspect_element(aspect_element)
                     vis_prop_size = len(self.opaqueAspects.get('cyVisualProperties'))
-                    mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='cyVisualProperties')
+                    mde = MetaDataElement(elementCount=vis_prop_size, version='1.0', consistencyGroup=1, name='cyVisualProperties')
                     self.add_metadata(mde)
         else:
             raise Exception(', '.join(error_message) + 'not specified in apply_template')
 
     def merge_node_attributes(self, source_attribute1, source_attribute2, target_attribute):
-        """
-        Checks 2 attribute fields for values and merges them into one attribute.  The best use is when one attribute
-        is empty which occurs when loading from an edge file.  Use with caution
 
-        :param source_attribute1: The name of the first attribute
-        :type source_attribute1: basestring
-        :param source_attribute2: The name of the second attribute
-        :type source_attribute2: basestring
-        :param target_attribute: The desired name for the merged data
-        :type target_attribute: basestring
-        :return:
-        :rtype:
-        """
+        # Checks 2 attribute fields for values and merges them into one attribute.  The best use is when one attribute
+        # is empty which occurs when loading from an edge file.  Use with caution
         for node_id, node in self.nodes.items():
             value1 = self.get_node_attribute(node, source_attribute1)
             value2 = self.get_node_attribute(node, source_attribute2)
@@ -969,6 +963,36 @@ class NiceCXNetwork(object):
                 self.set_node_attribute(node, target_attribute, merged_value)
                 self.remove_node_attribute(node, source_attribute1)
                 self.remove_node_attribute(node, source_attribute2)
+
+    def union_node_attributes(self, source_attribute1, source_attribute2, target_attribute):
+
+        # Checks 2 attribute fields for values and merges them into one attribute.  The best use is when one attribute
+        # is empty which occurs when loading from an edge file.  Use with caution
+
+        for node_id, node in self.nodes.items():
+
+            value1 = self.get_node_attribute(node, source_attribute1)
+            value2 = self.get_node_attribute(node, source_attribute2)
+            target_value = []
+
+            if not isinstance(value1, list):
+                value1 = [value1]
+
+            if not isinstance(value2, list):
+                value2 = [value2]
+
+            for val in value1:
+                target_value.append(str(val))
+
+            for val in value2:
+                target_value.append(str(val))
+
+            self.remove_node_attribute(node, source_attribute1)
+            self.remove_node_attribute(node, source_attribute2)
+
+            if target_value and len(target_value) > 0:
+                self.set_node_attribute(node, target_attribute, target_value)
+
 
     def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[], edge_interaction=None):
         """
@@ -1495,7 +1519,7 @@ class NiceCXNetwork(object):
 
             return return_bytes
 
-    def upload_to(self, server, username, password):
+    def upload_to(self, server, username, password, visibility=None):
         """
         Upload this network to the specified server to the account specified by username and password.
         Example:
@@ -1513,9 +1537,9 @@ class NiceCXNetwork(object):
         if server and 'http' not in server:
             server = 'http://' + server
 
-        ndex = nc.Ndex2(server,username,password)
+        ndex = nc.Ndex2(server, username, password, user_agent=self.user_agent)
         save_this_cx = self.to_cx()
-        return ndex.save_new_network(save_this_cx)
+        return ndex.save_new_network(save_this_cx, visibility=visibility)
 
     def update_to(self, uuid, server, username, password):
         """
@@ -1534,7 +1558,7 @@ class NiceCXNetwork(object):
             ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
         """
         cx = self.to_cx()
-        ndex = nc.Ndex2(server,username,password)
+        ndex = nc.Ndex2(server, username, password, user_agent=self.user_agent)
 
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):

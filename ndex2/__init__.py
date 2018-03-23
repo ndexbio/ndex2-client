@@ -40,8 +40,8 @@ def get_logger(name, level=logging.DEBUG):
     return logger
 
 
-def create_empty_nice_cx():
-    my_nicecx = NiceCXNetwork()
+def create_empty_nice_cx(user_agent=''):
+    my_nicecx = NiceCXNetwork(user_agent)
     return my_nicecx
 
 
@@ -51,7 +51,7 @@ def _create_cartesian_coordinates_aspect_from_networkx(G):
     ]
 
 
-def create_nice_cx_from_networkx(G):
+def create_nice_cx_from_networkx(G, user_agent=''):
     """
     Create a NiceCXNetwork based on a networkx graph. The resulting NiceCXNetwork
     contains the nodes edges and their attributes from the networkx graph and also
@@ -65,7 +65,7 @@ def create_nice_cx_from_networkx(G):
     if G is None:
         raise Exception('Networkx input is empty')
 
-    my_nicecx = NiceCXNetwork()
+    my_nicecx = NiceCXNetwork(user_agent)
 
     if G.graph.get('name'):
         my_nicecx.set_name(G.graph.get('name'))
@@ -130,14 +130,14 @@ def create_nice_cx_from_networkx(G):
     return my_nicecx
 
 
-def create_nice_cx_from_cx(cx):
+def create_nice_cx_from_cx(cx, user_agent=''):
     """
     Create a NiceCXNetwork from a CX list.
 
     :param cx: a list in CX format
     :return: NiceCXNetwork
     """
-    my_nicecx = NiceCXNetwork()
+    my_nicecx = NiceCXNetwork(user_agent)
 
     if cx:
         # ===================
@@ -288,7 +288,7 @@ def create_nice_cx_from_cx(cx):
 
 def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                                source_node_attr=[], target_node_attr=[],
-                               edge_attr=[], edge_interaction=None):
+                               edge_attr=[], edge_interaction=None, user_agent=''):
     """
     Create a NiceCXNetwork from a pandas dataframe in which each row
     specifies one edge in the network.
@@ -313,7 +313,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     :return: NiceCXNetwork
     """
 
-    my_nicecx = NiceCXNetwork()
+    my_nicecx = NiceCXNetwork(user_agent)
 
     # ====================================================
     # IF NODE FIELD NAME (SOURCE AND TARGET) IS PROVIDED
@@ -322,32 +322,36 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     my_nicecx.set_name('Pandas Upload')
     my_nicecx.add_metadata_stub('networkAttributes')
     count = 0
+    source_predicate = ''
+    target_predicate = ''
     if source_field and target_field:
         for index, row in df.iterrows():
-            if count % 10000 == 0:
-                print(count)
+            #if count % 10000 == 0:
+            #    print(count)
             count += 1
             # =============
             # ADD NODES
             # =============
-            my_nicecx.create_node(id=row[source_field], node_name=row[source_field], node_represents=row[source_field])
-            my_nicecx.create_node(id=row[target_field], node_name=row[target_field], node_represents=row[target_field])
+            my_nicecx.create_node(id=source_predicate + str(row[source_field]), node_name=source_predicate + str(row[source_field]),
+                                  node_represents=source_predicate + str(row[source_field]))
+            my_nicecx.create_node(id=target_predicate + str(row[target_field]), node_name=target_predicate + str(row[target_field]),
+                                  node_represents=target_predicate + str(row[target_field]))
 
             # =============
             # ADD EDGES
             # =============
             if edge_interaction:
                 if row.get(edge_interaction):
-                    my_nicecx.create_edge(id=index, edge_source=row[source_field],
-                                          edge_target=row[target_field],
+                    my_nicecx.create_edge(id=index, edge_source=source_predicate + str(row[source_field]),
+                                          edge_target=target_predicate + str(row[target_field]),
                                           edge_interaction=row[edge_interaction])
                 else:
-                    my_nicecx.create_edge(id=index, edge_source=row[source_field],
-                                          edge_target=row[target_field],
+                    my_nicecx.create_edge(id=index, edge_source=source_predicate + str(row[source_field]),
+                                          edge_target=target_predicate + str(row[target_field]),
                                           edge_interaction=edge_interaction)
             else:
-                my_nicecx.create_edge(id=index, edge_source=row[source_field],
-                                      edge_target=row[target_field],
+                my_nicecx.create_edge(id=index, edge_source=source_predicate + str(row[source_field]),
+                                      edge_target=target_predicate + str(row[target_field]),
                                       edge_interaction='interacts-with')
 
             # ==============================
@@ -365,7 +369,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                     attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
                 elif isinstance(row[sp], int):
                     attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
-                my_nicecx.set_node_attribute(row[source_field], sp, row[sp], type=attr_type)
+                my_nicecx.set_node_attribute(source_predicate + str(row[source_field]), sp, str(row[sp]), type=attr_type)
 
             # ==============================
             # ADD TARGET NODE ATTRIBUTES
@@ -382,7 +386,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                     attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
                 elif isinstance(row[tp], int):
                     attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
-                my_nicecx.set_node_attribute(row[target_field], tp, row[tp], type=attr_type)
+                my_nicecx.set_node_attribute(target_predicate + str(row[target_field]), tp, str(row[tp]), type=attr_type)
 
             # ==============================
             # ADD EDGE ATTRIBUTES
@@ -403,18 +407,18 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # =============
             # ADD NODES
             # =============
-            my_nicecx.create_node(id=row[0], node_name=row[0], node_represents=row[0])
-            my_nicecx.create_node(id=row[1], node_name=row[1], node_represents=row[1])
+            my_nicecx.create_node(id=str(row[0]), node_name=str(row[0]), node_represents=str(row[0]))
+            my_nicecx.create_node(id=str(row[1]), node_name=str(row[1]), node_represents=str(row[1]))
 
             # =============
             # ADD EDGES
             # =============
             if len(row) > 2:
-                my_nicecx.create_edge(id=index, edge_source=row[0],
-                                      edge_target=row[1], edge_interaction=row[2])
+                my_nicecx.create_edge(id=index, edge_source=str(row[0]),
+                                      edge_target=str(row[1]), edge_interaction=row[2])
             else:
-                my_nicecx.create_edge(id=index, edge_source=row[0],
-                                      edge_target=row[1], edge_interaction='interacts-with')
+                my_nicecx.create_edge(id=index, edge_source=str(row[0]),
+                                      edge_target=str(row[1]), edge_interaction='interacts-with')
 
     my_nicecx.add_metadata_stub('nodes')
     my_nicecx.add_metadata_stub('edges')
@@ -426,7 +430,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     return my_nicecx
 
 
-def create_nice_cx_from_server(server=None, username=None, password=None, uuid=None):
+def create_nice_cx_from_server(server=None, username=None, password=None, uuid=None, user_agent=''):
     """
     Create a NiceCXNetwork based on a network retrieved from NDEx, specified by its UUID.
     If the network is not public, then username and password arguments for an account on
@@ -439,7 +443,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
     :return: NiceCXNetwork
     """
     if server and uuid:
-        my_nicecx = NiceCXNetwork()
+        my_nicecx = NiceCXNetwork(user_agent)
 
         # ===================
         # METADATA
@@ -604,7 +608,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
     return my_nicecx
 
 
-def create_nice_cx_from_file(path):
+def create_nice_cx_from_file(path, user_agent=''):
     """
     Create a NiceCXNetwork based on CX JSON from a file.
 
@@ -612,7 +616,7 @@ def create_nice_cx_from_file(path):
     :return: NiceCXNetwork
     """
     if os.path.isfile(path):
-        my_nicecx = NiceCXNetwork()
+        my_nicecx = NiceCXNetwork(user_agent)
         with open(path, 'rU') as file_cx:
             # ====================================
             # BUILD NICECX FROM FILE

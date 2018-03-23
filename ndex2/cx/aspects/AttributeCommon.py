@@ -3,6 +3,7 @@ __author__ = 'aarongary'
 import json
 from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
 from ndex2.cx import CX_CONSTANTS
+from enum import Enum
 
 class AttributeCommon(object):
     def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, cx_fragment=None):
@@ -22,10 +23,12 @@ class AttributeCommon(object):
             self._subnetwork = subnetwork
             self._name = name
             self._values = values
-            if isinstance(type, str):
+            if isinstance(type, Enum):
+                self._data_type = type
+            elif type is not None:
                 self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(type)
             else:
-                self._data_type = type
+                self._data_type = None
 
         self.ASPECT_NAME = None
 
@@ -57,7 +60,13 @@ class AttributeCommon(object):
         return self._data_type
 
     def set_data_type(self, data_type):
-        self._data_type = data_type
+        if isinstance(type, Enum):
+            self._data_type = data_type
+        elif type is not None:
+            self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(data_type)
+        else:
+            self._data_type = None
+        #self._data_type = data_type
 
     def get_value_as_json_string(self):
         return json.dumps(self._values)

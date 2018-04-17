@@ -4,7 +4,6 @@ import json
 
 class NameSpace():
     def __init__(self):
-	    self.serialVersionUID = 1
 	    self.ASPECT_NAME = '@context'
 
     def getAspectName(self):
@@ -18,7 +17,4 @@ class NameSpace():
                 return -1
             else:
                 return 0
-
-	#def write(self, out):
-	#	out.writeObject(this);
 

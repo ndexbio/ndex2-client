@@ -98,7 +98,7 @@ class NiceCXNetwork(object):
         :return: Edge ID
         :rtype: int
         """
-        edge_element = EdgeElement(id=id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction, cx_fragment=cx_fragment)
+        edge_element = EdgeElement(edge_id=id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction, cx_fragment=cx_fragment)
 
         self.add_edge(edge_element)
 
@@ -609,7 +609,7 @@ class NiceCXNetwork(object):
                             e_a.set_subnetwork(subnetwork)
                             if type:
                                 if isinstance(type, str):
-                                    e_a.set_data_type(ATTRIBUTE_DATA_TYPE.fromCxLabel(type))
+                                    e_a.set_data_type(ATTRIBUTE_DATA_TYPE.from_cx_label(type))
                                 else:
                                     e_a.set_data_type(type)
 

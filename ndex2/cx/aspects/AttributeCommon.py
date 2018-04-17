@@ -8,8 +8,6 @@ from abc import ABC, abstractmethod
 
 class AttributeCommon(ABC):
     def __init__(self, property_of, name, values=None, data_type=None, subnetwork=None):
-        if property_of is None:
-            raise Exception("property_of field can not be None in attributes.")
         if name is None:
             raise Exception("name can not be None in attributes.")
         self._property_of = property_of
@@ -19,7 +17,7 @@ class AttributeCommon(ABC):
         if isinstance(data_type, Enum):
             self._data_type = data_type
         elif data_type is not None:
-            self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(data_type)
+            self._data_type = ATTRIBUTE_DATA_TYPE.from_cx_label(data_type)
         else:
             self._data_type = ATTRIBUTE_DATA_TYPE.STRING
 
@@ -54,7 +52,7 @@ class AttributeCommon(ABC):
         if isinstance(type, Enum):
             self._data_type = data_type
         elif type is not None:
-            self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(data_type)
+            self._data_type = ATTRIBUTE_DATA_TYPE.from_cx_label(data_type)
         else:
             self._data_type = ATTRIBUTE_DATA_TYPE.STRING
 
@@ -62,17 +60,16 @@ class AttributeCommon(ABC):
         return json.dumps(self._values)
 
     def is_single_value(self):
-        return ATTRIBUTE_DATA_TYPE.isSingleValueType(self._data_type)
+        return ATTRIBUTE_DATA_TYPE.is_single_value_type(self._data_type)
 
     @abstractmethod
     def get_aspect_name(self):
         pass
 
-    #   def __str__(self):
-    #       return json.dumps(self.to_cx())
-
     def to_cx_str(self):
-        return '{"po":' + str(self._property_of) + ',"n":' + json.dumps(self._name) + \
+        return '{"n":' + json.dumps(self._name) + \
+               (',"po":' + str(self._property_of) if self._property_of is not None else "") + \
                (',"s":' + str(self._subnetwork) if self._subnetwork is not None else "") + \
                (',"v":' + json.dumps(self._values) if self._values is not None else "") +\
-               ("" if self._data_type == ATTRIBUTE_DATA_TYPE.STRING else ',"d":"' +self._data_type.value + '"') + '}'
+               ("" if self._data_type == ATTRIBUTE_DATA_TYPE.STRING else ',"d":"' + str(self._data_type.value) + '"') \
+               + '}'

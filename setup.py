@@ -68,6 +68,7 @@ if __name__ == '__main__':
         packages=find_packages(exclude=[]),
 
         install_requires = [
+            'six'
             'ijson',
             'requests',
             'requests_toolbelt',

@@ -1,10 +1,8 @@
 __author__ = 'aarongary'
 
-from ndex2.cx import CX_CONSTANTS
 
 class AspectElement(object):
     def __init__(self, element, aspect_name):
-     #   self.serialVersionUID = 1
         self.ASPECT_NAME = aspect_name
         self.aspect_element = element
 

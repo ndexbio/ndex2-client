@@ -34,7 +34,7 @@ class NodeElement(object):
     def set_node_name(self, node_name ):
         self._name = node_name
 
-    def __eq__ (self, other):
+    def __eq__(self, other):
         return self == other or self._id == other._id
 
     def to_cx_str(self):

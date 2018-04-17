@@ -2,41 +2,32 @@ __author__ = 'aarongary'
 
 import json
 from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
-from ndex2.cx import CX_CONSTANTS
 from enum import Enum
+from abc import ABC, abstractmethod
 
-class AttributeCommon(object):
-    def __init__(self, subnetwork=None, property_of=None, name=None, values=None, type=None, cx_fragment=None):
-        if cx_fragment is not None:
-            if CX_CONSTANTS.DATA_TYPE in cx_fragment:
-                data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(cx_fragment.get(CX_CONSTANTS.DATA_TYPE))
-            else:
-                data_type = ATTRIBUTE_DATA_TYPE.convert_to_data_type(cx_fragment.get(CX_CONSTANTS.VALUE))
 
-            self._property_of = cx_fragment.get(CX_CONSTANTS.PROPERTY_OF)
-            self._subnetwork = cx_fragment.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK)
-            self._name = cx_fragment.get(CX_CONSTANTS.NAME)
-            self._values = cx_fragment.get(CX_CONSTANTS.VALUE)
+class AttributeCommon(ABC):
+    def __init__(self, property_of, name, values=None, data_type=None, subnetwork=None):
+        if property_of is None:
+            raise Exception("property_of field can not be None in attributes.")
+        if name is None:
+            raise Exception("name can not be None in attributes.")
+        self._property_of = property_of
+        self._subnetwork = subnetwork
+        self._name = name
+        self._values = values
+        if isinstance(data_type, Enum):
             self._data_type = data_type
+        elif data_type is not None:
+            self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(data_type)
         else:
-            self._property_of = property_of
-            self._subnetwork = subnetwork
-            self._name = name
-            self._values = values
-            if isinstance(type, Enum):
-                self._data_type = type
-            elif type is not None:
-                self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(type)
-            else:
-                self._data_type = None
-
-        self.ASPECT_NAME = None
+            self._data_type = ATTRIBUTE_DATA_TYPE.STRING
 
     def get_property_of(self):
         return self._property_of
 
-    def set_property_of(self, id):
-        self._property_of = id
+    def set_property_of(self, po):
+        self._property_of = po
 
     def get_subnetwork(self):
         return self._subnetwork
@@ -48,7 +39,7 @@ class AttributeCommon(object):
         return self._name
 
     def set_name(self, name):
-        self.name = name
+        self._name = name
 
     def get_values(self):
         return self._values
@@ -65,8 +56,7 @@ class AttributeCommon(object):
         elif type is not None:
             self._data_type = ATTRIBUTE_DATA_TYPE.fromCxLabel(data_type)
         else:
-            self._data_type = None
-        #self._data_type = data_type
+            self._data_type = ATTRIBUTE_DATA_TYPE.STRING
 
     def get_value_as_json_string(self):
         return json.dumps(self._values)
@@ -74,33 +64,15 @@ class AttributeCommon(object):
     def is_single_value(self):
         return ATTRIBUTE_DATA_TYPE.isSingleValueType(self._data_type)
 
+    @abstractmethod
     def get_aspect_name(self):
-        return self.ASPECT_NAME
+        pass
 
-    def set_aspect_name(self, aspect_name):
-        self.ASPECT_NAME = aspect_name
+    #   def __str__(self):
+    #       return json.dumps(self.to_cx())
 
-    def __str__(self):
-        return json.dumps(self.to_cx())
-
-    def to_cx(self):
-        return_dict = {}
-
-        if self._property_of is not None:
-            return_dict[CX_CONSTANTS.PROPERTY_OF] = self._property_of
-
-        if self._name is not None:
-            return_dict[CX_CONSTANTS.NAME] = self._name
-
-        if self._data_type:
-            return_dict[CX_CONSTANTS.DATA_TYPE] = self._data_type.value
-
-        if self._subnetwork:
-            return_dict[CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK] = self._subnetwork
-
-        if self.is_single_value():
-            return_dict[CX_CONSTANTS.VALUE] = self.get_values()
-        else:
-            return_dict[CX_CONSTANTS.VALUE] = self._values
-
-        return return_dict
+    def to_cx_str(self):
+        return '{"po":' + str(self._property_of) + ',"n":' + json.dumps(self._name) + \
+               (',"s":' + str(self._subnetwork) if self._subnetwork is not None else "") + \
+               (',"v":' + json.dumps(self._values) if self._values is not None else "") +\
+               ("" if self._data_type == ATTRIBUTE_DATA_TYPE.STRING else ',"d":"' +self._data_type.value + '"') + '}'

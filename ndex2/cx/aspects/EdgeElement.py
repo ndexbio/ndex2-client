@@ -66,8 +66,8 @@ class EdgeElement(object):
     def __eq__ (self, other):
         return self == other or self._id == other._id
 
-    def __str__(self):
-        return json.dumps(self.to_cx(), cls=DecimalEncoder)
+#    def __str__(self):
+#        return json.dumps(self.to_cx(), cls=DecimalEncoder)
 
     def to_cx(self):
         if self._id == -1:

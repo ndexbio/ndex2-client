@@ -10,5 +10,5 @@ class SimpleNode(object):
             'r': node_represents
         }
 
-    def __str__(self):
-        return json.dumps(self.return_this)
+ #   def __str__(self):
+ #       return json.dumps(self.return_this)

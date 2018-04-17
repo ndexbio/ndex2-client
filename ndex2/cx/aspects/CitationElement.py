@@ -1,28 +1,22 @@
 __author__ = 'aarongary'
 
-from ndex2.cx import CX_CONSTANTS
 import json
 
-class CitationElement(object):
-    def __init__(self, id=None, title=None, contributor=None, identifier=None, type=None, description=None, attributes=None, cx_fragment=None):
-        self.ASPECT_NAME = 'citations'
 
-        if cx_fragment is None:
-            self._id = id
-            self._title = title
-            self._contributor = contributor
-            self._identifier = identifier
-            self._type = type
-            self._description = description
-            self._attributes = attributes
-        else:
-            self._id = cx_fragment.get(CX_CONSTANTS.ID)
-            self._title = cx_fragment.get(CX_CONSTANTS.CITATION_TITLE)
-            self._contributor = cx_fragment.get(CX_CONSTANTS.CITATION_CONTRIBUTOR)
-            self._identifier = cx_fragment.get(CX_CONSTANTS.CITATION_IDENTIFIER)
-            self._type = cx_fragment.get(CX_CONSTANTS.CITATION_TYPE)
-            self._description = cx_fragment.get(CX_CONSTANTS.CITATION_DESCRIPTION)
-            self._attributes = cx_fragment.get(CX_CONSTANTS.ATTRIBUTES)
+class CitationElement(object):
+    def __init__(self, po, title=None, contributor=None, identifier=None, dc_type=None,
+                 description=None, attributes=None):
+        self._id = po
+        self._title = title
+        self._contributor = contributor
+        self._identifier = identifier
+        self._type = dc_type
+        self._description = description
+        self._attributes = attributes
+
+    @staticmethod
+    def get_aspect_name():
+        return 'citations'
 
     def get_id(self):
         return self._id
@@ -54,8 +48,8 @@ class CitationElement(object):
     def set_identifier(self, identifier):
         self._identifier = identifier
 
-    def set_type(self, type):
-        self._type = type
+    def set_type(self, dc_type):
+        self._type = dc_type
 
     def set_description(self, description):
         self._description = description
@@ -63,34 +57,11 @@ class CitationElement(object):
     def set_attributes(self, attributes):
         self._attributes = attributes
 
-    def __str__(self):
-        return json.dumps(self.to_cx())
-
-    def to_cx(self):
-        return_json = {}
-
-        if self._id == -1:
-            raise Exception('Edge element does not have a valid ID.  Unable to process this edge - ' + self._node_name)
-
-        return_json[CX_CONSTANTS.ID] = self._id
-
-        if self._contributor is not None:
-            return_json[CX_CONSTANTS.CITATION_CONTRIBUTOR] = self._contributor
-
-        if self._identifier is not None:
-            return_json[CX_CONSTANTS.CITATION_IDENTIFIER] = self._identifier
-
-        if self._type is not None:
-            return_json[CX_CONSTANTS.CITATION_TYPE] = self._type
-
-        if self._title is not None:
-            return_json[CX_CONSTANTS.CITATION_TITLE] = self._title
-
-        if self._description is not None:
-            return_json[CX_CONSTANTS.CITATION_DESCRIPTION] = self._description
-
-        if self._attributes is not None:
-            return_json[CX_CONSTANTS.ATTRIBUTES] = self._attributes
-
-        return return_json
-
+    def to_cx_str(self):
+        return '{"@id":'+str(self._id) + \
+               (',"dc:title":'+json.dumps(self._title) if self._title is not None else "") + \
+               (',"dc:contributor":' + json.dumps(self._contributor) if self._contributor is not None else "") +\
+               (',"dc:identifier":' + json.dumps(self._identifier) if self._identifier is not None else '') + \
+               (',"dc:type":' + json.dumps(self._type) if self._type is not None else '') + \
+               (',"dc:description":' + json.dumps(self._description) if self._description is not None else '') + \
+               (',"attributes":' + json.dumps(self._attributes) if self._attributes is not None else '') + '}'

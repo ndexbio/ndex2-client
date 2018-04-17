@@ -52,8 +52,8 @@ class SupportElement(object):
     def set_props(self, props):
         self._props = props
 
-    def __str__(self):
-        return json.dumps(self.to_cx())
+ #   def __str__(self):
+ #       return json.dumps(self.to_cx())
 
     def to_cx(self):
         return_json = {}

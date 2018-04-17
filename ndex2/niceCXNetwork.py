@@ -1680,8 +1680,8 @@ class NiceCXNetwork(object):
 
         return summary_string
 
-    def __str__(self):
-        return json.dumps(self.to_cx(), cls=DecimalEncoder)
+  #  def __str__(self):
+  #      return json.dumps(self.to_cx(), cls=DecimalEncoder)
 
     def to_cx(self):
         """

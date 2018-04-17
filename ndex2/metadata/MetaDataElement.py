@@ -73,8 +73,8 @@ class MetaDataElement(object):
     def set_version(self, v):
         self.version = v
 
-    def __str__(self):
-        return json.dumps(self.to_cx())
+ #   def __str__(self):
+ #       return json.dumps(self.to_cx())
 
     def to_cx(self):
         node_dict = {}

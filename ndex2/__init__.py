@@ -99,7 +99,7 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         # =============
         # ADD EDGES
         # =============
-        my_nicecx.create_edge(id=index, edge_source=u, edge_target=v, edge_interaction=d.get('interaction'))
+        my_nicecx.create_edge(edge_id=index, edge_source=u, edge_target=v, edge_interaction=d.get('interaction'))
 
         # ==============================
         # ADD EDGE ATTRIBUTES
@@ -342,15 +342,15 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # =============
             if edge_interaction:
                 if row.get(edge_interaction):
-                    my_nicecx.create_edge(id=index, edge_source=source_predicate + str(row[source_field]),
+                    my_nicecx.create_edge(edge_id=index, edge_source=source_predicate + str(row[source_field]),
                                           edge_target=target_predicate + str(row[target_field]),
                                           edge_interaction=row[edge_interaction])
                 else:
-                    my_nicecx.create_edge(id=index, edge_source=source_predicate + str(row[source_field]),
+                    my_nicecx.create_edge(edge_id=index, edge_source=source_predicate + str(row[source_field]),
                                           edge_target=target_predicate + str(row[target_field]),
                                           edge_interaction=edge_interaction)
             else:
-                my_nicecx.create_edge(id=index, edge_source=source_predicate + str(row[source_field]),
+                my_nicecx.create_edge(edge_id=index, edge_source=source_predicate + str(row[source_field]),
                                       edge_target=target_predicate + str(row[target_field]),
                                       edge_interaction='interacts-with')
 
@@ -414,10 +414,10 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # ADD EDGES
             # =============
             if len(row) > 2:
-                my_nicecx.create_edge(id=index, edge_source=str(row[0]),
+                my_nicecx.create_edge(edge_id=index, edge_source=str(row[0]),
                                       edge_target=str(row[1]), edge_interaction=row[2])
             else:
-                my_nicecx.create_edge(id=index, edge_source=str(row[0]),
+                my_nicecx.create_edge(edge_id=index, edge_source=str(row[0]),
                                       edge_target=str(row[1]), edge_interaction='interacts-with')
 
     my_nicecx.add_metadata_stub('nodes')

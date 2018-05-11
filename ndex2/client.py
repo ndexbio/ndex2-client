@@ -9,11 +9,7 @@ import sys
 import decimal
 import numpy
 
-if sys.version_info.major == 3:
-    from urllib.parse import urljoin
-else:
-    from urlparse import urljoin
-
+from urllib.parse import urljoin
 from requests import exceptions as req_except
 import time
 

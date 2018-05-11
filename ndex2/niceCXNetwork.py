@@ -13,6 +13,7 @@ import ijson
 import requests
 import base64
 from ndex2.metadata.MetaDataElement import MetaDataElement
+from ndex2.metadata.MetaData import MetaData
 from ndex2.cx.aspects.NodeElement import NodeElement
 from ndex2.cx.aspects.EdgeElement import EdgeElement
 from ndex2.cx.aspects.NodeAttributesElement import NodeAttributesElement
@@ -25,18 +26,14 @@ from ndex2.cx import CX_CONSTANTS
 from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
 from ndex2.cx import known_aspects_min
 import ndex2.client as nc
-
-if sys.version_info.major == 3:
-    from urllib.request import urlopen, Request, HTTPError, URLError
-else:
-    from urllib2 import urlopen, Request, HTTPError, URLError
+from urllib.request import urlopen, Request, HTTPError, URLError
 
 userAgent = 'NiceCX-Python/1.0'
 
 class NiceCXNetwork(object):
     def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, pandas_df=None,
                  filename=None, data=None, user_agent='', **attr):
-        self.metadata = {}
+        self.metadata = MetaData()
         self.context = []
         self.nodes = {}
         self.node_int_id_generator = set([])
@@ -81,52 +78,54 @@ class NiceCXNetwork(object):
             if server and uuid:
                 self.create_from_server(server, username, password, uuid)
 
-    def create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
+    def create_edge(self, edge_id, edge_source, edge_target, edge_interaction=None):
         """
         Create a new edge in the network by specifying source-interaction-target
 
-        :param id:
-        :type id:
+        :param edge_id:
+        :type edge_id:
         :param edge_source: The source node this edge, either its id or the node object itself.
         :type edge_source: int
         :param edge_target: The target node this edge, either its id or the node object itself.
         :type edge_target: int
         :param edge_interaction: The interaction that describes the relationship between the source and target nodes
         :type edge_interaction: string
-        :param cx_fragment: CX Fragment
-        :type cx_fragment: json
         :return: Edge ID
         :rtype: int
         """
-        edge_element = EdgeElement(edge_id=id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction, cx_fragment=cx_fragment)
+        edge_element = EdgeElement(edge_id=edge_id, edge_source=edge_source, edge_target=edge_target,
+                                   edge_interaction=edge_interaction)
 
         self.add_edge(edge_element)
 
         return edge_element.get_id()
 
-    def add_edge(self, edge_element):
-        """
-        Add an edge object to the network. (For an easier method for adding edges use create_edge() )
+#    def add_edge(self, edge_element):
+#        """
+#        Add an edge object to the network. (For an easier method for adding edges use create_edge() )
+#
+#        :param edge_element: An edge object
+#        :type edge_element: cx.aspects.EdgesElement
+#        :return: Edge ID
+#        :rtype:
+#        """
+#        if isinstance(edge_element, EdgeElement):
+#            if edge_element.get_id() < 0:
+#                edge_element.set_id(len(self.edges.keys()))
+#            self.edges[edge_element.get_id()] = edge_element
 
-        :param edge_element: An edge object
-        :type edge_element: cx.aspects.EdgesElement
-        :return: Edge ID
-        :rtype:
-        """
-        if isinstance(edge_element, EdgeElement):
-            if edge_element.get_id() < 0:
-                edge_element.set_id(len(self.edges.keys()))
-            self.edges[edge_element.get_id()] = edge_element
+#            if self.nodes.get(edge_element.get_source()) is None:
+#                self.missingNodes[edge_element.get_source()] = 1
 
-            if self.nodes.get(edge_element.get_source()) is None:
-                self.missingNodes[edge_element.get_source()] = 1
+#            if self.nodes.get(edge_element.get_target()) is None:
+#                self.missingNodes[edge_element.get_target()] = 1
 
-            if self.nodes.get(edge_element.get_target()) is None:
-                self.missingNodes[edge_element.get_target()] = 1
+#            return edge_element.get_id()
+#        else:
+#            raise Exception('Provided input was not of type EdgesElement.')
 
-            return edge_element.get_id()
-        else:
-            raise Exception('Provided input was not of type EdgesElement.')
+    def add_edge_element(self, edge_element):
+        self.edges[edge_element.get_id()] = edge_element
 
     def add_network_attribute(self, network_attribute_element=None, subnetwork=None, property_of=None, name=None, values=None, type=None, json_obj=None):
         if network_attribute_element is None:
@@ -179,6 +178,7 @@ class NiceCXNetwork(object):
         nodeAttrs = self.nodeAttributes.get(node_attribute_element.get_property_of())
         if nodeAttrs is None:
             nodeAttrs = []
+
             self.nodeAttributes[node_attribute_element.get_property_of()] = nodeAttrs
 
         nodeAttrs.append(node_attribute_element)
@@ -306,6 +306,16 @@ class NiceCXNetwork(object):
         """
         return self.edges.items()
 
+    def get_edge_table(self):
+        """
+        Returns the edge table of this niceCX object.
+
+        :return: Edge table. key: edge_id, value: edgeElement
+        :rtype: dictionaary
+        """
+        return self.edges.items()
+
+
     def get_edge(self, edge):
         if isinstance(edge, EdgeElement):
             return self.edges.get(edge.get_id())
@@ -400,34 +410,39 @@ class NiceCXNetwork(object):
     #==================
     # NODE OPERATIONS
     #==================
-    def create_node(self, id=None, node_name=None, node_represents=None, cx_fragment=None):
-        node_element = NodeElement(id=id, node_name=node_name, node_represents=node_represents, cx_fragment=cx_fragment)
+#    def create_node(self, id=None, node_name=None, node_represents=None):
+#        node_element = NodeElement(id=id, node_name=node_name, node_represents=node_represents)
 
-        self.add_node(node_element)
+#        self.add_node(node_element)
 
-        return node_element.get_id()
+#        return node_element.get_id()
 
-    def add_node(self, node_element):
-        """
-        Add a node object to the network. (For an easier method for adding nodes use create_node() )
+#    def add_node(self, node_element):
+#        """
+#        Add a node object to the network. (For an easier method for adding nodes use create_node() )
 
-        :param node_element: A node object
-        :type node_element: cx.aspects.NodesElement
-        :return: Node ID
-        :rtype: int
-        """
-        if isinstance(node_element, NodeElement):
-            self.nodes[node_element.get_id()] = node_element
+#        :param node_element: A node object
+#        :type node_element: cx.aspects.NodesElement
+#        :return: Node ID
+#        :rtype: int
+#        """
+#        if isinstance(node_element, NodeElement):
+#            self.nodes[node_element.get_id()] = node_element
 
-            if isinstance(node_element.get_id(), str):
-                self.node_int_id_generator.add(node_element.get_id())
+#            if isinstance(node_element.get_id(), str):
+#                self.node_int_id_generator.add(node_element.get_id())
 
-            if self.missingNodes.get(node_element.get_id()) is not None:
-                self.missingNodes.pop(node_element.get_id(), None)
+#            if self.missingNodes.get(node_element.get_id()) is not None:
+#                self.missingNodes.pop(node_element.get_id(), None)
 
-            return node_element.get_id()
-        else:
-            raise Exception('Provided input was not of type NodesElement.')
+#            return node_element.get_id()
+#        else:
+#            raise Exception('Provided input was not of type NodesElement.')
+
+    #metadata are not updated by the network update functions. User needs to recompute metadata before they write the
+    # network out if the network is updated.
+    def add_node_element(self, node_element):
+        self.node[node_element.get_id()] = node_element
 
     def get_nodes(self):
         """
@@ -438,11 +453,23 @@ class NiceCXNetwork(object):
         """
         return self.nodes.items()
 
+    def get_node_table(self):
+        """
+        Returns the node table of this niceCX object. key: node_id, value: nodeElement
+
+        :return: node table
+        :rtype: dictionary
+        """
+        return self.nodes
+
     def get_node(self, node):
         if isinstance(node, NodeElement):
             return self.nodes.get(node.get_id())
         else:
             return self.nodes.get(node)
+
+    def get_node_by_id(self, node_id):
+        return self.nodes.get(node_id)
 
     def remove_node(self, node):
         if isinstance(node, NodeElement):
@@ -571,6 +598,9 @@ class NiceCXNetwork(object):
             return self.nodeAttributes.get(node.get_id())
         else:
             return self.nodeAttributes.get(node)
+
+    def get_node_attributes_by_id(self,node_id):
+        return self.nodeAttributes.get(node_id)
 
     #==================================
     # EDGE ATTRIBUTE OPERATIONS
@@ -742,15 +772,13 @@ class NiceCXNetwork(object):
         """
         Set the @context aspect of the network, the aspect that maps namespace prefixes to their defining URIs
 
-        :param context: List of context objects
-        :type context: List of dict (namespace string: URI)
+        :param context: context object
+        :type context: dict (namespace string: URI)
         :return: None
         :rtype: none
         """
-        if isinstance(context, list):
-            self.context = context
-        else:
-            raise Exception('Context provided is not of type list')
+        self.context = context
+
 
     def get_metadata(self):
         """
@@ -778,7 +806,7 @@ class NiceCXNetwork(object):
     def add_metadata(self, md):
         if isinstance(md, MetaDataElement):
             #  TODO - alter metadata to match the element counts
-            self.metadata[md.get_name()] = md
+            self.metadata.add_metadata(md)
         else:
             raise Exception('Provided input was not of type <MetaDataElement>')
 
@@ -1027,7 +1055,7 @@ class NiceCXNetwork(object):
                 #=============
                 # ADD EDGES
                 #=============
-                self.create_edge(id=index, edge_source=row[source_field], edge_target=row[target_field], edge_interaction=row[edge_interaction])
+                self.create_edge(edge_id=index, edge_source=row[source_field], edge_target=row[target_field], edge_interaction=row[edge_interaction])
 
                 #==============================
                 # ADD SOURCE NODE ATTRIBUTES
@@ -1081,9 +1109,9 @@ class NiceCXNetwork(object):
                 # ADD EDGES
                 #=============
                 if len(row) > 2:
-                    self.create_edge(id=index, edge_source=row[0], edge_target=row[1], edge_interaction=row[2])
+                    self.create_edge(edge_id=index, edge_source=row[0], edge_target=row[1], edge_interaction=row[2])
                 else:
-                    self.create_edge(id=index, edge_source=row[0], edge_target=row[1], edge_interaction='interacts-with')
+                    self.create_edge(edge_id=index, edge_source=row[0], edge_target=row[1], edge_interaction='interacts-with')
 
         self.add_metadata_stub('nodes')
         self.add_metadata_stub('edges')
@@ -1112,7 +1140,7 @@ class NiceCXNetwork(object):
             #=============
             # ADD EDGES
             #=============
-            self.create_edge(id=index, edge_source=u, edge_target=v, edge_interaction=d.get('interaction'))
+            self.create_edge(edge_id=index, edge_source=u, edge_target=v, edge_interaction=d.get('interaction'))
 
             #==============================
             # ADD EDGE ATTRIBUTES

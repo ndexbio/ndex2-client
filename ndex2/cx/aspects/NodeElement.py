@@ -5,12 +5,12 @@ import json
 
 class NodeElement(object):
 
-    def __init__(self, id, node_name=None, node_represents=None):
+    def __init__(self, node_id, node_name=None, node_represents=None):
         if id is None:
             raise Exception('Node id can not be None')
         self._name = node_name
         self._represents = node_represents
-        self._id = id
+        self._id = node_id
 
     @staticmethod
     def get_aspect_name():
@@ -19,8 +19,8 @@ class NodeElement(object):
     def get_id(self):
         return self._id
 
-    def set_id(self, id):
-        self._id = id
+    def set_id(self, node_id):
+        self._id = node_id
 
     def get_node_represents(self):
         return self._represents
@@ -31,16 +31,13 @@ class NodeElement(object):
     def get_name(self):
         return self._name
 
-    def set_node_name(self, node_name ):
+    def set_name(self, node_name):
         self._name = node_name
 
     def __eq__(self, other):
         return self == other or self._id == other._id
 
     def to_cx_str(self):
-        return '{"@id":'+ str(self._id) + \
+        return '{"@id":' + str(self._id) + \
                (',"n":' + json.dumps(self._name) if self._name is not None else "") \
-               + (',"r":' + json.dumps(self._represents) if self._represents is not None else "")+ '}'
-
-
-
+               + (',"r":' + json.dumps(self._represents) if self._represents is not None else "") + '}'

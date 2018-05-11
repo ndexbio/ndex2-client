@@ -7,38 +7,27 @@ import base64
 import sys
 #from urllib import urlopen
 from ndex2.niceCXNetwork import NiceCXNetwork
-from nicecxModel.cx.aspects.NodeElement import NodeElement
-from nicecxModel.cx.aspects.EdgeElement import EdgeElement
-from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
-from nicecxModel.cx.aspects.NodeAttributesElement import NodeAttributesElement
-from nicecxModel.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
-from nicecxModel.cx.aspects.CitationElement import CitationElement
-from nicecxModel.cx.aspects.SupportElement import SupportElement
-from nicecxModel.cx.aspects.AspectElement import AspectElement
-from nicecxModel.metadata.MetaDataElement import MetaDataElement
-from nicecxModel.cx import CX_CONSTANTS
-from nicecxModel.cx import known_aspects, known_aspects_min
+from ndex2.cx.aspects.NodeElement import NodeElement
+from ndex2.cx.aspects.EdgeElement import EdgeElement
+from ndex2.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
+from ndex2.cx.aspects.NodeAttributesElement import NodeAttributesElement
+from ndex2.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
+from ndex2.cx.aspects.CitationElement import CitationElement
+from ndex2.cx.aspects.SupportElement import SupportElement
+from ndex2.cx.aspects.AspectElement import AspectElement
+from ndex2.metadata.MetaDataElement import MetaDataElement
+from ndex2.cx import CX_CONSTANTS
+from ndex2.cx import known_aspects, known_aspects_min
 
-if sys.version_info.major == 3:
-    from urllib.request import urlopen, Request, HTTPError, URLError
-else:
-    from urllib2 import urlopen, Request, HTTPError, URLError
+from urllib.request import urlopen, Request, HTTPError, URLError
 
 
 class NiceCXBuilder():
-    def __init__(self, cx=None, server=None, username='scratch', password='scratch', uuid=None, networkx_G=None, data=None, **attr):
-        self.user_base64 = None
-        self.username = None
-        self.password = None
-        if username and password:
-            self.username = username
-            self.password = password
-            if sys.version_info.major == 3:
-                encode_string = '%s:%s' % (username, password)
-                byte_string = encode_string.encode()
-                self.user_base64 = base64.b64encode(byte_string)#.replace('\n', '')
-            else:
-                self.user_base64 = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+    def __init__(self):
+        self._niceCX = NiceCXNetwork()
+        self._nodeCounter = 0
+        self._edgeCounter = 0
+
 
     def create_from_server(self, server, username, password, uuid):
         if server and uuid:

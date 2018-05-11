@@ -57,7 +57,7 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx = ndex2.create_empty_nice_cx() #NiceCXNetwork()
         niceCx.create_node(id=1, node_name='node%s' % str(1), node_represents='ABC')
         niceCx.create_node(id=2, node_name='node%s' % str(2), node_represents='DEF')
-        niceCx.create_edge(id=1, edge_source=1, edge_target=2, edge_interaction='neighbor')
+        niceCx.create_edge(edge_id=1, edge_source=1, edge_target=2, edge_interaction='neighbor')
 
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
@@ -76,7 +76,7 @@ class TestLoadByAspects(unittest.TestCase):
                 niceCx.create_node(id=row['Bait'], node_name=row['Bait'], node_represents=row['Bait'])
                 niceCx.create_node(id=row['Prey'], node_name=row['Prey'], node_represents=row['Prey'])
 
-                niceCx.create_edge(id=index, edge_source=row['Bait'], edge_target=row['Prey'], edge_interaction='interacts-with')
+                niceCx.create_edge(edge_id=index, edge_source=row['Bait'], edge_target=row['Prey'], edge_interaction='interacts-with')
 
             niceCx.add_metadata_stub('nodes')
             niceCx.add_metadata_stub('edges')

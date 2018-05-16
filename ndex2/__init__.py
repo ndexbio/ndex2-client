@@ -45,10 +45,16 @@ def create_empty_nice_cx(user_agent=''):
     return my_nicecx
 
 
-def _create_cartesian_coordinates_aspect_from_networkx(G):
-    return [
-        {'node': n, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])} for n in G.pos
-    ]
+def _create_cartesian_coordinates_aspect_from_networkx(G, node_id_mapping=None):
+    if node_id_mapping is not None:
+
+        return [
+            {'node': node_id_mapping.get(n), 'x': float(G.pos[n][0]) * 500.0, 'y': float(G.pos[n][1]) * 500.0} for n in G.pos
+        ]
+    else:
+        return [
+            {'node': n, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])} for n in G.pos
+        ]
 
 
 def create_nice_cx_from_networkx(G, user_agent=''):
@@ -123,7 +129,13 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         my_nicecx.add_metadata_stub('edgeAttributes')
 
     if hasattr(G, 'pos'):
-        aspect = _create_cartesian_coordinates_aspect_from_networkx(G)
+        # TODO - this will be replaced by Jing's changes to the node id mapping
+        if my_nicecx.node_int_id_generator:
+            node_id_lookup = list(my_nicecx.node_int_id_generator)
+            node_id_look_up_dict = {k: node_id_lookup.index(k) for k, v in my_nicecx.get_nodes()}
+
+        aspect = _create_cartesian_coordinates_aspect_from_networkx(G, node_id_look_up_dict)
+
         my_nicecx.add_opaque_aspect('cartesianLayout', aspect)
         my_nicecx.add_metadata_stub('cartesianLayout')
 

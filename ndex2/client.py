@@ -520,53 +520,94 @@ class Ndex2:
 
         return self.get(route)
 
-    def make_network_public(self, network_id):
+    def make_network_public(self, network_id, retry=10):
         """
         Makes the network specified by the network_id public.
 
         :param network_id: The UUID of the network.
         :type network_id: str
+        :param retry: Number of times to retry making the network public
+        :type network_id: int
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
         """
-        if self.version == "2.0":
-            return self.set_network_system_properties(network_id, {'visibility': 'PUBLIC'})
+        retry_count = 0
+        while True:
+            if retry_count >= retry:
+                break
+            try:
+                if self.version == "2.0":
+                    return_value = self.set_network_system_properties(network_id, {'visibility': 'PUBLIC'})
 
-        else:
-            return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
+                else:
+                    return_value = self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
 
-    def _make_network_public_indexed(self, network_id):
+                return return_value
+            except Exception as excp:
+                print('Network not ready to be made PUBLIC.  Will retry in 1 second...')
+                retry_count += 1
+                time.sleep(1)
+
+    def _make_network_public_indexed(self, network_id, retry=10):
         """
         Makes the network specified by the network_id public.
 
         :param network_id: The UUID of the network.
         :type network_id: str
+        :param retry: Number of times to retry making the network public and indexed
+        :type network_id: int
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
         """
-        if self.version == "2.0":
-            return self.set_network_system_properties(network_id, {'visibility': 'PUBLIC', 'index_level': 'ALL', 'showcase': True})
 
-        else:
-            return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
+        retry_count = 0
+        while True:
+            if retry_count >= retry:
+                break
+            try:
+                if self.version == "2.0":
+                    return_value = self.set_network_system_properties(network_id, {'visibility': 'PUBLIC',
+                                                                    'index_level': 'ALL', 'showcase': True})
+                else:
+                    return_value = self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
 
-    def make_network_private(self, network_id):
+                return return_value
+            except Exception as excp:
+                print('Network not ready to be made PUBLIC.  Will retry in 1 second...')
+                retry_count += 1
+                time.sleep(1)
+
+    def make_network_private(self, network_id, retry=10):
         """
         Makes the network specified by the network_id private.
 
         :param network_id: The UUID of the network.
         :type network_id: str
+        :param retry: Number of times to retry making the network private
+        :type network_id: int
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
         """
-        if self.version == "2.0":
-            return self.set_network_system_properties(network_id, {'visibility': 'PRIVATE'})
 
-        else:
-            return self.update_network_profile(network_id, {'visibility': 'PRIVATE'})
+        retry_count = 0
+        while True:
+            if retry_count >= retry:
+                break
+            try:
+                if self.version == "2.0":
+                    return_value = self.set_network_system_properties(network_id, {'visibility': 'PRIVATE'})
+
+                else:
+                    return_value = self.update_network_profile(network_id, {'visibility': 'PRIVATE'})
+
+                return return_value
+            except Exception as excp:
+                print('Network not ready to be made PUBLIC.  Will retry in 1 second...')
+                retry_count += 1
+                time.sleep(1)
 
     def get_task_by_id(self, task_id):
         """

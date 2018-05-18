@@ -627,5 +627,5 @@ def create_nice_cx_from_file(path, user_agent=''):
         raise Exception('The file ' + path + '  does not exist.')
 
 
-from ndex2.niceCXNetwork import NiceCXNetwork
+from ndex2.NiceCXNetwork import NiceCXNetwork
 from ndex2.client import Ndex2

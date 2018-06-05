@@ -33,6 +33,7 @@ class NiceCXBuilder(object):
     def __init__(self, cx=None, server=None, username='scratch', password='scratch', uuid=None, networkx_G=None, data=None, **attr):
         self.nice_cx = NiceCXNetwork(user_agent='niceCx Builder')
         self.node_id_lookup = {}
+        self.node_id_counter = 0
         self.edge_id_counter = 0
 
         self.user_base64 = None
@@ -55,21 +56,32 @@ class NiceCXBuilder(object):
 
         self.nice_cx.add_network_attribute(name='name', values=network_name, type='string')
 
-    def add_network_attribute(self, name=None, values=None, type=None):
+    def add_network_attribute(self, name=None, values=None, type=None, cx_element=None):
         self.nice_cx.add_network_attribute(name=name, values=values, type=type)
 
-    def add_node(self, name=None, represents=None):
-        if self.node_id_lookup.get(name) is None:
-            source_id = self.nice_cx.get_next_node_id()
-            self.node_id_lookup[name] = source_id
+    def add_node(self, name=None, represents=None, id=None):
+        if id is not None:
+            node_id = id
+            self.node_id_lookup[name] = node_id
+        elif self.node_id_lookup.get(name) is not None:
+            node_id = self.nice_cx.get_next_node_id()
+        else:
+            node_id = self.node_id_counter
+            self.node_id_counter += 1
+            self.node_id_lookup[name] = node_id
 
-            self.nice_cx.add_node(id=self.node_id_lookup.get(name), name=name, represents=represents)
+        self.nice_cx.add_node(id=self.node_id_lookup.get(name), name=name, represents=represents)
 
         return self.node_id_lookup.get(name)
 
-    def add_edge(self, id=None, source=None, target=None, interaction=None):
-        this_edge_id = self.edge_id_counter
-        self.edge_id_counter += 1
+    def add_edge(self, source=None, target=None, interaction=None, id=None):
+        if id is not None:
+            this_edge_id = id
+            self.edge_id_counter = id
+            self.edge_id_counter += 1
+        else:
+            this_edge_id = self.edge_id_counter
+            self.edge_id_counter += 1
 
         self.nice_cx.add_edge(id=this_edge_id, source=source, target=target, interaction=interaction)
 
@@ -83,6 +95,18 @@ class NiceCXBuilder(object):
 
         self.nice_cx.add_edge_attribute(property_of=property_of, name=name, values=values, type=type)
 
+    def add_opaque_aspect(self, oa_name, oa_list):
+        self.nice_cx.opaqueAspects[oa_name] = oa_list
+
+    def get_nice_cx(self):
+        return self.nice_cx
+
+    def get_frag_from_list_by_key(self, cx, key):
+        for aspect in cx:
+            if key in aspect:
+                return aspect[key]
+
+        return []
 
     def load_aspect(self, aspect_name):
         #with open('Signal1.cx', mode='r') as cx_f:

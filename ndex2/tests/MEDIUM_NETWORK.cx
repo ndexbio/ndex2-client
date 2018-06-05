@@ -25,6 +25,13 @@
         "version": "1.0"
       },
       {
+        "name": "@context",
+        "elementCount": 1,
+        "version": "1.0",
+        "consistencyGroup": 2,
+        "properties": []
+      },
+      {
         "consistencyGroup": 1,
         "elementCount": 14,
         "idCounter": 135,
@@ -104,6 +111,18 @@
           "creationEvent": null,
           "properties": []
         }
+      }
+    ]
+  },
+  {
+    "@context": [
+      {
+        "pubmed": "http://identifiers.org/pubmed/",
+        "cas": "http://identifiers.org/cas/",
+        "chebi": "http://identifiers.org/chebi/CHEBI:",
+        "hprd": "http://identifiers.org/hprd/",
+        "uniprot knowledgebase": "http://identifiers.org/uniprot/",
+        "KEGG Compound": "http://identifiers.org/kegg.compound/"
       }
     ]
   },

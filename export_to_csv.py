@@ -1,6 +1,6 @@
 __author__ = 'aarongary'
 
-from ndex2.niceCXNetwork import NiceCXNetwork
+from ndex2.NiceCXNetwork import NiceCXNetwork
 
 niceCx = NiceCXNetwork()
 

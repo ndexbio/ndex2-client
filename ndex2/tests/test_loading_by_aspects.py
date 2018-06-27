@@ -7,6 +7,7 @@ import pandas as pd
 import csv
 import networkx as nx
 import ndex2
+import ndex2.client as nc
 import os
 from ndex2.NiceCXNetwork import NiceCXNetwork
 from ndex2.client import DecimalEncoder
@@ -334,7 +335,7 @@ class TestLoadByAspects(unittest.TestCase):
 
 
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_big_tsv(self):
         path_to_network = os.path.join(path_this, 'identifier_mappings_small.txt')
 
@@ -350,10 +351,22 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
+    #@unittest.skip("Temporary skipping") # PASS
+    def test_update_style(self):
+        test_uuid = '83013c93-75ca-11e8-8b82-525400c25d22'
+        test_user = 'scratch2'
+        test_pass = 'scratch2'
+        test_server = 'dev.ndexbio.org'
+        print('loading network to nice cx')
+        niceCx = ndex2.create_nice_cx_from_server(server=test_server, uuid=test_uuid, username=test_user, password=test_pass)
+        print('done loading network to nice cx')
 
-
-
-
+        print('applying template')
+        niceCx.apply_template('public.ndexbio.org', '2ccec370-6689-11e7-a03e-0ac135e8bacf')
+        print('done applying template')
+        print('uploading to server')
+        message = niceCx.update_to(test_uuid, test_server, test_user, test_pass)
+        print('FINISHED')
 
     @unittest.skip("Temporary skipping") # PASS
     def test_netx_plot(self):
@@ -386,3 +399,5 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx_full.upload_to(upload_server, upload_username, upload_password)
         print(names)
 
+    #@unittest.skip("Temporary skipping") # PASS
+    #def test_scratch3(self):

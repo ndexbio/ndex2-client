@@ -133,6 +133,8 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         if my_nicecx.node_int_id_generator:
             node_id_lookup = list(my_nicecx.node_int_id_generator)
             node_id_look_up_dict = {k: node_id_lookup.index(k) for k, v in my_nicecx.get_nodes()}
+        else:
+            node_id_look_up_dict = None
 
         aspect = _create_cartesian_coordinates_aspect_from_networkx(G, node_id_look_up_dict)
 

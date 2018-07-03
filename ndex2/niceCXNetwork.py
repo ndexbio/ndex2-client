@@ -419,6 +419,7 @@ class NiceCXNetwork(object):
         if isinstance(node_element, NodeElement):
             self.nodes[node_element.get_id()] = node_element
 
+            #print('add_node: %s' % (str(node_element.get_id())))
             if isinstance(node_element.get_id(), str):
                 self.node_int_id_generator.add(node_element.get_id())
 
@@ -1587,7 +1588,7 @@ class NiceCXNetwork(object):
         :return: Networkx graph
         :rtype: networkx Graph()
         """
-        G = nx.Graph()
+        G = nx.MultiGraph()
 
         if sys.version_info.major == 3:
             node_items = self.nodes.items()
@@ -1630,7 +1631,7 @@ class NiceCXNetwork(object):
                     else:
                         add_this_dict[e_a_item.get_name()] = e_a_item.get_values()
 
-            G.add_edge(v.get_source(), v.get_target(), add_this_dict)
+            G.add_edge(v.get_source(), v.get_target(), v.get_id(), add_this_dict, )
 
         #================
         # PROCESS LAYOUT
@@ -1680,8 +1681,9 @@ class NiceCXNetwork(object):
 
         return summary_string
 
-    def __str__(self):
-        return json.dumps(self.to_cx(), cls=DecimalEncoder)
+    #def __str__(self):
+        #print('in to string')
+        #return 'nicecx' #json.dumps(self.to_cx(), cls=DecimalEncoder)
 
     def to_cx(self):
         """
@@ -1691,7 +1693,7 @@ class NiceCXNetwork(object):
         :rtype: CX (list of dict aspects)
         """
         output_cx = [{"numberVerification": [{"longNumber": 281474976710655}]}]
-
+        #print('in to_cx()')
         #=====================================================
         # IF THE @ID IS NOT NUMERIC WE NEED TO CONVERT IT TO
         # INT BY USING THE INDEX OF THE NON-NUMERIC VALUE
@@ -1743,7 +1745,7 @@ class NiceCXNetwork(object):
             output_cx.append(self.generate_metadata_aspect())
 
         #print json.dumps(output_cx)
-
+        output_cx.append({'status':[{'error':'','success': True}]})
         return output_cx
 
     def generate_aspect(self, aspect_name):
@@ -1799,6 +1801,7 @@ class NiceCXNetwork(object):
                         id = add_this_element.get(CX_CONSTANTS.ID)
                         if aspect_name == 'nodes' and isinstance(id, str):
                             # CONVERT TO INT
+                            #print('convert id %s %s' % (str(id), self.node_id_lookup.index(id)))
                             id = self.node_id_lookup.index(id)
                             add_this_element[CX_CONSTANTS.ID] = id
                         if aspect_name == 'edges' and isinstance(add_this_element.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK), str):

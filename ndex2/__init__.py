@@ -73,10 +73,13 @@ def create_nice_cx_from_networkx(G, user_agent=''):
 
     my_nicecx = NiceCXNetwork(user_agent)
 
-    if G.graph.get('name'):
-        my_nicecx.set_name(G.graph.get('name'))
-    else:
-        my_nicecx.set_name('created from networkx')
+    #if G.graph.get('name'):
+    #    my_nicecx.set_name(G.graph.get('name'))
+    #else:
+    #    my_nicecx.set_name('created from networkx')
+
+    for k, v in G.graph.items():
+        my_nicecx.add_network_attribute(name=k, values=v)
 
     my_nicecx.add_metadata_stub('networkAttributes')
     for n, d in G.nodes_iter(data=True):

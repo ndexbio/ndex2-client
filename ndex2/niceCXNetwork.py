@@ -1604,7 +1604,7 @@ class NiceCXNetwork(object):
             G.graph[net_a.get_name()] = net_a.get_values()
 
         if self.context is not None:
-            G.graph['__graphmlContext'] = self.context
+            G.graph['__context'] = self.context
 
         #================================
         # PROCESS NODE & NODE ATTRIBUTES

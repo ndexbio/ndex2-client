@@ -79,7 +79,7 @@ def create_nice_cx_from_networkx(G, user_agent=''):
     #    my_nicecx.set_name('created from networkx')
 
     for k, v in G.graph.items():
-        if k == '__graphmlContext':
+        if k == '__context':
             my_nicecx.context = v
         else:
             my_nicecx.add_network_attribute(name=k, values=v)

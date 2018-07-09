@@ -1603,15 +1603,30 @@ class NiceCXNetwork(object):
         for net_a in self.networkAttributes:
             G.graph[net_a.get_name()] = net_a.get_values()
 
+        if self.context is not None:
+            G.graph['__graphmlContext'] = self.context
+
         #================================
         # PROCESS NODE & NODE ATTRIBUTES
         #================================
         for k, v in node_items:
             node_attrs = {}
+
+            #==============================================
+            #  NEED TO STORE REPRESENTS IN NODE ATTRIBUTE
+            #==============================================
+            represents = v.get_node_represents()
+            if represents is not None:
+                node_attrs['r'] = represents
+
             n_a = self.nodeAttributes.get(k)
             if n_a:
                 for na_item in n_a:
-                    node_attrs[na_item.get_name()] = na_item.get_values()
+                    if isinstance(na_item.get_values(), list):
+                        list_to_string = '|'.join(str(e) for e in na_item.get_values())
+                        node_attrs[na_item.get_name()] = '"' + list_to_string + '"'
+                    else:
+                        node_attrs[na_item.get_name()] = na_item.get_values()
                     #print(v)
                     my_name = v.get_name()
             G.add_node(k, node_attrs, name=v.get_name())
@@ -1626,8 +1641,8 @@ class NiceCXNetwork(object):
             if e_a is not None:
                 for e_a_item in e_a:
                     if isinstance(e_a_item.get_values(), list):
-                        add_this_dict[e_a_item.get_name()] = ','.join(str(e) for e in e_a_item.get_values())
-                        add_this_dict[e_a_item.get_name()] = '"' + add_this_dict[e_a_item.get_name()] + '"'
+                        list_to_string = '|'.join(str(e) for e in e_a_item.get_values())
+                        add_this_dict[e_a_item.get_name()] = '"' + list_to_string + '"'
                     else:
                         add_this_dict[e_a_item.get_name()] = e_a_item.get_values()
 

@@ -79,7 +79,10 @@ def create_nice_cx_from_networkx(G, user_agent=''):
     #    my_nicecx.set_name('created from networkx')
 
     for k, v in G.graph.items():
-        my_nicecx.add_network_attribute(name=k, values=v)
+        if k == '__graphmlContext':
+            my_nicecx.context = v
+        else:
+            my_nicecx.add_network_attribute(name=k, values=v)
 
     my_nicecx.add_metadata_stub('networkAttributes')
     for n, d in G.nodes_iter(data=True):
@@ -95,13 +98,23 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         # ADD NODE ATTRIBUTES
         # ======================
         for k, v in d.items():
+            v = v.replace('"', '')
             attr_type = None
             if isinstance(v, float):
                 attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
             elif isinstance(v, int):
                 attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
+            else:
+                if '|' in v:
+                    v = v.split('|')
+                    attr_type = ATTRIBUTE_DATA_TYPE.LIST_OF_STRING
 
-            my_nicecx.set_node_attribute(n, k, v, type=attr_type)
+            if k == 'r':
+                nicecx_node = my_nicecx.get_node(n)
+                if nicecx_node is  not None:
+                    nicecx_node.set_node_represents(v)
+            else:
+                my_nicecx.set_node_attribute(n, k, v, type=attr_type)
 
     index = 0
     for u, v, d in G.edges_iter(data=True):
@@ -120,6 +133,11 @@ def create_nice_cx_from_networkx(G, user_agent=''):
                     attr_type = ATTRIBUTE_DATA_TYPE.FLOAT
                 elif isinstance(val, int):
                     attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
+                else:
+                    if '|' in val:
+                        val = val.replace('"', '').split('|')
+                        attr_type = ATTRIBUTE_DATA_TYPE.LIST_OF_STRING
+
                 my_nicecx.set_edge_attribute(index, k, val, type=attr_type)
 
         index += 1
@@ -178,6 +196,18 @@ def create_nice_cx_from_cx(cx, user_agent=''):
 
                 my_nicecx.add_network_attribute(network_attribute_element=add_this_network_attribute)
             my_nicecx.add_metadata_stub('networkAttributes')
+
+        # ===================
+        # CONTEXT
+        # ===================
+        if '@context' in available_aspects:
+            objects = my_nicecx.get_frag_from_list_by_key(cx, '@context')
+            if isinstance(objects, dict):
+                my_nicecx.context = [objects]
+            else:
+                my_nicecx.context = objects
+
+            my_nicecx.add_metadata_stub('@context')
 
         # ===================
         # NODES

@@ -1604,7 +1604,7 @@ class NiceCXNetwork(object):
             G.graph[net_a.get_name()] = net_a.get_values()
 
         if self.context is not None:
-            G.graph['__context'] = self.context
+            G.graph['__context'] = json.dumps(self.context)
 
         #================================
         # PROCESS NODE & NODE ATTRIBUTES
@@ -1657,14 +1657,10 @@ class NiceCXNetwork(object):
             for x_y_pos in cartesian_layout:
                 G.pos[x_y_pos.get('node')] = (x_y_pos.get('x'), x_y_pos.get('y'))
 
-        #def create_cartesian_coordinates_aspect_from_networkx(G):
-        #    return {'cartesianLayout': [
-        #        {'node': n, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])} for n in G.pos
-        #    ]}
-
-
-        #if hasattr(networkx_G, 'pos'):
-        #    G.pos = {node_dict[a] : b for a, b in networkx_G.pos.items()}
+        #====================================
+        # Assumption is that opaque aspects
+        # are not important to networkx
+        #====================================
 
         return G
 

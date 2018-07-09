@@ -80,7 +80,7 @@ def create_nice_cx_from_networkx(G, user_agent=''):
 
     for k, v in G.graph.items():
         if k == '__context':
-            my_nicecx.context = v
+            my_nicecx.context = json.loads(v)
         else:
             my_nicecx.add_network_attribute(name=k, values=v)
 

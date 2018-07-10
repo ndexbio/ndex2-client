@@ -1580,7 +1580,7 @@ class NiceCXNetwork(object):
         else:
             raise IndexError("Cannot save empty CX.  Please provide a non-empty CX document.")
 
-    def to_networkx(self):
+    def to_networkx(self, graphml_compatible=False):
         """
         Return a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect of the network are
         transformed to the NetworkX pos attribute.
@@ -1601,7 +1601,12 @@ class NiceCXNetwork(object):
         # PROCESS NETWORK ATTRIBUTES
         #============================
         for net_a in self.networkAttributes:
-            G.graph[net_a.get_name()] = net_a.get_values()
+            if isinstance(net_a.get_values(), list) and graphml_compatible:
+                list_to_string = '|'.join(str(e) for e in net_a.get_values())
+                network_attrs_temp = list_to_string
+                G.graph[net_a.get_name()] = network_attrs_temp
+            else:
+                G.graph[net_a.get_name()] = net_a.get_values()
 
         if self.context is not None:
             G.graph['__context'] = json.dumps(self.context)
@@ -1622,7 +1627,7 @@ class NiceCXNetwork(object):
             n_a = self.nodeAttributes.get(k)
             if n_a:
                 for na_item in n_a:
-                    if isinstance(na_item.get_values(), list):
+                    if isinstance(na_item.get_values(), list) and graphml_compatible:
                         list_to_string = '|'.join(str(e) for e in na_item.get_values())
                         node_attrs[na_item.get_name()] = '"' + list_to_string + '"'
                     else:
@@ -1640,7 +1645,7 @@ class NiceCXNetwork(object):
             add_this_dict['interaction'] = v.get_interaction()
             if e_a is not None:
                 for e_a_item in e_a:
-                    if isinstance(e_a_item.get_values(), list):
+                    if isinstance(e_a_item.get_values(), list) and graphml_compatible:
                         list_to_string = '|'.join(str(e) for e in e_a_item.get_values())
                         add_this_dict[e_a_item.get_name()] = '"' + list_to_string + '"'
                     else:

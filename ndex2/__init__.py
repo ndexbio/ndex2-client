@@ -57,7 +57,7 @@ def _create_cartesian_coordinates_aspect_from_networkx(G, node_id_mapping=None):
         ]
 
 
-def create_nice_cx_from_networkx(G, user_agent=''):
+def create_nice_cx_from_networkx(G, user_agent='', graphml_compatible=False):
     """
     Create a NiceCXNetwork based on a networkx graph. The resulting NiceCXNetwork
     contains the nodes edges and their attributes from the networkx graph and also
@@ -82,7 +82,10 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         if k == '__context':
             my_nicecx.context = json.loads(v)
         else:
-            my_nicecx.add_network_attribute(name=k, values=v)
+            if graphml_compatible and '|' in v:
+                my_nicecx.add_network_attribute(name=k, values=v.replace('"', '').split('|'), type=ATTRIBUTE_DATA_TYPE.LIST_OF_STRING)
+            else:
+                my_nicecx.add_network_attribute(name=k, values=v)
 
     my_nicecx.add_metadata_stub('networkAttributes')
     for n, d in G.nodes_iter(data=True):
@@ -105,7 +108,7 @@ def create_nice_cx_from_networkx(G, user_agent=''):
             elif isinstance(v, int):
                 attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
             else:
-                if '|' in v:
+                if graphml_compatible and '|' in v:
                     v = v.split('|')
                     attr_type = ATTRIBUTE_DATA_TYPE.LIST_OF_STRING
 
@@ -134,7 +137,7 @@ def create_nice_cx_from_networkx(G, user_agent=''):
                 elif isinstance(val, int):
                     attr_type = ATTRIBUTE_DATA_TYPE.INTEGER
                 else:
-                    if '|' in val:
+                    if graphml_compatible and '|' in val:
                         val = val.replace('"', '').split('|')
                         attr_type = ATTRIBUTE_DATA_TYPE.LIST_OF_STRING
 

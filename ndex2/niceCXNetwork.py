@@ -564,9 +564,12 @@ class NiceCXNetwork(object):
         :return: None
         :rtype: none
         """
+        print('context is of type %s' % type(context))
         if isinstance(context, list):
+            print('Setting context from list')
             self.context = context
         elif isinstance(context, dict):
+            print('Setting context from dict')
             self.context = [context]
         else:
             raise Exception('Context provided is not of type list')

@@ -8,6 +8,7 @@ import io
 import sys
 import decimal
 import numpy
+import base64
 
 from urllib.parse import urljoin
 from requests import exceptions as req_except
@@ -432,7 +433,13 @@ class Ndex2:
             # response_in_json = response.json()
             # data =  response_in_json["data"]
             # return data
-            return response.json()["data"]
+            response_json = response.json()
+            if isinstance(response_json, dict):
+                return response_json.get('data')
+            elif isinstance(response_json, list):
+                return response_json
+            else:
+                return response_json
         else:
             raise Exception("get_neighborhood is not supported for versions prior to 2.0, "
                             "use get_neighborhood_as_cx_stream")
@@ -1008,4 +1015,7 @@ class DecimalEncoder(json.JSONEncoder):
             return float(o)
         elif isinstance(o, numpy.int64):
             return int(o)
+        elif isinstance(o, bytes):
+            bytes_string = o.decode('ascii')
+            return bytes_string
         return super(DecimalEncoder, self).default(o)

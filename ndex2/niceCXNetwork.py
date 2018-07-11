@@ -14,19 +14,6 @@ import json
 import ijson
 import requests
 import base64
-#import nicecxModel.NiceCXStreamer as ncs
-#from nicecxModel.metadata.MetaDataElement import MetaDataElement
-#from nicecxModel.cx.aspects.NameSpace import NameSpace
-#from nicecxModel.cx.aspects.NodeElement import NodeElement
-#from nicecxModel.cx.aspects.EdgeElement import EdgeElement
-#from nicecxModel.cx.aspects.NodeAttributesElement import NodeAttributesElement
-#from nicecxModel.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
-##from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
-#from nicecxModel.cx.aspects.SupportElement import SupportElement
-#from nicecxModel.cx.aspects.CitationElement import CitationElement
-#from nicecxModel.cx.aspects.AspectElement import AspectElement
-#from nicecxModel.cx import CX_CONSTANTS
-#from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
 from ndex2cx import known_aspects_min
 
 if sys.version_info.major == 3:
@@ -225,9 +212,23 @@ class NiceCXNetwork(object):
 
         return id
 
-    def add_node(self, id=None, name=None, represents=None):
+    def add_node(self, id=None, name=None, represents=None, data_type=None):
         """
         Add a node object to the network. (For an easier method for adding nodes use create_node() )
+
+        :param id:
+        :type id:
+        :param name:
+        :type name:
+        :param represents:
+        :type represents:
+        :param data_type:
+        :type data_type:
+        :return:
+        :rtype:
+        """
+
+        """
         :param node_element: A node object
         :type node_element: nicecxModel.cx.aspects.NodesElement
         :return: Node ID
@@ -237,6 +238,9 @@ class NiceCXNetwork(object):
             self.nodes[id] = {'@id': id, 'n': name, 'r': represents}
         else:
             self.nodes[id] = {'@id': id, 'n': name, 'r': name}
+
+        if data_type is not None:
+            self.nodes[id]['d'] = data_type
 
         return id
 
@@ -262,17 +266,26 @@ class NiceCXNetwork(object):
 
     def add_edge(self, id=None, source=None, target=None, interaction=None):
         """
-        Add an edge object to the network. (For an easier method for adding edges use create_edge() )
-        :param edge_element: An edge object
-        :type edge_element: nicecxModel.cx.aspects.EdgesElement
-        :return: Edge ID
-        :rtype:
+        Add an edge object to the network.
+
+        :param id: internal identifier
+        :type id: int
+        :param source: id of source node
+        :type source: int
+        :param target: id of target node
+        :type target: int
+        :param interaction: type of edge interaction
+        :type interaction: string
+        :return: edge id
+        :rtype: int
         """
         if id is None:
             raise Exception('No ID provided')
 
         if source is None or target is None or interaction is None:
-            raise Exception('Source, Target and Interaction are required to create an edge')
+            print('source: %s, target: %s or target: %s was None.  Skipping edge' % (source, target, interaction))
+            return None
+            #raise Exception('Source, Target and Interaction are required to create an edge')
 
         self.edges[id] = {'@id': id, 's': source, 't': target, 'i': interaction}
 
@@ -794,428 +807,16 @@ class NiceCXNetwork(object):
                 self.remove_node_attribute(node, source_attribute2)
 
     def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[], edge_interaction=None):
-        """
-        Constructor that uses a pandas dataframe to build niceCX
-        :param df: dataframe
-        :type df: Pandas Dataframe
-        :param headers:
-        :type headers:
-        :return: none
-        :rtype: n/a
-        """
-
-        #====================================================
-        # IF NODE FIELD NAME (SOURCE AND TARGET) IS PROVIDED
-        # THEN USE THOSE FIELDS OTHERWISE USE INDEX 0 & 1
-        #====================================================
-        self.set_name('Pandas Upload')
-        self.add_metadata_stub('networkAttributes')
-        count = 0
-        if source_field and target_field:
-            for index, row in df.iterrows():
-                if count % 10000 == 0:
-                    print(count)
-                count += 1
-                #=============
-                # ADD NODES
-                #=============
-                self.create_node(id=row[source_field], node_name=row[source_field], node_represents=row[source_field])
-                self.create_node(id=row[target_field], node_name=row[target_field], node_represents=row[target_field])
-
-                #=============
-                # ADD EDGES
-                #=============
-                self.create_edge(id=index, edge_source=row[source_field], edge_target=row[target_field], edge_interaction=row[edge_interaction])
-
-                #==============================
-                # ADD SOURCE NODE ATTRIBUTES
-                #==============================
-                for sp in source_node_attr:
-                    attr_type = None
-                    if isinstance(row[sp], float) and math.isnan(row[sp]):
-                        row[sp] = ''
-                        attr_type = 'float'
-                    elif isinstance(row[sp], float) and math.isinf(row[sp]):
-                        row[sp] = 'Inf'
-                        attr_type = 'float'
-                    self.add_node_attribute(property_of=row[source_field], name=sp, values=row[sp], type=attr_type)
-
-                #==============================
-                # ADD TARGET NODE ATTRIBUTES
-                #==============================
-                for tp in target_node_attr:
-                    attr_type = None
-                    if isinstance(row[tp], float) and math.isnan(row[tp]):
-                        row[tp] = ''
-                        attr_type = 'float'
-                    elif isinstance(row[tp], float) and math.isinf(row[tp]):
-                        row[tp] = 'Inf'
-                        attr_type = 'float'
-                    self.add_node_attribute(property_of=row[target_field], name=tp, values=row[tp], type=attr_type)
-
-                #==============================
-                # ADD EDGE ATTRIBUTES
-                #==============================
-                for ep in edge_attr:
-                    attr_type = None
-                    if isinstance(row[ep], float) and math.isnan(row[ep]):
-                        row[ep] = ''
-                        attr_type = 'float'
-                    elif isinstance(row[ep], float) and math.isinf(row[ep]):
-                        row[ep] = 'INFINITY'
-                        attr_type = 'float'
-
-                    self.add_edge_attribute(property_of=index, name=ep, values=row[ep], type=attr_type)
-
-        else:
-            for index, row in df.iterrows():
-                #=============
-                # ADD NODES
-                #=============
-                self.create_node(id=row[0], node_name=row[0], node_represents=row[0])
-                self.create_node(id=row[1], node_name=row[1], node_represents=row[1])
-
-                #=============
-                # ADD EDGES
-                #=============
-                if len(row) > 2:
-                    self.create_edge(id=index, edge_source=row[0], edge_target=row[1], edge_interaction=row[2])
-                else:
-                    self.create_edge(id=index, edge_source=row[0], edge_target=row[1], edge_interaction='interacts-with')
-
-        #self.add_metadata_stub('nodes')
-        #self.add_metadata_stub('edges')
-        #if source_node_attr or target_node_attr:
-        #    self.add_metadata_stub('nodeAttributes')
-        #if edge_attr:
-        #    self.add_metadata_stub('edgeAttributes')
+        raise Exception('create_from_pandas() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_pandas()')
 
     def create_from_networkx(self, G):
-        """
-        Constructor that uses a networkx graph to build niceCX
-        :param G: networkx graph
-        :type G: networkx graph
-        :return: none
-        :rtype: none
-        """
-        self.set_name('Networkx Upload')
-        self.add_metadata_stub('networkAttributes')
-        for n, d in G.nodes_iter(data=True):
-            #=============
-            # ADD NODES
-            #=============
-            self.create_node(id=n, node_name=n, node_represents=n)
-
-            #======================
-            # ADD NODE ATTRIBUTES
-            #======================
-            for k,v in d.items():
-                self.add_node_attribute(property_of=n, name=k, values=v)
-
-        index = 0
-        for u, v, d in G.edges_iter(data=True):
-            #=============
-            # ADD EDGES
-            #=============
-            self.create_edge(id=index, edge_source=u, edge_target=v, edge_interaction=d.get('interaction'))
-
-            #==============================
-            # ADD EDGE ATTRIBUTES
-            #==============================
-            for k,v in d.items():
-                self.add_edge_attribute(property_of=index, name=k, values=v)
-
-            index += 1
-
-        #self.add_metadata_stub('nodes')
-        #self.add_metadata_stub('edges')
-        #if self.nodeAttributes:
-        #    self.add_metadata_stub('nodeAttributes')
-        #if self.edgeAttributes:
-        #    self.add_metadata_stub('edgeAttributes')
-        #print json.dumps(self.to_cx())
+        raise Exception('create_from_networkx() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_networkx()')
 
     def create_from_server(self, server, username, password, uuid):
-        if server and uuid:
-            #===================
-            # METADATA
-            #===================
-            available_aspects = []
-            for ae in (o for o in self.stream_aspect(uuid, 'metaData', server, username, password)):
-                available_aspects.append(ae.get('name'))
-                #mde = MetaDataElement(json_obj=ae)
-                #self.add_metadata(mde)
-
-            opaque_aspects = set(available_aspects).difference(known_aspects_min)
-
-            #====================
-            # NETWORK ATTRIBUTES
-            #====================
-            if 'networkAttributes' in available_aspects:
-                objects = self.stream_aspect(uuid, 'networkAttributes', server, username, password)
-                obj_items = (o for o in objects)
-                for network_item in obj_items:
-                    #add_this_network_attribute = NetworkAttributesElement(json_obj=network_item)
-
-                    self.add_network_attribute(json_obj=network_item)
-                self.add_metadata_stub('networkAttributes')
-
-            #===================
-            # NODES
-            #===================
-            if 'nodes' in available_aspects:
-                objects = self.stream_aspect(uuid, 'nodes', server, username, password)
-                obj_items = (o for o in objects)
-                for node_item in obj_items:
-                    #add_this_node = NodesElement(json_obj=node_item)
-
-                    self.create_node(json_obj=node_item)
-                self.add_metadata_stub('nodes')
-
-            #===================
-            # EDGES
-            #===================
-            if 'edges' in available_aspects:
-                objects = self.stream_aspect(uuid, 'edges', server, username, password)
-                obj_items = (o for o in objects)
-                for edge_item in obj_items:
-                    #add_this_edge = EdgesElement(json_obj=edge_item)
-
-                    self.create_edge(json_obj=edge_item)
-                self.add_metadata_stub('edges')
-
-            #===================
-            # NODE ATTRIBUTES
-            #===================
-            if 'nodeAttributes' in available_aspects:
-                objects = self.stream_aspect(uuid, 'nodeAttributes', server, username, password)
-                obj_items = (o for o in objects)
-                for att in obj_items:
-                    #add_this_node_att = NodeAttributesElement(json_obj=att)
-
-                    self.add_node_attribute(json_obj=att)
-                self.add_metadata_stub('nodeAttributes')
-
-            #===================
-            # EDGE ATTRIBUTES
-            #===================
-            if 'edgeAttributes' in available_aspects:
-                objects = self.stream_aspect(uuid, 'edgeAttributes', server, username, password)
-                obj_items = (o for o in objects)
-                for att in obj_items:
-                    #add_this_edge_att = EdgeAttributesElement(json_obj=att)
-
-                    self.add_edge_attribute(json_obj=att)
-                self.add_metadata_stub('edgeAttributes')
-
-            #===================
-            # CITATIONS
-            #===================
-            if 'citations' in available_aspects:
-                objects = self.stream_aspect(uuid, 'citations', server, username, password)
-                obj_items = (o for o in objects)
-                for cit in obj_items:
-                    add_this_citation = CitationElement(cx_fragment=cit)
-
-                    self.add_citation(add_this_citation)
-                self.add_metadata_stub('citations')
-
-            #===================
-            # SUPPORTS
-            #===================
-            if 'supports' in available_aspects:
-                objects = self.stream_aspect(uuid, 'supports', server, username, password)
-                obj_items = (o for o in objects)
-                for sup in obj_items:
-                    add_this_supports = SupportElement(cx_fragment=sup)
-
-                    self.add_support(add_this_supports)
-                self.add_metadata_stub('supports')
-
-            #===================
-            # EDGE SUPPORTS
-            #===================
-            if 'edgeSupports' in available_aspects:
-                objects = self.stream_aspect(uuid, 'edgeSupports', server, username, password)
-                obj_items = (o for o in objects)
-                for add_this_edge_sup in obj_items:
-                    self.add_edge_supports(add_this_edge_sup)
-
-                self.add_metadata_stub('edgeSupports')
-
-            #===================
-            # NODE CITATIONS
-            #===================
-            if 'nodeCitations' in available_aspects:
-                objects = self.stream_aspect(uuid, 'nodeCitations', server, username, password)
-                obj_items = (o for o in objects)
-                for node_cit in obj_items:
-                    self.add_node_citations_from_cx(node_cit)
-                self.add_metadata_stub('nodeCitations')
-
-            #===================
-            # EDGE CITATIONS
-            #===================
-            if 'edgeCitations' in available_aspects:
-                objects = self.stream_aspect(uuid, 'edgeCitations', server, username, password)
-                obj_items = (o for o in objects)
-                for edge_cit in obj_items:
-                    self.add_edge_citations_from_cx(edge_cit)
-                self.add_metadata_stub('edgeCitations')
-
-            #===================
-            # OPAQUE ASPECTS
-            #===================
-            for oa in opaque_aspects:
-                objects = self.stream_aspect(uuid, oa, server, username, password)
-                obj_items = (o for o in objects)
-                for oa_item in obj_items:
-                    aspect_element = AspectElement(oa_item, oa)
-                    self.add_opaque_aspect_element(aspect_element)
-                    self.add_metadata_stub(oa)
-        else:
-            raise Exception('Server and uuid not specified')
+        raise Exception('create_from_server() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_server()')
 
     def create_from_cx(self, cx):
-        if cx:
-            #===================
-            # METADATA
-            #===================
-            available_aspects = []
-            for ae in (o for o in self.get_frag_from_list_by_key(cx, 'metaData')):
-                available_aspects.append(ae.get(CX_CONSTANTS.METADATA_NAME))
-                mde = MetaDataElement(cx_fragment=ae)
-                self.add_metadata(mde)
-
-            opaque_aspects = set(available_aspects).difference(known_aspects_min)
-
-            #====================
-            # NETWORK ATTRIBUTES
-            #====================
-            if 'networkAttributes' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'networkAttributes')
-                obj_items = (o for o in objects)
-                for network_item in obj_items:
-                    add_this_network_attribute = NetworkAttributesElement(cx_fragment=network_item)
-
-                    self.add_network_attribute(network_attribute_element=add_this_network_attribute)
-                self.add_metadata_stub('networkAttributes')
-
-            #===================
-            # NODES
-            #===================
-            if 'nodes' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'nodes')
-                obj_items = (o for o in objects)
-                for node_item in obj_items:
-                    #add_this_node = NodesElement(json_obj=node_item)
-
-                    self.create_node(cx_fragment=node_item)
-                self.add_metadata_stub('nodes')
-
-            #===================
-            # EDGES
-            #===================
-            if 'edges' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'edges')
-                obj_items = (o for o in objects)
-                for edge_item in obj_items:
-                    #add_this_edge = EdgesElement(json_obj=edge_item)
-
-                    self.create_edge(cx_fragment=edge_item)
-                self.add_metadata_stub('edges')
-
-            #===================
-            # NODE ATTRIBUTES
-            #===================
-            if 'nodeAttributes' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'nodeAttributes')
-                obj_items = (o for o in objects)
-                for att in obj_items:
-                    #add_this_node_att = NodeAttributesElement(json_obj=att)
-
-                    self.set_node_attribute(cx_fragment=att)
-                self.add_metadata_stub('nodeAttributes')
-
-            #===================
-            # EDGE ATTRIBUTES
-            #===================
-            if 'edgeAttributes' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'edgeAttributes')
-                obj_items = (o for o in objects)
-                for att in obj_items:
-                    #add_this_edge_att = EdgeAttributesElement(json_obj=att)
-
-                    self.add_edge_attribute(cx_fragment=att)
-                self.add_metadata_stub('edgeAttributes')
-
-            #===================
-            # CITATIONS
-            #===================
-            if 'citations' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'citations')
-                obj_items = (o for o in objects)
-                for cit in obj_items:
-                    add_this_citation = CitationElement(cx_fragment=cit)
-
-                    self.add_citation(add_this_citation)
-                self.add_metadata_stub('citations')
-
-            #===================
-            # SUPPORTS
-            #===================
-            if 'supports' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'supports')
-                obj_items = (o for o in objects)
-                for sup in obj_items:
-                    add_this_supports = SupportElement(cx_fragment=sup)
-
-                    self.add_support(add_this_supports)
-                self.add_metadata_stub('supports')
-
-            #===================
-            # EDGE SUPPORTS
-            #===================
-            if 'edgeSupports' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'edgeSupports')
-                obj_items = (o for o in objects)
-                for add_this_edge_sup in obj_items:
-                    self.add_edge_supports(add_this_edge_sup)
-
-                self.add_metadata_stub('edgeSupports')
-
-            #===================
-            # NODE CITATIONS
-            #===================
-            if 'nodeCitations' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'nodeCitations')
-                obj_items = (o for o in objects)
-                for node_cit in obj_items:
-                    self.add_node_citations_from_cx(node_cit)
-                self.add_metadata_stub('nodeCitations')
-
-            #===================
-            # EDGE CITATIONS
-            #===================
-            if 'edgeCitations' in available_aspects:
-                objects = self.get_frag_from_list_by_key(cx, 'edgeCitations')
-                obj_items = (o for o in objects)
-                for edge_cit in obj_items:
-                    self.add_edge_citations_from_cx(edge_cit)
-                self.add_metadata_stub('edgeCitations')
-
-            #===================
-            # OPAQUE ASPECTS
-            #===================
-            for oa in opaque_aspects:
-                objects = self.get_frag_from_list_by_key(cx, oa)
-                obj_items = (o for o in objects)
-                for oa_item in obj_items:
-                    aspect_element = AspectElement(oa_item, oa)
-                    self.add_opaque_aspect_element(aspect_element)
-                    self.add_metadata_stub(oa)
-        else:
-            raise Exception('CX is empty')
+        raise Exception('create_from_cx() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_cx()')
 
     def get_frag_from_list_by_key(self, cx, key):
         for aspect in cx:
@@ -1342,13 +943,11 @@ class NiceCXNetwork(object):
             server = 'http://' + server
 
         ndex = nc.Ndex2(server,username,password)
-        save_this_cx = self.to_cx()
-        return ndex.save_new_network(save_this_cx)
+
+        return ndex.save_new_network(self.to_cx())
 
     def upload_new_network_stream(self, server, username, password):
-        response = ncs.postNiceCxStream(self)
-
-        print(response)
+        raise Exception('upload_new_network_stream() is no longer supported.  Please use upload_to()')
 
     def update_to(self, uuid, server, username, password):
         """ Upload this network to the specified server to the account specified by username and password.
@@ -1510,7 +1109,11 @@ class NiceCXNetwork(object):
             output_cx.append(self.generate_aspect('edgeAttributes'))
         if self.opaqueAspects:
             for oa in self.opaqueAspects:
-                output_cx.append({oa: self.opaqueAspects[oa]})
+                if isinstance(self.opaqueAspects[oa], bytes):
+                    bytes_string = self.opaqueAspects[oa].decode('ascii')
+                    output_cx.append({oa: [bytes_string]})
+                else:
+                    output_cx.append({oa: self.opaqueAspects[oa]})
                 oa_md = self.metadata.get(oa)
                 if oa_md:
                     oa_md['elementCount'] = len(self.opaqueAspects[oa])
@@ -1584,126 +1187,6 @@ class NiceCXNetwork(object):
 
         return aspect
 
-
-
-    def generate_aspect_old(self, aspect_name):
-        core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'citations', 'metaData',
-                       'supports', '@context']
-        aspect_element_array = []
-        element_count = 0
-        element_id_max = 0
-
-        use_this_aspect = None
-        #=============================
-        # PROCESS CORE ASPECTS FIRST
-        #=============================
-        if aspect_name in core_aspect:
-            use_this_aspect = self.string_to_aspect_object(aspect_name)
-
-        if use_this_aspect is not None:
-            if isinstance(use_this_aspect, list) and aspect_name != '@context':
-                for item in use_this_aspect:
-                    add_this_element = item.to_cx()
-                    id = add_this_element.get(CX_CONSTANTS.ID)
-                    if id is not None and id > element_id_max:
-                        element_id_max = id
-                    aspect_element_array.append(add_this_element)
-                    element_count +=1
-            elif aspect_name == '@context':
-                aspect_element_array = use_this_aspect
-                element_count += 1
-            else:
-                items = None
-                if sys.version_info.major == 3:
-                    items = use_this_aspect.items()
-                else:
-                    items = use_this_aspect.iteritems()
-
-                for k, v in items:
-                    if isinstance(v, list):
-                        for v_item in v:
-                            add_this_element = v_item.to_cx()
-                            id = add_this_element.get(CX_CONSTANTS.ID)
-                            if id is not None and id > element_id_max:
-                                element_id_max = id
-
-                            if aspect_name == 'nodeAttributes':
-                                if self.node_id_lookup:
-                                    po_id = self.node_id_lookup.index(add_this_element.get(CX_CONSTANTS.PROPERTY_OF))
-                                    add_this_element[CX_CONSTANTS.PROPERTY_OF] = po_id
-
-                            aspect_element_array.append(add_this_element)
-                            element_count +=1
-                    else:
-                        add_this_element = v.to_cx()
-                        id = add_this_element.get(CX_CONSTANTS.ID)
-                        if aspect_name == 'nodes' and isinstance(id, str):
-                            # CONVERT TO INT
-                            id = self.node_id_lookup.index(id)
-                            add_this_element[CX_CONSTANTS.ID] = id
-                        if aspect_name == 'edges' and isinstance(add_this_element.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK), str):
-                            s_id = self.node_id_lookup.index(add_this_element.get(CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK))
-                            add_this_element[CX_CONSTANTS.EDGE_SOURCE_NODE_ID_OR_SUBNETWORK] = s_id
-
-                        if aspect_name == 'edges' and isinstance(add_this_element.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID), str):
-                            t_id = self.node_id_lookup.index(add_this_element.get(CX_CONSTANTS.EDGE_TARGET_NODE_ID))
-                            add_this_element[CX_CONSTANTS.EDGE_TARGET_NODE_ID] = t_id
-
-                        if id is not None and id > element_id_max:
-                            element_id_max = id
-                        aspect_element_array.append(add_this_element)
-                        element_count +=1
-        else:
-            #===========================
-            # PROCESS NON-CORE ASPECTS
-            #===========================
-            use_this_aspect = self.string_to_aspect_object(aspect_name)
-
-            if use_this_aspect is not None:
-                if isinstance(use_this_aspect, dict):
-                    items = None
-                    if sys.version_info.major == 3:
-                        items = use_this_aspect.items()
-                    else:
-                        items = use_this_aspect.iteritems()
-
-                    for k, v in items:
-                        if aspect_name == 'edgeSupports':
-                            if isinstance(v, list):
-                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.SUPPORTS: v})
-                            else:
-                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.SUPPORTS: [v]})
-                        else:
-                            if isinstance(v, list):
-                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: v})
-                            else:
-                                aspect_element_array.append({CX_CONSTANTS.PROPERTY_OF: [k], CX_CONSTANTS.CITATIONS: [v]})
-                        element_count +=1
-                else:
-                    raise Exception('Citation was not in json format')
-            else:
-                return None
-
-        aspect = {aspect_name: aspect_element_array}
-        #============================================
-        # UPDATE METADATA ELEMENT COUNTS/ID COUNTER
-        #============================================
-        md = self.metadata.get(aspect_name)
-        if md is not None:
-            md.set_element_count(element_count)
-            md.set_id_counter(element_id_max)
-            #md.increment_consistency_group()
-        elif aspect_name != 'metaData':
-            mde = MetaDataElement(elementCount=element_count, properties=[], version='1.0', consistencyGroup=1, name=aspect_name)
-
-            if element_id_max != 0:
-                mde.set_id_counter(element_id_max)
-
-            self.add_metadata(mde)
-
-        #print('%s ELEMENT COUNT: %s, MAX ID: %s' % (aspect_name, str(element_count), str(element_id_max)))
-        return aspect
-
     def generate_metadata_aspect(self):
         aspect_element_array = []
         element_count = 0
@@ -1726,7 +1209,7 @@ class NiceCXNetwork(object):
 
 
                 add_this_element = v.to_cx()
-                id = add_this_element.get(CX_CONSTANTS.ID)
+                id = add_this_element.get('@id')
 
                 if id is not None and id > element_id_max:
                     element_id_max = id
@@ -1739,14 +1222,6 @@ class NiceCXNetwork(object):
 
     def handle_metadata_update(self, aspect_name):
         aspect = self.string_to_aspect_object(aspect_name)
-
-        #return_metadata = {
-        #    CX_CONSTANTS.CONSISTENCY_GROUP: consistency_group,
-        #    CX_CONSTANTS.ELEMENT_COUNT: 1,
-        #    CX_CONSTANTS.METADATA_NAME: "@context",
-        #    CX_CONSTANTS.PROPERTIES: [],
-        #    CX_CONSTANTS.VERSION: "1.0"
-        #}
 
     def update_consistency_group(self):
         consistency_group = 1
@@ -1854,16 +1329,6 @@ class NiceCXNetwork(object):
                 if attribute_name != "name" and attribute_name != "represents":
                     attr_count += 1
 
-
-
-        #
-        # for n, nattr in G.nodes(data=True):
-        #     if(bool(nattr)):
-        #         attr_count += len(nattr.keys())
-        #
-        #     if(n > id_max):
-        #         id_max = n
-
         if(attr_count > 0):
             return_metadata.append(
                 {
@@ -1886,10 +1351,6 @@ class NiceCXNetwork(object):
                 for attribute_name in a:
                     if attribute_name != "interaction":
                         attr_count += 1
-                #attr_count += len(a.keys())
-
-            # if(id > id_max):
-            #     id_max = id
 
         if(attr_count > 0):
             return_metadata.append(
@@ -2072,9 +1533,6 @@ class NiceCXNetwork(object):
                     )
             except Exception as e:
                 print(e.message)
-
-
-        #print {'metaData': return_metadata}
 
         return [{'metaData': return_metadata}]
 

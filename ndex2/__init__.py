@@ -3,7 +3,13 @@ import logging
 import logging.handlers
 import math
 import json
+import sys
+import pickle
+import base64
+import binascii
+import numpy as np
 from ndex2cx.NiceCXBuilder import NiceCXBuilder
+
 #from ndex2.metadata.MetaDataElement import MetaDataElement
 #from ndex2.cx.aspects.NodeAttributesElement import NodeAttributesElement
 #from ndex2.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
@@ -41,6 +47,76 @@ def get_logger(name, level=logging.DEBUG):
     logger.addHandler(handler)
 
     return logger
+
+
+def load_matrix_to_ndex(X, X_cols, X_rows, server, username, password, name):
+    if not isinstance(X, np.ndarray):
+        raise Exception('Provided matrix is not of type numpy.ndarray')
+    if not isinstance(X_cols, list):
+        raise Exception('Provided column header is not in the correct format.  Please provide a list of strings')
+    if not isinstance(X_rows, list):
+        raise Exception('Provided row header is not in the correct format.  Please provide a list of strings')
+
+    if not X.flags['C_CONTIGUOUS']:
+        X = np.ascontiguousarray(X)
+
+    serialized = pickle.dumps(X, protocol=0) #base64.b64encode(X)
+
+    niceCxBuilder = NiceCXBuilder()
+    niceCxBuilder.set_name(name)
+    node_id = niceCxBuilder.add_node(name='Sim Matrix', represents='Sim Matrix')
+
+    niceCxBuilder.add_opaque_aspect('matrix', [{'v': serialized}])
+    niceCxBuilder.add_opaque_aspect('matrix_cols', [{'v': X_cols}])
+    niceCxBuilder.add_opaque_aspect('matrix_rows', [{'v': X_rows}])
+    niceCxBuilder.add_opaque_aspect('matrix_dtype', [{'v': X.dtype.name}])
+
+    niceCx = niceCxBuilder.get_nice_cx()
+
+    print(X)
+    ont_url = niceCx.upload_to(server, username, password)
+
+    return ont_url
+
+
+def get_matrix_from_ndex(server, username, password, uuid):
+    print('place holder')
+    X = None
+    X_cols = None
+    X_rows = None
+
+    niceCx = create_nice_cx_from_server(server=server, uuid=uuid, username=username, password=password)
+
+    matrix = __get_v_from_aspect(niceCx, 'matrix')
+
+    matrix_cols = __get_v_from_aspect(niceCx, 'matrix_cols')
+    matrix_rows = __get_v_from_aspect(niceCx, 'matrix_rows')
+    matrix_dtype = __get_v_from_aspect(niceCx, 'matrix_dtype')
+
+    bimary_data = binascii.a2b_base64(matrix)
+    binary_data = base64.b64encode(bimary_data)
+
+    #base64.decodestring(s)
+
+    dtype = np.dtype(matrix_dtype)
+    rows = matrix_rows
+    cols = matrix_cols
+    dim = (len(rows), len(cols))
+
+    # Create a NumPy array, which is nothing but a glorified
+    # pointer in C to the binary data in RAM
+    X = np.frombuffer(binary_data, dtype=dtype)#.reshape(dim)
+
+    return X, X_cols, X_rows
+
+
+def __get_v_from_aspect(niceCx, aspect):
+    aspect_tmp = niceCx.get_opaque_aspect(aspect)
+    if len(aspect_tmp) > 0:
+        return aspect_tmp[0].get('v')
+
+def __string2bits(s=''):
+    return [bin(ord(x))[2:].zfill(8) for x in s]
 
 from enum import Enum
 
@@ -139,15 +215,18 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         # ADD NODE ATTRIBUTES
         # ======================
         for k, v in d.items():
+            node_attr_valid = True
             attr_type = None
             if isinstance(v, float):
+                if math.isnan(v):
+                    node_attr_valid = False
                 attr_type = 'float'
             elif isinstance(v, int):
                 attr_type = 'integer'
             elif isinstance(v, list):
                 attr_type = 'list_of_string'
-
-            niceCxBuilder.add_node_attribute(node_id, k, v, type=attr_type)
+            if node_attr_valid:
+                niceCxBuilder.add_node_attribute(node_id, k, v, type=attr_type)
 
     index = 0
     for u, v, d in G.edges_iter(data=True):
@@ -169,14 +248,21 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         # ADD EDGE ATTRIBUTES
         # ==============================
         for k, val in d.items():
+            edge_valid = True
             if k != 'interaction':
                 attr_type = None
                 if isinstance(val, float):
+                    if math.isnan(val):
+                        edge_valid = False
+                        val = ''
+                    elif math.isinf(val):
+                        val = 'INFINITY'
                     attr_type = 'float'
                 elif isinstance(val, int):
                     attr_type = 'integer'
 
-                niceCxBuilder.add_edge_attribute(property_of=index, name=k, values=val, type=attr_type)
+                if edge_valid:
+                    niceCxBuilder.add_edge_attribute(property_of=index, name=k, values=val, type=attr_type)
 
         index += 1
 

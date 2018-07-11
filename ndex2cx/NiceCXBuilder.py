@@ -59,7 +59,7 @@ class NiceCXBuilder(object):
     def add_network_attribute(self, name=None, values=None, type=None, cx_element=None):
         self.nice_cx.add_network_attribute(name=name, values=values, type=type)
 
-    def add_node(self, name=None, represents=None, id=None):
+    def add_node(self, name=None, represents=None, id=None, data_type=None):
         if id is not None:
             node_id = id
             self.node_id_lookup[name] = node_id
@@ -70,7 +70,8 @@ class NiceCXBuilder(object):
             self.node_id_counter += 1
             self.node_id_lookup[name] = node_id
 
-        self.nice_cx.add_node(id=self.node_id_lookup.get(name), name=name, represents=represents)
+
+        self.nice_cx.add_node(id=self.node_id_lookup.get(name), name=name, represents=represents, data_type=data_type)
 
         return self.node_id_lookup.get(name)
 

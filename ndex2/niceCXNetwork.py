@@ -292,6 +292,8 @@ class NiceCXNetwork(object):
         return id
 
     def add_edge_attribute(self, property_of=None, name=None, values=None, type=None, subnetwork=None):
+        if isinstance(property_of, dict):
+            property_of = property_of.get('@id')
         if property_of is None:
             raise Exception('Edge attribute requires the property_of property')
 

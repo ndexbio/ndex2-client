@@ -326,6 +326,18 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         # ===================
         for oa in opaque_aspects:
             objects = my_nicecx.get_frag_from_list_by_key(cx, oa)
+            if oa == 'visualProperties':
+                oa = 'cyVisualProperties'
+                for k, mde in my_nicecx.metadata.items():
+                    if k =='visualProperties':
+                        mde.set_name('cyVisualProperties')
+                        my_nicecx.add_metadata(mde)
+                        del my_nicecx.metadata['visualProperties']
+
+                for oa_item in objects:
+                    if 'applies_to' in oa_item:
+                        del oa_item['applies_to']
+
             for oa_item in objects:
                 aspect_element = AspectElement(oa_item, oa)
                 my_nicecx.add_opaque_aspect_element(aspect_element)
@@ -648,6 +660,19 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         # ===================
         for oa in opaque_aspects:
             objects = my_nicecx.get_aspect(uuid, oa, server, username, password)
+            if oa == 'visualProperties':
+                oa = 'cyVisualProperties'
+                for k, mde in my_nicecx.metadata.items():
+                    if k == 'visualProperties':
+                        mde.set_name('cyVisualProperties')
+                        my_nicecx.add_metadata(mde)
+                        del my_nicecx.metadata['visualProperties']
+
+                for oa_item in objects:
+                    if 'applies_to' in oa_item:
+                        del oa_item['applies_to']
+
+            #objects = my_nicecx.get_aspect(uuid, oa, server, username, password)
             for oa_item in objects:
                 aspect_element = AspectElement(oa_item, oa)
                 my_nicecx.add_opaque_aspect_element(aspect_element)

@@ -19,11 +19,11 @@ Sphinx-generated documentation: [Ndex2 and NiceCXNetwork objects](http://home.nd
 
 ## **Requirements**
 
-The NDEx2 Client 1.0 module requires Python 3.6+ and the latest version of the PIP Python package manager for installation. [Click here](https://pypi.python.org/pypi/pip) to download the PIP Python package.
+The NDEx2 Client module requires Python 3.6+ and the latest version of the PIP Python package manager for installation. [Click here](https://pypi.python.org/pypi/pip) to download the PIP Python package.
 
 ## **Installing the NDEx2 Client Module**
 
-The NDEx2 Client 1.0 module can be installed from the Python Package Index (PyPI) repository using PIP:
+The NDEx2 Client module can be installed from the Python Package Index (PyPI) repository using PIP:
 
 > pip install ndex2
 

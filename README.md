@@ -1,4 +1,4 @@
-# **NDEx2 Client v1.0**
+# **NDEx2 Client**
 
 ## **Overview**
 

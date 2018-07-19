@@ -932,11 +932,16 @@ class NiceCXNetwork(object):
                 if 'visualProperties' in oa:
                     objects = self.get_aspect(uuid, 'visualProperties', server, username, password)
                     obj_items = (o for o in objects)
+
+                    for oa_item in objects:
+                        if 'applies_to' in oa_item:
+                            del oa_item['applies_to']
+
                     for oa_item in obj_items:
-                        aspect_element = AspectElement(oa_item, oa)
+                        aspect_element = AspectElement(oa_item, 'cyVisualProperties')#oa)
                         self.add_opaque_aspect_element(aspect_element)
-                    vis_prop_size = len(self.opaqueAspects.get('visualProperties'))
-                    mde = MetaDataElement(elementCount=vis_prop_size, version='1.0', consistencyGroup=1, name='visualProperties')
+                    vis_prop_size = len(self.opaqueAspects.get('cyVisualProperties'))
+                    mde = MetaDataElement(elementCount=vis_prop_size, version='1.0', consistencyGroup=1, name='cyVisualProperties')
                     self.add_metadata(mde)
 
 

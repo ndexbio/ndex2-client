@@ -2,7 +2,7 @@
 
 ## **Overview**
 
-The NDEx2 Client Python module provides to access NDEx via two classes: Ndex2 and NiceCXNetwork. Instances of Ndex2 manage the access to an NDEx server via REST API methods. NiceCXNetwork is a simple network datamodel that also simplifies operations commonly used by applications.
+The NDEx2 Client v1.0 Python module provides to access NDEx via two classes: Ndex2 and NiceCXNetwork. Instances of Ndex2 manage the access to an NDEx server via REST API methods. NiceCXNetwork is a simple network datamodel that also simplifies operations commonly used by applications.
 
 ## **Jupyter Notebook Tutorials**
 

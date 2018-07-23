@@ -1496,24 +1496,24 @@ class NiceCXNetwork(object):
 
             return return_bytes
 
-    def upload_to(self, server, username, password):
+    def upload_to(self, server=None, username=None, password=None):
         """
         Upload this network to the specified server to the account specified by username and password.
         Example:
             ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
         :param server: The NDEx server to upload the network to.
-        :type server: string
+        :type server: Optional[str]
         :param username: The username of the account to store the network.
-        :type username: string
+        :type username: Optional[str]
         :param password: The password for the account.
-        :type password: string
+        :type password: Optional[str]
         :return: The UUID of the network on NDEx.
         :rtype: string
         """
         if server and 'http' not in server:
             server = 'http://' + server
 
-        ndex = nc.Ndex2(server,username,password)
+        ndex = nc.Ndex2(host=server, username=username, password=password)
         save_this_cx = self.to_cx()
         return ndex.save_new_network(save_this_cx)
 
@@ -1522,15 +1522,15 @@ class NiceCXNetwork(object):
 
         print(response)
 
-    def update_to(self, uuid, server, username, password):
+    def update_to(self, uuid, server=None, username=None, password=None):
         """ Upload this network to the specified server to the account specified by username and password.
 
         :param server: The NDEx server to upload the network to.
-        :type server: str
+        :type server: Optional[str]
         :param username: The username of the account to store the network.
-        :type username: str
+        :type username: Optional[str]
         :param password: The password for the account.
-        :type password: str
+        :type password: Optional[str]
         :return: The UUID of the network on NDEx.
         :rtype: str
 
@@ -1538,7 +1538,7 @@ class NiceCXNetwork(object):
             ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
         """
         cx = self.to_cx()
-        ndex = nc.Ndex2(server,username,password)
+        ndex = nc.Ndex2(host=server, username=username, password=password)
 
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):

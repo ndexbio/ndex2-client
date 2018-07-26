@@ -21,6 +21,8 @@ from ndex2cx.NiceCXBuilder import NiceCXBuilder
 
 root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 log_path = os.path.join(root, 'logs')
+if not os.path.exists(log_path):
+    os.makedirs(log_path)
 # solr_url = 'http://localhost:8983/solr/'
 # solr_url = 'http://dev2.ndexbio.org:8983/solr/'
 # deprecation_message = 'This function is now deprecated. use NiceCX'
@@ -396,7 +398,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
 
     if source_field and target_field:
         for index, row in df.iterrows():
-            if count % 100 == 0:
+            if count % 1000 == 0:
                 print(count)
             count += 1
             # =============

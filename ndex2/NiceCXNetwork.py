@@ -418,7 +418,7 @@ class NiceCXNetwork(NiceCx):
         :return:
         :rtype:
         """
-        return self.nodeAttributes.get(node)
+        return self.nodeAttributes.get(node.get('@id'))
 
 
 

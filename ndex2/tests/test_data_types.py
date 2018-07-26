@@ -7,7 +7,7 @@ import pandas as pd
 import networkx as nx
 import ndex2
 import os
-from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
+#from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
 
 upload_server = 'dev.ndexbio.org'
 upload_username = 'scratch'
@@ -16,17 +16,18 @@ upload_password = 'scratch'
 path_this = os.path.dirname(os.path.abspath(__file__))
 
 class TestLoadByAspects(unittest.TestCase):
-    @unittest.skip("Temporary skipping")
-    def test_node_data_types(self):
-        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='fc63173e-df66-11e7-adc1-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
+    #@unittest.skip("Temporary skipping")
+    def test_node_data_types2(self):
+        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='e70090bc-47a5-11e8-a935-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
         found_int_type = False
         for id, node in niceCx.get_nodes():
             abc_node_attrs = niceCx.get_node_attributes(node)
 
             if abc_node_attrs is not None:
                 for node_attr in abc_node_attrs:
-                    if node_attr.get_data_type() == ATTRIBUTE_DATA_TYPE.INTEGER:
+                    if node_attr.get('d') == 'int':
                         found_int_type = True
+                        break
 
         self.assertTrue(found_int_type)
 

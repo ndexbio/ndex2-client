@@ -550,7 +550,13 @@ class Ndex2:
 
         """
         if self.version == "2.0":
-            return self.set_network_system_properties(network_id, {'visibility': 'PUBLIC', 'index_level': 'ALL', 'showcase': True})
+            for i in range(0, 4):
+                try:
+                    return_message = self.set_network_system_properties(network_id, {'visibility': 'PUBLIC', 'index_level': 'ALL', 'showcase': True})
+                except Exception as exc:
+                    time.sleep(1)
+
+            return return_message
 
         else:
             return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})

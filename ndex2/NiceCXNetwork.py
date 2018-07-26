@@ -15,6 +15,7 @@ import ijson
 import requests
 import base64
 from ndex2cx import known_aspects_min
+from ndex2.niceCxInterface import NiceCx
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
@@ -25,8 +26,9 @@ else:
 
 userAgent = 'NiceCX-Python/1.0'
 
-class NiceCXNetwork(object):
+class NiceCXNetwork(NiceCx):
     def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, pandas_df=None, filename=None, data=None, **attr):
+
         self.metadata = {}
         self.context = []
         self.nodes = {}
@@ -71,7 +73,7 @@ class NiceCXNetwork(object):
             if server and uuid:
                 self.create_from_server(server, username, password, uuid)
 
-    def create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
+    def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
         """
         Create a new edge in the network by specifying source-interaction-target
         :param id:
@@ -94,6 +96,29 @@ class NiceCXNetwork(object):
         #self.add_edge(edge_element)
 
         return id
+
+    def create_edge(self, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
+        """
+        Create a new edge in the network by specifying source-interaction-target
+        :param id:
+        :type id:
+        :param edge_source: The source node this edge, either its id or the node object itself.
+        :type edge_source: int
+        :param edge_target: The target node this edge, either its id or the node object itself.
+        :type edge_target: int
+        :param edge_interaction: The interaction that describes the relationship between the source and target nodes
+        :type edge_interaction: string
+        :param cx_fragment: CX Fragment
+        :type cx_fragment: json
+        :return: Edge ID
+        :rtype: int
+        """
+        edge_id = self.edge_int_id_generator
+
+        self.add_edge(id=edge_id, source=edge_source, target=edge_target, interaction=edge_interaction)
+        self.edge_int_id_generator += 1
+
+        return edge_id
 
     def add_network_attribute(self, name=None, values=None, type=None, subnetwork=None):
         found_attr = False
@@ -319,8 +344,10 @@ class NiceCXNetwork(object):
     def get_node(self, node_id):
         return self.nodes.get(node_id)
 
-    def remove_node(self, node_id):
-        return self.nodes.pop(node_id, None)
+    # TODO - Check edges for orphans.  Check node attributes for orphans
+    #def remove_node(self, node_id):
+    #    raise Warning()
+    #    return self.nodes.pop(node_id, None)
 
     #=============================
     # NODE ATTRIBUTES OPERATIONS
@@ -513,9 +540,9 @@ class NiceCXNetwork(object):
         """
         edge_attr = self.get_edge_attribute_object(edge, attribute_name)
         if edge_attr:
-            return edge_attr.get('v')
+            return edge_attr.get('v'), edge_attr.get('d')
         else:
-            return None
+            return None, None
 
     def get_node_attributesx(self):
         return self.nodeAttributes.items()
@@ -855,7 +882,7 @@ class NiceCXNetwork(object):
             add_this_dict = {}
             if e_a is not None:
                 for e_a_item in e_a:
-                    if isinstance(e_a_item.get_values(), list):
+                    if isinstance(e_a_item.get('v'), list):
                         add_this_dict[e_a_item.get('n')] = ','.join(str(e) for e in e_a_item.get('v'))
                         add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
                     else:
@@ -885,9 +912,9 @@ class NiceCXNetwork(object):
                         add_this_dict['target_' + t_a_item.get('n')] = t_a_item.get('v')
 
             if add_this_dict:
-                rows.append(dict(add_this_dict, source=self.nodes.get(v.get('s')).get('n'), target=self.nodes.get(v.get('t')).get('n'), interaction=v.get('v')))
+                rows.append(dict(add_this_dict, source=self.nodes.get(v.get('s')).get('n'), target=self.nodes.get(v.get('t')).get('n'), interaction=v.get('i')))
             else:
-                rows.append(dict(source=self.nodes.get(v.get('s')).get('n'), target=self.nodes.get(v.get('t')).get('n'), interaction=v.get('v')))
+                rows.append(dict(source=self.nodes.get(v.get('s')).get('n'), target=self.nodes.get(v.get('t')).get('n'), interaction=v.get('i')))
 
         nodeAttributeSourceTarget = []
         for n_a in self.nodeAttributeHeader:

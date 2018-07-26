@@ -7,7 +7,7 @@ import base64
 import sys
 #from urllib import urlopen
 from ndex2.client import Ndex2
-from ndex2.niceCXNetwork import NiceCXNetwork
+from ndex2.NiceCXNetwork import NiceCXNetwork
 #from nicecxModel.cx.aspects.NodeElement import NodeElement
 #from nicecxModel.cx.aspects.EdgeElement import EdgeElement
 #from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
@@ -36,6 +36,18 @@ class NiceCXBuilder(object):
         self.node_id_counter = 0
         self.edge_id_counter = 0
 
+        self.node_inventory = {}
+        self.node_attribute_inventory = []
+
+        self.edge_inventory = {}
+        self.edge_attribute_inventory = []
+
+        self.opaque_aspect_inventory = []
+
+        self.context_inventory = []
+
+        self.network_attribute_inventory = {}
+
         self.user_base64 = None
         self.username = None
         self.password = None
@@ -50,56 +62,118 @@ class NiceCXBuilder(object):
                 self.user_base64 = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 
     def set_context(self, context):
-        self.nice_cx.set_context(context)
+        self.context_inventory.append(context)
 
     def set_name(self, network_name):
-
-        self.nice_cx.add_network_attribute(name='name', values=network_name, type='string')
+        self.network_attribute_inventory.append({'n': 'name', 'v': network_name, 'd': 'string'})
 
     def add_network_attribute(self, name=None, values=None, type=None, cx_element=None):
-        self.nice_cx.add_network_attribute(name=name, values=values, type=type)
+        add_this_network_attribute = {'n': name, 'v': values}
+        if type:
+            add_this_network_attribute['d'] = type
+
+        self.network_attribute_inventory[name] = add_this_network_attribute
 
     def add_node(self, name=None, represents=None, id=None, data_type=None):
-        if id is not None:
+        if self.node_inventory.get(name) is not None:
+            return self.node_inventory.get(name).get('@id')
+
+        if id:
             node_id = id
-            self.node_id_lookup[name] = node_id
-        elif self.node_id_lookup.get(name) is not None:
-            node_id = self.nice_cx.get_next_node_id()
         else:
             node_id = self.node_id_counter
             self.node_id_counter += 1
-            self.node_id_lookup[name] = node_id
 
+        add_this_node = {'@id': node_id, 'n': name}
+        if represents:
+            add_this_node['r'] = represents
+        if data_type:
+            add_this_node['d'] = data_type
 
-        self.nice_cx.add_node(id=self.node_id_lookup.get(name), name=name, represents=represents, data_type=data_type)
+        self.node_inventory[name] = add_this_node
 
-        return self.node_id_lookup.get(name)
+        return node_id
 
     def add_edge(self, source=None, target=None, interaction=None, id=None):
         if id is not None:
-            this_edge_id = id
-            self.edge_id_counter = id
-            self.edge_id_counter += 1
+            edge_id = id
         else:
-            this_edge_id = self.edge_id_counter
+            edge_id = self.edge_id_counter
             self.edge_id_counter += 1
 
-        self.nice_cx.add_edge(id=this_edge_id, source=source, target=target, interaction=interaction)
+        add_this_edge = {'@id': edge_id, 's': source, 't': target}
+        if interaction:
+            add_this_edge['i'] = interaction
+        else:
+            add_this_edge['i'] = 'interacts-with'
 
-        return this_edge_id
+        self.edge_inventory[edge_id] = add_this_edge
+
+        return edge_id
 
     def add_node_attribute(self, property_of, name, value, type=None):
-
-        self.nice_cx.add_node_attribute(property_of=property_of, name=name, values=value, type=type)
+        add_this_node_attribute = {'po': property_of, 'n': name, 'v': value}
+        if type:
+            add_this_node_attribute['d'] = type
+        self.node_attribute_inventory.append(add_this_node_attribute)
 
     def add_edge_attribute(self, property_of=None, name=None, values=None, type=None):
-
-        self.nice_cx.add_edge_attribute(property_of=property_of, name=name, values=values, type=type)
+        add_this_edge_attribute = {'po': property_of, 'n': name, 'v': values}
+        if type:
+            add_this_edge_attribute['d'] = type
+        self.edge_attribute_inventory.append(add_this_edge_attribute)
 
     def add_opaque_aspect(self, oa_name, oa_list):
-        self.nice_cx.opaqueAspects[oa_name] = oa_list
+        self.opaque_aspect_inventory.append({oa_name: oa_list})
 
     def get_nice_cx(self):
+        #==========================
+        # ADD CONTEXT
+        #==========================
+        for c in self.context_inventory:
+            self.nice_cx.set_context(c)
+
+        #=============================
+        # ASSEMBLE NETWORK ATTRIBUTES
+        #=============================
+        #{'n': 'name', 'v': network_name, 'd': 'string'}
+        for k, v in self.network_attribute_inventory.items():
+            self.nice_cx.add_network_attribute(name=v.get('n'), values=v.get('v'), type=v.get('d'))
+
+        #==========================
+        # ASSEMBLE NODES
+        #==========================
+        for k, v in self.node_inventory.items():
+            self.nice_cx.nodes[v.get('@id')] = v
+
+        #==========================
+        # ASSEMBLE NODE ATTRIBUTES
+        #==========================
+        for a in self.node_attribute_inventory:
+            property_of = a.get('po')
+
+            if self.nice_cx.nodeAttributes.get(property_of) is None:
+                self.nice_cx.nodeAttributes[property_of] = []
+
+            self.nice_cx.nodeAttributes[property_of].append(a)
+
+        #==========================
+        # ASSEMBLE EDGES
+        #==========================
+        for k, v in self.edge_inventory.items():
+            self.nice_cx.edges[k] = v
+
+        #==========================
+        # ASSEMBLE EDGE ATTRIBUTES
+        #==========================
+        for a in self.edge_attribute_inventory:
+            property_of = a.get('po')
+
+            if self.nice_cx.edgeAttributes.get(property_of) is None:
+                self.nice_cx.edgeAttributes[property_of] = []
+
+            self.nice_cx.edgeAttributes[property_of].append(a)
+
         return self.nice_cx
 
     def get_frag_from_list_by_key(self, cx, key):

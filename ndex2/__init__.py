@@ -592,16 +592,16 @@ def create_nice_cx_from_file(path, user_agent=''):
     :return: NiceCXNetwork
     """
     if os.path.isfile(path):
-        my_nicecx = NiceCXNetwork(user_agent)
         with open(path, 'rU') as file_cx:
             # ====================================
             # BUILD NICECX FROM FILE
             # ====================================
-            my_nicecx.create_from_cx(json.load(file_cx))
+            my_nicecx = create_nice_cx_from_cx(json.load(file_cx))
+            #my_nicecx.create_from_cx()
             return my_nicecx
     else:
         raise Exception('The file ' + path + '  does not exist.')
 
 
-from ndex2.niceCXNetwork import NiceCXNetwork
+from ndex2.NiceCXNetwork import NiceCXNetwork
 from ndex2.client import Ndex2

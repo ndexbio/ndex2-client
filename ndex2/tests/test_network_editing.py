@@ -5,7 +5,7 @@ import unittest
 import json
 import pandas as pd
 import os
-from ndex2.niceCXNetwork import NiceCXNetwork
+from ndex2.NiceCXNetwork import NiceCXNetwork
 import ndex2
 
 upload_server = 'dev.ndexbio.org'

@@ -306,7 +306,7 @@ class TestLoadByAspects(unittest.TestCase):
         upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    @unittest.skip("Temporary skipping") # PASS
+    #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_tsv_manipulate_and_save(self):
         path_to_network = os.path.join(path_this, 'mgdb_mutations.txt')
 
@@ -327,7 +327,7 @@ class TestLoadByAspects(unittest.TestCase):
             niceCx_from_netx = ndex2.create_nice_cx_from_networkx(nice_networkx)
 
             # Restore template
-            niceCx_from_netx.apply_template('public.ndexbio.org', '2e8f9bdc-1e5f-11e8-b939-0ac135e8bacf')
+            niceCx_from_netx.apply_template('ndexbio.org', '2e8f9bdc-1e5f-11e8-b939-0ac135e8bacf')
             niceCx_from_netx.set_name('Round trip from server to networkx to NDEx')
 
             upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
@@ -351,7 +351,7 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_update_style(self):
         test_uuid = '83013c93-75ca-11e8-8b82-525400c25d22'
         test_user = 'scratch2'
@@ -399,5 +399,11 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx_full.upload_to(upload_server, upload_username, upload_password)
         print(names)
 
-    #@unittest.skip("Temporary skipping") # PASS
-    #def test_scratch3(self):
+
+    @unittest.skip("Temporary skipping") # PASS
+    def test_encoding_file(self):
+        with open('/Users/aarongary/Development/DataSets/Alzheimer Disease.graphml', 'r', encoding='utf-8', errors='ignore') as gml:
+            gml_read = gml.read()
+
+            print(gml_read)
+        test_uuid = '83013c93-75ca-11e8-8b82-525400c25d22'

@@ -201,6 +201,7 @@ class Ndex2:
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
         headers['User-Agent'] = userAgent + self.user_agent
+        headers['Connection'] = 'close'
         response = self.s.post(url, data=post_json, headers=headers, stream=True)
         self.debug_response(response)
         response.raise_for_status()
@@ -217,7 +218,8 @@ class Ndex2:
 
         headers = {'Content-Type': multipart_data.content_type,
                    'Accept': 'application/json',
-                   'User-Agent': userAgent + self.user_agent
+                   'User-Agent': userAgent + self.user_agent,
+                   'Connection': 'close'
                    }
         response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         self.debug_response(response)
@@ -241,6 +243,7 @@ class Ndex2:
             print("POST route: " + url)
         headers = {'Content-Type': multipart_data.content_type,
                    'User-Agent': userAgent + self.user_agent,
+                   'Connection': 'close'
                    }
         response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         self.debug_response(response)

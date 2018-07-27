@@ -1613,10 +1613,12 @@ class NiceCXNetwork(NiceCx):
         if aspect_name == 'metaData':
             md_response = s.get(server + '/v2/network/' + uuid + '/aspect')
             json_response = md_response.json()
+            s.close()
             return json_response.get('metaData')
         else:
             aspect_response = s.get(server + '/v2/network/' + uuid + '/aspect/' + aspect_name)
             json_response = aspect_response.json()
+            s.close()
             return json_response
 
     def stream_aspect(self, uuid, aspect_name, server, username, password):
@@ -1631,6 +1633,7 @@ class NiceCXNetwork(NiceCx):
                 s.auth = (username, password)
             md_response = s.get(server + '/v2/network/' + uuid + '/aspect')
             json_response = md_response.json()
+            s.close()
             return json_response.get('metaData')
         else:
             if username and password:
@@ -1648,7 +1651,8 @@ class NiceCXNetwork(NiceCx):
                 print('URL Error %s' % e.message())
                 return []
 
-            return ijson.items(urlopen_result, 'item')
+            return_items = ijson.items(urlopen_result, 'item')
+            return return_items
 
 class DecimalEncoder(json.JSONEncoder):
 

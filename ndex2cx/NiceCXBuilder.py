@@ -62,10 +62,11 @@ class NiceCXBuilder(object):
                 self.user_base64 = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 
     def set_context(self, context):
-        self.context_inventory.append(context)
+        if isinstance(context, dict):
+            self.context_inventory = context
 
     def set_name(self, network_name):
-        self.network_attribute_inventory.append({'n': 'name', 'v': network_name, 'd': 'string'})
+        self.network_attribute_inventory['name'] = {'n': 'name', 'v': network_name, 'd': 'string'}
 
     def add_network_attribute(self, name=None, values=None, type=None, cx_element=None):
         add_this_network_attribute = {'n': name, 'v': values}
@@ -173,6 +174,13 @@ class NiceCXBuilder(object):
                 self.nice_cx.edgeAttributes[property_of] = []
 
             self.nice_cx.edgeAttributes[property_of].append(a)
+
+        #==========================
+        # ASSEMBLE OPAQUE ASPECTS
+        #==========================
+        for oa in self.opaque_aspect_inventory:
+            for k, v in oa.items():
+                self.nice_cx.add_opaque_aspect(k, v)
 
         return self.nice_cx
 

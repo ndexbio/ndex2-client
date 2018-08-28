@@ -14,8 +14,8 @@ from ndex2.client import DecimalEncoder
 from ndex2cx.NiceCXBuilder import NiceCXBuilder
 
 upload_server = 'dev.ndexbio.org'
-upload_username = 'username'
-upload_password = 'password'
+upload_username = 'scratch'
+upload_password = 'scratch'
 
 path_this = os.path.dirname(os.path.abspath(__file__))
 
@@ -66,9 +66,11 @@ class TestLoadByAspects(unittest.TestCase):
         node_id_1 = niceCxBuilder.add_node(name='node%s' % str(1), represents='ABC')
         node_id_2 = niceCxBuilder.add_node(name='node%s' % str(2), represents='DEF')
         niceCxBuilder.add_edge(id=1, source=node_id_1, target=node_id_2, interaction='neighbor')
-
+        niceCxBuilder.set_name('Network manual build')
+        niceCxBuilder.nice_cx.set_namespaces({'ndex context': 'http://dev.ndexbio.org'})
         niceCx = niceCxBuilder.get_nice_cx()
 
+        niceCx.set_provenance(['Provenance'])
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
@@ -179,6 +181,34 @@ class TestLoadByAspects(unittest.TestCase):
             # BUILD NICECX FROM CX OBJECT
             #====================================
             niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
+            my_cx = niceCx.to_cx()
+            #print(my_cx)
+            upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+            self.assertTrue(upload_message)
+
+    @unittest.skip("Temporary skipping")
+    def test_create_from_cx_file2(self):
+        path_to_network = os.path.join(path_this, 'CitationsAndSupports.cx')
+
+        with open(path_to_network, 'r') as ras_cx:
+            #====================================
+            # BUILD NICECX FROM CX OBJECT
+            #====================================
+            niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(ras_cx))
+            my_cx = niceCx.to_cx()
+            #print(my_cx)
+            upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+            self.assertTrue(upload_message)
+
+    @unittest.skip("Temporary skipping")
+    def test_create_from_cx_file_with_context(self):
+        path_to_network = os.path.join(path_this, 'Metabolism_of_RNA_data_types.cx')
+
+        with open(path_to_network, 'r') as ras_cx:
+            #====================================
+            # BUILD NICECX FROM CX OBJECT
+            #====================================
+            niceCx = ndex2.create_nice_cx_from_cx(json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
             my_cx = niceCx.to_cx()
             #print(my_cx)
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
@@ -306,11 +336,11 @@ class TestLoadByAspects(unittest.TestCase):
         upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_tsv_manipulate_and_save(self):
         path_to_network = os.path.join(path_this, 'mgdb_mutations.txt')
 
-        with open(path_to_network, 'rU') as tsvfile:
+        with open(path_to_network, 'r') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)

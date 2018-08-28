@@ -95,6 +95,12 @@ def get_matrix_from_ndex(server, username, password, uuid):
     matrix_rows = __get_v_from_aspect(niceCx, 'matrix_rows')
     matrix_dtype = __get_v_from_aspect(niceCx, 'matrix_dtype')
 
+    missing_padding = len(matrix) % 4
+    correct_pading = ''
+    for i in range(0, (4 - missing_padding)):
+        correct_pading += '='
+    if missing_padding != 0:
+        matrix += correct_pading
     bimary_data = binascii.a2b_base64(matrix)
     binary_data = base64.b64encode(bimary_data)
 
@@ -285,7 +291,7 @@ def create_nice_cx_from_cx(cx, user_agent=''):
 
     niceCxBuilder = NiceCXBuilder()
 
-    my_nicecx = NiceCXNetwork(user_agent)
+    my_nicecx = NiceCXNetwork()
 
     if cx:
         # ===================
@@ -344,11 +350,69 @@ def create_nice_cx_from_cx(cx, user_agent=''):
                     niceCxBuilder.nice_cx.edgeAttributes[att.get('po')].append(att)
 
         # ===================
+        # CITATIONS
+        # ===================
+        if 'citations' in available_aspects:
+            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'citations')
+            for cit in objects:
+                my_nicecx.citations[cit.get('@id')] = cit
+
+            my_nicecx.add_metadata_stub('citations')
+
+        # ===================
+        # SUPPORTS
+        # ===================
+        if 'supports' in available_aspects:
+            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'supports')
+            for sup in objects:
+                my_nicecx.supports[sup.get('@id')] = sup
+
+            my_nicecx.add_metadata_stub('supports')
+
+        # ===================
+        # EDGE SUPPORTS
+        # ===================
+        if 'edgeSupports' in available_aspects:
+            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeSupports')
+            for add_this_edge_sup in objects:
+                for po_id in add_this_edge_sup.get('po'):
+                    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
+
+            my_nicecx.add_metadata_stub('edgeSupports')
+
+        # ===================
+        # NODE CITATIONS
+        # ===================
+        if 'nodeCitations' in available_aspects:
+            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeCitations')
+            for node_cit in objects:
+                for po_id in node_cit.get('po'):
+                    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
+
+            my_nicecx.add_metadata_stub('nodeCitations')
+
+        # ===================
+        # EDGE CITATIONS
+        # ===================
+        if 'edgeCitations' in available_aspects:
+            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeCitations')
+            for edge_cit in objects:
+                for po_id in edge_cit.get('po'):
+                    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
+
+            my_nicecx.add_metadata_stub('edgeCitations')
+
+        # ===================
         # OPAQUE ASPECTS
         # ===================
         for oa in opaque_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
-            niceCxBuilder.nice_cx.opaqueAspects[oa] = objects
+            #TODO - Add context to builder
+            if oa == '@context':
+                objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
+                niceCxBuilder.nice_cx.set_namespaces(objects)
+            else:
+                objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
+                niceCxBuilder.nice_cx.opaqueAspects[oa] = objects
 
         return niceCxBuilder.get_nice_cx()
     else:
@@ -572,6 +636,59 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
             for att in objects:
                 niceCxBuilder.add_edge_attribute(property_of=att.get('po'), name=att.get('n'),
                                                  values=att.get('v'), type=att.get('d'))
+
+        # ===================
+        # CITATIONS
+        # ===================
+        if 'citations' in available_aspects:
+            objects = my_nicecx.get_aspect(uuid, 'citations', server, username, password)
+            for cit in objects:
+                my_nicecx.citations[cit.get('@id')] = cit
+
+            my_nicecx.add_metadata_stub('citations')
+
+        # ===================
+        # SUPPORTS
+        # ===================
+        if 'supports' in available_aspects:
+            objects = my_nicecx.get_aspect(uuid, 'supports', server, username, password)
+            for sup in objects:
+                my_nicecx.supports[sup.get('@id')] = sup
+
+            my_nicecx.add_metadata_stub('supports')
+
+        # ===================
+        # EDGE SUPPORTS
+        # ===================
+        if 'edgeSupports' in available_aspects:
+            objects = my_nicecx.get_aspect(uuid, 'edgeSupports', server, username, password)
+            for add_this_edge_sup in objects:
+                for po_id in add_this_edge_sup.get('po'):
+                    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
+
+            my_nicecx.add_metadata_stub('edgeSupports')
+
+        # ===================
+        # NODE CITATIONS
+        # ===================
+        if 'nodeCitations' in available_aspects:
+            objects = my_nicecx.get_aspect(uuid, 'nodeCitations', server, username, password)
+            for node_cit in objects:
+                for po_id in node_cit.get('po'):
+                    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
+
+            my_nicecx.add_metadata_stub('nodeCitations')
+
+        # ===================
+        # EDGE CITATIONS
+        # ===================
+        if 'edgeCitations' in available_aspects:
+            objects = my_nicecx.get_aspect(uuid, 'edgeCitations', server, username, password)
+            for edge_cit in objects:
+                for po_id in edge_cit.get('po'):
+                    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
+
+            my_nicecx.add_metadata_stub('edgeCitations')
 
         # ===================
         # OPAQUE ASPECTS

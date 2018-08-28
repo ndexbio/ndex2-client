@@ -26,8 +26,8 @@ else:
 
 userAgent = 'NiceCX-Python/1.0'
 
-class NiceCXNetwork(NiceCx):
-    def __init__(self, cx=None, server=None, username=None, password=None, uuid=None, networkx_G=None, pandas_df=None, filename=None, data=None, **attr):
+class NiceCXNetwork():
+    def __init__(self, **attr):
 
         self.metadata = {}
         self.context = []
@@ -54,26 +54,26 @@ class NiceCXNetwork(NiceCx):
         self.missingNodes = {}
         self.s = None
 
-        if cx:
-            self.create_from_cx(cx)
-        elif networkx_G:
-            self.create_from_networkx(networkx_G)
-        elif pandas_df is not None:
-            self.create_from_pandas(pandas_df)
-        elif filename is not None:
-            if os.path.isfile(filename):
-                with open(filename, 'rU') as file_cx:
+        #if cx:
+        #    self.create_from_cx(cx)
+        #elif networkx_G:
+        #    self.create_from_networkx(networkx_G)
+        #elif pandas_df is not None:
+        #    self.create_from_pandas(pandas_df)
+        #elif filename is not None:
+        #    if os.path.isfile(filename):
+        #        with open(filename, 'rU') as file_cx:
                     #====================================
                     # BUILD NICECX FROM FILE
                     #====================================
-                    self.create_from_cx(json.load(file_cx))
-            else:
-                raise Exception('Input provided is not a valid file')
-        else:
-            if server and uuid:
-                self.create_from_server(server, username, password, uuid)
+        #            self.create_from_cx(json.load(file_cx))
+        #    else:
+        #        raise Exception('Input provided is not a valid file')
+        #else:
+        #    if server and uuid:
+        #        self.create_from_server(server, username, password, uuid)
 
-    def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
+    def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None):
         """
         Create a new edge in the network by specifying source-interaction-target
         :param id:
@@ -90,14 +90,15 @@ class NiceCXNetwork(NiceCx):
         :rtype: int
         """
 
-        self.add_edge(id=id, source=edge_source, target=edge_target, interaction=edge_interaction)
+        #self.add_edge(id=id, source=edge_source, target=edge_target, interaction=edge_interaction)
+        self.edges[id] = {'@id': id, 's': edge_source, 't': edge_target, 'i': edge_interaction}
         #edge_element = EdgeElement(id=id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction, cx_fragment=cx_fragment)
 
         #self.add_edge(edge_element)
 
         return id
 
-    def create_edge(self, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
+    def create_edge(self, edge_source=None, edge_target=None, edge_interaction=None):
         """
         Create a new edge in the network by specifying source-interaction-target
         :param id:
@@ -115,10 +116,89 @@ class NiceCXNetwork(NiceCx):
         """
         edge_id = self.edge_int_id_generator
 
-        self.add_edge(id=edge_id, source=edge_source, target=edge_target, interaction=edge_interaction)
+        self.__create_edge(id=edge_id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction)
         self.edge_int_id_generator += 1
 
         return edge_id
+
+    def add_edge(self, id=None, source=None, target=None, interaction=None):
+        """
+        Add an edge object to the network.
+
+        :param id: internal identifier
+        :type id: int
+        :param source: id of source node
+        :type source: int
+        :param target: id of target node
+        :type target: int
+        :param interaction: type of edge interaction
+        :type interaction: string
+        :return: edge id
+        :rtype: int
+        """
+        raise Warning('add_edge() is deprecated.  Please use create_edge().')
+        #if id is None:
+        #    raise Exception('No ID provided')
+
+        #if source is None or target is None or interaction is None:
+        #    print('source: %s, target: %s or target: %s was None.  Skipping edge' % (source, target, interaction))
+        #    return None
+            #raise Exception('Source, Target and Interaction are required to create an edge')
+
+        #self.edges[id] = {'@id': id, 's': source, 't': target, 'i': interaction}
+
+        #return id
+
+    #==================
+    # NODE OPERATIONS
+    #==================
+    def __create_node(self, id=None, node_name=None, node_represents=None, data_type=None):
+        if id is None:
+            id=self.get_next_node_id()
+
+        if node_represents is not None:
+            self.nodes[id] = {'@id': id, 'n': node_name, 'r': node_represents}
+        else:
+            self.nodes[id] = {'@id': id, 'n': node_name, 'r': node_name}
+
+        if data_type is not None:
+            self.nodes[id]['d'] = data_type
+
+        return id
+
+    def create_node(self, node_name=None, node_represents=None, data_type=None):
+        id = self.node_int_id_generator
+        self.__create_node(id=id, node_name=node_name, node_represents=node_represents, data_type=data_type)
+        self.node_int_id_generator += 1
+
+        return id
+
+    def add_node(self, id=None, name=None, represents=None, data_type=None):
+        """
+        Add a node object to the network. (For an easier method for adding nodes use create_node() )
+
+        :param id:
+        :type id:
+        :param name:
+        :type name:
+        :param represents:
+        :type represents:
+        :param data_type:
+        :type data_type:
+        :return:
+        :rtype:
+        """
+        raise Warning('add_node() is deprecated.  Please use create_node().')
+
+        #if represents is not None:
+        #    self.nodes[id] = {'@id': id, 'n': name, 'r': represents}
+        #else:
+        #    self.nodes[id] = {'@id': id, 'n': name, 'r': name}
+
+        #if data_type is not None:
+        #    self.nodes[id]['d'] = data_type
+
+        #return id
 
     def add_network_attribute(self, name=None, values=None, type=None, subnetwork=None):
         found_attr = False
@@ -141,14 +221,94 @@ class NiceCXNetwork(NiceCx):
 
             self.networkAttributes.append(network_attribute)
 
+    def add_citation(self, id, title=None, contributor=None, identifier=None, type=None, description=None, attributes=None):
+        add_this_citation = {'@id': id}
+
+        if contributor is not None:
+            add_this_citation['dc:contributor'] = contributor
+
+        if identifier is not None:
+            add_this_citation['dc:identifier'] = identifier
+
+        if type is not None:
+            add_this_citation['dc:type'] = type
+
+        if title is not None:
+            add_this_citation['dc:title'] = title
+
+        if description is not None:
+            add_this_citation['dc:description'] = description
+
+        if attributes is not None:
+            add_this_citation[attributes] = attributes
+
+        self.citations[id] = add_this_citation
+
+        return add_this_citation
+
+    def add_edge_citations(self, edge_id, citation):
+        if isinstance(citation, dict):
+            edge_citation_element = {'po': [edge_id], 'citations': [citation.get('@id')]}
+        else:
+            edge_citation_element = {'po': [edge_id], 'citations': [citation]}
+
+        self.build_many_to_many_relation('edgeCitations', edge_citation_element, 'citations')
+
+    def add_support(self, id=None, text=None, citation_id=None, attributes=None, props=None):
+        add_this_supports = {'@id': id}
+
+        if text is not None:
+            add_this_supports['text'] = text
+
+        if citation_id is not None:
+            add_this_supports['citation'] = citation_id
+
+        if attributes is not None and len(attributes) > 0:
+            add_this_supports['attributes'] = attributes
+
+        if props is not None and len(props) > 0:
+            add_this_supports['properties'] = props
+
+
+        self.supports[id] = add_this_supports
+
+        return add_this_supports
+
+    def add_edge_supports(self, edge_id, support):
+        if isinstance(support, dict):
+            edge_support_element = {'po': [edge_id], 'supports': [support.get('@id')]}
+        else:
+            edge_support_element = {'po': [edge_id], 'supports': [support]}
+
+        self.build_many_to_many_relation('edgeSupports', edge_support_element, 'supports')
+
+    def build_many_to_many_relation(self, aspect_name, element, relation_name):
+        if aspect_name == 'nodeCitations':
+            aspect = self.nodeCitations
+        elif aspect_name == 'edgeCitations':
+            aspect = self.edgeCitations
+        elif aspect_name == 'edgeSupports':
+            aspect = self.edgeSupports
+        else:
+            raise Exception('Only nodeCitations, edgeCitations and edgeSupports are supported. ' + aspect_name + ' was supplied')
+
+        for po in element.get('po'):
+            po_id = aspect.get(po)
+            if po_id is None:
+                aspect[po] = element.get(relation_name)
+            else:
+                aspect[po] += element.get(relation_name)
     # TODO
     # make opaque aspect into a one shot method to set the whole aspect.
     # i.e. not one element at a time
     def add_opaque_aspect(self, aspect_name, aspect):
         if isinstance(aspect, list):
-            aspect_element = {aspect_name: aspect}
-            self.add_opaque_aspect_element(aspect_element)
-            #self.add_metadata_stub(aspect_name)
+            self.opaqueAspects[aspect_name] = aspect
+        elif isinstance(aspect, dict):
+            if 'error' in aspect:
+                pass
+            else:
+                self.opaqueAspects[aspect_name] = [aspect]
         else:
             raise Exception('Provided input was not of type list.')
 
@@ -180,13 +340,37 @@ class NiceCXNetwork(NiceCx):
         return None
 
     def add_name_space(self, prefix, uri):
-        self.context.append({prefix: uri})
+        found_context = False
+        for n_a in self.networkAttributes:
+            if n_a.get('n') == '@context':
+                found_context = True
+                add_to_this_context = json.loads(n_a['v'])
+                add_to_this_context[prefix] = uri
+                n_a['v'] = json.dumps(add_to_this_context)
+                break
 
-    def set_namespaces(self,ns ):
-        self.context = ns
+        if not found_context:
+            self.add_network_attribute(name='@context', values=json.dumps({prefix: uri}), type='string')
+
+
+    def set_namespaces(self,ns):
+        if isinstance(ns, list):
+            add_this_context = {}
+            for c in ns:
+                for k, v in c.items():
+                    add_this_context[k] = v
+            self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
+        elif isinstance(ns, dict):
+            self.add_network_attribute(name='@context', values=json.dumps(ns), type='string')
+        else:
+            raise Exception('Namespace must be of type dict or list')
 
     def get_namespaces(self,):
-        return self.context
+        for n_a in self.networkAttributes:
+            if n_a.get('n') == '@context':
+                return json.loads(n_a['v'])
+
+        return None
 
     def get_edges (self):
         """
@@ -200,14 +384,16 @@ class NiceCXNetwork(NiceCx):
         return self.edges.get(edge)
 
     def get_edge_attribute_object(self, edge, attribute_name):
-        edge_attrs = self.edgeAttributes.get(edge)
+        raise Warning('get_edge_attribute_object() is deprecated.  Please use get_edge_attribute().')
 
-        if edge_attrs:
-            for e_a in edge_attrs:
-                if e_a.get('n') == attribute_name:
-                    return e_a
+        #edge_attrs = self.edgeAttributes.get(edge)
 
-        return None
+        #if edge_attrs:
+        #    for e_a in edge_attrs:
+        #        if e_a.get('n') == attribute_name:
+        #            return e_a
+
+        #return None
 
     #==============================
     # NETWORK PROPERTY OPERATIONS
@@ -226,49 +412,6 @@ class NiceCXNetwork(NiceCx):
 
         return None
 
-    #==================
-    # NODE OPERATIONS
-    #==================
-    def create_node(self, id=None, node_name=None, node_represents=None, cx_fragment=None):
-        if id is None:
-            id=self.get_next_node_id()
-
-        self.add_node(id=id, name=node_name, represents=node_represents)
-
-        return id
-
-    def add_node(self, id=None, name=None, represents=None, data_type=None):
-        """
-        Add a node object to the network. (For an easier method for adding nodes use create_node() )
-
-        :param id:
-        :type id:
-        :param name:
-        :type name:
-        :param represents:
-        :type represents:
-        :param data_type:
-        :type data_type:
-        :return:
-        :rtype:
-        """
-
-        """
-        :param node_element: A node object
-        :type node_element: nicecxModel.cx.aspects.NodesElement
-        :return: Node ID
-        :rtype: int
-        """
-        if represents is not None:
-            self.nodes[id] = {'@id': id, 'n': name, 'r': represents}
-        else:
-            self.nodes[id] = {'@id': id, 'n': name, 'r': name}
-
-        if data_type is not None:
-            self.nodes[id]['d'] = data_type
-
-        return id
-
     def get_next_node_id(self):
         return_id = self.node_int_id_generator
         self.node_int_id_generator += 1
@@ -276,7 +419,7 @@ class NiceCXNetwork(NiceCx):
 
     def add_node_attribute(self, property_of=None, name=None, values=None, type=None, subnetwork=None):
         if property_of is None:
-            raise Exception('Node attribute requires the property_of property')
+            raise Exception('Node attribute requires property_of')
 
         if name is None or values is None:
             raise Exception('Node attribute requires the name and values property')
@@ -285,36 +428,20 @@ class NiceCXNetwork(NiceCx):
             self.nodeAttributes[property_of] = []
 
         if type is None:
-            self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values})
+            attr_type = None
+            if isinstance(values, float):
+                attr_type = 'float'
+            elif isinstance(values, int):
+                attr_type = 'integer'
+            elif isinstance(values, list):
+                attr_type = 'list_of_string'
+
+            if attr_type:
+                self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': attr_type})
+            else:
+                self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values})
         else:
             self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': type})
-
-    def add_edge(self, id=None, source=None, target=None, interaction=None):
-        """
-        Add an edge object to the network.
-
-        :param id: internal identifier
-        :type id: int
-        :param source: id of source node
-        :type source: int
-        :param target: id of target node
-        :type target: int
-        :param interaction: type of edge interaction
-        :type interaction: string
-        :return: edge id
-        :rtype: int
-        """
-        if id is None:
-            raise Exception('No ID provided')
-
-        if source is None or target is None or interaction is None:
-            print('source: %s, target: %s or target: %s was None.  Skipping edge' % (source, target, interaction))
-            return None
-            #raise Exception('Source, Target and Interaction are required to create an edge')
-
-        self.edges[id] = {'@id': id, 's': source, 't': target, 'i': interaction}
-
-        return id
 
     def add_edge_attribute(self, property_of=None, name=None, values=None, type=None, subnetwork=None):
         if isinstance(property_of, dict):
@@ -385,14 +512,17 @@ class NiceCXNetwork(NiceCx):
         :return:
         :rtype:
         """
-        node_attrs = self.get_node_attributes(node)
 
-        if node_attrs:
-            for n_a in node_attrs:
-                if n_a.get('n') == attribute_name:
-                    return n_a
+        raise Warning('get_node_attribute_objects() is deprecated.  Please use get_node_attribute() instead')
 
-        return None
+        #node_attrs = self.get_node_attributes(node)
+
+        #if node_attrs:
+        #    for n_a in node_attrs:
+        #        if n_a.get('n') == attribute_name:
+        #            return n_a
+
+        #return None
 
     def get_node_attribute(self, node, attribute_name):
         """
@@ -516,14 +646,16 @@ class NiceCXNetwork(NiceCx):
         :return: Edge attribute object
         :rtype: nicecxModel.cx.aspects.EdgesAttributesElement
         """
-        edge_attrs = self.get_edge_attributes(edge)
 
-        if edge_attrs:
-            for e_a in edge_attrs:
-                if e_a.get('n') == attribute_name:
-                    return e_a
+        raise Warning('get_edge_attribute_objects() is deprecated')
+        #edge_attrs = self.get_edge_attributes(edge)
 
-        return None
+        #if edge_attrs:
+        #    for e_a in edge_attrs:
+        #        if e_a.get('n') == attribute_name:
+        #            return e_a
+
+        #return None
 
     # TODO - return the element as the appropriate type (cast)
     def get_edge_attribute(self, edge, attribute_name, subnetwork=None):
@@ -581,7 +713,11 @@ class NiceCXNetwork(NiceCx):
         :return: List of context objects
         :rtype: list of json objects
         """
-        return self.context
+        for n_a in self.networkAttributes:
+            if n_a.get('n') == '@context':
+                return json.loads(n_a['v'])
+
+        return None
 
     def set_context(self, context):
         """
@@ -591,13 +727,17 @@ class NiceCXNetwork(NiceCx):
         :return: None
         :rtype: none
         """
-        print('context is of type %s' % type(context))
+        #print('context is of type %s' % type(context))
         if isinstance(context, list):
             print('Setting context from list')
-            self.context = context
+            add_this_context = {}
+            for c in context:
+                for k, v in c.items():
+                    add_this_context[k] = v
+            self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
         elif isinstance(context, dict):
             print('Setting context from dict')
-            self.context = [context]
+            self.add_network_attribute(name='@context', values=json.dumps(context), type='string')
         else:
             raise Exception('Context provided is not of type list')
 
@@ -631,14 +771,8 @@ class NiceCXNetwork(NiceCx):
         :return: List of provenance
         :rtype: list of json objects
         """
-
-        return self.provenance
-
-    def set_provenance(self, provenance):
-        if isinstance(provenance, list):
-            self.provenance = provenance
-        else:
-            raise Exception('Provided provenance was not of type <list>')
+        raise Warning('getProvenance() is deprecated')
+        #return self.provenance
 
     def get_opaque_aspect_table(self):
         return self.opaqueAspects
@@ -720,7 +854,11 @@ class NiceCXNetwork(NiceCx):
         :return: None
         :rtype: none
         """
-        self.provenance = provenance
+        raise Warning('set_provenance() is deprecated.')
+        #if isinstance(provenance, list):
+        #    self.provenance = provenance
+        #else:
+        #    raise Exception('Provided provenance was not of type <list>')
 
     def get_edge_citations(self):
         return self.edgeCitations
@@ -816,7 +954,7 @@ class NiceCXNetwork(NiceCx):
         else:
             raise Exception(', '.join(error_message) + 'not specified in apply_template')
 
-    def merge_node_attributes(self, source_attribute1, source_attribute2, target_attribute):
+    def __merge_node_attributes(self, source_attribute1, source_attribute2, target_attribute):
         """
         Checks 2 attribute fields for values and merges them into one attribute.  The best use is when one attribute
         is empty which occurs when loading from an edge file.  Use with caution
@@ -829,14 +967,16 @@ class NiceCXNetwork(NiceCx):
         :return:
         :rtype:
         """
-        for node_id, node in self.nodes.items():
-            value1 = self.get_node_attribute(node, source_attribute1)
-            value2 = self.get_node_attribute(node, source_attribute2)
-            merged_value = value1 or value2
-            if merged_value:
-                self.set_node_attribute(node, target_attribute, merged_value)
-                self.remove_node_attribute(node, source_attribute1)
-                self.remove_node_attribute(node, source_attribute2)
+        raise Warning('merge_node_attributes() is deprecated')
+
+        #for node_id, node in self.nodes.items():
+        #    value1 = self.get_node_attribute(node, source_attribute1)
+        #    value2 = self.get_node_attribute(node, source_attribute2)
+        #    merged_value = value1 or value2
+        #    if merged_value:
+        #        self.set_node_attribute(node, target_attribute, merged_value)
+        #        self.remove_node_attribute(node, source_attribute1)
+        #        self.remove_node_attribute(node, source_attribute2)
 
     def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[], edge_interaction=None):
         raise Exception('create_from_pandas() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_pandas()')
@@ -1085,6 +1225,37 @@ class NiceCXNetwork(NiceCx):
         :return: Network summary
         :rtype: string
         """
+
+        raise Warning('get_summary() is deprecated.  Please use print_summary() instead')
+
+        n_a_count = 0
+        for k, v in self.nodeAttributes.items():
+            n_a_count += len(v)
+
+        e_a_count = 0
+        for k, v in self.edgeAttributes.items():
+            e_a_count += len(v)
+
+        network_name = self.get_name()
+        if not network_name:
+            network_name = 'Untitled'
+
+        summary_json = {
+            'Name': network_name,
+            'Nodes': len(self.nodes),
+            'Edges': + len(self.edges),
+            'Node Attributes': n_a_count,
+            'Edge Attributes': e_a_count
+        }
+
+        return summary_json
+
+    def print_summary(self):
+        """
+        Print a network summary
+        :return: Network summary
+        :rtype: string
+        """
         n_a_count = 0
         for k, v in self.nodeAttributes.items():
             n_a_count += len(v)
@@ -1104,7 +1275,7 @@ class NiceCXNetwork(NiceCx):
             + 'Node Attributes: ' + str(n_a_count) + '\n'\
             + 'Edge Attributes: ' + str(e_a_count) + '\n'
 
-        return summary_string
+        print(summary_string)
 
     def __str__(self):
         return json.dumps(self.to_cx(), cls=DecimalEncoder)
@@ -1127,8 +1298,8 @@ class NiceCXNetwork(NiceCx):
         #if self.metadata:
             #output_cx.append(self.generate_aspect('metaData'))
         #    output_cx.append(self.generate_metadata_aspect())
-        if self.context:
-            output_cx.append(self.generate_aspect('@context'))
+        #if self.context: # REPLACED BY NETWORK ATTRIBUTE: @context
+        #    output_cx.append(self.generate_aspect('@context'))
         if self.nodes:
             output_cx.append(self.generate_aspect('nodes'))
         if self.edges:
@@ -1139,6 +1310,16 @@ class NiceCXNetwork(NiceCx):
             output_cx.append(self.generate_aspect('nodeAttributes'))
         if self.edgeAttributes:
             output_cx.append(self.generate_aspect('edgeAttributes'))
+        if self.citations:
+            output_cx.append(self.generate_aspect('citations'))
+        if self.nodeCitations:
+            output_cx.append(self.generate_aspect('nodeCitations'))
+        if self.edgeCitations:
+            output_cx.append(self.generate_aspect('edgeCitations'))
+        if self.supports:
+            output_cx.append(self.generate_aspect('supports'))
+        if self.edgeSupports:
+            output_cx.append(self.generate_aspect('edgeSupports'))
         if self.opaqueAspects:
             for oa in self.opaqueAspects:
                 if isinstance(self.opaqueAspects[oa], bytes):
@@ -1172,7 +1353,7 @@ class NiceCXNetwork(NiceCx):
         return output_cx
 
     def generate_aspect(self, aspect_name):
-        core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'metaData', '@context']
+        core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'metaData', '@context', 'citations', 'supports']
         aspect_element_array = []
         element_count = 0
         element_id_max = 0
@@ -1203,6 +1384,39 @@ class NiceCXNetwork(NiceCx):
             elif isinstance(use_this_aspect, list):
                 aspect_element_array = use_this_aspect
                 element_count = len(use_this_aspect)
+
+        else:
+            #===========================
+            # PROCESS NON-CORE ASPECTS
+            #===========================
+            use_this_aspect = self.string_to_aspect_object(aspect_name)
+
+            if use_this_aspect is not None:
+                if isinstance(use_this_aspect, dict):
+                    items = None
+                    if sys.version_info.major == 3:
+                        items = use_this_aspect.items()
+                    else:
+                        items = use_this_aspect.iteritems()
+
+                    for k, v in items:
+                        if aspect_name == 'edgeSupports':
+                            if isinstance(v, list):
+                                aspect_element_array.append({'po': [k], 'supports': v})
+                            else:
+                                aspect_element_array.append({'po': [k], 'supports': [v]})
+                        else:
+                            if isinstance(v, list):
+                                aspect_element_array.append({'po': [k], 'citations': v})
+                            else:
+                                aspect_element_array.append({'po': [k], 'citations': [v]})
+                        element_count +=1
+                else:
+                    raise Exception('Citation was not in json format')
+            else:
+                return None
+
+
 
         md = {
             'name': aspect_name,
@@ -1292,16 +1506,16 @@ class NiceCXNetwork(NiceCx):
         # ========================
         # @context metadata
         # ========================
-        if self.context:
-            return_metadata.append(
-                {
-                    "consistencyGroup": consistency_group,
-                    "elementCount": 1,
-                    "name": "@context",
-                    "properties": [],
-                    "version": "1.0"
-                }
-            )
+        #if self.context: # REPLACED BY NETWORK ATTRIBUTE: @context
+        #    return_metadata.append(
+        #        {
+        #            "consistencyGroup": consistency_group,
+        #            "elementCount": 1,
+        #            "name": "@context",
+        #            "properties": [],
+        #            "version": "1.0"
+        #        }
+        #    )
 
         #========================
         # Nodes metadata
@@ -1571,8 +1785,8 @@ class NiceCXNetwork(NiceCx):
     def string_to_aspect_object(self, aspect_name):
         if aspect_name == 'metaData':
             return self.metadata
-        elif aspect_name == '@context':
-            return self.context
+        #elif aspect_name == '@context':
+        #    return self.context
         elif aspect_name == 'nodes':
             return self.nodes
         elif aspect_name == 'edges':

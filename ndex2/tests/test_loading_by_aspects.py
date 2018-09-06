@@ -22,6 +22,7 @@ path_this = os.path.dirname(os.path.abspath(__file__))
 class TestLoadByAspects(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
     def test_create_from_pandas_with_headers2(self):
+        print('Testing: CTD_genes_pathways.txt')
         path_to_network = os.path.join(path_this, 'CTD_genes_pathways.txt')
 
         with open(path_to_network, 'r') as tsvfile:
@@ -43,6 +44,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_load_nodes(self):
+        print('Testing: Manual network build')
         niceCxBuilder = NiceCXBuilder()
         #niceCx = ndex2.create_empty_nice_cx() #NiceCXNetwork()
         gene_list = ['OR2J3', 'AANAT', 'CCDC158', 'PLAC8L1', 'CLK1', 'GLTP', 'PITPNM2','TRAPPC8', 'EIF2S2', 'ST14',
@@ -61,6 +63,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_load_edges(self):
+        print('Testing: NiceCXBuilder')
         niceCxBuilder = NiceCXBuilder()
 
         node_id_1 = niceCxBuilder.add_node(name='node%s' % str(1), represents='ABC')
@@ -76,6 +79,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_pandas_loading(self):
+        print('Testing: MDA1.txt')
         path_to_network = os.path.join(path_this, 'MDA1.txt')
         niceCxBuilder = NiceCXBuilder()
 
@@ -99,6 +103,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_pandas_no_headers(self):
+        print('Testing: SIMPLE.txt')
         path_to_network = os.path.join(path_this, 'SIMPLE.txt')
 
         with open(path_to_network, 'r') as tsvfile:
@@ -110,6 +115,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_pandas_with_headers(self):
+        print('Testing: MDA1.txt')
         path_to_network = os.path.join(path_this, 'MDA1.txt')
 
         with open(path_to_network, 'r') as tsvfile:
@@ -126,7 +132,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_server(self):
-        print('public network')
+        print('Testing: Create from server (uuid:75bf1e85-1bc7-11e6-a298-06603eb7f303)')
         #niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='72ef5c3a-caff-11e7-ad58-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', username='scratch', password='scratch', uuid='75bf1e85-1bc7-11e6-a298-06603eb7f303') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
 
@@ -135,6 +141,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_pandas_no_headers_3_columns(self):
+        print('Testing: SIMPLE3.txt')
         path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
 
         with open(path_to_network, 'r') as tsvfile:
@@ -150,6 +157,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") #PASS
     def test_create_from_networkx(self):
+        print('Testing: SIMPLE3.txt with DictReader')
         path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
 
         with open(path_to_network, 'r') as tsvfile:
@@ -174,6 +182,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_cx_file(self):
+        print('Testing: MEDIUM_NETWORK.cx')
         path_to_network = os.path.join(path_this, 'MEDIUM_NETWORK.cx')
 
         with open(path_to_network, 'r') as ras_cx:
@@ -188,6 +197,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_cx_file2(self):
+        print('Testing: CitationsAndSupports.cx')
         path_to_network = os.path.join(path_this, 'CitationsAndSupports.cx')
 
         with open(path_to_network, 'r') as ras_cx:
@@ -202,6 +212,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_cx_file_with_context(self):
+        print('Testing: Metabolism_of_RNA_data_types.cx')
         path_to_network = os.path.join(path_this, 'Metabolism_of_RNA_data_types.cx')
 
         with open(path_to_network, 'r') as ras_cx:
@@ -216,6 +227,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_server_1(self):
+        print('Testing: Create from serve (uuid:b7190ca4-aec2-11e7-9b0a-06832d634f41)')
         #====================================
         # BUILD NICECX FROM SERVER
         #====================================
@@ -225,6 +237,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_export_to_cx_file(self):
+        print('Testing: MEDIUM_NETWORK.cx')
         path_to_network = os.path.join(path_this, 'MEDIUM_NETWORK.cx')
 
         with open(path_to_network, 'r') as ras_cx:
@@ -240,6 +253,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_cx_file_with_position(self):
+        print('Testing: network_with_position.cx')
         path_to_network = os.path.join(path_this, 'network_with_position.cx')
 
         with open(path_to_network, 'r') as ras_cx:
@@ -256,6 +270,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_manual_build(self):
+        print('Testing: Build from empty nice cx')
         niceCx = ndex2.create_empty_nice_cx() #NiceCXNetwork()
 
         fox_node_id = niceCx.create_node(node_name='Fox')
@@ -273,6 +288,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")
     def test_create_from_small_cx(self):
+        print('Testing: Pandas DataFrame.from_items')
         my_cx = [
             {"numberVerification":[{"longNumber":281474976710655}]},
             {"metaData":[{"consistencyGroup":1,"elementCount":2,"idCounter":2,"name":"nodes","version":"1.0"},
@@ -304,7 +320,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_server_manipulate_and_save(self):
-        print('public network')
+        print('Testing: Create from server and manupulate (uuid:51247435-1e5f-11e8-b939-0ac135e8bacf)')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='51247435-1e5f-11e8-b939-0ac135e8bacf')
 
         nice_networkx = niceCx.to_networkx()
@@ -320,7 +336,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_server_manipulate_and_save2(self):
-        print('public network')
+        print('Testing: Create from server and generate networkx (uuid:51247435-1e5f-11e8-b939-0ac135e8bacf)')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='51247435-1e5f-11e8-b939-0ac135e8bacf')
 
         #serialized = pickle.dumps(niceCx.to_cx(), protocol=0)
@@ -339,6 +355,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_tsv_manipulate_and_save(self):
+        print('Testing: mgdb_mutations.txt')
         path_to_network = os.path.join(path_this, 'mgdb_mutations.txt')
 
         with open(path_to_network, 'r') as tsvfile:
@@ -368,6 +385,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_create_from_big_tsv(self):
+        print('Testing: identifier_mappings_small.txt')
         path_to_network = os.path.join(path_this, 'identifier_mappings_small.txt')
 
         with open(path_to_network, 'r') as tsvfile:
@@ -401,6 +419,7 @@ class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping") # PASS
     def test_netx_plot(self):
+        print('Testing: Get user networks (user: scratch)')
         my_ndex=ndex2.client.Ndex2('http://test.ndexbio.org', 'scratch', 'scratch')
         my_ndex.update_status()
 

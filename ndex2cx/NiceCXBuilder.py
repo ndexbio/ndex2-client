@@ -112,7 +112,7 @@ class NiceCXBuilder(object):
 
         self.network_attribute_inventory[name] = add_this_network_attribute
 
-    def add_node(self, name=None, represents=None, id=None, data_type=None):
+    def add_node(self, name=None, represents=None, id=None, data_type=None, map_node_ids=False):
         """
         Adds a new node with the corresponding name and represents (external id)
 
@@ -141,6 +141,9 @@ class NiceCXBuilder(object):
             add_this_node['d'] = data_type
 
         self.node_inventory[name] = add_this_node
+
+        if map_node_ids:
+            self.node_id_lookup[name] = node_id
 
         return node_id
 

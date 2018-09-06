@@ -235,14 +235,14 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         # =============
         if d and d.get('name'):
             if isinstance(n, int):
-                node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), id=n)
+                node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), id=n, map_node_ids=True)
             else:
-                node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'))
+                node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), map_node_ids=True)
         else:
             if isinstance(n, int):
-                node_id = niceCxBuilder.add_node(name=n,represents=n, id=n)
+                node_id = niceCxBuilder.add_node(name=n,represents=n, id=n, map_node_ids=True)
             else:
-                node_id = niceCxBuilder.add_node(name=n, represents=n)
+                node_id = niceCxBuilder.add_node(name=n, represents=n, map_node_ids=True)
 
         # ======================
         # ADD NODE ATTRIBUTES

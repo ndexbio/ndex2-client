@@ -79,7 +79,7 @@ class TestLoadByAspects(unittest.TestCase):
         path_to_network = os.path.join(path_this, 'MDA1.txt')
         niceCxBuilder = NiceCXBuilder()
 
-        with open(path_to_network, 'rU') as tsvfile:
+        with open(path_to_network, 'r') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
@@ -101,7 +101,7 @@ class TestLoadByAspects(unittest.TestCase):
     def test_create_from_pandas_no_headers(self):
         path_to_network = os.path.join(path_this, 'SIMPLE.txt')
 
-        with open(path_to_network, 'rU') as tsvfile:
+        with open(path_to_network, 'r') as tsvfile:
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',header=None)
 
             niceCx = ndex2.create_nice_cx_from_pandas(df) #NiceCXNetwork(pandas_df=df)
@@ -112,7 +112,7 @@ class TestLoadByAspects(unittest.TestCase):
     def test_create_from_pandas_with_headers(self):
         path_to_network = os.path.join(path_this, 'MDA1.txt')
 
-        with open(path_to_network, 'rU') as tsvfile:
+        with open(path_to_network, 'r') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
@@ -137,7 +137,7 @@ class TestLoadByAspects(unittest.TestCase):
     def test_create_from_pandas_no_headers_3_columns(self):
         path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
 
-        with open(path_to_network, 'rU') as tsvfile:
+        with open(path_to_network, 'r') as tsvfile:
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',header=None)
 
             #====================================
@@ -152,7 +152,7 @@ class TestLoadByAspects(unittest.TestCase):
     def test_create_from_networkx(self):
         path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
 
-        with open(path_to_network, 'rU') as tsvfile:
+        with open(path_to_network, 'r') as tsvfile:
             reader = csv.DictReader(filter(lambda row: row[0] != '#', tsvfile), dialect='excel-tab', fieldnames=['s','t','e'])
 
             #===========================
@@ -242,7 +242,7 @@ class TestLoadByAspects(unittest.TestCase):
     def test_cx_file_with_position(self):
         path_to_network = os.path.join(path_this, 'network_with_position.cx')
 
-        with open(path_to_network, 'rU') as ras_cx:
+        with open(path_to_network, 'r') as ras_cx:
             #====================================
             # BUILD NICECX FROM PANDAS DATAFRAME
             #====================================

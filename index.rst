@@ -9,8 +9,10 @@ Welcome to ndex2's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
+   docs/ndex2
+   docs/modules
 
 
 Indices and tables

@@ -62,13 +62,50 @@ class NiceCXBuilder(object):
                 self.user_base64 = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 
     def set_context(self, context):
+        """
+        Set the @context information of the network.  This information maps namespace prefixes to their defining URIs
+
+        Example:
+
+            ``set_context({'pmid': 'https://www.ncbi.nlm.nih.gov/pubmed/'})``
+
+        :param context: dict of name, URI pairs
+        :type context: dict
+        :return: None
+        :rtype: none
+        """
         if isinstance(context, dict):
             self.context_inventory = context
+        elif isinstance(context, list):
+            if len(context) > 0:
+                self.context_inventory = context[0]
 
     def set_name(self, network_name):
+        """
+        Set the network name
+
+        :param network_name: Network name
+        :type network_name: string
+        :return: None
+        :rtype:none
+        """
+
         self.network_attribute_inventory['name'] = {'n': 'name', 'v': network_name, 'd': 'string'}
 
     def add_network_attribute(self, name=None, values=None, type=None, cx_element=None):
+        """
+        Add an attribute to the network
+
+        :param name: Name of the attribute
+        :type name: str
+        :param values:  The value(s) of the attribute
+        :type values: One of the allowable CX types.  See `Supported data types`_
+        :param type: They type of data supplied in values. Default is string.  See `Supported data types`_
+        :type type: str
+        :return: None
+        :rtype: None
+        """
+
         add_this_network_attribute = {'n': name, 'v': values}
         if type:
             add_this_network_attribute['d'] = type
@@ -76,6 +113,18 @@ class NiceCXBuilder(object):
         self.network_attribute_inventory[name] = add_this_network_attribute
 
     def add_node(self, name=None, represents=None, id=None, data_type=None):
+        """
+        Adds a new node with the corresponding name and represents (external id)
+
+        :param node_name: Name of the node
+        :type node_name: str
+        :param represents: Representation of the node (alternate identifier)
+        :type represents: str
+        :param id:
+        :type id:
+        :return: Node ID
+        :rtype: int
+        """
         if self.node_inventory.get(name) is not None:
             return self.node_inventory.get(name).get('@id')
 
@@ -96,6 +145,21 @@ class NiceCXBuilder(object):
         return node_id
 
     def add_edge(self, source=None, target=None, interaction=None, id=None):
+        """
+        Adds a new edge in the network by specifying source-interaction-target
+
+        :param source: The source node of this edge, either its id or the node object itself.
+        :type source: int, dict (with @id property)
+        :param target: The target node of this edge, either its id or the node object itself.
+        :type target: int, dict (with @id property)
+        :param interaction: The interaction that describes the relationship between the source and target nodes
+        :type interaction: str
+        :param id: Edge id for this edge.  If none is provided the builder will create one
+        :type id: int
+        :return: Edge ID
+        :rtype: int
+        """
+
         if id is not None:
             edge_id = id
         else:
@@ -113,12 +177,48 @@ class NiceCXBuilder(object):
         return edge_id
 
     def add_node_attribute(self, property_of, name, value, type=None):
+        """
+        Set an attribute of a node, where the node may be specified by its id or passed in as a node dict.
+
+        :param property_of: Node ID to add the attribute to
+        :type property_of: int
+        :param name: Attribute name
+        :type name: str
+        :param value: A value or list of values of the attribute
+        :type value: list, string, int or float
+        :param type: The datatype of the attribute values, defaults is string.  See `Supported data types`_
+        :type type: str
+        :return: None
+        :rtype: None
+        """
         add_this_node_attribute = {'po': property_of, 'n': name, 'v': value}
         if type:
             add_this_node_attribute['d'] = type
         self.node_attribute_inventory.append(add_this_node_attribute)
 
     def add_edge_attribute(self, property_of=None, name=None, values=None, type=None):
+        """
+        Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
+
+        Example:
+
+            ``set_edge_attribute(0, 'weight', 0.5, type='float')``
+
+            or
+
+            ``set_edge_attribute(edge, 'Disease', 'Atherosclerosis')``
+
+        :param property_of: Edge to add the attribute to
+        :type property_of: int or edge dict with @id attribute
+        :param name: Attribute name
+        :type name: str
+        :param values: A value or list of values of the attribute
+        :type values: list, string, int or float
+        :param type: The datatype of the attribute values, defaults to the python datatype of the values.  See `Supported data types`_
+        :type type: str
+        :return: None
+        :rtype: None
+        """
         add_this_edge_attribute = {'po': property_of, 'n': name, 'v': values}
         if type:
             add_this_edge_attribute['d'] = type
@@ -127,12 +227,57 @@ class NiceCXBuilder(object):
     def add_opaque_aspect(self, oa_name, oa_list):
         self.opaque_aspect_inventory.append({oa_name: oa_list})
 
+    #===================================
+    # methods to add data by fragment
+    #===================================
+    def _add_network_attributes_from_fragment(self, fragment):
+        self.nice_cx.networkAttributes.append(fragment)
+
+    def _add_node_from_fragment(self, fragment):
+        self.nice_cx.nodes[fragment.get('@id')] = fragment
+
+    def _add_edge_from_fragment(self, fragment):
+        self.nice_cx.edges[fragment.get('@id')] = fragment
+
+    def _add_node_attribute_from_fragment(self, fragment):
+        if self.nice_cx.nodeAttributes.get(fragment.get('po')) is None:
+            self.nice_cx.nodeAttributes[fragment.get('po')] = []
+
+        self.nice_cx.nodeAttributes[fragment.get('po')].append(fragment)
+
+    def _add_edge_attribute_from_fragment(self, fragment):
+        if self.nice_cx.edgeAttributes.get(fragment.get('po')) is None:
+            self.nice_cx.edgeAttributes[fragment.get('po')] = []
+
+        self.nice_cx.edgeAttributes[fragment.get('po')].append(fragment)
+
+    def _add_citation_from_fragment(self, fragment):
+        self.nice_cx.citations[fragment.get('@id')] = fragment
+
+    def _add_supports_from_fragment(self, fragment):
+        self.nice_cx.supports[fragment.get('@id')] = fragment
+
+    def _add_edge_supports_from_fragment(self, fragment):
+        for po_id in fragment.get('po'):
+            self.nice_cx.edgeSupports[po_id] = fragment.get('supports')
+
+    def _add_node_citations_from_fragment(self, fragment):
+        for po_id in fragment.get('po'):
+            self.nice_cx.nodeCitations[po_id] = fragment.get('citations')
+
+    def _add_edge_citations_from_fragment(self, fragment):
+        for po_id in fragment.get('po'):
+            self.nice_cx.edgeCitations[po_id] = fragment.get('citations')
+
     def get_nice_cx(self):
         #==========================
         # ADD CONTEXT
         #==========================
-        for c in self.context_inventory:
-            self.nice_cx.set_context(c)
+        if isinstance(self.context_inventory, dict):
+            self.nice_cx.set_context(self.context_inventory)
+        else:
+            for c in self.context_inventory:
+                self.nice_cx.set_context(c)
 
         #=============================
         # ASSEMBLE NETWORK ATTRIBUTES

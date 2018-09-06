@@ -1,0 +1,1940 @@
+[
+  {
+    "numberVerification": [
+      {
+        "longNumber": 281474976710655
+      }
+    ]
+  },
+  {
+    "metaData": [
+      {
+        "name": "nodes",
+        "elementCount": 14,
+        "idCounter": 14,
+        "version": "1.0",
+        "consistencyGroup": 1,
+        "properties": []
+      },
+      {
+        "name": "edges",
+        "elementCount": 37,
+        "idCounter": 37,
+        "version": "1.0",
+        "consistencyGroup": 1,
+        "properties": []
+      },
+      {
+        "name": "networkAttributes",
+        "elementCount": 8,
+        "idCounter": 8,
+        "version": "1.0",
+        "consistencyGroup": 1,
+        "properties": []
+      },
+      {
+        "name": "nodeAttributes",
+        "elementCount": 36,
+        "idCounter": 36,
+        "version": "1.0",
+        "consistencyGroup": 1,
+        "properties": []
+      },
+      {
+        "name": "edgeAttributes",
+        "elementCount": 37,
+        "idCounter": 37,
+        "version": "1.0",
+        "consistencyGroup": 1,
+        "properties": []
+      },
+      {
+        "name": "edgeCitations",
+        "elementCount": 37,
+        "idCounter": 38,
+        "properties": []
+      },
+      {
+        "name": "edgeSupports",
+        "elementCount": 37,
+        "idCounter": 38,
+        "properties": []
+      },
+      {
+        "name": "provenanceHistory",
+        "elementCount": 1,
+        "idCounter": 2,
+        "properties": []
+      },
+      {
+        "name": "citations",
+        "elementCount": 38,
+        "idCounter": 39,
+        "properties": []
+      },
+      {
+        "name": "supports",
+        "elementCount": 46,
+        "idCounter": 47,
+        "properties": []
+      },
+      {
+        "name": "ndexStatus",
+        "elementCount": 1,
+        "version": "1.0",
+        "consistencyGroup": 1,
+        "properties": []
+      }
+    ]
+  },
+  {
+    "ndexStatus": [
+      {
+        "externalId": "f535a23c-941f-11e8-b117-525400c25d22",
+        "creationTime": 1532972561363,
+        "modificationTime": 1532972561363,
+        "visibility": "PRIVATE",
+        "published": false,
+        "nodeCount": 14,
+        "edgeCount": 37,
+        "owner": "scratch",
+        "ndexServerURI": "http://dev.ndexbio.org",
+        "readOnly": false
+      }
+    ]
+  },
+  {
+    "provenanceHistory": [
+      {
+        "entity": {
+          "uri": "http://dev.ndexbio.org/v2/network/f535a23c-941f-11e8-b117-525400c25d22/summary",
+          "creationEvent": {
+            "inputs": [
+              {
+                "uri": null,
+                "creationEvent": null,
+                "properties": []
+              }
+            ],
+            "startedAtTime": 1532972561363,
+            "endedAtTime": 1532972561363,
+            "eventType": "Program Upload in CX",
+            "properties": [
+              {
+                "name": "user name",
+                "value": "scratch"
+              }
+            ]
+          },
+          "properties": [
+            {
+              "name": "dc:title",
+              "value": "Copy of rasmachine"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "nodes": [
+      {
+        "@id": 0,
+        "n": "BRAF",
+        "s": 0
+      },
+      {
+        "@id": 1,
+        "n": "ERK",
+        "s": 0
+      },
+      {
+        "@id": 5,
+        "n": "MEK",
+        "s": 0
+      },
+      {
+        "@id": 50,
+        "n": "KRAS",
+        "s": 0
+      },
+      {
+        "@id": 54,
+        "n": "RAF1",
+        "s": 0
+      },
+      {
+        "@id": 59,
+        "n": "senescence",
+        "s": 0
+      },
+      {
+        "@id": 63,
+        "n": "EGFR",
+        "s": 0
+      },
+      {
+        "@id": 71,
+        "n": "MC1R",
+        "s": 0
+      },
+      {
+        "@id": 81,
+        "n": "RAF_inhibitors",
+        "s": 0
+      },
+      {
+        "@id": 82,
+        "n": "RAF",
+        "s": 0
+      },
+      {
+        "@id": 86,
+        "n": "vemurafenib",
+        "s": 0
+      },
+      {
+        "@id": 101,
+        "n": "Dabrafenib",
+        "s": 0
+      },
+      {
+        "@id": 118,
+        "n": "Trametinib",
+        "s": 0
+      },
+      {
+        "@id": 131,
+        "n": "KSR1",
+        "s": 0
+      }
+    ]
+  },
+  {
+    "edges": [
+      {
+        "@id": 2,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 6,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 9,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 12,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 15,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 18,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 21,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 24,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 27,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 30,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 33,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 37,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 40,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 43,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 46,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 51,
+        "s": 0,
+        "t": 50,
+        "i": "Activation"
+      },
+      {
+        "@id": 55,
+        "s": 0,
+        "t": 54,
+        "i": "Activation"
+      },
+      {
+        "@id": 60,
+        "s": 0,
+        "t": 59,
+        "i": "Activation"
+      },
+      {
+        "@id": 64,
+        "s": 63,
+        "t": 0,
+        "i": "Activation"
+      },
+      {
+        "@id": 67,
+        "s": 1,
+        "t": 54,
+        "i": "Activation"
+      },
+      {
+        "@id": 72,
+        "s": 71,
+        "t": 0,
+        "i": "Activation"
+      },
+      {
+        "@id": 75,
+        "s": 54,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 83,
+        "s": 81,
+        "t": 82,
+        "i": "Activation"
+      },
+      {
+        "@id": 87,
+        "s": 86,
+        "t": 0,
+        "i": "Activation"
+      },
+      {
+        "@id": 90,
+        "s": 54,
+        "t": 0,
+        "i": "Complex"
+      },
+      {
+        "@id": 93,
+        "s": 0,
+        "t": 1,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 98,
+        "s": 0,
+        "t": 5,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 102,
+        "s": 101,
+        "t": 0,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 105,
+        "s": 101,
+        "t": 54,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 108,
+        "s": 54,
+        "t": 1,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 112,
+        "s": 54,
+        "t": 5,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 115,
+        "s": 54,
+        "t": 81,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 119,
+        "s": 118,
+        "t": 0,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 122,
+        "s": 0,
+        "t": 1,
+        "i": "Phosphorylation"
+      },
+      {
+        "@id": 125,
+        "s": 0,
+        "t": 5,
+        "i": "Phosphorylation"
+      },
+      {
+        "@id": 128,
+        "s": 101,
+        "t": 54,
+        "i": "Phosphorylation"
+      },
+      {
+        "@id": 132,
+        "s": 131,
+        "t": 82,
+        "i": "Phosphorylation"
+      }
+    ]
+  },
+  {
+    "networkAttributes": [
+      {
+        "n": "name",
+        "v": "Copy of rasmachine"
+      },
+      {
+        "n": "description",
+        "v": "<div>sdfaasd</div>"
+      },
+      {
+        "n": "version",
+        "v": "1.1"
+      },
+      {
+        "n": "rights",
+        "v": "NDEX LIC (http://dev.ndexbio.org)"
+      },
+      {
+        "n": "rightsHolder",
+        "v": "RIGHTSHOLDER"
+      },
+      {
+        "n": "author",
+        "v": "AUTHOR"
+      },
+      {
+        "n": "reference",
+        "v": "<div>sdfgg</div>"
+      },
+      {
+        "n": "@context",
+        "v": "{\"pubmed\": \"http://identifiers.org/pubmed/\", \"cas\": \"http://identifiers.org/cas/\", \"chebi\": \"http://identifiers.org/chebi/CHEBI:\", \"hprd\": \"http://identifiers.org/hprd/\", \"uniprot knowledgebase\": \"http://identifiers.org/uniprot/\", \"KEGG Compound\": \"http://identifiers.org/kegg.compound/\"}"
+      }
+    ]
+  },
+  {
+    "nodeAttributes": [
+      {
+        "po": 0,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 0,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P15056"
+      },
+      {
+        "po": 0,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:1097"
+      },
+      {
+        "po": 1,
+        "n": "type",
+        "v": "proteinfamily"
+      },
+      {
+        "po": 1,
+        "n": "BE",
+        "v": "http://sorger.med.harvard.edu/indra/entities/ERK"
+      },
+      {
+        "po": 5,
+        "n": "type",
+        "v": "proteinfamily"
+      },
+      {
+        "po": 5,
+        "n": "BE",
+        "v": "http://sorger.med.harvard.edu/indra/entities/MEK"
+      },
+      {
+        "po": 50,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 50,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P01116"
+      },
+      {
+        "po": 50,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:6407"
+      },
+      {
+        "po": 54,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 54,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P04049"
+      },
+      {
+        "po": 54,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:9829"
+      },
+      {
+        "po": 59,
+        "n": "type",
+        "v": "bioprocess"
+      },
+      {
+        "po": 59,
+        "n": "GO",
+        "v": "http://identifiers.org/go/GO:0090398"
+      },
+      {
+        "po": 59,
+        "n": "MESH",
+        "v": "http://identifiers.org/mesh/D016922"
+      },
+      {
+        "po": 63,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 63,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P00533"
+      },
+      {
+        "po": 63,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:3236"
+      },
+      {
+        "po": 71,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 71,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/Q01726"
+      },
+      {
+        "po": 71,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:6929"
+      },
+      {
+        "po": 81,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 81,
+        "n": "ChEBI",
+        "v": "http://identifiers.org/chebi/CHEBI:75047"
+      },
+      {
+        "po": 82,
+        "n": "type",
+        "v": "proteinfamily"
+      },
+      {
+        "po": 82,
+        "n": "BE",
+        "v": "http://sorger.med.harvard.edu/indra/entities/RAF"
+      },
+      {
+        "po": 86,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 86,
+        "n": "ChEBI",
+        "v": "http://identifiers.org/chebi/CHEBI:63637"
+      },
+      {
+        "po": 86,
+        "n": "PubChem",
+        "v": "http://identifiers.org/pubchem.compound/42611257"
+      },
+      {
+        "po": 101,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 101,
+        "n": "PubChem",
+        "v": "http://identifiers.org/pubchem.compound/44462760"
+      },
+      {
+        "po": 118,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 118,
+        "n": "PubChem",
+        "v": "http://identifiers.org/pubchem.compound/11707110"
+      },
+      {
+        "po": 131,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 131,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/Q8IVT5"
+      },
+      {
+        "po": 131,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:6465"
+      }
+    ]
+  },
+  {
+    "edgeAttributes": [
+      {
+        "po": 2,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 466, V)), ERK())"
+      },
+      {
+        "po": 6,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 466, V)), MEK())"
+      },
+      {
+        "po": 9,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, A)), ERK())"
+      },
+      {
+        "po": 12,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, A)), MEK())"
+      },
+      {
+        "po": 15,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, E)), ERK())"
+      },
+      {
+        "po": 18,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, E)), MEK())"
+      },
+      {
+        "po": 21,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, G)), ERK())"
+      },
+      {
+        "po": 24,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, G)), MEK())"
+      },
+      {
+        "po": 27,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, N)), ERK())"
+      },
+      {
+        "po": 30,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, N)), MEK())"
+      },
+      {
+        "po": 33,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, V)), ERK())"
+      },
+      {
+        "po": 37,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, V)), MEK())"
+      },
+      {
+        "po": 40,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 596, C)), ERK())"
+      },
+      {
+        "po": 43,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 596, C)), MEK())"
+      },
+      {
+        "po": 46,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (V, 600, E)), ERK())"
+      },
+      {
+        "po": 51,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (None, None, None)), KRAS())"
+      },
+      {
+        "po": 55,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (None, None, None)), RAF1())"
+      },
+      {
+        "po": 60,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(), senescence())"
+      },
+      {
+        "po": 64,
+        "n": "INDRA statement",
+        "v": "Activation(EGFR(), BRAF())"
+      },
+      {
+        "po": 67,
+        "n": "INDRA statement",
+        "v": "Activation(ERK(), RAF1())"
+      },
+      {
+        "po": 72,
+        "n": "INDRA statement",
+        "v": "Activation(MC1R(), BRAF())"
+      },
+      {
+        "po": 75,
+        "n": "INDRA statement",
+        "v": "Activation(RAF1(), ERK())"
+      },
+      {
+        "po": 83,
+        "n": "INDRA statement",
+        "v": "Activation(RAF_inhibitors(), RAF())"
+      },
+      {
+        "po": 87,
+        "n": "INDRA statement",
+        "v": "Activation(vemurafenib(), BRAF())"
+      },
+      {
+        "po": 90,
+        "n": "INDRA statement",
+        "v": "Complex(RAF1(), BRAF())"
+      },
+      {
+        "po": 93,
+        "n": "INDRA statement",
+        "v": "Inhibition(BRAF(muts: (None, None, None)), ERK())"
+      },
+      {
+        "po": 98,
+        "n": "INDRA statement",
+        "v": "Inhibition(BRAF(), MEK())"
+      },
+      {
+        "po": 102,
+        "n": "INDRA statement",
+        "v": "Inhibition(Dabrafenib(), BRAF())"
+      },
+      {
+        "po": 105,
+        "n": "INDRA statement",
+        "v": "Inhibition(Dabrafenib(), RAF1())"
+      },
+      {
+        "po": 108,
+        "n": "INDRA statement",
+        "v": "Inhibition(RAF1(), ERK())"
+      },
+      {
+        "po": 112,
+        "n": "INDRA statement",
+        "v": "Inhibition(RAF1(), MEK())"
+      },
+      {
+        "po": 115,
+        "n": "INDRA statement",
+        "v": "Inhibition(RAF1(), RAF_inhibitors())"
+      },
+      {
+        "po": 119,
+        "n": "INDRA statement",
+        "v": "Inhibition(Trametinib(), BRAF())"
+      },
+      {
+        "po": 122,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(BRAF(mods: (modification), muts: (None, None, None)), ERK())"
+      },
+      {
+        "po": 125,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(BRAF(mods: (modification), muts: (None, None, None)), MEK())"
+      },
+      {
+        "po": 128,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(Dabrafenib(), RAF1(), S, 338)"
+      },
+      {
+        "po": 132,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(KSR1(), RAF())"
+      }
+    ]
+  },
+  {
+    "edgeCitations": [
+      {
+        "po": [
+          2
+        ],
+        "citations": [
+          3
+        ]
+      },
+      {
+        "po": [
+          6
+        ],
+        "citations": [
+          7
+        ]
+      },
+      {
+        "po": [
+          9
+        ],
+        "citations": [
+          10
+        ]
+      },
+      {
+        "po": [
+          12
+        ],
+        "citations": [
+          13
+        ]
+      },
+      {
+        "po": [
+          15
+        ],
+        "citations": [
+          16
+        ]
+      },
+      {
+        "po": [
+          18
+        ],
+        "citations": [
+          19
+        ]
+      },
+      {
+        "po": [
+          21
+        ],
+        "citations": [
+          22
+        ]
+      },
+      {
+        "po": [
+          24
+        ],
+        "citations": [
+          25
+        ]
+      },
+      {
+        "po": [
+          27
+        ],
+        "citations": [
+          28
+        ]
+      },
+      {
+        "po": [
+          30
+        ],
+        "citations": [
+          31
+        ]
+      },
+      {
+        "po": [
+          33
+        ],
+        "citations": [
+          34
+        ]
+      },
+      {
+        "po": [
+          37
+        ],
+        "citations": [
+          38
+        ]
+      },
+      {
+        "po": [
+          40
+        ],
+        "citations": [
+          41
+        ]
+      },
+      {
+        "po": [
+          43
+        ],
+        "citations": [
+          44
+        ]
+      },
+      {
+        "po": [
+          46
+        ],
+        "citations": [
+          47
+        ]
+      },
+      {
+        "po": [
+          51
+        ],
+        "citations": [
+          52
+        ]
+      },
+      {
+        "po": [
+          55
+        ],
+        "citations": [
+          56
+        ]
+      },
+      {
+        "po": [
+          60
+        ],
+        "citations": [
+          61
+        ]
+      },
+      {
+        "po": [
+          64
+        ],
+        "citations": [
+          65
+        ]
+      },
+      {
+        "po": [
+          67
+        ],
+        "citations": [
+          68
+        ]
+      },
+      {
+        "po": [
+          72
+        ],
+        "citations": [
+          73
+        ]
+      },
+      {
+        "po": [
+          75
+        ],
+        "citations": [
+          76,
+          77
+        ]
+      },
+      {
+        "po": [
+          83
+        ],
+        "citations": [
+          84
+        ]
+      },
+      {
+        "po": [
+          87
+        ],
+        "citations": [
+          88
+        ]
+      },
+      {
+        "po": [
+          90
+        ],
+        "citations": [
+          91
+        ]
+      },
+      {
+        "po": [
+          93
+        ],
+        "citations": [
+          94
+        ]
+      },
+      {
+        "po": [
+          98
+        ],
+        "citations": [
+          99
+        ]
+      },
+      {
+        "po": [
+          102
+        ],
+        "citations": [
+          103
+        ]
+      },
+      {
+        "po": [
+          105
+        ],
+        "citations": [
+          106
+        ]
+      },
+      {
+        "po": [
+          108
+        ],
+        "citations": [
+          109
+        ]
+      },
+      {
+        "po": [
+          112
+        ],
+        "citations": [
+          113
+        ]
+      },
+      {
+        "po": [
+          115
+        ],
+        "citations": [
+          116
+        ]
+      },
+      {
+        "po": [
+          119
+        ],
+        "citations": [
+          120
+        ]
+      },
+      {
+        "po": [
+          122
+        ],
+        "citations": [
+          123
+        ]
+      },
+      {
+        "po": [
+          125
+        ],
+        "citations": [
+          126
+        ]
+      },
+      {
+        "po": [
+          128
+        ],
+        "citations": [
+          129
+        ]
+      },
+      {
+        "po": [
+          132
+        ],
+        "citations": [
+          133
+        ]
+      }
+    ]
+  },
+  {
+    "edgeSupports": [
+      {
+        "po": [
+          2
+        ],
+        "supports": [
+          4
+        ]
+      },
+      {
+        "po": [
+          6
+        ],
+        "supports": [
+          8
+        ]
+      },
+      {
+        "po": [
+          9
+        ],
+        "supports": [
+          11
+        ]
+      },
+      {
+        "po": [
+          12
+        ],
+        "supports": [
+          14
+        ]
+      },
+      {
+        "po": [
+          15
+        ],
+        "supports": [
+          17
+        ]
+      },
+      {
+        "po": [
+          18
+        ],
+        "supports": [
+          20
+        ]
+      },
+      {
+        "po": [
+          21
+        ],
+        "supports": [
+          23
+        ]
+      },
+      {
+        "po": [
+          24
+        ],
+        "supports": [
+          26
+        ]
+      },
+      {
+        "po": [
+          27
+        ],
+        "supports": [
+          29
+        ]
+      },
+      {
+        "po": [
+          30
+        ],
+        "supports": [
+          32
+        ]
+      },
+      {
+        "po": [
+          33
+        ],
+        "supports": [
+          35,
+          36
+        ]
+      },
+      {
+        "po": [
+          37
+        ],
+        "supports": [
+          39
+        ]
+      },
+      {
+        "po": [
+          40
+        ],
+        "supports": [
+          42
+        ]
+      },
+      {
+        "po": [
+          43
+        ],
+        "supports": [
+          45
+        ]
+      },
+      {
+        "po": [
+          46
+        ],
+        "supports": [
+          48,
+          49
+        ]
+      },
+      {
+        "po": [
+          51
+        ],
+        "supports": [
+          53
+        ]
+      },
+      {
+        "po": [
+          55
+        ],
+        "supports": [
+          57,
+          58
+        ]
+      },
+      {
+        "po": [
+          60
+        ],
+        "supports": [
+          62
+        ]
+      },
+      {
+        "po": [
+          64
+        ],
+        "supports": [
+          66
+        ]
+      },
+      {
+        "po": [
+          67
+        ],
+        "supports": [
+          69,
+          70
+        ]
+      },
+      {
+        "po": [
+          72
+        ],
+        "supports": [
+          74
+        ]
+      },
+      {
+        "po": [
+          75
+        ],
+        "supports": [
+          78,
+          79,
+          80
+        ]
+      },
+      {
+        "po": [
+          83
+        ],
+        "supports": [
+          85
+        ]
+      },
+      {
+        "po": [
+          87
+        ],
+        "supports": [
+          89
+        ]
+      },
+      {
+        "po": [
+          90
+        ],
+        "supports": [
+          92
+        ]
+      },
+      {
+        "po": [
+          93
+        ],
+        "supports": [
+          95,
+          96,
+          97
+        ]
+      },
+      {
+        "po": [
+          98
+        ],
+        "supports": [
+          100
+        ]
+      },
+      {
+        "po": [
+          102
+        ],
+        "supports": [
+          104
+        ]
+      },
+      {
+        "po": [
+          105
+        ],
+        "supports": [
+          107
+        ]
+      },
+      {
+        "po": [
+          108
+        ],
+        "supports": [
+          110,
+          111
+        ]
+      },
+      {
+        "po": [
+          112
+        ],
+        "supports": [
+          114
+        ]
+      },
+      {
+        "po": [
+          115
+        ],
+        "supports": [
+          117
+        ]
+      },
+      {
+        "po": [
+          119
+        ],
+        "supports": [
+          121
+        ]
+      },
+      {
+        "po": [
+          122
+        ],
+        "supports": [
+          124
+        ]
+      },
+      {
+        "po": [
+          125
+        ],
+        "supports": [
+          127
+        ]
+      },
+      {
+        "po": [
+          128
+        ],
+        "supports": [
+          130
+        ]
+      },
+      {
+        "po": [
+          132
+        ],
+        "supports": [
+          134
+        ]
+      }
+    ]
+  },
+  {
+    "citations": [
+      {
+        "@id": 3,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 7,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 10,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 13,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 16,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 19,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 22,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 25,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 28,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 31,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 34,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 38,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 41,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 44,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 47,
+        "dc:identifier": "pmid:28986151",
+        "attributes": []
+      },
+      {
+        "@id": 52,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 56,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 61,
+        "dc:identifier": "pmid:28986151",
+        "attributes": []
+      },
+      {
+        "@id": 65,
+        "dc:identifier": "pmid:28974625",
+        "attributes": []
+      },
+      {
+        "@id": 68,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 73,
+        "dc:identifier": "pmid:28916587",
+        "attributes": []
+      },
+      {
+        "@id": 76,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 77,
+        "dc:identifier": "pmid:28953887",
+        "attributes": []
+      },
+      {
+        "@id": 84,
+        "dc:identifier": "pmid:28951457",
+        "attributes": []
+      },
+      {
+        "@id": 88,
+        "dc:identifier": "pmid:28963614",
+        "attributes": []
+      },
+      {
+        "@id": 91,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 94,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 99,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 103,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 106,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 109,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 113,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 116,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 120,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 123,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 126,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 129,
+        "dc:identifier": "pmid:28947956",
+        "attributes": []
+      },
+      {
+        "@id": 133,
+        "dc:identifier": "pmid:28959611",
+        "attributes": []
+      }
+    ]
+  },
+  {
+    "supports": [
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 4,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 8,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 11,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 14,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 17,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 20,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 23,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 26,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 29,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 32,
+        "attributes": []
+      },
+      {
+        "text": "As we observed, D594V BRAF, even in the presence of CRAF, did not induce strong ERK activity.",
+        "citation": null,
+        "@id": 35,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 36,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 39,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 42,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 45,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF V600E mutation activates MAPK, affecting cell proliferation, differentiation, and survival.",
+        "citation": null,
+        "@id": 48,
+        "attributes": []
+      },
+      {
+        "text": "BRAF V600E mutation has been reported to abnormally activate MAPK signal pathway.",
+        "citation": null,
+        "@id": 49,
+        "attributes": []
+      },
+      {
+        "text": "This result may explain why H1666 and H508 cells are more sensitive to Trametinib than to Selumetinib, as BRAF mutations in these cell lines activate the ERK pathway in a CRAF dependent manner, similarly to KRAS mutated cells.",
+        "citation": null,
+        "@id": 53,
+        "attributes": []
+      },
+      {
+        "text": "A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF.",
+        "citation": null,
+        "@id": 57,
+        "attributes": []
+      },
+      {
+        "text": "This result may explain why H1666 and H508 cells are more sensitive to Trametinib than to Selumetinib, as BRAF mutations in these cell lines activate the ERK pathway in a CRAF dependent manner, similarly to KRAS mutated cells.",
+        "citation": null,
+        "@id": 58,
+        "attributes": []
+      },
+      {
+        "text": "Some studies also found that constitutive BRAF activity induces MAPK activity and glioma genesis in xenografted mice but eventually leads to tumour senescence.",
+        "citation": null,
+        "@id": 62,
+        "attributes": []
+      },
+      {
+        "text": "Retraction : EGFR Mediated Reactivation of MAPK Signaling Induces Acquired Resistance to GSK2118436 in BRAF V600E-Mutant NSCLC Cell Lines.",
+        "citation": null,
+        "@id": 66,
+        "attributes": []
+      },
+      {
+        "text": "A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF.",
+        "citation": null,
+        "@id": 69,
+        "attributes": []
+      },
+      {
+        "text": "In addition, combined Dabrafenib and Trametinib treatment inhibited Dabrafenib induced ERK activation in CRAF overexpressing monotransfectants.",
+        "citation": null,
+        "@id": 70,
+        "attributes": []
+      },
+      {
+        "text": "Palmitoylation deficient MC1R variants accelerate BRAF (V60E)-driven melanomagenesis.",
+        "citation": null,
+        "@id": 74,
+        "attributes": []
+      },
+      {
+        "text": "In HEK293T cells, Trametinib modestly decreased ERK activity induced by BRAF mutations conferring elevated kinase activity while strongly inhibited kinase impaired BRAF and CRAF induced ERK activation.",
+        "citation": null,
+        "@id": 78,
+        "attributes": []
+      },
+      {
+        "text": "A recent study revealed the superior efficacy of Trametinib versus several other MEK-inhibitors in cells with KRAS mutations and CRAF mediated ERK pathway activation [].",
+        "citation": null,
+        "@id": 79,
+        "attributes": []
+      },
+      {
+        "text": "In BRAFi resistant cells, PAKs phosphorylate CRAF and MEK to reactivate ERK.",
+        "citation": null,
+        "@id": 80,
+        "attributes": []
+      },
+      {
+        "text": "Currently approved RAF inhibitors inhibit RAF monomers but not dimers.",
+        "citation": null,
+        "@id": 85,
+        "attributes": []
+      },
+      {
+        "text": "From November 2012 to October 2015 we have selected 43 BRAF mutated, metastatic melanoma patients, treated with vemurafenib.",
+        "citation": null,
+        "@id": 89,
+        "attributes": []
+      },
+      {
+        "text": "However, kinase impairing BRAF mutations still induce ERK pathway activation when wild-type CRAF, a hetero-dimerization partner of BRAF, is also present in the cell [].",
+        "citation": null,
+        "@id": 92,
+        "attributes": []
+      },
+      {
+        "text": "As previously reported, kinase impaired BRAF mutants can still activate the ERK pathway in a CRAF dependent manner [].",
+        "citation": null,
+        "@id": 95,
+        "attributes": []
+      },
+      {
+        "text": "Inhibitory effect of Dabrafenib on mutant BRAF induced ERK signaling.",
+        "citation": null,
+        "@id": 96,
+        "attributes": []
+      },
+      {
+        "text": "Inhibitory effect of Trametinib on mutant BRAF induced ERK signaling.",
+        "citation": null,
+        "@id": 97,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.",
+        "citation": null,
+        "@id": 100,
+        "attributes": []
+      },
+      {
+        "text": "Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines.",
+        "citation": null,
+        "@id": 104,
+        "attributes": []
+      },
+      {
+        "text": "The IC50 of Dabrafenib to inhibit CRAF is ~ 10-fold less than that of Vemurafenib [ - ].",
+        "citation": null,
+        "@id": 107,
+        "attributes": []
+      },
+      {
+        "text": "The study reveals that two MEK inhibitors (Selumetinib and PD0325901) are less efficient than Trametinib for sustained suppression of CRAF mediated ERK activity.",
+        "citation": null,
+        "@id": 110,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.",
+        "citation": null,
+        "@id": 111,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.",
+        "citation": null,
+        "@id": 114,
+        "attributes": []
+      },
+      {
+        "text": "Therefore, it has yet to be determined whether over time activated CRAF can contribute to kinase independent resistance mechanisms to RAF inhibitors in BRAF mutated cancers [].",
+        "citation": null,
+        "@id": 117,
+        "attributes": []
+      },
+      {
+        "text": "Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines.",
+        "citation": null,
+        "@id": 121,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation.",
+        "citation": null,
+        "@id": 124,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation.",
+        "citation": null,
+        "@id": 127,
+        "attributes": []
+      },
+      {
+        "text": "We observed that Dabrafenib treatment of all HEK293T transfectants resulted in phosphorylation of the transfected CRAF molecule at S338, irrespective of the presence and type of BRAF molecule.",
+        "citation": null,
+        "@id": 130,
+        "attributes": []
+      },
+      {
+        "text": "Of the five up-regulated genes, P21 and P19 encode for inhibitors for the cyclin D and the CDK4/6 complex; CFOS and CJUN are down stream of ERK and JNK kinases, and KSR1 promotes MEK and RAF phosphorylation.",
+        "citation": null,
+        "@id": 134,
+        "attributes": []
+      }
+    ]
+  },
+  {
+    "status": [
+      {
+        "error": "",
+        "success": true
+      }
+    ]
+  }
+]

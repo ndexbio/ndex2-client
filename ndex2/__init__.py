@@ -52,6 +52,25 @@ def get_logger(name, level=logging.DEBUG):
 
 
 def load_matrix_to_ndex(X, X_cols, X_rows, server, username, password, name):
+    """
+    Testing 1
+    :param X: param 1
+    :type X:
+    :param X_cols:
+    :type X_cols:
+    :param X_rows:
+    :type X_rows:
+    :param server:
+    :type server:
+    :param username:
+    :type username:
+    :param password:
+    :type password:
+    :param name:
+    :type name:
+    :return:
+    :rtype:
+    """
     if not isinstance(X, np.ndarray):
         raise Exception('Provided matrix is not of type numpy.ndarray')
     if not isinstance(X_cols, list):
@@ -152,13 +171,19 @@ known_aspects_min = [
     'edges',
     'nodeAttributes',
     'edgeAttributes',
-    'networkAttributes'
+    'networkAttributes',
+    'citations',
+    'nodeCitations',
+    'edgeCitations',
+    'supports',
+    'nodeSupports',
+    'edgeSupports'
     ]
 
 
 
 
-def add_node(nice_cx, name=None, represents=None):
+def __add_node(nice_cx, name=None, represents=None):
     if node_id_lookup.get(name) is None:
         source_id = nice_cx.get_next_node_id()
         node_id_lookup[name] = source_id
@@ -169,7 +194,7 @@ def add_node(nice_cx, name=None, represents=None):
 
 
 def create_empty_nice_cx(user_agent=''):
-    my_nicecx = NiceCXNetwork(user_agent)
+    my_nicecx = NiceCXNetwork()
     return my_nicecx
 
 
@@ -291,7 +316,7 @@ def create_nice_cx_from_cx(cx, user_agent=''):
 
     niceCxBuilder = NiceCXBuilder()
 
-    my_nicecx = NiceCXNetwork()
+    #my_nicecx = NiceCXNetwork()
 
     if cx:
         # ===================
@@ -309,7 +334,7 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'networkAttributes' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'networkAttributes')
             for network_item in objects:
-                niceCxBuilder.nice_cx.networkAttributes.append(network_item)
+                niceCxBuilder._add_network_attributes_from_fragment(network_item)
 
         # ===================
         # NODES
@@ -317,7 +342,8 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'nodes' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodes')
             for node_item in objects:
-                niceCxBuilder.nice_cx.nodes[node_item.get('@id')] = node_item
+                #niceCxBuilder.nice_cx.nodes[node_item.get('@id')] = node_item
+                niceCxBuilder._add_node_from_fragment(node_item)
 
         # ===================
         # EDGES
@@ -325,7 +351,8 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'edges' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edges')
             for edge_item in objects:
-                niceCxBuilder.nice_cx.edges[edge_item.get('@id')] = edge_item
+                #niceCxBuilder.nice_cx.edges[edge_item.get('@id')] = edge_item
+                niceCxBuilder._add_edge_from_fragment(edge_item)
 
         # ===================
         # NODE ATTRIBUTES
@@ -333,10 +360,11 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'nodeAttributes' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeAttributes')
             for att in objects:
-                if niceCxBuilder.nice_cx.nodeAttributes.get(att.get('po')) is None:
-                    niceCxBuilder.nice_cx.nodeAttributes[att.get('po')] = []
-
-                niceCxBuilder.nice_cx.nodeAttributes[att.get('po')].append(att)
+                niceCxBuilder._add_node_attribute_from_fragment(att)
+                #if niceCxBuilder.nice_cx.nodeAttributes.get(att.get('po')) is None:
+                #    niceCxBuilder.nice_cx.nodeAttributes[att.get('po')] = []
+                #
+                #niceCxBuilder.nice_cx.nodeAttributes[att.get('po')].append(att)
 
         # ===================
         # EDGE ATTRIBUTES
@@ -344,10 +372,11 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'edgeAttributes' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeAttributes')
             for att in objects:
-                if niceCxBuilder.nice_cx.edgeAttributes.get(att.get('po')) is None:
-                    niceCxBuilder.nice_cx.edgeAttributes[att.get('po')] = []
-
-                    niceCxBuilder.nice_cx.edgeAttributes[att.get('po')].append(att)
+                niceCxBuilder._add_edge_attribute_from_fragment(att)
+                #if niceCxBuilder.nice_cx.edgeAttributes.get(att.get('po')) is None:
+                #    niceCxBuilder.nice_cx.edgeAttributes[att.get('po')] = []
+                #
+                #niceCxBuilder.nice_cx.edgeAttributes[att.get('po')].append(att)
 
         # ===================
         # CITATIONS
@@ -355,9 +384,10 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'citations' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'citations')
             for cit in objects:
-                my_nicecx.citations[cit.get('@id')] = cit
+                niceCxBuilder._add_citation_from_fragment(cit)
+                #my_nicecx.citations[cit.get('@id')] = cit
 
-            my_nicecx.add_metadata_stub('citations')
+            #my_nicecx.add_metadata_stub('citations')
 
         # ===================
         # SUPPORTS
@@ -365,9 +395,10 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'supports' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'supports')
             for sup in objects:
-                my_nicecx.supports[sup.get('@id')] = sup
+                niceCxBuilder._add_supports_from_fragment(sup)
+                #my_nicecx.supports[sup.get('@id')] = sup
 
-            my_nicecx.add_metadata_stub('supports')
+            #my_nicecx.add_metadata_stub('supports')
 
         # ===================
         # EDGE SUPPORTS
@@ -375,10 +406,11 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'edgeSupports' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeSupports')
             for add_this_edge_sup in objects:
-                for po_id in add_this_edge_sup.get('po'):
-                    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
+                niceCxBuilder._add_edge_supports_from_fragment(add_this_edge_sup)
+                #for po_id in add_this_edge_sup.get('po'):
+                #    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
 
-            my_nicecx.add_metadata_stub('edgeSupports')
+            #my_nicecx.add_metadata_stub('edgeSupports')
 
         # ===================
         # NODE CITATIONS
@@ -386,10 +418,11 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'nodeCitations' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeCitations')
             for node_cit in objects:
-                for po_id in node_cit.get('po'):
-                    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
+                niceCxBuilder._add_node_citations_from_fragment(node_cit)
+                #for po_id in node_cit.get('po'):
+                #    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
 
-            my_nicecx.add_metadata_stub('nodeCitations')
+            #my_nicecx.add_metadata_stub('nodeCitations')
 
         # ===================
         # EDGE CITATIONS
@@ -397,10 +430,11 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'edgeCitations' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeCitations')
             for edge_cit in objects:
-                for po_id in edge_cit.get('po'):
-                    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
+                niceCxBuilder._add_edge_citations_from_fragment(edge_cit)
+                #for po_id in edge_cit.get('po'):
+                #    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
 
-            my_nicecx.add_metadata_stub('edgeCitations')
+            #my_nicecx.add_metadata_stub('edgeCitations')
 
         # ===================
         # OPAQUE ASPECTS
@@ -409,10 +443,12 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             #TODO - Add context to builder
             if oa == '@context':
                 objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
-                niceCxBuilder.nice_cx.set_namespaces(objects)
+                niceCxBuilder.set_context(objects) #nice_cx.set_namespaces(objects)
             else:
                 objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
-                niceCxBuilder.nice_cx.opaqueAspects[oa] = objects
+                niceCxBuilder.add_opaque_aspect(oa, objects)
+
+                #niceCxBuilder.nice_cx.opaqueAspects[oa] = objects
 
         return niceCxBuilder.get_nice_cx()
     else:
@@ -570,7 +606,7 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
     niceCxBuilder = NiceCXBuilder()
 
     if server and uuid:
-        my_nicecx = NiceCXNetwork(user_agent)
+        my_nicecx = NiceCXNetwork()
 
         # ===================
         # METADATA
@@ -594,14 +630,16 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'networkAttributes' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'networkAttributes', server, username, password)
             for network_item in objects:
-                niceCxBuilder.add_network_attribute(network_item.get('n'), network_item.get('v'), network_item.get('d'))
+                niceCxBuilder._add_network_attributes_from_fragment(network_item)
+                #niceCxBuilder.add_network_attribute(network_item.get('n'), network_item.get('v'), network_item.get('d'))
 
         # ===================
         # @CONTEXT
         # ===================
         if '@context' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, '@context', server, username, password)
-            niceCxBuilder.set_context(objects)
+            niceCxBuilder.set_context(objects) #nice_cx.set_namespaces(objects)
+            #niceCxBuilder.set_context(objects)
 
         # ===================
         # NODES
@@ -609,7 +647,8 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'nodes' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'nodes', server, username, password)
             for node_item in objects:
-                niceCxBuilder.add_node(node_item.get('n'), node_item.get('r'), id=node_item.get('@id'))
+                niceCxBuilder._add_node_from_fragment(node_item)
+                #niceCxBuilder.add_node(node_item.get('n'), node_item.get('r'), id=node_item.get('@id'))
 
         # ===================
         # EDGES
@@ -617,8 +656,10 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'edges' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'edges', server, username, password)
             for edge_item in objects:
-                niceCxBuilder.add_edge(source=edge_item.get('s'), target=edge_item.get('t'),
-                                       interaction=edge_item.get('i'), id=edge_item.get('@id'))
+                niceCxBuilder._add_edge_from_fragment(edge_item)
+
+                #niceCxBuilder.add_edge(source=edge_item.get('s'), target=edge_item.get('t'),
+                #                       interaction=edge_item.get('i'), id=edge_item.get('@id'))
 
         # ===================
         # NODE ATTRIBUTES
@@ -626,7 +667,9 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'nodeAttributes' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'nodeAttributes', server, username, password)
             for att in objects:
-                niceCxBuilder.add_node_attribute(att.get('po'), att.get('n'), att.get('v'), type=att.get('d'))
+                niceCxBuilder._add_node_attribute_from_fragment(att)
+
+                #niceCxBuilder.add_node_attribute(att.get('po'), att.get('n'), att.get('v'), type=att.get('d'))
 
         # ===================
         # EDGE ATTRIBUTES
@@ -634,8 +677,10 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'edgeAttributes' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'edgeAttributes', server, username, password)
             for att in objects:
-                niceCxBuilder.add_edge_attribute(property_of=att.get('po'), name=att.get('n'),
-                                                 values=att.get('v'), type=att.get('d'))
+                niceCxBuilder._add_edge_attribute_from_fragment(att)
+
+                #niceCxBuilder.add_edge_attribute(property_of=att.get('po'), name=att.get('n'),
+                #                                 values=att.get('v'), type=att.get('d'))
 
         # ===================
         # CITATIONS
@@ -643,9 +688,10 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'citations' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'citations', server, username, password)
             for cit in objects:
-                my_nicecx.citations[cit.get('@id')] = cit
+                niceCxBuilder._add_citation_from_fragment(cit)
+                #my_nicecx.citations[cit.get('@id')] = cit
 
-            my_nicecx.add_metadata_stub('citations')
+            #my_nicecx.add_metadata_stub('citations')
 
         # ===================
         # SUPPORTS
@@ -653,9 +699,11 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'supports' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'supports', server, username, password)
             for sup in objects:
-                my_nicecx.supports[sup.get('@id')] = sup
+                niceCxBuilder._add_supports_from_fragment(sup)
 
-            my_nicecx.add_metadata_stub('supports')
+                #my_nicecx.supports[sup.get('@id')] = sup
+
+            #my_nicecx.add_metadata_stub('supports')
 
         # ===================
         # EDGE SUPPORTS
@@ -663,10 +711,12 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'edgeSupports' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'edgeSupports', server, username, password)
             for add_this_edge_sup in objects:
-                for po_id in add_this_edge_sup.get('po'):
-                    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
+                niceCxBuilder._add_edge_supports_from_fragment(add_this_edge_sup)
 
-            my_nicecx.add_metadata_stub('edgeSupports')
+                #for po_id in add_this_edge_sup.get('po'):
+                #    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
+
+            #my_nicecx.add_metadata_stub('edgeSupports')
 
         # ===================
         # NODE CITATIONS
@@ -674,10 +724,12 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'nodeCitations' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'nodeCitations', server, username, password)
             for node_cit in objects:
-                for po_id in node_cit.get('po'):
-                    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
+                niceCxBuilder._add_node_citations_from_fragment(node_cit)
 
-            my_nicecx.add_metadata_stub('nodeCitations')
+                #for po_id in node_cit.get('po'):
+                #    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
+
+            #my_nicecx.add_metadata_stub('nodeCitations')
 
         # ===================
         # EDGE CITATIONS
@@ -685,10 +737,11 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
         if 'edgeCitations' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, 'edgeCitations', server, username, password)
             for edge_cit in objects:
-                for po_id in edge_cit.get('po'):
-                    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
+                niceCxBuilder._add_edge_citations_from_fragment(edge_cit)
+                #for po_id in edge_cit.get('po'):
+                #    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
 
-            my_nicecx.add_metadata_stub('edgeCitations')
+            #my_nicecx.add_metadata_stub('edgeCitations')
 
         # ===================
         # OPAQUE ASPECTS

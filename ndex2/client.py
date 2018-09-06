@@ -10,7 +10,13 @@ import decimal
 import numpy
 import base64
 
-from urllib.parse import urljoin
+
+try:
+    from urllib.parse import urljoin
+    #from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urljoin
+
 from requests import exceptions as req_except
 import time
 

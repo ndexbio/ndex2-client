@@ -18,18 +18,24 @@ path_this = os.path.dirname(os.path.abspath(__file__))
 class TestLoadByAspects(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
     def test_node_data_types2(self):
-        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='e70090bc-47a5-11e8-a935-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
-        found_int_type = False
+        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='a18fd45e-68d5-11e7-961c-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
+        found_double_type = False
         for id, node in niceCx.get_nodes():
             abc_node_attrs = niceCx.get_node_attributes(node)
 
             if abc_node_attrs is not None:
                 for node_attr in abc_node_attrs:
-                    if node_attr.get('d') == 'int':
-                        found_int_type = True
+                    if node_attr.get('d') == 'double':
+                        found_double_type = True
                         break
 
-        self.assertTrue(found_int_type)
+
+
+
+
+
+
+        self.assertTrue(found_double_type)
 
         print(niceCx.__str__())
 
@@ -50,7 +56,7 @@ class TestLoadByAspects(unittest.TestCase):
 
                 if abc_node_attrs is not None:
                     for node_attr in abc_node_attrs:
-                        if node_attr.get_data_type() == ATTRIBUTE_DATA_TYPE.INTEGER:
+                        if node_attr.get('d') == 'integer':
                             found_int_type = True
 
             self.assertTrue(found_int_type)
@@ -102,15 +108,15 @@ class TestLoadByAspects(unittest.TestCase):
 
         #print(niceCx_full.__str__())
 
-        abc_node_attrs = niceCx_full.get_node_attributes('ABC')
+        abc_node_attrs = niceCx_full.get_node_attributes(0)
 
         found_int_type = False
         found_float_type = False
         if abc_node_attrs is not None:
             for node_attr in abc_node_attrs:
-                if node_attr.get_data_type() == ATTRIBUTE_DATA_TYPE.INTEGER:
+                if node_attr.get('d') == 'integer':
                     found_int_type = True
-                if node_attr.get_data_type() == ATTRIBUTE_DATA_TYPE.FLOAT:
+                if node_attr.get('d') == 'double':
                     found_float_type = True
 
         found_edge_float_type = False
@@ -118,7 +124,7 @@ class TestLoadByAspects(unittest.TestCase):
             edge_attrs = niceCx_full.get_edge_attributes(edge)
             if edge_attrs is not None:
                 for edge_attr in edge_attrs:
-                    if edge_attr.get_data_type() == ATTRIBUTE_DATA_TYPE.FLOAT:
+                    if edge_attr.get('d') == 'double':
                         found_edge_float_type = True
 
         self.assertTrue(found_int_type)
@@ -129,11 +135,11 @@ class TestLoadByAspects(unittest.TestCase):
     def test_data_types_with_special_chars(self):
         path_to_network = os.path.join(path_this, 'Metabolism_of_RNA_data_types.cx')
 
-        with open(path_to_network, 'rU') as data_types_cx:
+        with open(path_to_network, 'r') as data_types_cx:
             #============================
             # BUILD NICECX FROM CX FILE
             #============================
-            niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(data_types_cx))
+            niceCx = ndex2.create_nice_cx_from_raw_cx(cx=json.load(data_types_cx))
 
             found_list_of_strings_type = False
             for id, node in niceCx.get_nodes():
@@ -141,7 +147,7 @@ class TestLoadByAspects(unittest.TestCase):
 
                 if abc_node_attrs is not None:
                     for node_attr in abc_node_attrs:
-                        if node_attr.get_data_type() == ATTRIBUTE_DATA_TYPE.LIST_OF_STRING:
+                        if node_attr.get('d') == 'list_of_string':
                             found_list_of_strings_type = True
 
             self.assertTrue(found_list_of_strings_type)
@@ -165,7 +171,7 @@ class TestLoadByAspects(unittest.TestCase):
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         spec_char_network_uuid = upload_message.split('\\')[-1]
 
-        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='fc63173e-df66-11e7-adc1-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
+        #niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='fc63173e-df66-11e7-adc1-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
 
         self.assertTrue(upload_message)
 

@@ -9,9 +9,10 @@ import networkx as nx
 import ndex2
 import ndex2.client as nc
 import os
-from ndex2.NiceCXNetwork import NiceCXNetwork
+from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import DecimalEncoder
-from ndex2cx.NiceCXBuilder import NiceCXBuilder
+from ndex2cx.nice_cx_builder import NiceCXBuilder
+import numpy as np
 
 upload_server = 'dev.ndexbio.org'
 upload_username = 'scratch'
@@ -20,29 +21,22 @@ upload_password = 'scratch'
 path_this = os.path.dirname(os.path.abspath(__file__))
 
 class TestLoadByAspects(unittest.TestCase):
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_pandas_with_headers2(self):
-        print('Testing: CTD_genes_pathways.txt')
-        path_to_network = os.path.join(path_this, 'CTD_genes_pathways.txt')
+        print('Testing: CTD_genes_pathways_small.txt')
+        path_to_network = os.path.join(path_this, 'CTD_genes_pathways_small.txt')
 
         with open(path_to_network, 'r') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
 
-            niceCx = NiceCXNetwork()
             niceCx = ndex2.create_nice_cx_from_pandas(df, source_field='GeneSymbol', target_field='PathwayName', source_node_attr=['GeneID'], target_node_attr=['Pathway Source'], edge_attr=[])
 
-            #for k, v in niceCx.get_edges():
-            #    print(k)
-            #    print(v)
-            #niceCx.create_from_pandas(df, source_field='GeneSymbol', target_field='PathwayName', source_node_attr=['GeneID'], target_node_attr=['Pathway Source'], edge_attr=[])
-            #my_cx_json = niceCx.to_cx()
-            #print(json.dumps(my_cx_json))
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_load_nodes(self):
         print('Testing: Manual network build')
         niceCxBuilder = NiceCXBuilder()
@@ -50,8 +44,11 @@ class TestLoadByAspects(unittest.TestCase):
         gene_list = ['OR2J3', 'AANAT', 'CCDC158', 'PLAC8L1', 'CLK1', 'GLTP', 'PITPNM2','TRAPPC8', 'EIF2S2', 'ST14',
                      'NXF1', 'H3F3B','FOSB', 'MTMR4', 'USP46', 'CDH11', 'ENAH', 'CNOT7', 'STK39', 'CAPZA1', 'STIM2',
                      'DLL4', 'WEE1', 'MYO1D', 'TEAD3']
-        for i in range(1,10):
-            node_id = niceCxBuilder.add_node(name='node%s' % str(i), represents=gene_list[i])
+        max_edge = 1004
+        for i in range(1,max_edge):
+            node_id = niceCxBuilder.add_node(name='node%s' % str(i), represents=gene_list[i % 10])
+            if i > 1 and i < (max_edge - 1):
+                niceCxBuilder.add_edge(i - 1, i, 'neighbor-of')
 
             #niceCx.create_node(id=i, node_name='node%s' % str(i), node_represents=gene_list[i])
 
@@ -61,7 +58,7 @@ class TestLoadByAspects(unittest.TestCase):
         self.assertTrue(upload_message)
         #print(niceCx.to_cx())
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_load_edges(self):
         print('Testing: NiceCXBuilder')
         niceCxBuilder = NiceCXBuilder()
@@ -77,7 +74,7 @@ class TestLoadByAspects(unittest.TestCase):
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_pandas_loading(self):
         print('Testing: MDA1.txt')
         path_to_network = os.path.join(path_this, 'MDA1.txt')
@@ -91,7 +88,7 @@ class TestLoadByAspects(unittest.TestCase):
             for index, row in df.iterrows():
                 node_id_1 = niceCxBuilder.add_node(name=row['Bait'], represents=row['Bait'])
                 node_id_2 = niceCxBuilder.add_node(name=row['Prey'], represents=row['Prey'])
-                niceCxBuilder.add_edge(id=1, source=node_id_1, target=node_id_2, interaction='interacts-with')
+                niceCxBuilder.add_edge(id=index, source=node_id_1, target=node_id_2, interaction='interacts-with')
 
             niceCx = niceCxBuilder.get_nice_cx()
 
@@ -101,7 +98,7 @@ class TestLoadByAspects(unittest.TestCase):
         self.assertIsNotNone(my_df)
         #print(pd.DataFrame(my_df))
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_pandas_no_headers(self):
         print('Testing: SIMPLE.txt')
         path_to_network = os.path.join(path_this, 'SIMPLE.txt')
@@ -113,7 +110,7 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_pandas_with_headers(self):
         print('Testing: MDA1.txt')
         path_to_network = os.path.join(path_this, 'MDA1.txt')
@@ -130,16 +127,16 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_server(self):
-        print('Testing: Create from server (uuid:75bf1e85-1bc7-11e6-a298-06603eb7f303)')
+        print('Testing: Create from server with 548970 edges (uuid:75bf1e85-1bc7-11e6-a298-06603eb7f303)')
         #niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='72ef5c3a-caff-11e7-ad58-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', username='scratch', password='scratch', uuid='75bf1e85-1bc7-11e6-a298-06603eb7f303') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
 
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_pandas_no_headers_3_columns(self):
         print('Testing: SIMPLE3.txt')
         path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
@@ -155,7 +152,7 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") #PASS
+    @unittest.skip("Temporary skipping") #PASS
     def test_create_from_networkx(self):
         print('Testing: SIMPLE3.txt with DictReader')
         path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
@@ -170,7 +167,8 @@ class TestLoadByAspects(unittest.TestCase):
             for row in reader:
                 G.add_node(row.get('s'), test1='test1_s', test2='test2_s')
                 G.add_node(row.get('t'), test1='test1_t', test2='test2_t')
-                G.add_edge(row.get('s'), row.get('t'), {'interaction': 'controls-production-of', 'test3': 'test3'})
+                G.add_edges_from([(row.get('s'), row.get('t'), {'interaction': 'controls-production-of', 'test3': 'test3',
+                                                        'non-number': np.nan})])
 
             #====================================
             # BUILD NICECX FROM NETWORKX GRAPH
@@ -180,7 +178,7 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_cx_file(self):
         print('Testing: MEDIUM_NETWORK.cx')
         path_to_network = os.path.join(path_this, 'MEDIUM_NETWORK.cx')
@@ -189,13 +187,13 @@ class TestLoadByAspects(unittest.TestCase):
             #====================================
             # BUILD NICECX FROM CX OBJECT
             #====================================
-            niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
+            niceCx = ndex2.create_nice_cx_from_raw_cx(cx=json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
             my_cx = niceCx.to_cx()
             #print(my_cx)
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_cx_file2(self):
         print('Testing: CitationsAndSupports.cx')
         path_to_network = os.path.join(path_this, 'CitationsAndSupports.cx')
@@ -204,13 +202,13 @@ class TestLoadByAspects(unittest.TestCase):
             #====================================
             # BUILD NICECX FROM CX OBJECT
             #====================================
-            niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(ras_cx))
+            niceCx = ndex2.create_nice_cx_from_raw_cx(cx=json.load(ras_cx))
             my_cx = niceCx.to_cx()
             #print(my_cx)
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_cx_file_with_context(self):
         print('Testing: Metabolism_of_RNA_data_types.cx')
         path_to_network = os.path.join(path_this, 'Metabolism_of_RNA_data_types.cx')
@@ -219,13 +217,13 @@ class TestLoadByAspects(unittest.TestCase):
             #====================================
             # BUILD NICECX FROM CX OBJECT
             #====================================
-            niceCx = ndex2.create_nice_cx_from_cx(json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
+            niceCx = ndex2.create_nice_cx_from_raw_cx(json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
             my_cx = niceCx.to_cx()
             #print(my_cx)
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_server_1(self):
         print('Testing: Create from serve (uuid:b7190ca4-aec2-11e7-9b0a-06832d634f41)')
         #====================================
@@ -235,40 +233,35 @@ class TestLoadByAspects(unittest.TestCase):
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_export_to_cx_file(self):
         print('Testing: MEDIUM_NETWORK.cx')
         path_to_network = os.path.join(path_this, 'MEDIUM_NETWORK.cx')
 
         with open(path_to_network, 'r') as ras_cx:
-            #====================================
-            # BUILD NICECX FROM PANDAS DATAFRAME
-            #====================================
-            niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
+            niceCx = ndex2.create_nice_cx_from_raw_cx(cx=json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
+            niceCx.apply_template('public.ndexbio.org', '51247435-1e5f-11e8-b939-0ac135e8bacf')
+
             nice_networkx = niceCx.to_networkx()
-            #my_cx = niceCx.to_cx()
-            #print(nice_networkx)
+
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_cx_file_with_position(self):
         print('Testing: network_with_position.cx')
         path_to_network = os.path.join(path_this, 'network_with_position.cx')
 
         with open(path_to_network, 'r') as ras_cx:
-            #====================================
-            # BUILD NICECX FROM PANDAS DATAFRAME
-            #====================================
-            niceCx = ndex2.create_nice_cx_from_cx(cx=json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
+            niceCx = ndex2.create_nice_cx_from_raw_cx(cx=json.load(ras_cx)) #NiceCXNetwork(cx=json.load(ras_cx))
             nice_networkx = niceCx.to_networkx()
-            #my_cx = niceCx.to_cx()
+
             niceCx_from_netx = ndex2.create_nice_cx_from_networkx(nice_networkx)
-            #print(nice_networkx)
+
             upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_manual_build(self):
         print('Testing: Build from empty nice cx')
         niceCx = ndex2.create_empty_nice_cx() #NiceCXNetwork()
@@ -284,9 +277,10 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx.add_node_attribute(property_of=mouse_node_id, name='Color', values='Gray')
         niceCx.add_node_attribute(property_of=bird_node_id, name='Color', values='Blue')
 
+        upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         #print(niceCx)
 
-    #@unittest.skip("Temporary skipping")
+    @unittest.skip("Temporary skipping")
     def test_create_from_small_cx(self):
         print('Testing: Pandas DataFrame.from_items')
         my_cx = [
@@ -307,18 +301,18 @@ class TestLoadByAspects(unittest.TestCase):
         df = pd.DataFrame.from_items([('Source', ['ABC', 'DEF']),
                                         ('Target', ['DEF', 'XYZ']),
                                         ('Interaction', ['interacts-with', 'neighbor-of']),
-                                        ('EdgeProp', ['Edge property 1', 'Edge property 2'])])
+                                        ('EdgeProp', [np.float(0.843), 1.2345])])
 
         #niceCx = ndex2.create_empty_nice_cx() #NiceCXNetwork()
         #niceCx.create_from_pandas(df, source_field='Source', target_field='Target', edge_attr=['EdgeProp'], edge_interaction='Interaction')
 
         niceCx = ndex2.create_nice_cx_from_pandas(df, source_field='Source', target_field='Target', edge_attr=['EdgeProp'], edge_interaction='Interaction')
-        niceCx = '' #NiceCXNetwork(server='public.ndexbio.org', uuid='f1dd6cc3-0007-11e6-b550-06603eb7f303')
+        #niceCx = '' #NiceCXNetwork(server='public.ndexbio.org', uuid='f1dd6cc3-0007-11e6-b550-06603eb7f303')
 
-        #upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+        upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         #print(niceCx)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_server_manipulate_and_save(self):
         print('Testing: Create from server and manupulate (uuid:51247435-1e5f-11e8-b939-0ac135e8bacf)')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='51247435-1e5f-11e8-b939-0ac135e8bacf')
@@ -334,7 +328,7 @@ class TestLoadByAspects(unittest.TestCase):
         upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_server_manipulate_and_save2(self):
         print('Testing: Create from server and generate networkx (uuid:51247435-1e5f-11e8-b939-0ac135e8bacf)')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='51247435-1e5f-11e8-b939-0ac135e8bacf')
@@ -350,10 +344,12 @@ class TestLoadByAspects(unittest.TestCase):
         niceCx_from_netx.apply_template('public.ndexbio.org', '51247435-1e5f-11e8-b939-0ac135e8bacf')
         niceCx_from_netx.set_name('Round trip from server to networkx to NDEx')
 
+        print(niceCx_from_netx)
+
         upload_message = niceCx_from_netx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_tsv_manipulate_and_save(self):
         print('Testing: mgdb_mutations.txt')
         path_to_network = os.path.join(path_this, 'mgdb_mutations.txt')
@@ -383,7 +379,7 @@ class TestLoadByAspects(unittest.TestCase):
 
 
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_create_from_big_tsv(self):
         print('Testing: identifier_mappings_small.txt')
         path_to_network = os.path.join(path_this, 'identifier_mappings_small.txt')
@@ -402,6 +398,8 @@ class TestLoadByAspects(unittest.TestCase):
 
     @unittest.skip("Temporary skipping") # PASS
     def test_update_style(self):
+        print('!!!!! WARNING !!!!!')
+        print('This test will load a network with 63 Million edges.  It will take a while to run and consume a lot of RAM')
         test_uuid = '83013c93-75ca-11e8-8b82-525400c25d22'
         test_user = 'scratch2'
         test_pass = 'scratch2'
@@ -417,9 +415,9 @@ class TestLoadByAspects(unittest.TestCase):
         message = niceCx.update_to(test_uuid, test_server, test_user, test_pass)
         print('FINISHED')
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_netx_plot(self):
-        print('Testing: Get user networks (user: scratch)')
+        print('Testing: Get user networks (user: scratch) and networkx building')
         my_ndex=ndex2.client.Ndex2('http://test.ndexbio.org', 'scratch', 'scratch')
         my_ndex.update_status()
 
@@ -452,7 +450,8 @@ class TestLoadByAspects(unittest.TestCase):
 
     @unittest.skip("Temporary skipping") # PASS
     def test_encoding_file(self):
-        pass
+        print(nx.__version__)
+        #pass
         #with open('/Users/aarongary/Development/DataSets/Alzheimer Disease.graphml', 'r', encoding='utf-8', errors='ignore') as gml:
         #    gml_read = gml.read()
 

@@ -7,20 +7,8 @@ import base64
 import sys
 #from urllib import urlopen
 from ndex2.client import Ndex2
-from ndex2.NiceCXNetwork import NiceCXNetwork
-#from nicecxModel.cx.aspects.NodeElement import NodeElement
-#from nicecxModel.cx.aspects.EdgeElement import EdgeElement
-#from nicecxModel.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
-#from nicecxModel.cx.aspects.NodeAttributesElement import NodeAttributesElement
-#from nicecxModel.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
-#from nicecxModel.cx.aspects.CitationElement import CitationElement
-#from nicecxModel.cx.aspects.SupportElement import SupportElement
-#from nicecxModel.cx.aspects.AspectElement import AspectElement
-#from nicecxModel.metadata.MetaDataElement import MetaDataElement
-#from nicecxModel.cx.aspects import ATTRIBUTE_DATA_TYPE
-#from nicecxModel.cx.aspects.SimpleNode import SimpleNode
-#from nicecxModel.cx import CX_CONSTANTS
-#from nicecxModel.cx import known_aspects, known_aspects_min
+from ndex2.nice_cx_network import NiceCXNetwork
+import ndex2
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
@@ -38,9 +26,11 @@ class NiceCXBuilder(object):
 
         self.node_inventory = {}
         self.node_attribute_inventory = []
+        self.node_attribute_map = {}
 
         self.edge_inventory = {}
         self.edge_attribute_inventory = []
+        self.edge_attribute_map = {}
 
         self.opaque_aspect_inventory = []
 
@@ -179,7 +169,7 @@ class NiceCXBuilder(object):
 
         return edge_id
 
-    def add_node_attribute(self, property_of, name, value, type=None):
+    def add_node_attribute(self, property_of, name, values, type=None):
         """
         Set an attribute of a node, where the node may be specified by its id or passed in as a node dict.
 
@@ -194,10 +184,51 @@ class NiceCXBuilder(object):
         :return: None
         :rtype: None
         """
-        add_this_node_attribute = {'po': property_of, 'n': name, 'v': value}
+        if property_of is None:
+            raise TypeError('Node value is None')
+
+        if name is None:
+            raise TypeError('Property name is None')
+
+        if values is None:
+            raise TypeError('Attribute value is None')
+
+        add_this_node_attribute = {'po': property_of, 'n': name, 'v': values}
+
+
+        if self.node_attribute_map.get(property_of) is None:
+            self.node_attribute_map[property_of] = {}
+        elif self.node_attribute_map[property_of].get(name) is not None:
+            return
+
         if type:
+            if type == 'float' or type == 'double':
+                type = 'double'
+                try:
+                    if not isinstance(values, float):
+                        add_this_node_attribute['v'] = float(values)
+                except ValueError as e:
+                    raise ValueError('Value was not of type %s' % type)
+            if type == 'list_of_float' or type == 'list_of_double':
+                try:
+                    if isinstance(values, list):
+                        for value in values:
+                            if not isinstance(value, float):
+                                value = float(value)
+                except ValueError as e:
+                    raise ValueError('Value was not of type %s' % type)
+
+                type = 'list_of_double'
+
             add_this_node_attribute['d'] = type
-        self.node_attribute_inventory.append(add_this_node_attribute)
+        else:
+            use_this_value, attr_type = ndex2._infer_data_type(values)
+            add_this_node_attribute['v'] = use_this_value
+            add_this_node_attribute['d'] = attr_type
+
+        if add_this_node_attribute['v'] is not None:
+            self.node_attribute_inventory.append(add_this_node_attribute)
+            self.node_attribute_map[property_of][name] = True
 
     def add_edge_attribute(self, property_of=None, name=None, values=None, type=None):
         """
@@ -222,10 +253,49 @@ class NiceCXBuilder(object):
         :return: None
         :rtype: None
         """
+        if property_of is None:
+            raise TypeError('Edge value is None')
+
+        if name is None:
+            raise TypeError('Property name is None')
+
+        if values is None:
+            raise TypeError('Attribute value is None')
+
         add_this_edge_attribute = {'po': property_of, 'n': name, 'v': values}
+
+        if self.edge_attribute_map.get(property_of) is None:
+            self.edge_attribute_map[property_of] = {}
+        elif self.edge_attribute_map[property_of].get(name) is not None:
+            return
+
         if type:
+            if type == 'float' or type == 'double':
+                type = 'double'
+                try:
+                    if not isinstance(values, float):
+                        add_this_edge_attribute['v'] = float(values)
+                except ValueError as e:
+                    raise ValueError('Value was not of type %s' % type)
+            if type == 'list_of_float' or  type == 'list_of_double':
+                try:
+                    if isinstance(values, list):
+                        for value in values:
+                            if not isinstance(value, float):
+                                value = float(value)
+                except ValueError as e:
+                    raise ValueError('Value was not of type %s' % type)
+
+                type = 'list_of_double'
             add_this_edge_attribute['d'] = type
-        self.edge_attribute_inventory.append(add_this_edge_attribute)
+        else:
+            use_this_value, attr_type = ndex2._infer_data_type(values)
+            add_this_edge_attribute['v'] = use_this_value
+            add_this_edge_attribute['d'] = attr_type
+
+        if add_this_edge_attribute['v'] is not None:
+            self.edge_attribute_inventory.append(add_this_edge_attribute)
+            self.edge_attribute_map[property_of][name] = True
 
     def add_opaque_aspect(self, oa_name, oa_list):
         self.opaque_aspect_inventory.append({oa_name: oa_list})

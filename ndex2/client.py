@@ -26,7 +26,11 @@ DEFAULT_SERVER = "http://public.ndexbio.org"
 
 
 class Ndex2:
-    """ A class to facilitate communication with an NDEx server."""
+    """ A class to facilitate communication with an NDEx server.
+
+        If host is not provided it will default to the NDEx public server.  UUID is required
+
+    """
     def __init__(self, host=None, username=None, password=None, update_status=False, debug=False, user_agent=''):
         """
         Creates a connection to a particular NDEx server.
@@ -264,7 +268,7 @@ class Ndex2:
 
 # Network methods
 
-    def save_new_network(self, cx, visibility=None, indexed_fields=None):
+    def save_new_network(self, cx, visibility=None):
         """
         Create a new network (cx) on the server
 
@@ -272,11 +276,11 @@ class Ndex2:
         :type cx: list of dicts
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
-        :param indexed_fields: Fields to be indexed
-        :type indexed_fields: list of strings
         :return: Response data
         :rtype: string or dict
         """
+        indexed_fields = None
+        #TODO add functionality for indexed_fields when it's supported by the server
         if len(cx) > 0:
             if cx[len(cx) - 1] is not None:
                 if cx[len(cx) - 1].get('status') is None:
@@ -290,11 +294,11 @@ class Ndex2:
             else:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 
-            return self.save_cx_stream_as_new_network(stream, visibility=visibility, indexed_fields=indexed_fields)
+            return self.save_cx_stream_as_new_network(stream, visibility=visibility)
         else:
             raise IndexError("Cannot save empty CX.  Please provide a non-empty CX document.")
 
-    def save_cx_stream_as_new_network(self, cx_stream, visibility=None, indexed_fields=None):
+    def save_cx_stream_as_new_network(self, cx_stream, visibility=None):
         """
         Create a new network from a CX stream.
 
@@ -302,11 +306,12 @@ class Ndex2:
         :type cx_stream: BytesIO
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
-        :param indexed_fields: Fields to be indexed
-        :type indexed_fields: list of strings
         :return: Response data
         :rtype: string or dict
         """
+
+        indexed_fields = None
+        #TODO add functionality for indexed_fields when it's supported by the server
 
         self.require_auth()
         query_string = None
@@ -391,7 +396,7 @@ class Ndex2:
 
         return self.get_stream(route)
 
-    def get_neighborhood_as_cx_stream(self, network_id, search_string, search_depth=1, edge_limit=2500):
+    def get_neighborhood_as_cx_stream(self, network_id, search_string, search_depth=1, edge_limit=2500, error_when_limit=True):
         """
         Get a CX stream for a subnetwork of the network specified by UUID network_id and a traversal of search_depth
         steps around the nodes found by search_string.
@@ -404,6 +409,8 @@ class Ndex2:
         :type search_depth: int
         :param edge_limit: The maximum size of the neighborhood.
         :type edge_limit: int
+        :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
+        :type error_when_limit: boolean
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
@@ -415,7 +422,8 @@ class Ndex2:
 
         post_data = {'searchString': search_string,
                      'searchDepth': search_depth,
-                     'edgeLimit': edge_limit}
+                     'edgeLimit': edge_limit,
+                     'errorWhenLimitIsOver': error_when_limit}
         post_json = json.dumps(post_data)
         return self.post_stream(route, post_json=post_json)
 
@@ -630,6 +638,12 @@ class Ndex2:
         """
         Gets the network provenance
 
+        .. warning::
+
+           This method has been deprecated.
+
+        ..
+
         :param network_id: Network id
         :type network_id: string
         :return: Provenance
@@ -641,6 +655,12 @@ class Ndex2:
     def set_provenance(self, network_id, provenance):
         """
         Sets the network provenance
+
+        .. warning::
+
+           This method has been deprecated.
+
+        ..
 
         :param network_id: Network id
         :type network_id: string
@@ -979,8 +999,8 @@ class Ndex2:
         :type set_id: basestring
         :param networks: networks that will be added to the set
         :type networks: list of strings
-        :return:
-        :rtype:
+        :return: None
+        :rtype: None
         """
 
         route = '/networkset/%s/members' % set_id
@@ -998,8 +1018,8 @@ class Ndex2:
         :type networks: list of strings
         :param retry: Number of times to retry
         :type retry: int
-        :return:
-        :rtype:
+        :return: None
+        :rtype: None
         """
 
         route = '/networkset/%s/members' % set_id

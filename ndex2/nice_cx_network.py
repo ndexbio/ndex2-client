@@ -24,10 +24,10 @@ else:
     from urllib2 import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
         build_opener, install_opener, HTTPError, URLError
 
-userAgent = 'NiceCX-Python/1.0'
+userAgent = 'NDEx-NiceCX/2.0'
 
 class NiceCXNetwork():
-    def __init__(self, user_agent=None, **attr):
+    def __init__(self, **attr):
 
         self.metadata = {}
         self.context = []
@@ -53,6 +53,7 @@ class NiceCXNetwork():
         self.provenance = []
         self.missingNodes = {}
         self.s = None
+        self.node_name_to_id_map_cache = {}
 
         #if cx:
         #    self.create_from_cx(cx)
@@ -91,17 +92,20 @@ class NiceCXNetwork():
         :rtype: int
         """
 
-        #self.add_edge(id=id, source=edge_source, target=edge_target, interaction=edge_interaction)
-        self.edges[id] = {'@id': id, 's': edge_source, 't': edge_target, 'i': edge_interaction}
-        #edge_element = EdgeElement(id=id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction, cx_fragment=cx_fragment)
+        self.edges[id] = {'@id': id, 's': edge_source, 't': edge_target}
 
-        #self.add_edge(edge_element)
+        if edge_interaction is not None:
+            self.edges[id]['i'] = edge_interaction
 
         return id
 
     def create_edge(self, edge_source=None, edge_target=None, edge_interaction=None):
         """
         Create a new edge in the network by specifying source-interaction-target
+
+        Example:
+
+            ``my_edge = create_edge(edge_source=my_node, edge_target=my_node2, edge_interaction='up-regulates')``
 
         :param edge_source: The source node of this edge, either its id or the node object itself.
         :type edge_source: int, dict (with @id property)
@@ -113,6 +117,9 @@ class NiceCXNetwork():
         :rtype: int
         """
         edge_id = self.edge_int_id_generator
+
+        #if not edge_interaction:
+        #    edge_interaction = ''
 
         self.__create_edge(id=edge_id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction)
         self.edge_int_id_generator += 1
@@ -144,7 +151,7 @@ class NiceCXNetwork():
     #==================
     # NODE OPERATIONS
     #==================
-    def __create_node(self, id=None, node_name=None, node_represents=None, data_type=None):
+    def __create_node(self, id=None, node_name=None, node_represents=None):
         if id is None:
             id=self.get_next_node_id()
 
@@ -153,14 +160,15 @@ class NiceCXNetwork():
         else:
             self.nodes[id] = {'@id': id, 'n': node_name, 'r': node_name}
 
-        if data_type is not None:
-            self.nodes[id]['d'] = data_type
-
         return id
 
-    def create_node(self, node_name=None, node_represents=None, data_type=None):
+    def create_node(self, node_name=None, node_represents=None):
         """
         Creates a new node with the corresponding name and represents (external id)
+
+        Example:
+
+            ``my_node = create_node(node_name='MAPK1, node_represents='1114208')``
 
         :param node_name: Name of the node
         :type node_name: str
@@ -171,12 +179,12 @@ class NiceCXNetwork():
         """
 
         id = self.node_int_id_generator
-        self.__create_node(id=id, node_name=node_name, node_represents=node_represents, data_type=data_type)
+        self.__create_node(id=id, node_name=node_name, node_represents=node_represents)
         self.node_int_id_generator += 1
 
         return id
 
-    def add_node(self, id=None, name=None, represents=None, data_type=None):
+    def add_node(self, id=None, name=None, represents=None):
         """
         .. warning::
 
@@ -328,10 +336,15 @@ class NiceCXNetwork():
         """
         Set the network name
 
+        Example:
+
+            ``set_name('P38 Signaling')``
+
         :param network_name: Network name
         :type network_name: string
         :return: None
-        :rtype:none
+        :rtype: None
+
         """
         #add_this_network_attribute = NetworkAttributesElement(name='name', values=network_name, type=ATTRIBUTE_DATA_TYPE.STRING)
 
@@ -387,6 +400,14 @@ class NiceCXNetwork():
         """
         Returns an iterator over edge ids as keys and edge objects as values.
 
+        Example:
+
+            ``for edge_id, edge_obj in nice_cx.get_edges():``
+
+            ``print(edge_obj.get('i')) # print interaction``
+
+            ``print(edge_obj.get('s')) # print source node id``
+
         :return: Edge iterator
         :rtype: iterator
         """
@@ -425,7 +446,7 @@ class NiceCXNetwork():
         :param attribute_name: Attribute name
         :type attribute_name: string
         :return: Network attribute object
-        :rtype: nicecxModel.cx.aspects.NetworkAttributesElement
+        :rtype: dict
         """
         for n_a in self.networkAttributes:
             if n_a.get('n') == attribute_name:
@@ -451,7 +472,7 @@ class NiceCXNetwork():
         if type is None:
             attr_type = None
             if isinstance(values, float):
-                attr_type = 'float'
+                attr_type = 'double'
             elif isinstance(values, int):
                 attr_type = 'integer'
             elif isinstance(values, list):
@@ -463,15 +484,17 @@ class NiceCXNetwork():
                 self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values})
         else:
             self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': type})
+            #TODO add support for subnetwork
 
-    def add_edge_attribute(self, property_of=None, name=None, values=None, type=None, subnetwork=None):
+    def add_edge_attribute(self, property_of, name, values, type=None, subnetwork=None):
         if isinstance(property_of, dict):
             property_of = property_of.get('@id')
-        if property_of is None:
-            raise Exception('Edge attribute requires the property_of property')
 
-        if name is None or values is None:
-            raise Exception('Edge attribute requires the name and values property')
+        #if property_of is None:
+        #    raise Exception('Edge attribute requires the property_of property')
+
+        #if name is None or values is None:
+        #    raise Exception('Edge attribute requires the name and values property')
 
         if self.edgeAttributes.get(property_of) is None :
             self.edgeAttributes[property_of] = []
@@ -479,11 +502,24 @@ class NiceCXNetwork():
         if type is None:
             self.edgeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values})
         else:
+            #TODO check for float --> double and numpy types
+            if type == 'float' or type == 'list_of_float':
+                type = 'float'
             self.edgeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': type})
 
     def get_nodes(self):
         """
         Returns an iterator over node ids as keys and node objects as values.
+
+        Example:
+
+            ``for id, node in nice_cx.get_nodes():``
+
+            ``node_name = node.get('n')``
+
+            ``node_represents = node.get('r')``
+
+
 
         :return: iterator over nodes
         :rtype: iterator
@@ -493,6 +529,19 @@ class NiceCXNetwork():
     def get_node(self, node_id):
         return self.nodes.get(node_id)
 
+    def _generate_node_name_to_id_map(self):
+        self.node_name_to_id_map_cache = {node.get('n'): node_id for node_id, node in self.get_nodes()}
+
+    def get_node_by_name(self, node_name):
+        if(len(self.node_name_to_id_map_cache) < 1):
+            self._generate_node_name_to_id_map()
+
+        node_id_lookup = self.node_name_to_id_map_cache.get(node_name)
+        if node_id_lookup is not None:
+            return self.nodes.get(node_id_lookup)
+        else:
+            return None
+
     # TODO - Check edges for orphans.  Check node attributes for orphans
     #def remove_node(self, node_id):
     #    raise Warning()
@@ -501,20 +550,26 @@ class NiceCXNetwork():
     #=============================
     # NODE ATTRIBUTES OPERATIONS
     #=============================
-    def set_node_attribute(self, node, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
+    def set_node_attribute(self, node, attribute_name, values, type=None):
         """
         Set an attribute of a node, where the node may be specified by its id or passed in as a node dict.
+
+        Example:
+
+            ``set_node_attribute(my_node, 'Pathway', 'Signal Transduction / Growth Regulation')``
+
+            or
+
+            ``set_node_attribute(my_node, 'Mutation Frequency', 0.007, type='double')``
 
         :param node: Node to add the attribute to
         :type node: int or node dict with @id attribute
         :param attribute_name: attribute name
         :type attribute_name: string
         :param values: A value or list of values of the attribute
-        :type values: list, string, int or float
+        :type values: list, string, int or double
         :param type: The datatype of the attribute values, defaults is string.  See `Supported data types`_
         :type type: str
-        :param subnetwork: The ID of the subnetwork to which this attribute applies.
-        :type subnetwork: int or string
         :param cx_fragment: CX fragment
         :type cx_fragment: json
         :return: None
@@ -546,14 +601,49 @@ class NiceCXNetwork():
 
     def get_node_attribute(self, node, attribute_name):
         """
-        Get the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
+        Get the node attribute of a node, where the node may be specified by its id or passed in as an object.
+
+        Example:
+
+             ``get_node_attribute(my_node, 'Pathway')``
+             ``# returns: {'@id': 0, 'n': 'diffusion-heat', 'v': 0.832, 'd': 'double'}``
+
 
         :param node: node object or node id
         :type node: int or node dict with @id attribute
         :param attribute_name: attribute name
         :type attribute_name:
-        :return: string
-        :rtype:
+        :return: the node attibute object or None if the attribute doesn't exist
+        :rtype: dict
+        """
+        #n_a = self.get_node_attribute_objects(node, attribute_name)
+
+        node_attrs = self.get_node_attributes(node)
+
+        if node_attrs:
+            for n_a in node_attrs:
+                if n_a.get('n') == attribute_name:
+                    return n_a
+
+        return None
+
+
+    def get_node_attribute_value(self, node, attribute_name):
+        """
+        Get the value(s) of an attribute of a node, where the node may be specified by its id or passed in as an object.
+
+        Example:
+
+             ``get_node_attribute_value(my_node, 'Pathway')``
+             ``# returns: 'Signal Transduction / Growth Regulation'``
+
+
+        :param node: node object or node id
+        :type node: int or node dict with @id attribute
+        :param attribute_name: attribute name
+        :type attribute_name:
+        :return: the value of the attibute or None if the attribute doesn't exist
+        :rtype: string
         """
         #n_a = self.get_node_attribute_objects(node, attribute_name)
 
@@ -566,14 +656,21 @@ class NiceCXNetwork():
 
         return None
 
+
+
     def get_node_attributes(self, node):
         """
         Get the attribute objects of a node, where the node may be specified by its id or passed in as an object.
 
+        Example:
+
+             ``get_node_attributes(my_node)``
+             ``# returns: [{'po': 0, 'n': 'Pathway', 'v': 'Signal Transduction / Growth Regulation'}]``
+
         :param node: node object or node id
         :type node: int or node dict with @id attribute
-        :return:
-        :rtype:
+        :return: node attributes
+        :rtype: list
         """
         if isinstance(node, dict):
             return self.nodeAttributes.get(node.get('@id'))
@@ -581,29 +678,34 @@ class NiceCXNetwork():
             return self.nodeAttributes.get(node)
 
 
-    def set_network_attribute(self, name=None, values=None, type=None, subnetwork=None, cx_fragment=None):
+    def set_network_attribute(self, name, values=None, type=None):
         """
         Set an attribute of the network
+
+        Example:
+
+            ``set_network_attribute(name='networkType', values='Genetic interactions')``
 
         :param name: Attribute name
         :type name: string
         :param values: The values of the attribute
-        :type values: list, string, float or int
+        :type values: list, string, double or int
         :param type: The datatype of the attribute values.  See `Supported data types`_
         :type type: str
-        :param subnetwork: The id of the subnetwork (if any) to which this attribute applies.
-        :type subnetwork: int
-        :param cx_fragment: CX fragment
-        :type cx_fragment: json
         :return: None
         :rtype: none
         """
-
+        subnetwork = None
+        #TODO add support for subnetworks
         found_attr = False
         for n_a in self.networkAttributes:
             if n_a.get('n') == name:
                 n_a['v'] = values
                 if type is not None:
+                    if type == 'float':
+                        type = 'double'
+                    elif type == 'list_of_float':
+                        type = 'list_of_double'
                     n_a['d'] = type
 
                 if subnetwork:
@@ -615,6 +717,11 @@ class NiceCXNetwork():
 
         if not found_attr:
             if type is not None:
+                if type == 'float':
+                    type = 'double'
+                elif type == 'list_of_float':
+                    type = 'list_of_double'
+
                 net_attr = {
                     'n': name,
                     'v': values,
@@ -629,17 +736,17 @@ class NiceCXNetwork():
             self.networkAttributes.append(net_attr)
 
 
-    def set_edge_attribute(self, edge, attribute_name, values, type=None, subnetwork=None, cx_fragment=None):
+    def set_edge_attribute(self, edge, attribute_name, values, type=None):
         """
         Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
 
         Example:
 
-            ``set_edge_attribute(0, 'weight', 0.5, type='float')``
+            ``set_edge_attribute(0, 'weight', 0.5, type='double')``
 
             or
 
-            ``set_edge_attribute(edge, 'Disease', 'Atherosclerosis')``
+            ``set_edge_attribute(my_edge, 'Disease', 'Atherosclerosis')``
 
 
         :param edge: Edge to add the attribute to
@@ -650,25 +757,31 @@ class NiceCXNetwork():
         :type values: list
         :param type: The datatype of the attribute values, defaults to the python datatype of the values.  See `Supported data types`_
         :type type: str
-        :param subnetwork: The ID of the subnetwork to which this attribute applies.
-        :type subnetwork: string or int
-        :param cx_fragment: CX Fragment (optional)
-        :type cx_fragment: json
         :return: None
         :rtype: None
         """
 
         self.add_edge_attribute(property_of=edge, name=attribute_name, values=values, type=type)
+        #TODO add support for subnetworks
 
     def get_edge_attributes(self, edge):
         """
         Get the attribute objects of an edge, where the edge may be specified by its id or passed in as an object.
+
+        Example:
+
+             ``get_edge_attributes(my_edge)``
+
+             ``# returns: [{'@id': 0, 'n': 'weight', 'v': 0.849, 'd': 'double'}, {'@id': 0, 'n': 'Type', 'v': 'E1'}]``
 
         :param edge: Edge object or edge id
         :type edge: int or edge dict with @id attribute
         :return: Edge attribute objects
         :rtype: list of edge dict
         """
+        if isinstance(edge, dict):
+            return self.edgeAttributes.get(edge.get('@id'))
+
         return self.edgeAttributes.get(edge)
 
     def get_edge_attribute_objects(self, edge, attribute_name):
@@ -692,19 +805,53 @@ class NiceCXNetwork():
         #return None
 
 
-    def get_edge_attribute(self, edge, attribute_name, subnetwork=None):
+    def get_edge_attribute(self, edge, attribute_name):
         """
-        Get the value(s) of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
+        Get the edge attributes of an edge, where the edge may be specified by its id or passed in as an object.
+
+
+        Example:
+
+             ``get_edge_attribute(my_edge, 'weight')``
+
+             ``# returns: {'@id': 0, 'n': 'weight', 'v': 0.849, 'd': 'double'}``
+
 
         :param edge: Edge object or edge id
         :type edge: int or edge dict with @id attribute
         :param attribute_name: Attribute name
         :type attribute_name:
-        :param subnetwork: The id of the subnetwork (if any) to which this attribute was applied.
-        :type subnetwork: int
-        :return: Edge attribute value(s)
-        :rtype: list, string, int or float
+        :return: Edge attribute object
+        :rtype: list, string, int or double
         """
+
+        edge_attrs = self.get_edge_attributes(edge)
+        if edge_attrs:
+            edge_attr_found = False
+            for e_a in edge_attrs:
+                if e_a.get('n') == attribute_name:
+                    return e_a
+
+        return None, None
+
+    def get_edge_attribute_value(self, edge, attribute_name):
+        """
+        Get the value(s) of an attribute of an edge, where the edge may be specified by its id or passed in as an object.
+
+        Example:
+
+             ``get_edge_attribute_value(my_edge, 'weight')``
+
+             ``# returns: 0.849``
+
+        :param edge: Edge object or edge id
+        :type edge: int or edge dict with @id attribute
+        :param attribute_name: Attribute name
+        :type attribute_name:
+        :return: Edge attribute value(s)
+        :rtype: list, string, int or double
+        """
+
         edge_attrs = self.get_edge_attributes(edge)
         if edge_attrs:
             edge_attr_found = False
@@ -753,14 +900,18 @@ class NiceCXNetwork():
 
             ``{'pmid': 'https://www.ncbi.nlm.nih.gov/pubmed/'}``
 
-        :return: List of context objects
-        :rtype: list of json objects
+        :return: context object
+        :rtype: dict
         """
-        for n_a in self.networkAttributes:
-            if n_a.get('n') == '@context':
-                return json.loads(n_a['v'])
 
-        return None
+        return self.context
+
+        # TODO uncomment when context is fixed on web app ---
+        #for n_a in self.networkAttributes:
+        #    if n_a.get('n') == '@context':
+        #        return json.loads(n_a['v'])
+
+        #return None
 
     def set_context(self, context):
         """
@@ -776,19 +927,21 @@ class NiceCXNetwork():
         :return: None
         :rtype: none
         """
-        #print('context is of type %s' % type(context))
         if isinstance(context, list):
-            #print('Setting context from list')
+            self.context = context
+
             add_this_context = {}
             for c in context:
                 for k, v in c.items():
                     add_this_context[k] = v
-            self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
+            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
         elif isinstance(context, dict):
-            #print('Setting context from dict')
-            self.add_network_attribute(name='@context', values=json.dumps(context), type='string')
+            self.context = [context]
+
+            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(context), type='string')
         else:
-            raise Exception('Context provided is not of type list')
+            raise Exception('Context provided is not of type list or dict')
+
 
     def get_metadata(self):
         """
@@ -838,7 +991,7 @@ class NiceCXNetwork():
         :param aspect_name: the name of the aspect to retrieve.
         :type aspect_name: string
         :return: Opaque aspect
-        :rtype: list of aspect dict
+        :rtype: list of aspect elements
         """
         return self.opaqueAspects.get(aspect_name)
 
@@ -854,15 +1007,27 @@ class NiceCXNetwork():
         :return: None
         :rtype: none
         """
-        if aspect_elements is None:
-            self.opaqueAspects.pop(aspect_name, None)
+
+        if isinstance(aspect_elements, list):
+            self.opaqueAspects[aspect_name] = aspect_elements
+        elif isinstance(aspect_elements, dict):
+            self.opaqueAspects[aspect_name] = [aspect_elements]
         else:
-            if isinstance(aspect_elements, list):
-                self.opaqueAspects[aspect_name] = aspect_elements
-            else:
-                if aspect_name is None:
-                    aspect_name = 'unknown'
-                raise Exception('Provided aspect for ' + aspect_name + ' is not of type <list>')
+            #if aspect_name is None:
+            #    aspect_name = 'unknown'
+            raise Exception('Provided aspect for ' + aspect_name + ' is not of type <list>')
+
+    # TODO move removal code to remove_opaque_aspect() - Done
+    def remove_opaque_aspect(self, aspect_name):
+        '''
+        Removes the given aspect from the opaque aspects collection
+
+        :param aspect_name: The opaque aspect name
+        :type aspect_name: str
+        :return: None
+        :rtype: None
+        '''
+        self.opaqueAspects.pop(aspect_name, None)
 
     def get_opaque_aspect_names(self):
         """
@@ -926,7 +1091,13 @@ class NiceCXNetwork():
 
     def apply_template(self, server, uuid, username=None, password=None):
         """
-        Applies a network style from the provided uuid.
+        Applies the Cytoscape visual properties of a network from the provided uuid to this network.
+
+        This allows the use of networks formatted in Cytoscape as templates to apply visual styles to other networks.
+
+        Example:
+
+            ``nice_cx.apply_template('public.ndexbio.org', '51247435-1e5f-11e8-b939-0ac135e8bacf')``
 
         :param server: server host name (i.e. public.ndexbio.org)
         :type server: string
@@ -950,6 +1121,10 @@ class NiceCXNetwork():
             # METADATA
             #===================
             available_aspects = []
+            metadata_return = self.get_aspect(uuid, 'metaData', server, username, password)
+            if metadata_return is None:
+                raise Exception('Template not found %s.' % uuid)
+
             for ae in (o for o in self.get_aspect(uuid, 'metaData', server, username, password)):
                 available_aspects.append(ae.get('name'))
 
@@ -964,26 +1139,18 @@ class NiceCXNetwork():
                         aspectElmts = self.opaqueAspects.get(oa)
                         if aspectElmts is None:
                             aspectElmts = []
-                            self.opaqueAspects[oa] = aspectElmts
+                            self.opaqueAspects['cyVisualProperties'] = aspectElmts # ALWAYS USE cyVisualProperties
 
                         aspectElmts.append(oa_item)
 
-                        #aspect_element = AspectElement(oa_item, oa)
-                        #self.add_opaque_aspect_element(aspect_element)
-                    #vis_prop_size = len(self.opaqueAspects.get('visualProperties'))
-                    #mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='visualProperties')
-
                     mde = {
-                        'name': 'visualProperties',
+                        'name': 'cyVisualProperties',
                         'elementCount': len(aspectElmts),
                         'version': "1.0",
                         'consistencyGroup': 1,
                         'properties': []
                     }
                     self.metadata['visualProperties'] = mde
-
-                    #self.add_metadata(mde)
-
 
                 if 'cyVisualProperties' in oa:
                     objects = self.get_aspect(uuid, 'cyVisualProperties', server, username, password)
@@ -1005,11 +1172,6 @@ class NiceCXNetwork():
                           }
                     self.metadata['cyVisualProperties'] = mde
 
-                        #aspect_element = AspectElement(oa_item, oa)
-                        #self.add_opaque_aspect_element(aspect_element)
-                    #vis_prop_size = len(self.opaqueAspects.get('cyVisualProperties'))
-                    #mde = MetaDataElement(elementCount=vis_prop_size, version=1, consistencyGroup=1, name='cyVisualProperties')
-                    #self.add_metadata(mde)
         else:
             raise Exception(', '.join(error_message) + 'not specified in apply_template')
 
@@ -1048,7 +1210,7 @@ class NiceCXNetwork():
         raise Exception('create_from_server() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_server()')
 
     def create_from_cx(self, cx):
-        raise Exception('create_from_cx() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_cx()')
+        raise Exception('create_from_cx() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_raw_cx()')
 
     def get_frag_from_list_by_key(self, cx, key):
         for aspect in cx:
@@ -1061,12 +1223,17 @@ class NiceCXNetwork():
         """
         Export the network as a Pandas DataFrame.
 
-        Note: This method only processed nodes, edges, node attributes and edge attributes, but not network attributes
+         Example:
+
+            ``df = nice_cx.to_pandas_dataframe() # df is now a pandas dataframe``
+
+        Note: This method only processes nodes, edges, node attributes and edge attributes, but not network attributes
         or other aspects
 
         :return: Pandas dataframe
         :rtype: Pandas dataframe
         """
+        #TODO expand documentation
         rows = []
         edge_items = None
         if sys.version_info.major == 3:
@@ -1161,8 +1328,10 @@ class NiceCXNetwork():
     def upload_to(self, server, username, password):
         """
         Upload this network to the specified server to the account specified by username and password.
+
         Example:
-            ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
+
+            ``nice_cx.upload_to('http://public.ndexbio.org', username, password)``
 
         :param server: The NDEx server to upload the network to.
         :type server: string
@@ -1186,6 +1355,10 @@ class NiceCXNetwork():
     def update_to(self, uuid, server, username, password):
         """ Upload this network to the specified server to the account specified by username and password.
 
+        Example:
+
+            ``nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22', 'public.ndexbio.org, username, password)``
+
         :param server: The NDEx server to upload the network to.
         :type server: str
         :param username: The username of the account to store the network.
@@ -1195,8 +1368,6 @@ class NiceCXNetwork():
         :return: The UUID of the network on NDEx.
         :rtype: str
 
-        Example:
-            ndexGraph.upload_to('http://test.ndexbio.org', 'myusername', 'mypassword')
         """
         cx = self.to_cx()
         ndex = nc.Ndex2(server,username,password)
@@ -1222,7 +1393,13 @@ class NiceCXNetwork():
 
     def to_networkx(self):
         """
-        Return a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect of the network are transformed to the NetworkX pos attribute.
+        Returns a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect
+        of the network are transformed to the NetworkX pos attribute. Node name is stored in the networkx
+        node id. Node 'represents' is stored in the networkx node attribute 'represents'
+
+        Example:
+
+            ``G = nice_cx.to_networkx() # G is now a networkx object``
 
         :return: Networkx graph
         :rtype: networkx Graph()
@@ -1242,34 +1419,71 @@ class NiceCXNetwork():
         for net_a in self.networkAttributes:
             G.graph[net_a.get('n')] = net_a.get('v')
 
-        #================================
-        # PROCESS NODE & NODE ATTRIBUTES
-        #================================
-        for k, v in node_items:
-            node_attrs = {}
-            n_a = self.nodeAttributes.get(k)
-            if n_a:
-                for na_item in n_a:
-                    node_attrs[na_item.get('n')] = na_item.get('v')
 
-            G.add_node(k, node_attrs, name=v.get('n'))
+        if float(nx.__version__) >= 2.0:
+            # ================================
+            # PROCESS NODE & NODE ATTRIBUTES
+            # ================================
+            for k, v in node_items:
+                node_name = v.get('n')
+                G.add_node(v.get('n'))
+                n_a = self.nodeAttributes.get(k)
+                if n_a:
+                    for na_item in n_a:
+                        G.nodes[node_name][na_item.get('n')] = na_item.get('v')
 
-        #================================
-        # PROCESS EDGE & EDGE ATTRIBUTES
-        #================================
-        for k, v in edge_items:
-            e_a = self.edgeAttributes.get(k)
-            add_this_dict = {}
-            add_this_dict['interaction'] = v.get('i')
-            if e_a is not None:
-                for e_a_item in e_a:
-                    if isinstance(e_a_item.get('v'), list):
-                        add_this_dict[e_a_item.get('n')] = ','.join(str(e) for e in e_a_item.get('v'))
-                        add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
-                    else:
-                        add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
+                if v.get('r'):
+                    G.nodes[node_name]['represents'] = v.get('r')
 
-            G.add_edge(v.get('s'), v.get('t'), add_this_dict)
+            #================================
+            # PROCESS EDGE & EDGE ATTRIBUTES
+            #================================
+            for k, v in edge_items:
+                source_node = self.nodes.get(v.get('s')).get('n')
+                target_node = self.nodes.get(v.get('t')).get('n')
+
+                G.add_edge(source_node, target_node)
+
+                e_a = self.edgeAttributes.get(k)
+                add_this_dict = {}
+                add_this_dict['interaction'] = v.get('i')
+                G[source_node][target_node]['interaction'] = v.get('i')
+                if e_a is not None:
+                    for e_a_item in e_a:
+                        if isinstance(e_a_item.get('v'), list):
+                            G[source_node][target_node][e_a_item.get('n')] =  '"%s"' % ','.join(str(e) for e in e_a_item.get('v'))
+                        else:
+                            G[source_node][target_node][e_a_item.get('n')] =  e_a_item.get('v')
+        else:
+            print('networkx version 1.11')
+            # ================================
+            # PROCESS NODE & NODE ATTRIBUTES
+            # ================================
+            for k, v in node_items:
+                node_attrs = {}
+                n_a = self.nodeAttributes.get(k)
+                if n_a:
+                    for na_item in n_a:
+                        node_attrs[na_item.get('n')] = na_item.get('v')
+
+                G.add_node(k, node_attrs, name=v.get('n'))
+
+            # ================================
+            # PROCESS EDGE & EDGE ATTRIBUTES
+            # ================================
+            for k, v in edge_items:
+                e_a = self.edgeAttributes.get(k)
+                add_this_dict = {}
+                add_this_dict['interaction'] = v.get('i')
+                if e_a is not None:
+                    for e_a_item in e_a:
+                        if isinstance(e_a_item.get('v'), list):
+                            add_this_dict[e_a_item.get('n')] = ','.join(str(e) for e in e_a_item.get('v'))
+                            add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
+                        else:
+                            add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
+
+                G.add_edge(v.get('s'), v.get('t'), add_this_dict)
 
         #================
         # PROCESS LAYOUT
@@ -1345,7 +1559,7 @@ class NiceCXNetwork():
         print(summary_string)
 
     def __str__(self):
-        return json.dumps(self.to_cx(), cls=DecimalEncoder)
+        return 'nodes: %d \n edges: %d' % (len(self.nodes), len(self.edges)) #f'nodes: {len(self.nodes)} edges: {len(self.edges)}'
 
     def to_cx(self):
         """
@@ -1354,6 +1568,8 @@ class NiceCXNetwork():
         :return: CX representation of the network
         :rtype: CX (list of dict aspects)
         """
+
+        #TODO - when server is compatible remove numberVerification and alter metadata insert() to position 0
         output_cx = [{"numberVerification": [{"longNumber": 281474976710655}]}]
 
         print('Generating CX')
@@ -1362,14 +1578,8 @@ class NiceCXNetwork():
         # IF THE @ID IS NOT NUMERIC WE NEED TO CONVERT IT TO
         # INT BY USING THE INDEX OF THE NON-NUMERIC VALUE
         #=====================================================
-        #if self.node_int_id_generator:
-        #    self.node_id_lookup = list(self.node_int_id_generator)
-
-        #if self.metadata:
-            #output_cx.append(self.generate_aspect('metaData'))
-        #    output_cx.append(self.generate_metadata_aspect())
-        #if self.context: # REPLACED BY NETWORK ATTRIBUTE: @context
-        #    output_cx.append(self.generate_aspect('@context'))
+        if self.context:
+            output_cx.append(self.generate_aspect('@context'))
         if self.nodes:
             output_cx.append(self.generate_aspect('nodes'))
         if self.edges:
@@ -1418,7 +1628,8 @@ class NiceCXNetwork():
 
             output_cx.insert(1, {'metaData': metadata_list})
 
-        #print json.dumps(output_cx)
+            if output_cx[-1].get('status') is None:
+                output_cx.append({'status': [{'error': '', 'success': True}]})
 
         return output_cx
 
@@ -1434,7 +1645,11 @@ class NiceCXNetwork():
         #=============================
         if aspect_name in core_aspect:
             use_this_aspect = self.string_to_aspect_object(aspect_name)
+
         if use_this_aspect is not None:
+
+
+
             if isinstance(use_this_aspect, dict):
                 if aspect_name in ['nodes', 'edges']:
                     for k, asp in use_this_aspect.items():
@@ -1486,8 +1701,6 @@ class NiceCXNetwork():
             else:
                 return None
 
-
-
         md = {
             'name': aspect_name,
             'elementCount': element_count,
@@ -1517,13 +1730,6 @@ class NiceCXNetwork():
                 items = use_this_aspect.iteritems()
 
             for k, v in items:
-
-
-
-
-
-
-
                 add_this_element = v.to_cx()
                 id = add_this_element.get('@id')
 
@@ -1855,8 +2061,8 @@ class NiceCXNetwork():
     def string_to_aspect_object(self, aspect_name):
         if aspect_name == 'metaData':
             return self.metadata
-        #elif aspect_name == '@context':
-        #    return self.context
+        elif aspect_name == '@context':
+            return self.context
         elif aspect_name == 'nodes':
             return self.nodes
         elif aspect_name == 'edges':

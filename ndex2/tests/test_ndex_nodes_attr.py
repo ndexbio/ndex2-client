@@ -5,7 +5,7 @@ import os
 import unittest
 import ndex2
 
-from ndex2.NiceCXNetwork import NiceCXNetwork
+from ndex2.nice_cx_network import NiceCXNetwork
 
 
 upload_server = 'dev.ndexbio.org'

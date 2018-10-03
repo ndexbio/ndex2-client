@@ -6,7 +6,7 @@ import unittest
 import ndex2
 import json
 import pandas as pd
-from ndex2.NiceCXNetwork import NiceCXNetwork
+from ndex2.nice_cx_network import NiceCXNetwork
 
 import ndex2.client as nc
 import networkx as nx

@@ -2,7 +2,7 @@ six
 ijson
 requests
 requests_toolbelt
-networkx==1.11
+networkx
 urllib3>=1.16
 pandas
 enum34

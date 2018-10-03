@@ -8,24 +8,13 @@ import pickle
 import base64
 import binascii
 import numpy as np
-from ndex2cx.NiceCXBuilder import NiceCXBuilder
-
-#from ndex2.metadata.MetaDataElement import MetaDataElement
-#from ndex2.cx.aspects.NodeAttributesElement import NodeAttributesElement
-#from ndex2.cx.aspects.EdgeAttributesElement import EdgeAttributesElement
-#from ndex2.cx.aspects.NetworkAttributesElement import NetworkAttributesElement
-#from ndex2.cx.aspects.AspectElement import AspectElement
-#from ndex2.cx import CX_CONSTANTS
-#from ndex2.cx.aspects import ATTRIBUTE_DATA_TYPE
-#from ndex2.cx import known_aspects_min
+from ndex2cx.nice_cx_builder import NiceCXBuilder
 
 root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 log_path = os.path.join(root, 'logs')
 if not os.path.exists(log_path):
     os.makedirs(log_path)
-# solr_url = 'http://localhost:8983/solr/'
-# solr_url = 'http://dev2.ndexbio.org:8983/solr/'
-# deprecation_message = 'This function is now deprecated. use NiceCX'
+
 node_id_lookup = {}
 edge_id_counter = 0
 
@@ -51,7 +40,7 @@ def get_logger(name, level=logging.DEBUG):
     return logger
 
 
-def load_matrix_to_ndex(X, X_cols, X_rows, server, username, password, name):
+def load_matrix_to_ndex(x, x_cols, x_rows, server, username, password, name):
     """
     Testing 1
     :param X: param 1
@@ -71,70 +60,53 @@ def load_matrix_to_ndex(X, X_cols, X_rows, server, username, password, name):
     :return:
     :rtype:
     """
-    if not isinstance(X, np.ndarray):
+    if not isinstance(x, np.ndarray):
         raise Exception('Provided matrix is not of type numpy.ndarray')
-    if not isinstance(X_cols, list):
+    if not isinstance(x_cols, list):
         raise Exception('Provided column header is not in the correct format.  Please provide a list of strings')
-    if not isinstance(X_rows, list):
+    if not isinstance(x_rows, list):
         raise Exception('Provided row header is not in the correct format.  Please provide a list of strings')
 
-    if not X.flags['C_CONTIGUOUS']:
-        X = np.ascontiguousarray(X)
+    if not x.flags['C_CONTIGUOUS']:
+        x = np.ascontiguousarray(x)
 
-    serialized = pickle.dumps(X, protocol=0) #base64.b64encode(X)
+    serialized = base64.b64encode(x.tobytes())
 
-    niceCxBuilder = NiceCXBuilder()
-    niceCxBuilder.set_name(name)
-    node_id = niceCxBuilder.add_node(name='Sim Matrix', represents='Sim Matrix')
+    nice_cx_builder = NiceCXBuilder()
+    nice_cx_builder.set_name(name)
+    nice_cx_builder.add_node(name='Sim Matrix', represents='Sim Matrix')
 
-    niceCxBuilder.add_opaque_aspect('matrix', [{'v': serialized}])
-    niceCxBuilder.add_opaque_aspect('matrix_cols', [{'v': X_cols}])
-    niceCxBuilder.add_opaque_aspect('matrix_rows', [{'v': X_rows}])
-    niceCxBuilder.add_opaque_aspect('matrix_dtype', [{'v': X.dtype.name}])
+    nice_cx_builder.add_opaque_aspect('matrix', [{'v': serialized}])
+    nice_cx_builder.add_opaque_aspect('matrix_cols', [{'v': x_cols}])
+    nice_cx_builder.add_opaque_aspect('matrix_rows', [{'v': x_rows}])
+    nice_cx_builder.add_opaque_aspect('matrix_dtype', [{'v': x.dtype.name}])
 
-    niceCx = niceCxBuilder.get_nice_cx()
+    nice_cx = nice_cx_builder.get_nice_cx()
 
-    print(X)
-    ont_url = niceCx.upload_to(server, username, password)
+    #print(x)
+    ont_url = nice_cx.upload_to(server, username, password)
 
     return ont_url
 
 
 def get_matrix_from_ndex(server, username, password, uuid):
-    print('place holder')
-    X = None
-    X_cols = None
-    X_rows = None
+    nice_cx = create_nice_cx_from_server(server=server, uuid=uuid, username=username, password=password)
 
-    niceCx = create_nice_cx_from_server(server=server, uuid=uuid, username=username, password=password)
+    matrix = __get_v_from_aspect(nice_cx, 'matrix')
 
-    matrix = __get_v_from_aspect(niceCx, 'matrix')
+    matrix_cols = __get_v_from_aspect(nice_cx, 'matrix_cols')
+    matrix_rows = __get_v_from_aspect(nice_cx, 'matrix_rows')
+    matrix_dtype = __get_v_from_aspect(nice_cx, 'matrix_dtype')
 
-    matrix_cols = __get_v_from_aspect(niceCx, 'matrix_cols')
-    matrix_rows = __get_v_from_aspect(niceCx, 'matrix_rows')
-    matrix_dtype = __get_v_from_aspect(niceCx, 'matrix_dtype')
-
-    missing_padding = len(matrix) % 4
-    correct_pading = ''
-    for i in range(0, (4 - missing_padding)):
-        correct_pading += '='
-    if missing_padding != 0:
-        matrix += correct_pading
-    bimary_data = binascii.a2b_base64(matrix)
-    binary_data = base64.b64encode(bimary_data)
-
-    #base64.decodestring(s)
+    binary_data = base64.b64decode(matrix)
 
     dtype = np.dtype(matrix_dtype)
-    rows = matrix_rows
-    cols = matrix_cols
-    dim = (len(rows), len(cols))
+    dim = (len(matrix_rows), len(matrix_cols))
 
-    # Create a NumPy array, which is nothing but a glorified
-    # pointer in C to the binary data in RAM
-    X = np.frombuffer(binary_data, dtype=dtype)#.reshape(dim)
+    # Create a NumPy array
+    x = np.frombuffer(binary_data, dtype=dtype).reshape(dim)
 
-    return X, X_cols, X_rows
+    return x, matrix_cols, matrix_rows
 
 
 def __get_v_from_aspect(niceCx, aspect):
@@ -193,7 +165,7 @@ def __add_node(nice_cx, name=None, represents=None):
     return node_id_lookup.get(name)
 
 
-def create_empty_nice_cx(user_agent=''):
+def create_empty_nice_cx():
     my_nicecx = NiceCXNetwork()
     return my_nicecx
 
@@ -204,11 +176,13 @@ def _create_cartesian_coordinates_aspect_from_networkx(G):
     ]
 
 
-def create_nice_cx_from_networkx(G, user_agent=''):
+def create_nice_cx_from_networkx(G):
     """
-    Create a NiceCXNetwork based on a networkx graph. The resulting NiceCXNetwork
+    Creates a NiceCXNetwork based on a networkx graph. The resulting NiceCXNetwork
     contains the nodes edges and their attributes from the networkx graph and also
     preserves the graph 'pos' attribute as a CX cartesian coordinates aspect.
+    Node name is taken from the networkx node id. Node 'represents' is
+    taken from the networkx node attribute 'represents'
 
     :param G: networkx graph
     :type G: networkx graph
@@ -217,11 +191,10 @@ def create_nice_cx_from_networkx(G, user_agent=''):
     """
 
     niceCxBuilder = NiceCXBuilder()
-
     if G is None:
         raise Exception('Networkx input is empty')
 
-    my_nicecx = NiceCXNetwork(user_agent)
+    my_nicecx = NiceCXNetwork()
 
     if G.graph.get('name'):
         my_nicecx.set_name(G.graph.get('name'))
@@ -229,44 +202,57 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         my_nicecx.set_name('created from networkx')
 
     my_nicecx.add_metadata_stub('networkAttributes')
-    for n, d in G.nodes_iter(data=True):
+
+
+    #=========================================
+    # Check to see if the node label is same
+    # (case insensitive) as 'name' attribute
+    #=========================================
+    #use_node_label = False
+    #for n, d in G.nodes_iter(data=True):
+    #    if not isinstance(n, int) and d and d.get('name'):
+    #        if n.lower() == d.get('name').lower():
+    #            use_node_label = True
+
+    #    break
+
+    for n, d in G.nodes(data=True):
         # =============
         # ADD NODES
         # =============
-        if d and d.get('name'):
-            if isinstance(n, int):
-                node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), id=n, map_node_ids=True)
-            else:
-                node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), map_node_ids=True)
+        #if d and d.get('name'):
+        #    if isinstance(n, int):
+        #        node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), id=n, map_node_ids=True)
+        #    else:
+        #        # If networkx node is of type string then maybe the 'name' atribute is no longer accurate
+        #        if use_node_label:
+        #            node_id = niceCxBuilder.add_node(name=n,represents=n, map_node_ids=True)
+        #        else:
+        #            node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), map_node_ids=True)
+        #else:
+        if isinstance(n, int):
+            node_id = niceCxBuilder.add_node(name=n,represents=d.get('represents'), id=n, map_node_ids=True)
         else:
-            if isinstance(n, int):
-                node_id = niceCxBuilder.add_node(name=n,represents=n, id=n, map_node_ids=True)
-            else:
-                node_id = niceCxBuilder.add_node(name=n, represents=n, map_node_ids=True)
+            node_id = niceCxBuilder.add_node(name=n, represents=d.get('represents'), map_node_ids=True)
 
         # ======================
         # ADD NODE ATTRIBUTES
         # ======================
         for k, v in d.items():
-            node_attr_valid = True
-            attr_type = None
-            if isinstance(v, float):
-                if math.isnan(v):
-                    node_attr_valid = False
-                attr_type = 'float'
-            elif isinstance(v, int):
-                attr_type = 'integer'
-            elif isinstance(v, list):
+            use_this_value, attr_type = _infer_data_type(v, split_string=True)
+
+            if k == 'citation' and not isinstance(use_this_value, list):
+                use_this_value = [use_this_value]
                 attr_type = 'list_of_string'
-            if node_attr_valid:
-                niceCxBuilder.add_node_attribute(node_id, k, v, type=attr_type)
+            if use_this_value is not None:
+                niceCxBuilder.add_node_attribute(node_id, k, use_this_value, type=attr_type)
 
     index = 0
-    for u, v, d in G.edges_iter(data=True):
+    for u, v, d in G.edges(data=True):
         # =============
         # ADD EDGES
         # =============
-        if d.get('interaction') is None:
+        if d.get('interaction') is None or d.get('interaction') == 'null':
             interaction = 'neighbor-of'
         else:
             interaction = d.get('interaction')
@@ -281,21 +267,15 @@ def create_nice_cx_from_networkx(G, user_agent=''):
         # ADD EDGE ATTRIBUTES
         # ==============================
         for k, val in d.items():
-            edge_valid = True
             if k != 'interaction':
-                attr_type = None
-                if isinstance(val, float):
-                    if math.isnan(val):
-                        edge_valid = False
-                        val = ''
-                    elif math.isinf(val):
-                        val = 'INFINITY'
-                    attr_type = 'float'
-                elif isinstance(val, int):
-                    attr_type = 'integer'
+                use_this_value, attr_type = _infer_data_type(val, split_string=True)
 
-                if edge_valid:
-                    niceCxBuilder.add_edge_attribute(property_of=index, name=k, values=val, type=attr_type)
+                if k == 'citation' and not isinstance(use_this_value, list):
+                    use_this_value = [use_this_value]
+                    attr_type = 'list_of_string'
+
+                if use_this_value is not None:
+                    niceCxBuilder.add_edge_attribute(property_of=index, name=k, values=use_this_value, type=attr_type)
 
         index += 1
 
@@ -306,11 +286,11 @@ def create_nice_cx_from_networkx(G, user_agent=''):
     return niceCxBuilder.get_nice_cx()
 
 
-def create_nice_cx_from_cx(cx, user_agent=''):
+def create_nice_cx_from_raw_cx(cx):
     """
-    Create a NiceCXNetwork from a CX list.
+    Create a NiceCXNetwork from a CX json object. (see http://www.home.ndexbio.org/data-model)
 
-    :param cx: a list in CX format
+    :param cx: a valid CX document
     :return: NiceCXNetwork
     """
 
@@ -342,7 +322,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'nodes' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodes')
             for node_item in objects:
-                #niceCxBuilder.nice_cx.nodes[node_item.get('@id')] = node_item
                 niceCxBuilder._add_node_from_fragment(node_item)
 
         # ===================
@@ -351,7 +330,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
         if 'edges' in available_aspects:
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edges')
             for edge_item in objects:
-                #niceCxBuilder.nice_cx.edges[edge_item.get('@id')] = edge_item
                 niceCxBuilder._add_edge_from_fragment(edge_item)
 
         # ===================
@@ -361,10 +339,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeAttributes')
             for att in objects:
                 niceCxBuilder._add_node_attribute_from_fragment(att)
-                #if niceCxBuilder.nice_cx.nodeAttributes.get(att.get('po')) is None:
-                #    niceCxBuilder.nice_cx.nodeAttributes[att.get('po')] = []
-                #
-                #niceCxBuilder.nice_cx.nodeAttributes[att.get('po')].append(att)
 
         # ===================
         # EDGE ATTRIBUTES
@@ -373,10 +347,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeAttributes')
             for att in objects:
                 niceCxBuilder._add_edge_attribute_from_fragment(att)
-                #if niceCxBuilder.nice_cx.edgeAttributes.get(att.get('po')) is None:
-                #    niceCxBuilder.nice_cx.edgeAttributes[att.get('po')] = []
-                #
-                #niceCxBuilder.nice_cx.edgeAttributes[att.get('po')].append(att)
 
         # ===================
         # CITATIONS
@@ -385,9 +355,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'citations')
             for cit in objects:
                 niceCxBuilder._add_citation_from_fragment(cit)
-                #my_nicecx.citations[cit.get('@id')] = cit
-
-            #my_nicecx.add_metadata_stub('citations')
 
         # ===================
         # SUPPORTS
@@ -396,9 +363,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'supports')
             for sup in objects:
                 niceCxBuilder._add_supports_from_fragment(sup)
-                #my_nicecx.supports[sup.get('@id')] = sup
-
-            #my_nicecx.add_metadata_stub('supports')
 
         # ===================
         # EDGE SUPPORTS
@@ -407,10 +371,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeSupports')
             for add_this_edge_sup in objects:
                 niceCxBuilder._add_edge_supports_from_fragment(add_this_edge_sup)
-                #for po_id in add_this_edge_sup.get('po'):
-                #    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
-
-            #my_nicecx.add_metadata_stub('edgeSupports')
 
         # ===================
         # NODE CITATIONS
@@ -419,10 +379,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeCitations')
             for node_cit in objects:
                 niceCxBuilder._add_node_citations_from_fragment(node_cit)
-                #for po_id in node_cit.get('po'):
-                #    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
-
-            #my_nicecx.add_metadata_stub('nodeCitations')
 
         # ===================
         # EDGE CITATIONS
@@ -431,10 +387,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
             objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeCitations')
             for edge_cit in objects:
                 niceCxBuilder._add_edge_citations_from_fragment(edge_cit)
-                #for po_id in edge_cit.get('po'):
-                #    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
-
-            #my_nicecx.add_metadata_stub('edgeCitations')
 
         # ===================
         # OPAQUE ASPECTS
@@ -448,8 +400,6 @@ def create_nice_cx_from_cx(cx, user_agent=''):
                 objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
                 niceCxBuilder.add_opaque_aspect(oa, objects)
 
-                #niceCxBuilder.nice_cx.opaqueAspects[oa] = objects
-
         return niceCxBuilder.get_nice_cx()
     else:
         raise Exception('CX is empty')
@@ -457,7 +407,7 @@ def create_nice_cx_from_cx(cx, user_agent=''):
 
 def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                                source_node_attr=[], target_node_attr=[],
-                               edge_attr=[], edge_interaction=None, user_agent=''):
+                               edge_attr=[], edge_interaction=None, source_represents=None, target_represents=None):
     """
     Create a NiceCXNetwork from a pandas dataframe in which each row
     specifies one edge in the network.
@@ -482,7 +432,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     :return: NiceCXNetwork
     """
 
-    my_nicecx = NiceCXNetwork(user_agent)
+    my_nicecx = NiceCXNetwork()
 
     # ====================================================
     # IF NODE FIELD NAME (SOURCE AND TARGET) IS PROVIDED
@@ -504,8 +454,16 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # =============
             # ADD NODES
             # =============
-            source_node_id = niceCxBuilder.add_node(name=source_predicate + str(row[source_field]), represents=source_predicate + str(row[source_field]))
-            target_node_id = niceCxBuilder.add_node(name=target_predicate + str(row[target_field]), represents=target_predicate + str(row[target_field]))
+
+            if source_represents is not None:
+                source_node_id = niceCxBuilder.add_node(name=source_predicate + str(row[source_field]), represents=source_predicate + str(row[source_represents]))
+            else:
+                source_node_id = niceCxBuilder.add_node(name=source_predicate + str(row[source_field]), represents=source_predicate + str(row[source_field]))
+
+            if target_represents is not None:
+                target_node_id = niceCxBuilder.add_node(name=target_predicate + str(row[target_field]), represents=target_predicate + str(row[target_represents]))
+            else:
+                target_node_id = niceCxBuilder.add_node(name=target_predicate + str(row[target_field]), represents=target_predicate + str(row[target_field]))
 
             # =============
             # ADD EDGES
@@ -524,49 +482,74 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # ADD SOURCE NODE ATTRIBUTES
             # ==============================
             for sp in source_node_attr:
-                attr_type = None
-                if type(row[sp]) is float and math.isnan(row[sp]):
-                    row[sp] = ''
-                    attr_type = 'float'
-                elif type(row[sp]) is float and math.isinf(row[sp]):
-                    row[sp] = 'Inf'
-                    attr_type = 'float'
-                elif type(row[sp]) is float:
-                    attr_type = 'float'
-                elif isinstance(row[sp], int):
-                    attr_type = 'integer'
 
+                #TODO - need to be smarter about how data type is inferred
+                #row[sp], attr_type = _infer_data_type(row[sp])
+
+                attr_type = None
+
+                #attr_type = None
+                #if type(row[sp]) is float and math.isnan(row[sp]):
+                #    row[sp] = ''
+                #    attr_type = 'float'
+                #elif type(row[sp]) is float and math.isinf(row[sp]):
+                #    row[sp] = 'Inf'
+                #    attr_type = 'float'
+                #elif type(row[sp]) is float:
+                #    attr_type = 'float'
+                #elif isinstance(row[sp], int):
+                #    attr_type = 'integer'
+                if sp == 'citation' and not isinstance(row[sp], list):
+                    row[sp] = [row[sp]]
+                    attr_type = 'list_of_string'
                 niceCxBuilder.add_node_attribute(source_node_id, sp, str(row[sp]), type=attr_type)
 
             # ==============================
             # ADD TARGET NODE ATTRIBUTES
             # ==============================
             for tp in target_node_attr:
-                attr_type = None
-                if type(row[tp]) is float and math.isnan(row[tp]):
-                    row[tp] = ''
-                    attr_type = 'float'
-                elif type(row[tp]) is float and math.isinf(row[tp]):
-                    row[tp] = 'Inf'
-                    attr_type = 'float'
-                elif type(row[tp]) is float:
-                    attr_type = 'float'
-                elif isinstance(row[tp], int):
-                    attr_type = 'integer'
+                #TODO - need to be smarter about how data type is inferred
+                #row[tp], attr_type = _infer_data_type(row[tp])
 
+                attr_type = None
+
+                #attr_type = None
+                #if type(row[tp]) is float and math.isnan(row[tp]):
+                #    row[tp] = ''
+                #    attr_type = 'float'
+                #elif type(row[tp]) is float and math.isinf(row[tp]):
+                #    row[tp] = 'Inf'
+                #    attr_type = 'float'
+                #elif type(row[tp]) is float:
+                #    attr_type = 'float'
+                #elif isinstance(row[tp], int):
+                #    attr_type = 'integer'
+
+                if tp == 'citation' and not isinstance(row[tp], list):
+                    row[tp] = [row[tp]]
+                    attr_type = 'list_of_string'
                 niceCxBuilder.add_node_attribute(target_node_id, tp, str(row[tp]), type=attr_type)
 
             # ==============================
             # ADD EDGE ATTRIBUTES
             # ==============================
             for ep in edge_attr:
+                #TODO - need to be smarter about how data type is inferred
+                #row[ep], attr_type = _infer_data_type(row[ep])
+
                 attr_type = None
-                if type(row[ep]) is float and math.isnan(row[ep]):
-                    row[ep] = ''
-                    attr_type = 'float'
-                elif type(row[ep]) is float and math.isinf(row[ep]):
-                    row[ep] = 'INFINITY'
-                    attr_type = 'float'
+
+                #attr_type = None
+                #if type(row[ep]) is float and math.isnan(row[ep]):
+                #    row[ep] = ''
+                #    attr_type = 'float'
+                #elif type(row[ep]) is float and math.isinf(row[ep]):
+                #    row[ep] = 'INFINITY'
+                #    attr_type = 'float'
+
+                if ep == 'citation' and not isinstance(row[ep], list):
+                    row[ep] = [row[ep]]
+                    attr_type = 'list_of_string'
 
                 niceCxBuilder.add_edge_attribute(property_of=index, name=ep, values=row[ep], type=attr_type)
 
@@ -587,10 +570,10 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             else:
                 niceCxBuilder.add_edge(id=index, source=source_node_id, target=target_node_id, interaction='interacts-with')
 
-    return niceCxBuilder.get_nice_cx()  #my_nicecx
+    return niceCxBuilder.get_nice_cx()  # my_nicecx
 
 
-def create_nice_cx_from_server(server=None, username=None, password=None, uuid=None, user_agent=''):
+def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
     """
     Create a NiceCXNetwork based on a network retrieved from NDEx, specified by its UUID.
     If the network is not public, then username and password arguments for an account on
@@ -756,24 +739,61 @@ def create_nice_cx_from_server(server=None, username=None, password=None, uuid=N
     return niceCxBuilder.get_nice_cx()
 
 
-def create_nice_cx_from_file(path, user_agent=''):
+def create_nice_cx_from_file(path):
     """
-    Create a NiceCXNetwork based on CX JSON from a file.
+    Create a NiceCXNetwork from a file that is in the CX format.
 
-    :param path: the path from which the CX will be loaded
+    :param path: the path of the CX file
     :return: NiceCXNetwork
     """
     if os.path.isfile(path):
-        with open(path, 'rU') as file_cx:
+        with open(path, 'r') as file_cx:
             # ====================================
             # BUILD NICECX FROM FILE
             # ====================================
-            my_nicecx = create_nice_cx_from_cx(json.load(file_cx))
-            #my_nicecx.create_from_cx()
+            my_nicecx = create_nice_cx_from_raw_cx(json.load(file_cx))
+
             return my_nicecx
     else:
         raise Exception('The file ' + path + '  does not exist.')
 
 
-from ndex2.NiceCXNetwork import NiceCXNetwork
+def _infer_data_type(val, split_string=False):
+    if val is None:
+        return None, None
+
+    attr_type = 'string'
+
+    if split_string:
+        if isinstance(val, str):
+            val = val.replace('"', '')
+            if ',' in val:
+                val = val.split(',')
+            elif ';' in val:
+                val = val.split(';')
+
+    processed_value = val
+
+    if isinstance(val, float) or isinstance(val, np.float) or isinstance(val, np.double):
+        if math.isnan(val):
+            # do something (skip?)
+            processed_value = None
+        elif math.isinf(val):
+            processed_value = 'INFINITY'
+        attr_type = 'double'  # CX spec dropped support for float and instead uses double precision
+    elif isinstance(val, int) or isinstance(val, np.int):
+        attr_type = 'integer'
+    elif isinstance(val, list):
+        if len(val) > 0:
+            if isinstance(val[0], float) or isinstance(val[0], np.float) or isinstance(val[0], np.double):
+                attr_type = 'list_of_double'
+            elif isinstance(val[0], int) or isinstance(val[0], np.int):
+                attr_type = 'list_of_integer'
+            else:
+                attr_type = 'list_of_string'
+
+    return processed_value, attr_type
+
+
+from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import Ndex2

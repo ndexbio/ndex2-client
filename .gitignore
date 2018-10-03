@@ -1,2 +1,9 @@
 *.pyc
 .idea
+_build
+_static
+buildclear
+docs
+*egg*
+publish*
+vpy*

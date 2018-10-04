@@ -54,6 +54,7 @@ class NiceCXNetwork():
         self.missingNodes = {}
         self.s = None
         self.node_name_to_id_map_cache = {}
+        self.user_agent = 'ndex2-client:v2.0'
 
         #if cx:
         #    self.create_from_cx(cx)
@@ -1345,7 +1346,7 @@ class NiceCXNetwork():
         if server and 'http' not in server:
             server = 'http://' + server
 
-        ndex = nc.Ndex2(server,username,password)
+        ndex = nc.Ndex2(server,username,password, user_agent=self.user_agent)
 
         return ndex.save_new_network(self.to_cx())
 
@@ -1370,7 +1371,7 @@ class NiceCXNetwork():
 
         """
         cx = self.to_cx()
-        ndex = nc.Ndex2(server,username,password)
+        ndex = nc.Ndex2(server,username,password, user_agent=self.user_agent)
 
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):
@@ -2143,6 +2144,18 @@ class NiceCXNetwork():
 
             return_items = ijson.items(urlopen_result, 'item')
             return return_items
+
+    def _stringify_node_attributes(self):
+        for node_id, node in self.get_nodes():
+            if self.get_node_attributes(node) is not None:
+                for attr in self.get_node_attributes(node):
+                    if isinstance(attr['v'], dict) or isinstance(attr['v'], list):
+                        attr['v'] = json.dumps(attr['v'])
+                    elif not isinstance(attr['v'], str):
+                        attr['v'] = str(attr['v'])
+
+
+
 
 class DecimalEncoder(json.JSONEncoder):
 

@@ -184,6 +184,8 @@ class NiceCXBuilder(object):
         :return: None
         :rtype: None
         """
+
+
         if property_of is None:
             raise TypeError('Node value is None')
 
@@ -199,6 +201,7 @@ class NiceCXBuilder(object):
         if self.node_attribute_map.get(property_of) is None:
             self.node_attribute_map[property_of] = {}
         elif self.node_attribute_map[property_of].get(name) is not None:
+            # TODO - Raise warning/exception for duplicate attribute
             return
 
         if type:
@@ -403,11 +406,16 @@ class NiceCXBuilder(object):
         return self.nice_cx
 
     def get_frag_from_list_by_key(self, cx, key):
+        return_list = []
         for aspect in cx:
             if key in aspect:
-                return aspect[key]
+                if isinstance(aspect[key], list):
+                    for a_item in aspect[key]:
+                        return_list.append(a_item)
+                else:
+                    return_list.append(aspect[key])
 
-        return []
+        return return_list
 
     def load_aspect(self, aspect_name):
         #with open('Signal1.cx', mode='r') as cx_f:

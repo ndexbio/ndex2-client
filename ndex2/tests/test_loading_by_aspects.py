@@ -396,7 +396,7 @@ class TestLoadByAspects(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             self.assertTrue(upload_message)
 
-    #@unittest.skip("Temporary skipping") # PASS
+    @unittest.skip("Temporary skipping") # PASS
     def test_update_style(self):
         print('!!!!! WARNING !!!!!')
         print('This test will load a network with 63 Million edges.  It will take a while to run and consume a lot of RAM')

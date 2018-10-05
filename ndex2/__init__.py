@@ -148,6 +148,7 @@ known_aspects_min = [
     'nodeCitations',
     'edgeCitations',
     'supports',
+    '@context',
     'nodeSupports',
     'edgeSupports'
     ]
@@ -621,6 +622,7 @@ def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
         # ===================
         if '@context' in available_aspects:
             objects = my_nicecx.get_aspect(uuid, '@context', server, username, password)
+
             niceCxBuilder.set_context(objects) #nice_cx.set_namespaces(objects)
             #niceCxBuilder.set_context(objects)
 

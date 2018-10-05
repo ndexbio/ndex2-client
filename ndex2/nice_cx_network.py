@@ -378,17 +378,20 @@ class NiceCXNetwork():
             self.add_network_attribute(name='@context', values=json.dumps({prefix: uri}), type='string')
 
 
-    def set_namespaces(self,ns):
-        if isinstance(ns, list):
-            add_this_context = {}
-            for c in ns:
-                for k, v in c.items():
-                    add_this_context[k] = v
-            self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
-        elif isinstance(ns, dict):
-            self.add_network_attribute(name='@context', values=json.dumps(ns), type='string')
-        else:
-            raise Exception('Namespace must be of type dict or list')
+    def set_namespaces(self, ns):
+        self.set_context(ns)
+
+        # TODO - uncomment the following when the web app supports context located in the network attributes
+        #if isinstance(ns, list):
+        #    add_this_context = {}
+        #    for c in ns:
+        #        for k, v in c.items():
+        #            add_this_context[k] = v
+        #    self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
+        #elif isinstance(ns, dict):
+        #    self.add_network_attribute(name='@context', values=json.dumps(ns), type='string')
+        #else:
+        #    raise Exception('Namespace must be of type dict or list')
 
     def get_namespaces(self,):
         for n_a in self.networkAttributes:

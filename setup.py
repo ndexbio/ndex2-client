@@ -18,12 +18,12 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 if __name__ == '__main__':
     setup(
-        name='ndex2-dev',
+        name='ndex2',
 
         # Versions should comply with PEP440.  For a discussion on single-sourcing
         # the version across setup.py and the project code, see
         # https://packaging.python.org/en/latest/single_source_version.html
-        version='0.2.0.29',
+        version='2.0.0',
 
         description='Nice CX Python includes a client and a data model.',
         long_description=long_description,
@@ -44,7 +44,7 @@ if __name__ == '__main__':
             #   3 - Alpha
             #   4 - Beta
             #   5 - Production/Stable
-            'Development Status :: 4 - Beta',
+            'Development Status :: 5 - Production/Stable',
 
             # Indicate who your project is intended for
             'Intended Audience :: Science/Research',
@@ -68,20 +68,17 @@ if __name__ == '__main__':
         packages=find_packages(exclude=[]),
 
         install_requires = [
+            'six',
             'ijson',
             'requests',
             'requests_toolbelt',
-            'networkx==1.11',
+            'networkx',
             'urllib3>=1.16',
             'pandas',
             'enum34',
-            'pysolr'
+            'pysolr',
+            'enum; python_version == "2.6" or python_version=="2.7"'
         ],
-
-        extras_require={
-            ':python_version=="2.6"': ['enum'],
-            ':python_version=="2.7"': ['enum']
-            },
 
         include_package_data=True
     )

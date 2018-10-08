@@ -8,11 +8,14 @@ import io
 import sys
 import decimal
 import numpy
+import base64
 
-if sys.version_info.major == 3:
+
+try:
     from urllib.parse import urljoin
-else:
-    from urlparse import urljoin
+    #from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urljoin
 
 from requests import exceptions as req_except
 import time
@@ -23,8 +26,12 @@ DEFAULT_SERVER = "http://public.ndexbio.org"
 
 
 class Ndex2:
-    """ A class to facilitate communication with an NDEx server."""
-    def __init__(self, host=None, username=None, password=None, update_status=False, debug=False):
+    """ A class to facilitate communication with an NDEx server.
+
+        If host is not provided it will default to the NDEx public server.  UUID is required
+
+    """
+    def __init__(self, host=None, username=None, password=None, update_status=False, debug=False, user_agent=''):
         """
         Creates a connection to a particular NDEx server.
 
@@ -40,6 +47,8 @@ class Ndex2:
         self.status = {}
         self.username = username
         self.password = password
+        self.user_agent = ' ' + user_agent if len(user_agent) > 0 else user_agent
+
 
         if host is None:
             host = DEFAULT_SERVER
@@ -54,7 +63,7 @@ class Ndex2:
             try:
                 version_url = urljoin(host, status_url)
 
-                response = requests.get(version_url, headers={'User-Agent': userAgent})
+                response = requests.get(version_url, headers={'User-Agent': userAgent + self.user_agent})
                 response.raise_for_status()
                 data = response.json()
 
@@ -113,7 +122,7 @@ class Ndex2:
         headers = self.s.headers
         headers['Content-Type'] = 'application/json;charset=UTF-8'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
 
         if put_json is not None:
             response = self.s.put(url, data=put_json, headers=headers)
@@ -136,7 +145,7 @@ class Ndex2:
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json,text/plain',
                    'Cache-Control': 'no-cache',
-                   'User-Agent':  userAgent,
+                   'User-Agent':  userAgent + self.user_agent,
                    }
         response = self.s.post(url, data=post_json, headers=headers)
         self.debug_response(response)
@@ -153,7 +162,7 @@ class Ndex2:
         if self.debug:
             print("DELETE route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
 
         if data is not None:
             response = self.s.delete(url, headers=headers, data=data)
@@ -170,7 +179,7 @@ class Ndex2:
         if self.debug:
             print("GET route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
         response = self.s.get(url, params=get_params, headers=headers)
         self.debug_response(response)
         response.raise_for_status()
@@ -184,7 +193,7 @@ class Ndex2:
         if self.debug:
             print("GET stream route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
         response = self.s.get(url, params=get_params, stream=True, headers=headers)
         self.debug_response(response)
         response.raise_for_status()
@@ -201,7 +210,8 @@ class Ndex2:
 
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
+        headers['Connection'] = 'close'
         response = self.s.post(url, data=post_json, headers=headers, stream=True)
         self.debug_response(response)
         response.raise_for_status()
@@ -218,7 +228,8 @@ class Ndex2:
 
         headers = {'Content-Type': multipart_data.content_type,
                    'Accept': 'application/json',
-                   'User-Agent': userAgent
+                   'User-Agent': userAgent + self.user_agent,
+                   'Connection': 'close'
                    }
         response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         self.debug_response(response)
@@ -241,7 +252,8 @@ class Ndex2:
         if self.debug:
             print("POST route: " + url)
         headers = {'Content-Type': multipart_data.content_type,
-                   'User-Agent': userAgent,
+                   'User-Agent': userAgent + self.user_agent,
+                   'Connection': 'close'
                    }
         response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         self.debug_response(response)
@@ -256,18 +268,19 @@ class Ndex2:
 
 # Network methods
 
-    def save_new_network(self, cx, visibility=None, indexed_fields=None):
+    def save_new_network(self, cx, visibility=None):
         """
         Create a new network (cx) on the server
+
         :param cx: Network cx
         :type cx: list of dicts
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
-        :param indexed_fields: Fields to be indexed
-        :type indexed_fields: list of strings
         :return: Response data
         :rtype: string or dict
         """
+        indexed_fields = None
+        #TODO add functionality for indexed_fields when it's supported by the server
         if len(cx) > 0:
             if cx[len(cx) - 1] is not None:
                 if cx[len(cx) - 1].get('status') is None:
@@ -281,22 +294,24 @@ class Ndex2:
             else:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 
-            return self.save_cx_stream_as_new_network(stream, visibility=visibility, indexed_fields=indexed_fields)
+            return self.save_cx_stream_as_new_network(stream, visibility=visibility)
         else:
             raise IndexError("Cannot save empty CX.  Please provide a non-empty CX document.")
 
-    def save_cx_stream_as_new_network(self, cx_stream, visibility=None, indexed_fields=None):
+    def save_cx_stream_as_new_network(self, cx_stream, visibility=None):
         """
         Create a new network from a CX stream.
+
         :param cx_stream:  IO stream of cx
         :type cx_stream: BytesIO
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
-        :param indexed_fields: Fields to be indexed
-        :type indexed_fields: list of strings
         :return: Response data
         :rtype: string or dict
         """
+
+        indexed_fields = None
+        #TODO add functionality for indexed_fields when it's supported by the server
 
         self.require_auth()
         query_string = None
@@ -381,7 +396,7 @@ class Ndex2:
 
         return self.get_stream(route)
 
-    def get_neighborhood_as_cx_stream(self, network_id, search_string, search_depth=1, edge_limit=2500):
+    def get_neighborhood_as_cx_stream(self, network_id, search_string, search_depth=1, edge_limit=2500, error_when_limit=True):
         """
         Get a CX stream for a subnetwork of the network specified by UUID network_id and a traversal of search_depth
         steps around the nodes found by search_string.
@@ -394,6 +409,8 @@ class Ndex2:
         :type search_depth: int
         :param edge_limit: The maximum size of the neighborhood.
         :type edge_limit: int
+        :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
+        :type error_when_limit: boolean
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
@@ -405,7 +422,8 @@ class Ndex2:
 
         post_data = {'searchString': search_string,
                      'searchDepth': search_depth,
-                     'edgeLimit': edge_limit}
+                     'edgeLimit': edge_limit,
+                     'errorWhenLimitIsOver': error_when_limit}
         post_json = json.dumps(post_data)
         return self.post_stream(route, post_json=post_json)
 
@@ -432,7 +450,13 @@ class Ndex2:
             # response_in_json = response.json()
             # data =  response_in_json["data"]
             # return data
-            return response.json()["data"]
+            response_json = response.json()
+            if isinstance(response_json, dict):
+                return response_json.get('data')
+            elif isinstance(response_json, list):
+                return response_json
+            else:
+                return response_json
         else:
             raise Exception("get_neighborhood is not supported for versions prior to 2.0, "
                             "use get_neighborhood_as_cx_stream")
@@ -458,7 +482,7 @@ class Ndex2:
         """
         post_data = {"searchString": search_string}
         if self.version == "2.0":
-            route = "/search/network?start=%s&size=%s" % start, size
+            route = "/search/network?start=%s&size=%s" % (start, size)
             if include_groups:
                 post_data["includeGroups"] = True
         else:
@@ -532,6 +556,28 @@ class Ndex2:
         else:
             return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
 
+    def _make_network_public_indexed(self, network_id):
+        """
+        Makes the network specified by the network_id public.
+
+        :param network_id: The UUID of the network.
+        :type network_id: str
+        :return: The response.
+        :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
+
+        """
+        if self.version == "2.0":
+            for i in range(0, 4):
+                try:
+                    return_message = self.set_network_system_properties(network_id, {'visibility': 'PUBLIC', 'index_level': 'ALL', 'showcase': True})
+                except Exception as exc:
+                    time.sleep(1)
+
+            return return_message
+
+        else:
+            return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
+
     def make_network_private(self, network_id):
         """
         Makes the network specified by the network_id private.
@@ -551,6 +597,7 @@ class Ndex2:
     def get_task_by_id(self, task_id):
         """
         Retrieves a task by id
+
         :param task_id: Task id
         :type task_id: string
         :return: Task
@@ -563,6 +610,7 @@ class Ndex2:
     def delete_network(self, network_id, retry=5):
         """
         Deletes the specified network from the server
+
         :param network_id: Network id
         :type network_id: string
         :param retry: Number of times to retry if deleting fails
@@ -589,6 +637,13 @@ class Ndex2:
     def get_provenance(self, network_id):
         """
         Gets the network provenance
+
+        .. warning::
+
+           This method has been deprecated.
+
+        ..
+
         :param network_id: Network id
         :type network_id: string
         :return: Provenance
@@ -600,6 +655,13 @@ class Ndex2:
     def set_provenance(self, network_id, provenance):
         """
         Sets the network provenance
+
+        .. warning::
+
+           This method has been deprecated.
+
+        ..
+
         :param network_id: Network id
         :type network_id: string
         :param provenance: Network provcenance
@@ -618,6 +680,7 @@ class Ndex2:
     def set_read_only(self, network_id, value):
         """
         Sets the read only flag on the specified network
+
         :param network_id: Network id
         :type network_id: string
         :param value: Read only value
@@ -631,6 +694,7 @@ class Ndex2:
     def set_network_properties(self, network_id, network_properties):
         """
         Sets network properties
+
         :param network_id: Network id
         :type network_id: string
         :param network_properties: List of NDEx property value pairs
@@ -651,6 +715,7 @@ class Ndex2:
     def get_sample_network(self, network_id):
         """
         Gets the sample network
+
         :param network_id: Network id
         :type network_id: string
         :return: Sample network
@@ -668,6 +733,7 @@ class Ndex2:
     def set_network_system_properties(self, network_id, network_properties):
         """
         Set network system properties
+
         :param network_id: Network id
         :type network_id: string
         :param network_properties: Network properties
@@ -719,10 +785,6 @@ class Ndex2:
             return self.post(route, json_data)
 
     def upload_file(self, filename):
-        """
-        This method has not been implemented yet
-        :return: Exception
-        """
         raise Exception("This function is not supported in this release. Please use the save_new_network "
                         "function to create new networks in NDEx server.")
         #       self.require_auth()
@@ -747,6 +809,7 @@ class Ndex2:
     def update_network_group_permission(self, groupid, networkid, permission):
         """
         Updated group permissions
+
         :param groupid: Group id
         :type groupid: string
         :param networkid: Network id
@@ -762,6 +825,7 @@ class Ndex2:
     def update_network_user_permission(self, userid, networkid, permission):
         """
         Updated network user permission
+
         :param userid: User id
         :type userid: string
         :param networkid: Network id
@@ -777,6 +841,7 @@ class Ndex2:
     def grant_networks_to_group(self, groupid, networkids, permission="READ"):
         """
         Set group permission for a set of networks
+
         :param groupid: Group id
         :type groupid: string
         :param networkids: List of network ids
@@ -792,6 +857,7 @@ class Ndex2:
     def get_user_by_username(self, username):
         """
         Gets the user id by user name
+
         :param username: User name
         :type username: string
         :return: User id
@@ -847,6 +913,7 @@ class Ndex2:
     def get_network_ids_for_user(self, username):
         """
         Get the network uuids owned by the user
+
         :param username: users NDEx username
         :type username: str
         :return: list of uuids
@@ -858,6 +925,7 @@ class Ndex2:
     def grant_network_to_user_by_username(self, username, network_id, permission):
         """
         Grants permission to network for the given user name
+
         :param username: User name
         :type username: string
         :param network_id: Network id
@@ -873,6 +941,7 @@ class Ndex2:
     def grant_networks_to_user(self, userid, networkids, permission="READ"):
         """
         Gives read permission to specified networks for the provided user
+
         :param userid: User id
         :type userid: string
         :param networkids: Network ids
@@ -888,6 +957,7 @@ class Ndex2:
     def update_status(self):
         """
         Updates the admin status
+
         :return: None (however the status is stored in the client object self.status)
         :rtype:
         """
@@ -897,6 +967,7 @@ class Ndex2:
     def create_networkset(self, name, description):
         """
         Creates a new network set
+
         :param name: Network set name
         :type name: string
         :param description: Network set description
@@ -910,6 +981,7 @@ class Ndex2:
     def get_network_set(self, set_id):
         """
         Gets the network set information including the list of networks
+
         :param set_id: network set id
         :type set_id: basestring
         :return: network set information
@@ -922,12 +994,13 @@ class Ndex2:
     def add_networks_to_networkset(self, set_id, networks):
         """
         Add networks to a network set.  User must have visibility of all networks being added
+
         :param set_id: network set id
         :type set_id: basestring
         :param networks: networks that will be added to the set
         :type networks: list of strings
-        :return:
-        :rtype:
+        :return: None
+        :rtype: None
         """
 
         route = '/networkset/%s/members' % set_id
@@ -945,8 +1018,8 @@ class Ndex2:
         :type networks: list of strings
         :param retry: Number of times to retry
         :type retry: int
-        :return:
-        :rtype:
+        :return: None
+        :rtype: None
         """
 
         route = '/networkset/%s/members' % set_id
@@ -954,7 +1027,7 @@ class Ndex2:
         headers = self.s.headers
         headers['Content-Type'] = 'application/json;charset=UTF-8'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent
+        headers['User-Agent'] = userAgent + self.user_agent
 
         count = 0
         while count < retry:
@@ -977,4 +1050,7 @@ class DecimalEncoder(json.JSONEncoder):
             return float(o)
         elif isinstance(o, numpy.int64):
             return int(o)
+        elif isinstance(o, bytes):
+            bytes_string = o.decode('ascii')
+            return bytes_string
         return super(DecimalEncoder, self).default(o)

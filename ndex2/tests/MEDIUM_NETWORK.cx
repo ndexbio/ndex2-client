@@ -1,0 +1,3359 @@
+[
+  {
+    "numberVerification": [
+      {
+        "longNumber": 281474976710655
+      }
+    ]
+  },
+  {
+    "metaData": [
+      {
+        "consistencyGroup": 1,
+        "elementCount": 1,
+        "lastUpdate": 1507763425988,
+        "name": "ndexStatus",
+        "properties": [],
+        "version": "1.0"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 1,
+        "lastUpdate": 1507762851414,
+        "name": "provenanceHistory",
+        "properties": [],
+        "version": "1.0"
+      },
+      {
+        "name": "@context",
+        "elementCount": 1,
+        "version": "1.0",
+        "consistencyGroup": 2,
+        "properties": []
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 14,
+        "idCounter": 135,
+        "name": "nodes"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 37,
+        "idCounter": 135,
+        "name": "edges"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 46,
+        "idCounter": 135,
+        "name": "supports"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 38,
+        "idCounter": 135,
+        "name": "citations"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 296,
+        "idCounter": 135,
+        "name": "edgeAttributes"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 37,
+        "idCounter": 135,
+        "name": "edgeCitations"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 37,
+        "idCounter": 135,
+        "name": "edgeSupports"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 7,
+        "idCounter": 135,
+        "name": "networkAttributes"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 36,
+        "idCounter": 135,
+        "name": "nodeAttributes"
+      }
+    ]
+  },
+  {
+    "ndexStatus": [
+      {
+        "externalId": "b7190ca4-aec2-11e7-9b0a-06832d634f41",
+        "creationTime": 1507753697687,
+        "modificationTime": 1507763425988,
+        "visibility": "PRIVATE",
+        "published": false,
+        "nodeCount": 14,
+        "edgeCount": 37,
+        "owner": "scratch",
+        "ndexServerURI": "http://dev.ndexbio.org",
+        "readOnly": true
+      }
+    ]
+  },
+  {
+    "provenanceHistory": [
+      {
+        "entity": {
+          "uri": null,
+          "creationEvent": null,
+          "properties": []
+        }
+      }
+    ]
+  },
+  {
+    "@context": [
+      {
+        "pubmed": "http://identifiers.org/pubmed/",
+        "cas": "http://identifiers.org/cas/",
+        "chebi": "http://identifiers.org/chebi/CHEBI:",
+        "hprd": "http://identifiers.org/hprd/",
+        "uniprot knowledgebase": "http://identifiers.org/uniprot/",
+        "KEGG Compound": "http://identifiers.org/kegg.compound/"
+      }
+    ]
+  },
+  {
+    "nodes": [
+      {
+        "@id": 0,
+        "n": "BRAF"
+      },
+      {
+        "@id": 1,
+        "n": "ERK"
+      },
+      {
+        "@id": 5,
+        "n": "MEK"
+      },
+      {
+        "@id": 50,
+        "n": "KRAS"
+      },
+      {
+        "@id": 54,
+        "n": "RAF1"
+      },
+      {
+        "@id": 59,
+        "n": "senescence"
+      },
+      {
+        "@id": 63,
+        "n": "EGFR"
+      },
+      {
+        "@id": 71,
+        "n": "MC1R"
+      },
+      {
+        "@id": 81,
+        "n": "RAF_inhibitors"
+      },
+      {
+        "@id": 82,
+        "n": "RAF"
+      },
+      {
+        "@id": 86,
+        "n": "vemurafenib"
+      },
+      {
+        "@id": 101,
+        "n": "Dabrafenib"
+      },
+      {
+        "@id": 118,
+        "n": "Trametinib"
+      },
+      {
+        "@id": 131,
+        "n": "KSR1"
+      }
+    ]
+  },
+  {
+    "edges": [
+      {
+        "@id": 2,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 6,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 9,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 12,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 15,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 18,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 21,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 24,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 27,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 30,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 33,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 37,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 40,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 43,
+        "s": 0,
+        "t": 5,
+        "i": "Activation"
+      },
+      {
+        "@id": 46,
+        "s": 0,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 51,
+        "s": 0,
+        "t": 50,
+        "i": "Activation"
+      },
+      {
+        "@id": 55,
+        "s": 0,
+        "t": 54,
+        "i": "Activation"
+      },
+      {
+        "@id": 60,
+        "s": 0,
+        "t": 59,
+        "i": "Activation"
+      },
+      {
+        "@id": 64,
+        "s": 63,
+        "t": 0,
+        "i": "Activation"
+      },
+      {
+        "@id": 67,
+        "s": 1,
+        "t": 54,
+        "i": "Activation"
+      },
+      {
+        "@id": 72,
+        "s": 71,
+        "t": 0,
+        "i": "Activation"
+      },
+      {
+        "@id": 75,
+        "s": 54,
+        "t": 1,
+        "i": "Activation"
+      },
+      {
+        "@id": 83,
+        "s": 81,
+        "t": 82,
+        "i": "Activation"
+      },
+      {
+        "@id": 87,
+        "s": 86,
+        "t": 0,
+        "i": "Activation"
+      },
+      {
+        "@id": 90,
+        "s": 54,
+        "t": 0,
+        "i": "Complex"
+      },
+      {
+        "@id": 93,
+        "s": 0,
+        "t": 1,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 98,
+        "s": 0,
+        "t": 5,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 102,
+        "s": 101,
+        "t": 0,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 105,
+        "s": 101,
+        "t": 54,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 108,
+        "s": 54,
+        "t": 1,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 112,
+        "s": 54,
+        "t": 5,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 115,
+        "s": 54,
+        "t": 81,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 119,
+        "s": 118,
+        "t": 0,
+        "i": "Inhibition"
+      },
+      {
+        "@id": 122,
+        "s": 0,
+        "t": 1,
+        "i": "Phosphorylation"
+      },
+      {
+        "@id": 125,
+        "s": 0,
+        "t": 5,
+        "i": "Phosphorylation"
+      },
+      {
+        "@id": 128,
+        "s": 101,
+        "t": 54,
+        "i": "Phosphorylation"
+      },
+      {
+        "@id": 132,
+        "s": 131,
+        "t": 82,
+        "i": "Phosphorylation"
+      }
+    ]
+  },
+  {
+    "supports": [
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 4,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 8,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 11,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 14,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 17,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 20,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 23,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 26,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 29,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 32,
+        "attributes": []
+      },
+      {
+        "text": "As we observed, D594V BRAF, even in the presence of CRAF, did not induce strong ERK activity.",
+        "citation": null,
+        "@id": 35,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 36,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 39,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 42,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.",
+        "citation": null,
+        "@id": 45,
+        "attributes": []
+      },
+      {
+        "text": "The BRAF V600E mutation activates MAPK, affecting cell proliferation, differentiation, and survival.",
+        "citation": null,
+        "@id": 48,
+        "attributes": []
+      },
+      {
+        "text": "BRAF V600E mutation has been reported to abnormally activate MAPK signal pathway.",
+        "citation": null,
+        "@id": 49,
+        "attributes": []
+      },
+      {
+        "text": "This result may explain why H1666 and H508 cells are more sensitive to Trametinib than to Selumetinib, as BRAF mutations in these cell lines activate the ERK pathway in a CRAF dependent manner, similarly to KRAS mutated cells.",
+        "citation": null,
+        "@id": 53,
+        "attributes": []
+      },
+      {
+        "text": "A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF.",
+        "citation": null,
+        "@id": 57,
+        "attributes": []
+      },
+      {
+        "text": "This result may explain why H1666 and H508 cells are more sensitive to Trametinib than to Selumetinib, as BRAF mutations in these cell lines activate the ERK pathway in a CRAF dependent manner, similarly to KRAS mutated cells.",
+        "citation": null,
+        "@id": 58,
+        "attributes": []
+      },
+      {
+        "text": "Some studies also found that constitutive BRAF activity induces MAPK activity and glioma genesis in xenografted mice but eventually leads to tumour senescence.",
+        "citation": null,
+        "@id": 62,
+        "attributes": []
+      },
+      {
+        "text": "Retraction : EGFR Mediated Reactivation of MAPK Signaling Induces Acquired Resistance to GSK2118436 in BRAF V600E-Mutant NSCLC Cell Lines.",
+        "citation": null,
+        "@id": 66,
+        "attributes": []
+      },
+      {
+        "text": "A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF.",
+        "citation": null,
+        "@id": 69,
+        "attributes": []
+      },
+      {
+        "text": "In addition, combined Dabrafenib and Trametinib treatment inhibited Dabrafenib induced ERK activation in CRAF overexpressing monotransfectants.",
+        "citation": null,
+        "@id": 70,
+        "attributes": []
+      },
+      {
+        "text": "Palmitoylation deficient MC1R variants accelerate BRAF (V60E)-driven melanomagenesis.",
+        "citation": null,
+        "@id": 74,
+        "attributes": []
+      },
+      {
+        "text": "In HEK293T cells, Trametinib modestly decreased ERK activity induced by BRAF mutations conferring elevated kinase activity while strongly inhibited kinase impaired BRAF and CRAF induced ERK activation.",
+        "citation": null,
+        "@id": 78,
+        "attributes": []
+      },
+      {
+        "text": "A recent study revealed the superior efficacy of Trametinib versus several other MEK-inhibitors in cells with KRAS mutations and CRAF mediated ERK pathway activation [].",
+        "citation": null,
+        "@id": 79,
+        "attributes": []
+      },
+      {
+        "text": "In BRAFi resistant cells, PAKs phosphorylate CRAF and MEK to reactivate ERK.",
+        "citation": null,
+        "@id": 80,
+        "attributes": []
+      },
+      {
+        "text": "Currently approved RAF inhibitors inhibit RAF monomers but not dimers.",
+        "citation": null,
+        "@id": 85,
+        "attributes": []
+      },
+      {
+        "text": "From November 2012 to October 2015 we have selected 43 BRAF mutated, metastatic melanoma patients, treated with vemurafenib.",
+        "citation": null,
+        "@id": 89,
+        "attributes": []
+      },
+      {
+        "text": "However, kinase impairing BRAF mutations still induce ERK pathway activation when wild-type CRAF, a hetero-dimerization partner of BRAF, is also present in the cell [].",
+        "citation": null,
+        "@id": 92,
+        "attributes": []
+      },
+      {
+        "text": "As previously reported, kinase impaired BRAF mutants can still activate the ERK pathway in a CRAF dependent manner [].",
+        "citation": null,
+        "@id": 95,
+        "attributes": []
+      },
+      {
+        "text": "Inhibitory effect of Dabrafenib on mutant BRAF induced ERK signaling.",
+        "citation": null,
+        "@id": 96,
+        "attributes": []
+      },
+      {
+        "text": "Inhibitory effect of Trametinib on mutant BRAF induced ERK signaling.",
+        "citation": null,
+        "@id": 97,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.",
+        "citation": null,
+        "@id": 100,
+        "attributes": []
+      },
+      {
+        "text": "Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines.",
+        "citation": null,
+        "@id": 104,
+        "attributes": []
+      },
+      {
+        "text": "The IC50 of Dabrafenib to inhibit CRAF is ~ 10-fold less than that of Vemurafenib [ - ].",
+        "citation": null,
+        "@id": 107,
+        "attributes": []
+      },
+      {
+        "text": "The study reveals that two MEK inhibitors (Selumetinib and PD0325901) are less efficient than Trametinib for sustained suppression of CRAF mediated ERK activity.",
+        "citation": null,
+        "@id": 110,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.",
+        "citation": null,
+        "@id": 111,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.",
+        "citation": null,
+        "@id": 114,
+        "attributes": []
+      },
+      {
+        "text": "Therefore, it has yet to be determined whether over time activated CRAF can contribute to kinase independent resistance mechanisms to RAF inhibitors in BRAF mutated cancers [].",
+        "citation": null,
+        "@id": 117,
+        "attributes": []
+      },
+      {
+        "text": "Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines.",
+        "citation": null,
+        "@id": 121,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation.",
+        "citation": null,
+        "@id": 124,
+        "attributes": []
+      },
+      {
+        "text": "Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation.",
+        "citation": null,
+        "@id": 127,
+        "attributes": []
+      },
+      {
+        "text": "We observed that Dabrafenib treatment of all HEK293T transfectants resulted in phosphorylation of the transfected CRAF molecule at S338, irrespective of the presence and type of BRAF molecule.",
+        "citation": null,
+        "@id": 130,
+        "attributes": []
+      },
+      {
+        "text": "Of the five up-regulated genes, P21 and P19 encode for inhibitors for the cyclin D and the CDK4/6 complex; CFOS and CJUN are down stream of ERK and JNK kinases, and KSR1 promotes MEK and RAF phosphorylation.",
+        "citation": null,
+        "@id": 134,
+        "attributes": []
+      }
+    ]
+  },
+  {
+    "citations": [
+      {
+        "@id": 3,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 7,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 10,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 13,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 16,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 19,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 22,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 25,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 28,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 31,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 34,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 38,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 41,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 44,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 47,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28986151",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 52,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 56,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 61,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28986151",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 65,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28974625",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 68,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 73,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28916587",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 76,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 77,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28953887",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 84,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28951457",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 88,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28963614",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 91,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 94,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 99,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 103,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 106,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 109,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 113,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 116,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 120,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 123,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 126,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 129,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28947956",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      },
+      {
+        "@id": 133,
+        "dc:title": null,
+        "dc:contributor": null,
+        "dc:identifier": "pmid:28959611",
+        "dc:type": null,
+        "dc:description": null,
+        "attributes": []
+      }
+    ]
+  },
+  {
+    "edgeAttributes": [
+      {
+        "po": 2,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 466, V)), ERK())"
+      },
+      {
+        "po": 2,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"466\", \"residue_from\": \"G\", \"residue_to\": \"V\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"6bf35494-4c76-43f2-bfe8-ff9ab1649876\", \"supported_by\": [\"68e0c377-cf08-4f78-ac3a-c091adb87f1f\", \"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\", \"801a10a6-8690-4c82-814e-2e107613971d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 2,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 2,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 2,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 2,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 2,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 2,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 6,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 466, V)), MEK())"
+      },
+      {
+        "po": 6,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"466\", \"residue_from\": \"G\", \"residue_to\": \"V\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"d0fc25e0-ec0d-4864-a6fb-b5a27069da65\", \"supported_by\": [\"85cc2ebc-b977-4a04-9e34-5795a4f6f52d\", \"771097ad-717f-41da-b345-69c33dff8de4\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 6,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 6,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 6,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 6,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 6,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 6,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 9,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, A)), ERK())"
+      },
+      {
+        "po": 9,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"A\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"c08e01a8-1106-44cc-b3ed-faac092033fc\", \"supported_by\": [\"68e0c377-cf08-4f78-ac3a-c091adb87f1f\", \"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\", \"801a10a6-8690-4c82-814e-2e107613971d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 9,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 9,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 9,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 9,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 9,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 9,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 12,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, A)), MEK())"
+      },
+      {
+        "po": 12,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"A\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"e3b4735f-b0dd-4a4a-a732-deb4c716b6a7\", \"supported_by\": [\"85cc2ebc-b977-4a04-9e34-5795a4f6f52d\", \"771097ad-717f-41da-b345-69c33dff8de4\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 12,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 12,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 12,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 12,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 12,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 12,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 15,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, E)), ERK())"
+      },
+      {
+        "po": 15,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"E\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"43958f7b-e4f0-4c26-9072-37e6646b7d1c\", \"supported_by\": [\"801a10a6-8690-4c82-814e-2e107613971d\", \"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\", \"68e0c377-cf08-4f78-ac3a-c091adb87f1f\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 15,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 15,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 15,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 15,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 15,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 15,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 18,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, E)), MEK())"
+      },
+      {
+        "po": 18,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"E\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"3af54d2c-a4c4-41e2-b126-cb16b03f908a\", \"supported_by\": [\"771097ad-717f-41da-b345-69c33dff8de4\", \"85cc2ebc-b977-4a04-9e34-5795a4f6f52d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 18,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 18,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 18,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 18,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 18,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 18,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 21,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, G)), ERK())"
+      },
+      {
+        "po": 21,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"G\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"64a1f4a8-8d7d-4d28-b417-8abb818c33e2\", \"supported_by\": [\"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\", \"68e0c377-cf08-4f78-ac3a-c091adb87f1f\", \"801a10a6-8690-4c82-814e-2e107613971d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 21,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 21,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 21,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 21,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 21,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 21,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 24,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, G)), MEK())"
+      },
+      {
+        "po": 24,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"G\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"e1abe305-32b4-4a32-ad2b-08c7fc78cb5a\", \"supported_by\": [\"771097ad-717f-41da-b345-69c33dff8de4\", \"85cc2ebc-b977-4a04-9e34-5795a4f6f52d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 24,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 24,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 24,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 24,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 24,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 24,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 27,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, N)), ERK())"
+      },
+      {
+        "po": 27,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"N\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"98d42160-3c9c-4cd8-89da-8bcebb7caae3\", \"supported_by\": [\"68e0c377-cf08-4f78-ac3a-c091adb87f1f\", \"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\", \"801a10a6-8690-4c82-814e-2e107613971d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 27,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 27,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 27,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 27,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 27,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 27,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 30,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, N)), MEK())"
+      },
+      {
+        "po": 30,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"N\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"f3a51c3f-75fd-486d-8563-d1db91eb39fe\", \"supported_by\": [\"771097ad-717f-41da-b345-69c33dff8de4\", \"85cc2ebc-b977-4a04-9e34-5795a4f6f52d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 30,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 30,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 30,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 30,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 30,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 30,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 33,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, V)), ERK())"
+      },
+      {
+        "po": 33,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"V\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"As we observed, D594V BRAF, even in the presence of CRAF, did not induce strong ERK activity.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"00a6e12c-eba7-498b-a59c-a27a21a91d85\", \"supported_by\": [\"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\", \"801a10a6-8690-4c82-814e-2e107613971d\", \"68e0c377-cf08-4f78-ac3a-c091adb87f1f\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 33,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 33,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 33,
+        "n": "Belief score",
+        "v": "0.86"
+      },
+      {
+        "po": 33,
+        "n": "Text",
+        "v": "As we observed, D594V BRAF, even in the presence of CRAF, did not induce strong ERK activity."
+      },
+      {
+        "po": 33,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 33,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 37,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (D, 594, V)), MEK())"
+      },
+      {
+        "po": 37,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"594\", \"residue_from\": \"D\", \"residue_to\": \"V\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"581301ea-cbaf-4c59-9d5a-9405a743962f\", \"supported_by\": [\"771097ad-717f-41da-b345-69c33dff8de4\", \"85cc2ebc-b977-4a04-9e34-5795a4f6f52d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 37,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 37,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 37,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 37,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 37,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 37,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 40,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 596, C)), ERK())"
+      },
+      {
+        "po": 40,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"596\", \"residue_from\": \"G\", \"residue_to\": \"C\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"3492dad4-9228-4e61-ad08-28c2c8ababb3\", \"supported_by\": [\"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\", \"801a10a6-8690-4c82-814e-2e107613971d\", \"68e0c377-cf08-4f78-ac3a-c091adb87f1f\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 40,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 40,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 40,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 40,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 40,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 40,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 43,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (G, 596, C)), MEK())"
+      },
+      {
+        "po": 43,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"596\", \"residue_from\": \"G\", \"residue_to\": \"C\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"a714426b-948a-436a-9bdb-47c007f8bc8e\", \"supported_by\": [\"85cc2ebc-b977-4a04-9e34-5795a4f6f52d\", \"771097ad-717f-41da-b345-69c33dff8de4\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 43,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 43,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 43,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 43,
+        "n": "Text",
+        "v": "The BRAF mutants G466V, D594A, D594G, D594E, D594N, D594V and G596C did not induce MEK or ERK activation compared to wt-BRAF."
+      },
+      {
+        "po": 43,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 43,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 46,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (V, 600, E)), ERK())"
+      },
+      {
+        "po": 46,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": \"600\", \"residue_from\": \"V\", \"residue_to\": \"E\"}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"MAPK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28986151\", \"text\": \"The BRAF V600E mutation activates MAPK, affecting cell proliferation, differentiation, and survival.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28986151\", \"text\": \"BRAF V600E mutation has been reported to abnormally activate MAPK signal pathway.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"6cb10cca-7d40-48b6-ba4e-12766a7d4029\", \"supported_by\": [\"68e0c377-cf08-4f78-ac3a-c091adb87f1f\", \"801a10a6-8690-4c82-814e-2e107613971d\", \"9c8af0f8-7add-4cdc-bee5-84f2ec571d0d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 46,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 46,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 46,
+        "n": "Belief score",
+        "v": "0.86"
+      },
+      {
+        "po": 46,
+        "n": "Text",
+        "v": "The BRAF V600E mutation activates MAPK, affecting cell proliferation, differentiation, and survival."
+      },
+      {
+        "po": 46,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 46,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 51,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (None, None, None)), KRAS())"
+      },
+      {
+        "po": 51,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": null, \"residue_from\": null, \"residue_to\": null}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"KRAS\", \"db_refs\": {\"TEXT\": \"KRAS\", \"UP\": \"P01116\", \"HGNC\": \"6407\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"This result may explain why H1666 and H508 cells are more sensitive to Trametinib than to Selumetinib, as BRAF mutations in these cell lines activate the ERK pathway in a CRAF dependent manner, similarly to KRAS mutated cells.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_7_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"5a1dfdf7-5f79-4a9c-a753-37c2ec76b177\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 51,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 51,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 51,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 51,
+        "n": "Text",
+        "v": "This result may explain why H1666 and H508 cells are more sensitive to Trametinib than to Selumetinib, as BRAF mutations in these cell lines activate the ERK pathway in a CRAF dependent manner, similarly to KRAS mutated cells."
+      },
+      {
+        "po": 51,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 51,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 55,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(muts: (None, None, None)), RAF1())"
+      },
+      {
+        "po": 55,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": null, \"residue_from\": null, \"residue_to\": null}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"This result may explain why H1666 and H508 cells are more sensitive to Trametinib than to Selumetinib, as BRAF mutations in these cell lines activate the ERK pathway in a CRAF dependent manner, similarly to KRAS mutated cells.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"389a79fd-59a9-4948-b8e4-c98a525b11fc\", \"supported_by\": [\"b939dd60-2425-4db4-8d27-88782444892e\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 55,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 55,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 55,
+        "n": "Belief score",
+        "v": "0.86"
+      },
+      {
+        "po": 55,
+        "n": "Text",
+        "v": "A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF."
+      },
+      {
+        "po": 55,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 55,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 60,
+        "n": "INDRA statement",
+        "v": "Activation(BRAF(), senescence())"
+      },
+      {
+        "po": 60,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"senescence\", \"db_refs\": {\"GO\": \"GO:0090398\", \"TEXT\": \"senescence\", \"MESH\": \"D016922\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28986151\", \"text\": \"Some studies also found that constitutive BRAF activity induces MAPK activity and glioma genesis in xenografted mice but eventually leads to tumour senescence.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_7_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"dc7fb5b6-1ac9-4a2c-ba35-17627337fdf8\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 60,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 60,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 60,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 60,
+        "n": "Text",
+        "v": "Some studies also found that constitutive BRAF activity induces MAPK activity and glioma genesis in xenografted mice but eventually leads to tumour senescence."
+      },
+      {
+        "po": 60,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 60,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 64,
+        "n": "INDRA statement",
+        "v": "Activation(EGFR(), BRAF())"
+      },
+      {
+        "po": 64,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"EGFR\", \"db_refs\": {\"TEXT\": \"EGFR\", \"UP\": \"P00533\", \"HGNC\": \"3236\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28974625\", \"text\": \"Retraction : EGFR Mediated Reactivation of MAPK Signaling Induces Acquired Resistance to GSK2118436 in BRAF V600E-Mutant NSCLC Cell Lines.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"b202c476-e5de-44a5-bacc-599a21695a36\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 64,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 64,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 64,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 64,
+        "n": "Text",
+        "v": "Retraction : EGFR Mediated Reactivation of MAPK Signaling Induces Acquired Resistance to GSK2118436 in BRAF V600E-Mutant NSCLC Cell Lines."
+      },
+      {
+        "po": 64,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 64,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 67,
+        "n": "INDRA statement",
+        "v": "Activation(ERK(), RAF1())"
+      },
+      {
+        "po": 67,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"In addition, combined Dabrafenib and Trametinib treatment inhibited Dabrafenib induced ERK activation in CRAF overexpressing monotransfectants.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_3_noun\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"c56399b1-5c85-406c-8609-f68b731adecd\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 67,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 67,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 67,
+        "n": "Belief score",
+        "v": "0.86"
+      },
+      {
+        "po": 67,
+        "n": "Text",
+        "v": "A clinically relevant dose of Dabrafenib, a type I RAF-inhibitor, in HEK293T cells reduced ERK activity induced by BRAF mutations conferring high kinase activity in the presence and absence of CRAF."
+      },
+      {
+        "po": 67,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 67,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 72,
+        "n": "INDRA statement",
+        "v": "Activation(MC1R(), BRAF())"
+      },
+      {
+        "po": 72,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"MC1R\", \"db_refs\": {\"TEXT\": \"MC1R\", \"UP\": \"Q01726\", \"HGNC\": \"6929\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28916587\", \"text\": \"Palmitoylation deficient MC1R variants accelerate BRAF (V60E)-driven melanomagenesis.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"2fc7fda0-15b0-414e-8ff7-025f45cb8c0b\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 72,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 72,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 72,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 72,
+        "n": "Text",
+        "v": "Palmitoylation deficient MC1R variants accelerate BRAF (V60E)-driven melanomagenesis."
+      },
+      {
+        "po": 72,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 72,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 75,
+        "n": "INDRA statement",
+        "v": "Activation(RAF1(), ERK())"
+      },
+      {
+        "po": 75,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"In HEK293T cells, Trametinib modestly decreased ERK activity induced by BRAF mutations conferring elevated kinase activity while strongly inhibited kinase impaired BRAF and CRAF induced ERK activation.\", \"annotations\": {\"found_by\": \"Positive_early_activation\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"A recent study revealed the superior efficacy of Trametinib versus several other MEK-inhibitors in cells with KRAS mutations and CRAF mediated ERK pathway activation [XREF_BIBR].\", \"annotations\": {\"found_by\": \"Positive_early_activation\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28953887\", \"text\": \"In BRAFi resistant cells, PAKs phosphorylate CRAF and MEK to reactivate ERK.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"65ffaa64-8419-4f74-818a-d43992319f17\", \"supported_by\": [\"801a10a6-8690-4c82-814e-2e107613971d\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 75,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 75,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 75,
+        "n": "Belief score",
+        "v": "0.92"
+      },
+      {
+        "po": 75,
+        "n": "Text",
+        "v": "In HEK293T cells, Trametinib modestly decreased ERK activity induced by BRAF mutations conferring elevated kinase activity while strongly inhibited kinase impaired BRAF and CRAF induced ERK activation."
+      },
+      {
+        "po": 75,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 75,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 83,
+        "n": "INDRA statement",
+        "v": "Activation(RAF_inhibitors(), RAF())"
+      },
+      {
+        "po": 83,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"RAF_inhibitors\", \"db_refs\": {\"TEXT\": \"RAF inhibitors\", \"CHEBI\": \"CHEBI:75047\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"RAF\", \"db_refs\": {\"TEXT\": \"RAF\", \"BE\": \"RAF\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28951457\", \"text\": \"Currently approved RAF inhibitors inhibit RAF monomers but not dimers.\", \"annotations\": {\"found_by\": \"Negative_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"5ba5fe59-5973-48f3-871c-dbf2e2108436\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 83,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 83,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 83,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 83,
+        "n": "Text",
+        "v": "Currently approved RAF inhibitors inhibit RAF monomers but not dimers."
+      },
+      {
+        "po": 83,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 83,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 87,
+        "n": "INDRA statement",
+        "v": "Activation(vemurafenib(), BRAF())"
+      },
+      {
+        "po": 87,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Activation\", \"subj\": {\"name\": \"vemurafenib\", \"db_refs\": {\"TEXT\": \"vemurafenib\", \"CHEBI\": \"CHEBI:63637\", \"PUBCHEM\": \"42611257\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000459\"}, \"obj\": {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000643\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28963614\", \"text\": \"From November 2012 to October 2015 we have selected 43 BRAF mutated, metastatic melanoma patients, treated with vemurafenib.\", \"annotations\": {\"found_by\": \"Positive_activation_surface_treated_with\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"2157d53e-94d4-424c-99eb-754e1beb7a6d\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 87,
+        "n": "type",
+        "v": "Activation"
+      },
+      {
+        "po": 87,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 87,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 87,
+        "n": "Text",
+        "v": "From November 2012 to October 2015 we have selected 43 BRAF mutated, metastatic melanoma patients, treated with vemurafenib."
+      },
+      {
+        "po": 87,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 87,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 90,
+        "n": "INDRA statement",
+        "v": "Complex(RAF1(), BRAF())"
+      },
+      {
+        "po": 90,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Complex\", \"members\": [{\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}}, {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}}], \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"However, kinase impairing BRAF mutations still induce ERK pathway activation when wild-type CRAF, a hetero-dimerization partner of BRAF, is also present in the cell [XREF_BIBR].\", \"annotations\": {\"cell_type\": null, \"organ\": null, \"found_by\": \"binding_19\", \"tissue\": null, \"location\": null, \"cell_line\": null, \"species\": [\"taxonomy:9606\"]}, \"epistemics\": {\"section_type\": null, \"direct\": true}}], \"id\": \"aa33b60b-1dfd-43c7-8fd4-e0af85bdf988\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000526\"}"
+      },
+      {
+        "po": 90,
+        "n": "type",
+        "v": "Complex"
+      },
+      {
+        "po": 90,
+        "n": "polarity",
+        "v": "none"
+      },
+      {
+        "po": 90,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 90,
+        "n": "Text",
+        "v": "However, kinase impairing BRAF mutations still induce ERK pathway activation when wild-type CRAF, a hetero-dimerization partner of BRAF, is also present in the cell [XREF_BIBR]."
+      },
+      {
+        "po": 90,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 90,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 93,
+        "n": "INDRA statement",
+        "v": "Inhibition(BRAF(muts: (None, None, None)), ERK())"
+      },
+      {
+        "po": 93,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"BRAF\", \"mutations\": [{\"position\": null, \"residue_from\": null, \"residue_to\": null}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"As previously reported, kinase impaired BRAF mutants can still activate the ERK pathway in a CRAF dependent manner [XREF_BIBR].\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Inhibitory effect of Dabrafenib on mutant BRAF induced ERK signaling.\", \"annotations\": {\"found_by\": \"Positive_early_activation\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Inhibitory effect of Trametinib on mutant BRAF induced ERK signaling.\", \"annotations\": {\"found_by\": \"Positive_early_activation\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"7b9004b3-1185-42aa-b3bc-cb6376afeed6\", \"supported_by\": [\"8801cc23-52d0-47aa-9f50-90150a675b3d\", \"25cc8002-0c51-42cf-ad7b-4a2b0cd922da\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 93,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 93,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 93,
+        "n": "Belief score",
+        "v": "0.92"
+      },
+      {
+        "po": 93,
+        "n": "Text",
+        "v": "As previously reported, kinase impaired BRAF mutants can still activate the ERK pathway in a CRAF dependent manner [XREF_BIBR]."
+      },
+      {
+        "po": 93,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 93,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 98,
+        "n": "INDRA statement",
+        "v": "Inhibition(BRAF(), MEK())"
+      },
+      {
+        "po": 98,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"32b9b643-213e-45f3-b979-f3fc5c82fcde\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 98,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 98,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 98,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 98,
+        "n": "Text",
+        "v": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells."
+      },
+      {
+        "po": 98,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 98,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 102,
+        "n": "INDRA statement",
+        "v": "Inhibition(Dabrafenib(), BRAF())"
+      },
+      {
+        "po": 102,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"Dabrafenib\", \"db_refs\": {\"PUBCHEM\": \"44462760\", \"TEXT\": \"Dabrafenib\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"39d890f3-31eb-4d3d-a2ca-4042415f5a38\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 102,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 102,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 102,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 102,
+        "n": "Text",
+        "v": "Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines."
+      },
+      {
+        "po": 102,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 102,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 105,
+        "n": "INDRA statement",
+        "v": "Inhibition(Dabrafenib(), RAF1())"
+      },
+      {
+        "po": 105,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"Dabrafenib\", \"db_refs\": {\"PUBCHEM\": \"44462760\", \"TEXT\": \"Dabrafenib\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The IC50 of Dabrafenib to inhibit CRAF is ~ 10-fold less than that of Vemurafenib [XREF_BIBR - XREF_BIBR].\", \"annotations\": {\"found_by\": \"Negative_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"6eb20af6-42c9-4209-9bb3-681d8716ba18\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 105,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 105,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 105,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 105,
+        "n": "Text",
+        "v": "The IC50 of Dabrafenib to inhibit CRAF is ~ 10-fold less than that of Vemurafenib [XREF_BIBR - XREF_BIBR]."
+      },
+      {
+        "po": 105,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 105,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 108,
+        "n": "INDRA statement",
+        "v": "Inhibition(RAF1(), ERK())"
+      },
+      {
+        "po": 108,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"The study reveals that two MEK inhibitors (Selumetinib and PD0325901) are less efficient than Trametinib for sustained suppression of CRAF mediated ERK activity.\", \"annotations\": {\"found_by\": \"Positive_early_activation\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}, {\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"6c1d5376-3224-4bd5-96ad-ecedd7d1c54c\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 108,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 108,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 108,
+        "n": "Belief score",
+        "v": "0.86"
+      },
+      {
+        "po": 108,
+        "n": "Text",
+        "v": "The study reveals that two MEK inhibitors (Selumetinib and PD0325901) are less efficient than Trametinib for sustained suppression of CRAF mediated ERK activity."
+      },
+      {
+        "po": 108,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 108,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 112,
+        "n": "INDRA statement",
+        "v": "Inhibition(RAF1(), MEK())"
+      },
+      {
+        "po": 112,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"0db1c1bb-c7ab-47d2-a7ee-2ccb763f29d5\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 112,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 112,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 112,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 112,
+        "n": "Text",
+        "v": "Co-expression of kinase impaired BRAF and CRAF induces MEK and ERK pathway activation in HEK293T cells."
+      },
+      {
+        "po": 112,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 112,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 115,
+        "n": "INDRA statement",
+        "v": "Inhibition(RAF1(), RAF_inhibitors())"
+      },
+      {
+        "po": 115,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"RAF_inhibitors\", \"db_refs\": {\"TEXT\": \"RAF inhibitors\", \"CHEBI\": \"CHEBI:75047\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Therefore, it has yet to be determined whether over time activated CRAF can contribute to kinase independent resistance mechanisms to RAF inhibitors in BRAF mutated cancers [XREF_BIBR].\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_7_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"a9427ab8-7862-47ac-80ec-4e99bafb098a\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 115,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 115,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 115,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 115,
+        "n": "Text",
+        "v": "Therefore, it has yet to be determined whether over time activated CRAF can contribute to kinase independent resistance mechanisms to RAF inhibitors in BRAF mutated cancers [XREF_BIBR]."
+      },
+      {
+        "po": 115,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 115,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 119,
+        "n": "INDRA statement",
+        "v": "Inhibition(Trametinib(), BRAF())"
+      },
+      {
+        "po": 119,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Inhibition\", \"subj\": {\"name\": \"Trametinib\", \"db_refs\": {\"PUBCHEM\": \"11707110\", \"TEXT\": \"Trametinib\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000020\"}, \"obj\": {\"name\": \"BRAF\", \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000642\"}, \"obj_activity\": \"activity\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines.\", \"annotations\": {\"found_by\": \"Positive_activation_syntax_1_verb\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"62edbe1c-da19-4fc2-9ce2-4eef86fe1025\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000182\"}"
+      },
+      {
+        "po": 119,
+        "n": "type",
+        "v": "Inhibition"
+      },
+      {
+        "po": 119,
+        "n": "polarity",
+        "v": "negative"
+      },
+      {
+        "po": 119,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 119,
+        "n": "Text",
+        "v": "Combination of Dabrafenib and Trametinib enhances and prolongs ERK inhibition in non V600 BRAF mutated cell lines."
+      },
+      {
+        "po": 119,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 119,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 122,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(BRAF(mods: (modification), muts: (None, None, None)), ERK())"
+      },
+      {
+        "po": 122,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Phosphorylation\", \"enz\": {\"name\": \"BRAF\", \"mods\": [{\"mod_type\": \"modification\", \"is_modified\": true}], \"mutations\": [{\"position\": null, \"residue_from\": null, \"residue_to\": null}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000460\"}, \"sub\": {\"name\": \"ERK\", \"db_refs\": {\"TEXT\": \"ERK\", \"BE\": \"ERK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000015\"}, \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation.\", \"annotations\": {\"cell_type\": null, \"organ\": null, \"found_by\": \"Phosphorylation_syntax_4_noun\", \"tissue\": null, \"location\": null, \"cell_line\": [\"cellosaurus:CVCL_0045\"], \"species\": [\"taxonomy:9606\"]}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"3c8c9c9f-91e7-419f-8738-b9529e7570b7\", \"supported_by\": [\"253bfc59-b6d9-4de2-9497-c1a219083bcb\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000216\"}"
+      },
+      {
+        "po": 122,
+        "n": "type",
+        "v": "Modification"
+      },
+      {
+        "po": 122,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 122,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 122,
+        "n": "Text",
+        "v": "Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation."
+      },
+      {
+        "po": 122,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 122,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 125,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(BRAF(mods: (modification), muts: (None, None, None)), MEK())"
+      },
+      {
+        "po": 125,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Phosphorylation\", \"enz\": {\"name\": \"BRAF\", \"mods\": [{\"mod_type\": \"modification\", \"is_modified\": true}], \"mutations\": [{\"position\": null, \"residue_from\": null, \"residue_to\": null}], \"db_refs\": {\"TEXT\": \"BRAF\", \"UP\": \"P15056\", \"HGNC\": \"1097\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000460\"}, \"sub\": {\"name\": \"MEK\", \"db_refs\": {\"TEXT\": \"MEK\", \"BE\": \"MEK\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000015\"}, \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation.\", \"annotations\": {\"cell_type\": null, \"organ\": null, \"found_by\": \"Phosphorylation_syntax_4_noun\", \"tissue\": null, \"location\": null, \"cell_line\": [\"cellosaurus:CVCL_0045\"], \"species\": [\"taxonomy:9606\"]}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"96bc8290-e868-43f0-9ba1-1d6238924245\", \"supported_by\": [\"d298a9d6-568f-4abb-84da-1b2060a0b327\"], \"sbo\": \"http://identifiers.org/sbo/SBO:0000216\"}"
+      },
+      {
+        "po": 125,
+        "n": "type",
+        "v": "Modification"
+      },
+      {
+        "po": 125,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 125,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 125,
+        "n": "Text",
+        "v": "Co-expression of BRAF mutants with impaired kinase activity and CRAF strongly increased MEK and ERK phosphorylation."
+      },
+      {
+        "po": 125,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 125,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 128,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(Dabrafenib(), RAF1(), S, 338)"
+      },
+      {
+        "po": 128,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Phosphorylation\", \"enz\": {\"name\": \"Dabrafenib\", \"db_refs\": {\"PUBCHEM\": \"44462760\", \"TEXT\": \"Dabrafenib\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000460\"}, \"sub\": {\"name\": \"RAF1\", \"db_refs\": {\"TEXT\": \"CRAF\", \"UP\": \"P04049\", \"HGNC\": \"9829\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000015\"}, \"residue\": \"S\", \"position\": \"338\", \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28947956\", \"text\": \"We observed that Dabrafenib treatment of all HEK293T transfectants resulted in phosphorylation of the transfected CRAF molecule at S338, irrespective of the presence and type of BRAF molecule.\", \"annotations\": {\"found_by\": \"Phosphorylation_syntax_1a_noun\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"b7b02426-f9dd-4dd8-b623-52315acdcf48\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000216\"}"
+      },
+      {
+        "po": 128,
+        "n": "type",
+        "v": "Modification"
+      },
+      {
+        "po": 128,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 128,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 128,
+        "n": "Text",
+        "v": "We observed that Dabrafenib treatment of all HEK293T transfectants resulted in phosphorylation of the transfected CRAF molecule at S338, irrespective of the presence and type of BRAF molecule."
+      },
+      {
+        "po": 128,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 128,
+        "n": "supportType",
+        "v": "literature"
+      },
+      {
+        "po": 132,
+        "n": "INDRA statement",
+        "v": "Phosphorylation(KSR1(), RAF())"
+      },
+      {
+        "po": 132,
+        "n": "INDRA json",
+        "v": "{\"type\": \"Phosphorylation\", \"enz\": {\"name\": \"KSR1\", \"db_refs\": {\"TEXT\": \"KSR1\", \"UP\": \"Q8IVT5\", \"HGNC\": \"6465\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000460\"}, \"sub\": {\"name\": \"RAF\", \"db_refs\": {\"TEXT\": \"RAF\", \"BE\": \"RAF\"}, \"sbo\": \"http://identifiers.org/sbo/SBO:0000015\"}, \"evidence\": [{\"source_api\": \"reach\", \"pmid\": \"28959611\", \"text\": \"Of the five up-regulated genes, P21 and P19 encode for inhibitors for the cyclin D and the CDK4/6 complex; CFOS and CJUN are down stream of ERK and JNK kinases, and KSR1 promotes MEK and RAF phosphorylation.\", \"annotations\": {\"found_by\": \"Phosphorylation_syntax_4_noun\"}, \"epistemics\": {\"section_type\": null, \"direct\": false}}], \"id\": \"d475a8bc-a2eb-4898-a6d4-34a412323171\", \"sbo\": \"http://identifiers.org/sbo/SBO:0000216\"}"
+      },
+      {
+        "po": 132,
+        "n": "type",
+        "v": "Modification"
+      },
+      {
+        "po": 132,
+        "n": "polarity",
+        "v": "positive"
+      },
+      {
+        "po": 132,
+        "n": "Belief score",
+        "v": "0.65"
+      },
+      {
+        "po": 132,
+        "n": "Text",
+        "v": "Of the five up-regulated genes, P21 and P19 encode for inhibitors for the cyclin D and the CDK4/6 complex; CFOS and CJUN are down stream of ERK and JNK kinases, and KSR1 promotes MEK and RAF phosphorylation."
+      },
+      {
+        "po": 132,
+        "n": "indra",
+        "v": ""
+      },
+      {
+        "po": 132,
+        "n": "supportType",
+        "v": "literature"
+      }
+    ]
+  },
+  {
+    "edgeCitations": [
+      {
+        "po": [
+          2
+        ],
+        "citations": [
+          3
+        ]
+      },
+      {
+        "po": [
+          6
+        ],
+        "citations": [
+          7
+        ]
+      },
+      {
+        "po": [
+          9
+        ],
+        "citations": [
+          10
+        ]
+      },
+      {
+        "po": [
+          12
+        ],
+        "citations": [
+          13
+        ]
+      },
+      {
+        "po": [
+          15
+        ],
+        "citations": [
+          16
+        ]
+      },
+      {
+        "po": [
+          18
+        ],
+        "citations": [
+          19
+        ]
+      },
+      {
+        "po": [
+          21
+        ],
+        "citations": [
+          22
+        ]
+      },
+      {
+        "po": [
+          24
+        ],
+        "citations": [
+          25
+        ]
+      },
+      {
+        "po": [
+          27
+        ],
+        "citations": [
+          28
+        ]
+      },
+      {
+        "po": [
+          30
+        ],
+        "citations": [
+          31
+        ]
+      },
+      {
+        "po": [
+          33
+        ],
+        "citations": [
+          34
+        ]
+      },
+      {
+        "po": [
+          37
+        ],
+        "citations": [
+          38
+        ]
+      },
+      {
+        "po": [
+          40
+        ],
+        "citations": [
+          41
+        ]
+      },
+      {
+        "po": [
+          43
+        ],
+        "citations": [
+          44
+        ]
+      },
+      {
+        "po": [
+          46
+        ],
+        "citations": [
+          47
+        ]
+      },
+      {
+        "po": [
+          51
+        ],
+        "citations": [
+          52
+        ]
+      },
+      {
+        "po": [
+          55
+        ],
+        "citations": [
+          56
+        ]
+      },
+      {
+        "po": [
+          60
+        ],
+        "citations": [
+          61
+        ]
+      },
+      {
+        "po": [
+          64
+        ],
+        "citations": [
+          65
+        ]
+      },
+      {
+        "po": [
+          67
+        ],
+        "citations": [
+          68
+        ]
+      },
+      {
+        "po": [
+          72
+        ],
+        "citations": [
+          73
+        ]
+      },
+      {
+        "po": [
+          75
+        ],
+        "citations": [
+          76,
+          77
+        ]
+      },
+      {
+        "po": [
+          83
+        ],
+        "citations": [
+          84
+        ]
+      },
+      {
+        "po": [
+          87
+        ],
+        "citations": [
+          88
+        ]
+      },
+      {
+        "po": [
+          90
+        ],
+        "citations": [
+          91
+        ]
+      },
+      {
+        "po": [
+          93
+        ],
+        "citations": [
+          94
+        ]
+      },
+      {
+        "po": [
+          98
+        ],
+        "citations": [
+          99
+        ]
+      },
+      {
+        "po": [
+          102
+        ],
+        "citations": [
+          103
+        ]
+      },
+      {
+        "po": [
+          105
+        ],
+        "citations": [
+          106
+        ]
+      },
+      {
+        "po": [
+          108
+        ],
+        "citations": [
+          109
+        ]
+      },
+      {
+        "po": [
+          112
+        ],
+        "citations": [
+          113
+        ]
+      },
+      {
+        "po": [
+          115
+        ],
+        "citations": [
+          116
+        ]
+      },
+      {
+        "po": [
+          119
+        ],
+        "citations": [
+          120
+        ]
+      },
+      {
+        "po": [
+          122
+        ],
+        "citations": [
+          123
+        ]
+      },
+      {
+        "po": [
+          125
+        ],
+        "citations": [
+          126
+        ]
+      },
+      {
+        "po": [
+          128
+        ],
+        "citations": [
+          129
+        ]
+      },
+      {
+        "po": [
+          132
+        ],
+        "citations": [
+          133
+        ]
+      }
+    ]
+  },
+  {
+    "edgeSupports": [
+      {
+        "po": [
+          2
+        ],
+        "supports": [
+          4
+        ]
+      },
+      {
+        "po": [
+          6
+        ],
+        "supports": [
+          8
+        ]
+      },
+      {
+        "po": [
+          9
+        ],
+        "supports": [
+          11
+        ]
+      },
+      {
+        "po": [
+          12
+        ],
+        "supports": [
+          14
+        ]
+      },
+      {
+        "po": [
+          15
+        ],
+        "supports": [
+          17
+        ]
+      },
+      {
+        "po": [
+          18
+        ],
+        "supports": [
+          20
+        ]
+      },
+      {
+        "po": [
+          21
+        ],
+        "supports": [
+          23
+        ]
+      },
+      {
+        "po": [
+          24
+        ],
+        "supports": [
+          26
+        ]
+      },
+      {
+        "po": [
+          27
+        ],
+        "supports": [
+          29
+        ]
+      },
+      {
+        "po": [
+          30
+        ],
+        "supports": [
+          32
+        ]
+      },
+      {
+        "po": [
+          33
+        ],
+        "supports": [
+          35,
+          36
+        ]
+      },
+      {
+        "po": [
+          37
+        ],
+        "supports": [
+          39
+        ]
+      },
+      {
+        "po": [
+          40
+        ],
+        "supports": [
+          42
+        ]
+      },
+      {
+        "po": [
+          43
+        ],
+        "supports": [
+          45
+        ]
+      },
+      {
+        "po": [
+          46
+        ],
+        "supports": [
+          48,
+          49
+        ]
+      },
+      {
+        "po": [
+          51
+        ],
+        "supports": [
+          53
+        ]
+      },
+      {
+        "po": [
+          55
+        ],
+        "supports": [
+          57,
+          58
+        ]
+      },
+      {
+        "po": [
+          60
+        ],
+        "supports": [
+          62
+        ]
+      },
+      {
+        "po": [
+          64
+        ],
+        "supports": [
+          66
+        ]
+      },
+      {
+        "po": [
+          67
+        ],
+        "supports": [
+          69,
+          70
+        ]
+      },
+      {
+        "po": [
+          72
+        ],
+        "supports": [
+          74
+        ]
+      },
+      {
+        "po": [
+          75
+        ],
+        "supports": [
+          78,
+          79,
+          80
+        ]
+      },
+      {
+        "po": [
+          83
+        ],
+        "supports": [
+          85
+        ]
+      },
+      {
+        "po": [
+          87
+        ],
+        "supports": [
+          89
+        ]
+      },
+      {
+        "po": [
+          90
+        ],
+        "supports": [
+          92
+        ]
+      },
+      {
+        "po": [
+          93
+        ],
+        "supports": [
+          95,
+          96,
+          97
+        ]
+      },
+      {
+        "po": [
+          98
+        ],
+        "supports": [
+          100
+        ]
+      },
+      {
+        "po": [
+          102
+        ],
+        "supports": [
+          104
+        ]
+      },
+      {
+        "po": [
+          105
+        ],
+        "supports": [
+          107
+        ]
+      },
+      {
+        "po": [
+          108
+        ],
+        "supports": [
+          110,
+          111
+        ]
+      },
+      {
+        "po": [
+          112
+        ],
+        "supports": [
+          114
+        ]
+      },
+      {
+        "po": [
+          115
+        ],
+        "supports": [
+          117
+        ]
+      },
+      {
+        "po": [
+          119
+        ],
+        "supports": [
+          121
+        ]
+      },
+      {
+        "po": [
+          122
+        ],
+        "supports": [
+          124
+        ]
+      },
+      {
+        "po": [
+          125
+        ],
+        "supports": [
+          127
+        ]
+      },
+      {
+        "po": [
+          128
+        ],
+        "supports": [
+          130
+        ]
+      },
+      {
+        "po": [
+          132
+        ],
+        "supports": [
+          134
+        ]
+      }
+    ]
+  },
+  {
+    "networkAttributes": [
+      {
+        "n": "name",
+        "v": "Copy of rasmachine"
+      },
+      {
+        "n": "description",
+        "v": "<div>sdfaasd</div>"
+      },
+      {
+        "n": "version",
+        "v": "1.1"
+      },
+      {
+        "n": "rights",
+        "v": "NDEX LIC (http://dev.ndexbio.org)"
+      },
+      {
+        "n": "rightsHolder",
+        "v": "RIGHTSHOLDER"
+      },
+      {
+        "n": "author",
+        "v": "AUTHOR"
+      },
+      {
+        "n": "reference",
+        "v": "<div>sdfgg</div>"
+      }
+    ]
+  },
+  {
+    "nodeAttributes": [
+      {
+        "po": 0,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 0,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P15056"
+      },
+      {
+        "po": 0,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:1097"
+      },
+      {
+        "po": 1,
+        "n": "type",
+        "v": "proteinfamily"
+      },
+      {
+        "po": 1,
+        "n": "BE",
+        "v": "http://sorger.med.harvard.edu/indra/entities/ERK"
+      },
+      {
+        "po": 5,
+        "n": "type",
+        "v": "proteinfamily"
+      },
+      {
+        "po": 5,
+        "n": "BE",
+        "v": "http://sorger.med.harvard.edu/indra/entities/MEK"
+      },
+      {
+        "po": 50,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 50,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P01116"
+      },
+      {
+        "po": 50,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:6407"
+      },
+      {
+        "po": 54,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 54,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P04049"
+      },
+      {
+        "po": 54,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:9829"
+      },
+      {
+        "po": 59,
+        "n": "type",
+        "v": "bioprocess"
+      },
+      {
+        "po": 59,
+        "n": "GO",
+        "v": "http://identifiers.org/go/GO:0090398"
+      },
+      {
+        "po": 59,
+        "n": "MESH",
+        "v": "http://identifiers.org/mesh/D016922"
+      },
+      {
+        "po": 63,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 63,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/P00533"
+      },
+      {
+        "po": 63,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:3236"
+      },
+      {
+        "po": 71,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 71,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/Q01726"
+      },
+      {
+        "po": 71,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:6929"
+      },
+      {
+        "po": 81,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 81,
+        "n": "ChEBI",
+        "v": "http://identifiers.org/chebi/CHEBI:75047"
+      },
+      {
+        "po": 82,
+        "n": "type",
+        "v": "proteinfamily"
+      },
+      {
+        "po": 82,
+        "n": "BE",
+        "v": "http://sorger.med.harvard.edu/indra/entities/RAF"
+      },
+      {
+        "po": 86,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 86,
+        "n": "ChEBI",
+        "v": "http://identifiers.org/chebi/CHEBI:63637"
+      },
+      {
+        "po": 86,
+        "n": "PubChem",
+        "v": "http://identifiers.org/pubchem.compound/42611257"
+      },
+      {
+        "po": 101,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 101,
+        "n": "PubChem",
+        "v": "http://identifiers.org/pubchem.compound/44462760"
+      },
+      {
+        "po": 118,
+        "n": "type",
+        "v": "chemical"
+      },
+      {
+        "po": 118,
+        "n": "PubChem",
+        "v": "http://identifiers.org/pubchem.compound/11707110"
+      },
+      {
+        "po": 131,
+        "n": "type",
+        "v": "protein"
+      },
+      {
+        "po": 131,
+        "n": "UniProt",
+        "v": "http://identifiers.org/uniprot/Q8IVT5"
+      },
+      {
+        "po": 131,
+        "n": "HGNC",
+        "v": "http://identifiers.org/hgnc/HGNC:6465"
+      }
+    ]
+  },
+  {
+    "status": [
+      {
+        "error": "",
+        "success": true
+      }
+    ]
+  }
+]

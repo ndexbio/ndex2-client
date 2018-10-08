@@ -1,5 +1,0 @@
-SOURCE	TARGET	INTERACTION	NODEATTR	EDGEATTR
-A	C	controls-production-of	NODEATTR1	EDGEATTR1
-B	D	controls-production-of	NODEATTR2	EDGEATTR2
-C	E	controls-production-of	NODEATTR3	EDGEATTR3
-D	F	controls-production-of	NODEATTR4	EDGEATTR4

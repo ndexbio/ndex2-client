@@ -1,0 +1,59 @@
+[
+  {
+    "numberVerification": [
+      {
+        "longNumber": 281474976710655
+      }
+    ]
+  },
+  {
+    "metaData": [
+      {
+        "consistencyGroup": 1,
+        "elementCount": 2,
+        "idCounter": 2,
+        "name": "nodes",
+        "version": "1.0"
+      },
+      {
+        "consistencyGroup": 1,
+        "elementCount": 1,
+        "idCounter": 1,
+        "name": "edges",
+        "version": "1.0"
+      }
+    ]
+  },
+  {
+    "nodes": [
+      {
+        "@id": 1,
+        "n": "node1",
+        "r": "ABC"
+      },
+      {
+        "@id": 2,
+        "n": "node2",
+        "r": "DEF"
+      }
+    ]
+  },
+  {
+    "edges": [
+      {
+        "@id": 1,
+        "s": 1,
+        "t": 2,
+        "i": "neighbor"
+      }
+    ]
+  },
+  {
+    "status": [
+      {
+        "error": "",
+        "success": true
+      }
+    ]
+  }
+]

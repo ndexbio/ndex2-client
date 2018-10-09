@@ -14,27 +14,29 @@ from ndex2.client import DecimalEncoder
 from ndex2cx.nice_cx_builder import NiceCXBuilder
 
 upload_server = 'dev.ndexbio.org'
-upload_username = 'scratch'
-upload_password = 'scratch'
+upload_username = 'username'
+upload_password = 'password'
 
 path_this = os.path.dirname(os.path.abspath(__file__))
 
 class TestCitations(unittest.TestCase):
     # @unittest.skip("Temporary skipping")
     def test_load_edges(self):
-        niceCx = NiceCXNetwork()
+        self.assertFalse(upload_username == 'username')
 
-        node_id_1 = niceCx.create_node(node_name='node%s' % str(1), node_represents='ABC')
-        node_id_2 = niceCx.create_node(node_name='node%s' % str(2), node_represents='DEF')
+        nice_cx = NiceCXNetwork()
 
-        edge_id_1 = niceCx.create_edge(edge_source=node_id_1, edge_target=node_id_2, edge_interaction='neighbor')
+        node_id_1 = nice_cx.create_node(node_name='node%s' % str(1), node_represents='ABC')
+        node_id_2 = nice_cx.create_node(node_name='node%s' % str(2), node_represents='DEF')
 
-        citation1 = niceCx.add_citation(id=0, title='Hi 1', identifier='pmid:28947956')
-        niceCx.add_edge_citations(edge_id_1, citation1.get('@id'))
+        edge_id_1 = nice_cx.create_edge(edge_source=node_id_1, edge_target=node_id_2, edge_interaction='neighbor')
 
-        supports1 = niceCx.add_support(id=0, text='Hi supports 1')
-        niceCx.add_edge_supports(edge_id_1, supports1.get('@id'))
+        citation1 = nice_cx.add_citation(id=0, title='Hi 1', identifier='pmid:28947956')
+        nice_cx.add_edge_citations(edge_id_1, citation1.get('@id'))
 
-        niceCx.set_name('Citation testing')
-        upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
+        supports1 = nice_cx.add_support(id=0, text='Hi supports 1')
+        nice_cx.add_edge_supports(edge_id_1, supports1.get('@id'))
+
+        nice_cx.set_name('Citation testing')
+        upload_message = nice_cx.upload_to(upload_server, upload_username, upload_password)
         print(upload_message)

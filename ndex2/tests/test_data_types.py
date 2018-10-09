@@ -18,6 +18,7 @@ path_this = os.path.dirname(os.path.abspath(__file__))
 class TestLoadByAspects(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
     def test_node_data_types2(self):
+        self.assertFalse(upload_username == 'username')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='a18fd45e-68d5-11e7-961c-0ac135e8bacf') #NiceCXNetwork(server='dev2.ndexbio.org', username='scratch', password='scratch', uuid='9433a84d-6196-11e5-8ac5-06603eb7f303')
         found_double_type = False
         for id, node in niceCx.get_nodes():
@@ -29,40 +30,40 @@ class TestLoadByAspects(unittest.TestCase):
                         found_double_type = True
                         break
 
-
-
-
-
-
-
         self.assertTrue(found_double_type)
 
         print(niceCx.__str__())
 
-    @unittest.skip("Temporary skipping") # PASS
+    #@unittest.skip("Temporary skipping") # PASS
     def test_node_data_types_from_tsv(self):
+        self.assertFalse(upload_username == 'username')
         path_to_network = os.path.join(path_this, 'mgdb_mutations.txt')
 
-        with open(path_to_network, 'rU') as tsvfile:
+        with open(path_to_network, 'r') as tsvfile:
             header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
+            print(df.head())
 
-            niceCx = ndex2.create_nice_cx_from_pandas(df, source_field='CDS Mutation', target_field='Gene Symbol', source_node_attr=['Primary Tissue', 'Histology', 'Genomic Locus'], target_node_attr=['Gene ID'], edge_interaction='variant-gene-relationship') #NiceCXNetwork()
+            niceCx = ndex2.create_nice_cx_from_pandas(df, source_field='CDS Mutation', target_field='Gene Symbol',
+                                                      source_node_attr=['Primary Tissue', 'Histology', 'Genomic Locus',
+                                                                        'Gene ID'], target_node_attr=['Gene ID'],
+                                                      edge_interaction='variant-gene-relationship') #NiceCXNetwork()
 
-            found_int_type = False
+            found_string_type = False
             for id, node in niceCx.get_nodes():
                 abc_node_attrs = niceCx.get_node_attributes(node)
 
                 if abc_node_attrs is not None:
                     for node_attr in abc_node_attrs:
-                        if node_attr.get('d') == 'integer':
-                            found_int_type = True
+                        if node_attr.get('d') == 'string':
+                            found_string_type = True
 
-            self.assertTrue(found_int_type)
+            self.assertTrue(found_string_type)
 
-    @unittest.skip("Temporary skipping") # PASS
+    #@unittest.skip("Temporary skipping") # PASS
     def test_data_types_from_networkx(self):
+        self.assertFalse(upload_username == 'username')
         G = nx.Graph()
         G.add_node('ABC')
         G.add_node('DEF')
@@ -76,37 +77,34 @@ class TestLoadByAspects(unittest.TestCase):
                           ('DEF', 'JKL'), ('JKL', 'MNO'), ('DEF', 'MNO'),
                          ('MNO', 'XYZ'), ('DEF', 'PQR')])
 
-        attribute_floats = {
-            'ABC': 1.234,
-            'DEF': 1.345,
-            'GHI': 1.456,
-            'JKL': 1.567,
-            'MNO': 1.678
-        }
-
-        attribute_integers = {
-            'ABC': 1,
-            'DEF': 2,
-            'GHI': 3,
-            'JKL': 4,
-            'MNO': 5
-        }
-
-        nx.set_node_attributes(G, 'floatLabels', attribute_floats)
-        nx.set_node_attributes(G, 'integerLabels', attribute_integers)
+        G['ABC']['DEF']['ABC'] = 1
+        G['DEF']['GHI']['DEF'] = 2
+        G['GHI']['JKL']['GHI'] = 3
+        G['MNO']['XYZ']['JKL'] = 4
+        G['MNO']['XYZ']['MNO'] = 5
 
         G['ABC']['DEF']['weight'] = 0.321
         G['DEF']['GHI']['weight'] = 0.434
         G['GHI']['JKL']['weight'] = 0.555
         G['MNO']['XYZ']['weight'] = 0.987
 
-        niceCx_full = ndex2.create_nice_cx_from_networkx(G)
-        context = [{'ncbigene': 'http://identifiers.org/ncbigene/',
-                   'hgnc.symbol': 'http://identifiers.org/hgnc.symbol/',
-                   'uniprot': 'http://identifiers.org/uniprot/'}]
-        niceCx_full.set_context(context)
+        G.nodes['ABC']['attr1'] = 1
+        G.nodes['DEF']['attr1'] = 1
+        G.nodes['GHI']['attr1'] = 1
+        G.nodes['JKL']['attr1'] = 1
+        G.nodes['MNO']['attr1'] = 1
+        G.nodes['PQR']['attr1'] = 1
+        G.nodes['XYZ']['attr1'] = 1
 
-        #print(niceCx_full.__str__())
+        G.nodes['ABC']['attr2'] = 0.1
+        G.nodes['DEF']['attr2'] = 0.1
+        G.nodes['GHI']['attr2'] = 0.1
+        G.nodes['JKL']['attr2'] = 0.1
+        G.nodes['MNO']['attr2'] = 0.1
+        G.nodes['PQR']['attr2'] = 0.1
+        G.nodes['XYZ']['attr2'] = 0.1
+
+        niceCx_full = ndex2.create_nice_cx_from_networkx(G)
 
         abc_node_attrs = niceCx_full.get_node_attributes(0)
 
@@ -131,8 +129,9 @@ class TestLoadByAspects(unittest.TestCase):
         self.assertTrue(found_float_type)
         self.assertTrue(found_edge_float_type)
 
-    @unittest.skip("Temporary skipping") # PASS
+    #@unittest.skip("Temporary skipping") # PASS
     def test_data_types_with_special_chars(self):
+        self.assertFalse(upload_username == 'username')
         path_to_network = os.path.join(path_this, 'Metabolism_of_RNA_data_types.cx')
 
         with open(path_to_network, 'r') as data_types_cx:
@@ -152,8 +151,9 @@ class TestLoadByAspects(unittest.TestCase):
 
             self.assertTrue(found_list_of_strings_type)
 
-    @unittest.skip("Temporary skipping") # PASS
+    #@unittest.skip("Temporary skipping") # PASS
     def test_data_types_with_special_chars2(self):
+        self.assertFalse(upload_username == 'username')
         niceCx = ndex2.create_empty_nice_cx()
 
         fox_node_id = niceCx.create_node(node_name='A#"')
@@ -175,8 +175,9 @@ class TestLoadByAspects(unittest.TestCase):
 
         self.assertTrue(upload_message)
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_node_data_types(self):
+        self.assertFalse(upload_username == 'username')
         niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='f1dd6cc3-0007-11e6-b550-06603eb7f303')
         my_aspect = []
         my_aspect.append({'node': '1', 'value': 'test1'})
@@ -189,11 +190,6 @@ class TestLoadByAspects(unittest.TestCase):
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(True)
 
-    @unittest.skip("Temporary skipping")
-    def test_round_trip(self):
-        #niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='258f0156-f26f-11e7-adc1-0ac135e8bacf',
-        #                                          username='ndextutorials', password='ndextutorials2015')
-        #upload_message = niceCx.upload_to('public.ndexbio.org', 'ndextutorials', 'ndextutorials2015')
-        #niceCx.update_to('258f0156-f26f-11e7-adc1-0ac135e8bacf', 'public.ndexbio.org', 'ndextutorials', 'ndextutorials2015')
-        self.assertTrue(True)
 
+if __name__ == '__main__':
+    unittest.main()

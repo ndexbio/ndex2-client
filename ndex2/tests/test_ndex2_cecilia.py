@@ -20,7 +20,7 @@ upload_password = 'cc.zhang'
 path_this = os.path.dirname(os.path.abspath(__file__))
 
 class TestNdex2Release(unittest.TestCase):
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_load_from_pandas(self):
         path_to_network = os.path.join(path_this, 'SIMPLE3.txt')
 
@@ -35,7 +35,7 @@ class TestNdex2Release(unittest.TestCase):
             upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
             #self.assertTrue(upload_message)
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     #@unittest.expectedFailure
     def test_set_name(self):
         niceCx_creatures = NiceCXNetwork()
@@ -44,45 +44,41 @@ class TestNdex2Release(unittest.TestCase):
         upload_message = niceCx_creatures.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_bad_name_add_node(self):
         niceCx_creatures = NiceCXNetwork()
         niceCx_creatures.set_name("Test Network")
-        niceCx_creatures.create_node(node_name=54, id = 45, node_represents="Tree")
+        node1_id = niceCx_creatures.create_node(node_name=54, node_represents="Tree")
         upload_message = niceCx_creatures.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_bad_nodes_add_edge(self):
         niceCx_creatures = NiceCXNetwork()
         niceCx_creatures.set_name("Test Network")
-        niceCx_creatures.create_node(node_name=324,id=324)
-        niceCx_creatures.create_node(node_name=453, id=453)
-        niceCx_creatures.create_edge(edge_source="324", edge_target= "453", edge_interaction=['inte'])
+        node1_id = niceCx_creatures.create_node(node_name=324)
+        node2_id = niceCx_creatures.create_node(node_name=453)
+        niceCx_creatures.create_edge(edge_source=node1_id, edge_target=node2_id, edge_interaction=['inte'])
         upload_message = niceCx_creatures.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_bad_node_attr(self):
         niceCx_creatures = NiceCXNetwork()
         niceCx_creatures.set_name("Test Network")
-        fox_node = niceCx_creatures.create_node(node_name=453, id=453)
+        fox_node = niceCx_creatures.create_node(node_name=453)
         niceCx_creatures.add_node_attribute(property_of=fox_node, name='Color', values=['Red',"tree"])
 
         upload_message = niceCx_creatures.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-
-
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_bad_edge_attr(self):
         niceCx_creatures = NiceCXNetwork()
         niceCx_creatures.set_name("Test Network")
-        niceCx_creatures.create_node(node_name=324, id=324)
-        niceCx_creatures.create_node(node_name=453, id=453)
-        edge = niceCx_creatures.create_edge(edge_source="324", edge_target="453", edge_interaction='inte')
+        node1_id = niceCx_creatures.create_node(node_name=324)
+        node2_id = niceCx_creatures.create_node(node_name=453)
+        edge = niceCx_creatures.create_edge(edge_source=node1_id, edge_target=node2_id, edge_interaction='inte')
         niceCx_creatures.add_edge_attribute(property_of=edge, name= "djks", values= "jfkl")
 
         upload_message = niceCx_creatures.upload_to(upload_server, upload_username, upload_password)
@@ -90,8 +86,7 @@ class TestNdex2Release(unittest.TestCase):
         #with self.assertRaises(TypeError):
         #    print("type error raised, passed test")
 
-
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_creating_from_file(self):
         niceCx_from_cx_file = ndex2.create_nice_cx_from_file('WNT.cx')
 
@@ -100,14 +95,14 @@ class TestNdex2Release(unittest.TestCase):
         #with self.assertRaises(TypeError):
         #    print("type error raised, passed test")
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_creating_from_server(self):
         niceCx_from_server = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='3f08d557-1e5f-11e8-b939-0ac135e8bacf')
 
         upload_message = niceCx_from_server.upload_to(upload_server, upload_username, upload_password)
         self.assertTrue(upload_message)
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_to_pandas(self):
         niceCx_from_server = ndex2.create_nice_cx_from_server(server='public.ndexbio.org',
                                                               uuid='3f08d557-1e5f-11e8-b939-0ac135e8bacf')
@@ -117,7 +112,7 @@ class TestNdex2Release(unittest.TestCase):
         print(upload_message)
         self.assertFalse(upload_message.empty)
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_pandas(self):
 
         df = pd.DataFrame.from_dict({'Source': ['a', 'b', 'c','e'],
@@ -131,11 +126,11 @@ class TestNdex2Release(unittest.TestCase):
                                                                   edge_interaction='Interaction', source_node_attr=["size"],
                                                                   target_node_attr=["width"])
         upload_message = niceCx_df_with_headers.upload_to(upload_server, upload_username, upload_password)
-        print(niceCx_df_with_headers.get_summary())
+        niceCx_df_with_headers.print_summary()
 
         self.assertTrue(upload_message)
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_to_netx(self):
         niceCx_from_server = ndex2.create_nice_cx_from_server(server='public.ndexbio.org',
                                                                uuid='3f08d557-1e5f-11e8-b939-0ac135e8bacf')
@@ -157,15 +152,15 @@ class TestNdex2Release(unittest.TestCase):
         self.assertTrue(upload_message)
 
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_context(self):
         niceCx_creatures = NiceCXNetwork()
         niceCx_creatures.set_name("Test")
         niceCx_creatures.create_node(node_name="Fox")
-        niceCx_creatures.set_context("hkjhnk")
-        upload_message = niceCx_creatures.upload_to(upload_server, upload_username, upload_password)
-
-        self.assertTrue(upload_message)
+        try:
+            self.assertRaises(Exception, niceCx_creatures.set_context("hkjhnk"))
+        except Exception as e:
+            print('Bad context exception was caught')
 
 
 

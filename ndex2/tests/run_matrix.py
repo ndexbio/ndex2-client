@@ -8,8 +8,8 @@ path_this = os.path.dirname(os.path.abspath(__file__))
 params = {
     'name': 'SIM MATRIX TEST',
     'ndex_server': 'http://dev.ndexbio.org',
-    'ndex_user': 'scratch3',
-    'ndex_pass': 'scratch3'
+    'ndex_user': 'username',
+    'ndex_pass': 'password'
 }
 
 X = np.array(
@@ -35,6 +35,10 @@ X_cols = ['ABC', 'DEF', 'GHI', 'XYZ', 'ABC1', 'DEF1', 'GHI1', 'XYZ1', 'ABC2', 'D
 
 X_rows = ['ABC', 'DEF', 'GHI', 'XYZ', 'ABC1', 'DEF1', 'GHI1', 'XYZ1', 'ABC2', 'DEF2',
           'GHI2', 'XYZ2', 'ABC3', 'DEF3', 'GHI3']
+
+if params['ndex_user'] == 'username':
+    print('************** WARNING!!!!! **************')
+    raise Exception('Please set the username and password before running this test')
 
 new_network_url = ndex2.load_matrix_to_ndex(X, X_cols, X_rows, params['ndex_server'], params['ndex_user'],
                                             params['ndex_pass'], 'matrix test')

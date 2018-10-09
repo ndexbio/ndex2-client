@@ -4,13 +4,14 @@ __author__ = 'aarongary'
 import os
 import unittest
 import ndex2
+import time
 
 from ndex2.nice_cx_network import NiceCXNetwork
 
 
 upload_server = 'dev.ndexbio.org'
-upload_username = 'cc.zhang'
-upload_password = 'cc.zhang'
+upload_username = 'scratch'
+upload_password = 'scratch'
 
 path_this = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,10 +23,11 @@ class TestNodes(unittest.TestCase):
         niceCx.add_node_attribute(property_of=int_node, name='Size', values=1, type="integer")
 
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
-        UUID = upload_message.replace("http://dev.ndexbio.org/v2/network/", "")
+        UUID = upload_message.split('/')[-1]
+        time.sleep(1)
         imported_cx = ndex2.create_nice_cx_from_server(server='dev.ndexbio.org', uuid=UUID, username=upload_username, password=upload_password)
-        for i in imported_cx.get_node_attributesx():
-            self.assertEqual(i[1][0]["d"], "integer")
+        for i in imported_cx.get_node_attributes(0):
+            self.assertEqual(i.get('d'), "integer")
 
 
     #@unittest.skip("Temporary skipping")
@@ -35,11 +37,12 @@ class TestNodes(unittest.TestCase):
         niceCx.add_node_attribute(property_of=float_node, name='Score', values=1.0, type="float")
 
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
-        UUID = upload_message.replace("http://dev.ndexbio.org/v2/network/", "")
+        UUID = upload_message.split('/')[-1]
+        time.sleep(1)
         imported_cx = ndex2.create_nice_cx_from_server(server='dev.ndexbio.org', uuid=UUID, username=upload_username,
                                                        password=upload_password)
-        for i in imported_cx.get_node_attributesx():
-            self.assertEqual(i[1][0]["d"], "float")
+        for i in imported_cx.get_node_attributes(0):
+            self.assertEqual(i.get('d'), "double")
 
     #@unittest.skip("Temporary skipping")
     def test_add_lst_int(self):
@@ -48,11 +51,12 @@ class TestNodes(unittest.TestCase):
         niceCx.add_node_attribute(property_of=list_int_node, name='Too many sizes', values=[1,2,3,4,5], type="list_of_integer")
 
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
-        UUID = upload_message.replace("http://dev.ndexbio.org/v2/network/", "")
+        UUID = upload_message.split('/')[-1]
+        time.sleep(1)
         imported_cx = ndex2.create_nice_cx_from_server(server='dev.ndexbio.org', uuid=UUID, username=upload_username,
                                                        password=upload_password)
-        for i in imported_cx.get_node_attributesx():
-            self.assertEqual(i[1][0]["d"], "list_of_integer")
+        for i in imported_cx.get_node_attributes(0):
+            self.assertEqual(i.get('d'), "list_of_integer")
 
     #@unittest.skip("Temporary skipping")
     def test_add_lst_flt(self):
@@ -62,8 +66,9 @@ class TestNodes(unittest.TestCase):
         niceCx.add_node_attribute(property_of=list_float_node, name='Too many scores', values=[15.3,43.6,-34.0,43.3], type="list_of_float")
 
         upload_message = niceCx.upload_to(upload_server, upload_username, upload_password)
-        UUID = upload_message.replace("http://dev.ndexbio.org/v2/network/", "")
+        UUID = upload_message.split('/')[-1]
+        time.sleep(1)
         imported_cx = ndex2.create_nice_cx_from_server(server='dev.ndexbio.org', uuid=UUID, username=upload_username,
                                                        password=upload_password)
-        for i in imported_cx.get_node_attributesx():
-            self.assertEqual(i[1][0]["d"], "list_of_float")
+        for i in imported_cx.get_node_attributes(0):
+            self.assertEqual(i.get('d'), "list_of_double")

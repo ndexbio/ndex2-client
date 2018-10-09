@@ -48,8 +48,8 @@ class TestNdex2Client(unittest.TestCase):
 
 
     #@unittest.skip("Temporary skipping")
-    def test_get_set(self):
-        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='c7f3660b-df7e-11e7-adc1-0ac135e8bacf')
+    def test_get_set2(self):
+        niceCx = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid='192ce948-1e5f-11e8-b939-0ac135e8bacf')
 
         context = [{'ncbigene': 'http://identifiers.org/ncbigene/',
                    'hgnc.symbol': 'http://identifiers.org/hgnc.symbol/',

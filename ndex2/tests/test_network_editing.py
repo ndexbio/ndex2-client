@@ -15,7 +15,7 @@ here = os.path.dirname(__file__)
 
 class TestLoadByAspects(unittest.TestCase):
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_simple_create(self):
         niceCx_creatures = NiceCXNetwork()
         niceCx_creatures.set_name("Food Web")
@@ -37,25 +37,25 @@ class TestLoadByAspects(unittest.TestCase):
 
         print(niceCx_creatures.get_node_attribute(fox_node, 'Color'))
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_edit_network_attributes(self):
         with open('SIMPLE_WITH_ATTRIBUTES.txt', 'rU') as tsvfile:
-            header = [h.strip() for h in tsvfile.next().split('\t')]
+            header = [h.strip() for h in tsvfile.readline().split('\t')]
 
             df = pd.read_csv(tsvfile,delimiter='\t',engine='python',names=header)
 
             niceCx = ndex2.create_nice_cx_from_pandas(df, source_field='SOURCE', target_field='TARGET', source_node_attr=['NODEATTR'], target_node_attr=[], edge_attr=['EDGEATTR']) #NiceCXNetwork()
 
             for k, v in niceCx.get_nodes():
-                node_attr = niceCx.get_node_attribute_object(k, 'NODEATTR')
+                node_attr = niceCx.get_node_attribute(k, 'NODEATTR')
                 if node_attr:
-                    niceCx.set_node_attribute(k, 'NODEATTR', node_attr.get_values() + 'xyz')
+                    niceCx.set_node_attribute(k, 'NODEATTR', node_attr.get('v') + 'xyz')
                 print(node_attr)
 
             for k, v in niceCx.get_edges():
-                edge_attr = niceCx.get_edge_attribute_object(k, 'EDGEATTR')
+                edge_attr = niceCx.get_edge_attribute(k, 'EDGEATTR')
                 if edge_attr:
-                    niceCx.set_edge_attribute(k, 'EDGEATTR', edge_attr.get_values() + 'abc')
+                    niceCx.set_edge_attribute(k, 'EDGEATTR', edge_attr.get('v') + 'abc')
                 print(edge_attr)
 
 
@@ -73,7 +73,7 @@ class TestLoadByAspects(unittest.TestCase):
         print("downloading network and buiding NiceCX...")
         my_network = ndex2.create_nice_cx_from_server(server='public.ndexbio.org', uuid=my_network_uuid)
         print("done")
-        print(my_network.get_summary())
+        my_network.print_summary()
 
         # (for clarity, this example code is rather verbose)
 
@@ -90,4 +90,4 @@ class TestLoadByAspects(unittest.TestCase):
                 my_network.remove_node_attribute(node, source_attribute1)
                 my_network.remove_node_attribute(node, source_attribute2)
 
-        print(my_network.get_summary())
+        my_network.print_summary()

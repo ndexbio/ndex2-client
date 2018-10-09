@@ -94,10 +94,10 @@ class TestRegression(unittest.TestCase):
 
         self.assertTrue(upload_message)
 
-    @unittest.skip("Temporary skipping")
+    #@unittest.skip("Temporary skipping")
     def test_full_core_aspects_cx_file(self):
-        print('Testing: Full_core_aspects.cx')
-        path_to_network = os.path.join(path_this, 'Full_core_aspects.cx')
+        print('Testing: Full_core_aspects')
+        path_to_network = os.path.join(path_this, 'network1.cx')
 
         with open(path_to_network, 'r') as ras_cx:
             nice_cx = ndex2.create_nice_cx_from_raw_cx(cx=json.load(ras_cx))

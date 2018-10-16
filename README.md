@@ -6,7 +6,7 @@ The NDEx2 Client v1.0 Python module provides methods to access NDEx via the NDEx
 
 ## **Jupyter Notebook Tutorials**
 * Basic Use of the NDEx2 Client:[NDEx2 Client v1.0 Tutorial](https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDEx2%20Client%20v1.0%20Tutorial.ipynb)
-* Working with the NiceCX Network Class: [NiceCX v2.0 Tutorial](https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v1.0%20Tutorial.ipynb)
+* Working with the NiceCX Network Class: [NiceCX v2.0 Tutorial](https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20Tutorial.ipynb)
 
 To use these tutorials, clone the [ndex-jupyter-notebooks repository](https://github.com/ndexbio/ndex-jupyter-notebooks) to your local machine and start Jupyter Notebooks in the project directory.
 

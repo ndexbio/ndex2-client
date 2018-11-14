@@ -10,16 +10,17 @@ import binascii
 import numpy as np
 from ndex2cx.nice_cx_builder import NiceCXBuilder
 
-root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-log_path = os.path.join(root, 'logs')
-if not os.path.exists(log_path):
-    os.makedirs(log_path)
 
 node_id_lookup = {}
 edge_id_counter = 0
 
 
 def get_logger(name, level=logging.DEBUG):
+    # TODO Creating a logs directory within the package installation of Python is bad
+    root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    log_path = os.path.join(root, 'logs')
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
     logger = logging.getLogger(name)
     logger.setLevel(level)
 

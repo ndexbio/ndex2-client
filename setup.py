@@ -29,7 +29,7 @@ if __name__ == '__main__':
         long_description=long_description,
 
         # The project's main homepage.
-        url='https://www.ndexbio.org',
+        url='https://github.com/ndexbio/ndex2-client',
 
         # Author details
         author='The NDEx Project',

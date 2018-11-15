@@ -2,6 +2,7 @@
 
 import requests
 import json
+import logging
 import ndex2
 from requests_toolbelt import MultipartEncoder
 import io
@@ -10,7 +11,7 @@ import decimal
 import numpy
 import base64
 
-
+logger = logging.getLogger(__name__)
 try:
     from urllib.parse import urljoin
     #from urllib.parse import urlparse
@@ -82,8 +83,8 @@ class Ndex2:
                         self.host = host + "/rest"
 
             except req_except.HTTPError as he:
-                ndex2.get_logger('CLIENT').warning('Can''t determine server version. ' + host +
-                                                   ' Server returned error -- ' + str(he))
+                logger.warning("Can't determine server version. " + host +
+                               ' Server returned error -- ' + str(he))
                 self.version = "1.3"
                 self.host = host + "/rest"
                 # TODO - how to handle errors getting server version...

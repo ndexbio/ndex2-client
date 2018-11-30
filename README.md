@@ -434,7 +434,7 @@ my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
         * *inputs* : array of ProvenanceEntity objects. Has semantics of PROV:used.
 
-        * *properties *: array of SimplePropertyValuePair.
+        * *properties*: array of SimplePropertyValuePair.
 
 ##### **set_provenance(network_id, provenance)**
 
@@ -752,6 +752,7 @@ Used to add a node to the network.
 
 **add_edge_element(json_obj=None, edge)**
 Low level function
+
 * **json_obj**: The cx representation of an edge
 
 **addNetworkAttribute(json_obj=None)**

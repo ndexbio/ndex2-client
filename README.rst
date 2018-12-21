@@ -1,10 +1,10 @@
-**NDEx2 Client v1.0**
+**NDEx2 Client v2.0**
 =====================
 
 **Overview**
 ------------
 
-The NDEx2 Client v1.0 Python module provides methods to access NDEx via
+The NDEx2 Client v2.0 Python module provides methods to access NDEx via
 the NDEx Server API. It also provides methods for common operations on
 networks. It includes the NiceCX network object class for convenient
 NDEx access and as a data model for applications.
@@ -12,8 +12,8 @@ NDEx access and as a data model for applications.
 **Jupyter Notebook Tutorials**
 ------------------------------
 
--  Basic Use of the NDEx2 Client:\ `NDEx2 Client v1.0
-   Tutorial <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDEx2%20Client%20v1.0%20Tutorial.ipynb>`__
+-  Basic Use of the NDEx2 Client:  `NDEx2 Client v2.0
+   Tutorial <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDEx2%20Client%20v2.0%20Tutorial.ipynb>`__
 -  Working with the NiceCX Network Class: `NiceCX v2.0
    Tutorial <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20Tutorial.ipynb>`__
 
@@ -27,7 +27,7 @@ For information on installing and using Jupyter Notebooks, go to
 **Requirements**
 ----------------
 
-The NDEx2 Client 1.0 module requires Python 3.6+ and the latest version
+The NDEx2 Client 2.0 module requires Python 3.6+ and the latest version
 of the PIP Python package manager for installation. `Click
 here <https://pypi.python.org/pypi/pip>`__ to download the PIP Python
 package.
@@ -35,7 +35,7 @@ package.
 **Installing the NDEx2 Client Module**
 --------------------------------------
 
-The NDEx2 Client 1.0 module can be installed from the Python Package
+The NDEx2 Client 2.0 module can be installed from the Python Package
 Index (PyPI) repository using PIP:
 
     pip install ndex2

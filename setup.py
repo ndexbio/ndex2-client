@@ -102,6 +102,7 @@ if __name__ == '__main__':
             'pandas',
             'enum34',
             'pysolr',
+            'numpy',
             'enum; python_version == "2.6" or python_version=="2.7"'
         ],
 

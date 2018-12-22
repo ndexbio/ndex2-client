@@ -36,9 +36,9 @@ class TestClient(unittest.TestCase):
         res = dec.default(np.int64(12))
         self.assertTrue(isinstance(res, int))
 
-        # test regular old int comes back as int
-        # res = dec.default(type(1))
-        # self.assertTrue(isinstance(res, int))
-
-
-
+        # test regular old int which throws TypeError
+        try:
+            res = dec.default(1)
+            self.fail('Expected exception')
+        except TypeError:
+            pass

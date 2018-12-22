@@ -32,10 +32,6 @@ def run_test():
 # print(kmers[-1])
 # print(kmers)
 
-def Neighbors(pattern, d):
-
-
-
 # anon_ndex = nc.Ndex2("http://public.ndexbio.org")
 # query_result_cx = anon_ndex.get_neighborhood('c9243cce-2d32-11e8-b939-0ac135e8bacf', 'XRN1')
 def hamming_distance(p, q):

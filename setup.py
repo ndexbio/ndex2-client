@@ -11,8 +11,14 @@ from setuptools import setup, find_packages
 
 
 # Get the long description from the relevant file
+readme = ''
 with open('README.rst', 'r') as f:
-    readme = f.read()
+    for line in f:
+        # raw keyword is unsupported so README.rst
+        # below NDEx2 Client Objects header line is being omitted
+        if line.startswith('**NDEx2 Client Objects**'):
+            break
+        readme = readme + line
 
 with open('HISTORY.rst') as history_file:
     history = history_file.read()

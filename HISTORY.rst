@@ -2,7 +2,9 @@
 History
 =======
 
-2.0.0 (2018-11-30)
+2.0.1 (2019-01-02)
 ------------------
 
-* Add notes here
+* Fixed bug where logs directory is created within
+  the package installation directory. 
+  `Issue #26 <https://github.com/ndexbio/ndex2-client/issues/26>`_

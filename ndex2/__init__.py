@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '2.0.1rc3'
+__version__ = '2.0.1rc4'
 
 import os
 import logging

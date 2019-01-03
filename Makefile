@@ -53,6 +53,9 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 ndex2 tests
 
+systemtest: ## run system tests (under ndex2/tests/) and unit tests via nose
+	nosetests -v
+
 test: ## run tests quickly with the default Python
 	python setup.py test
 

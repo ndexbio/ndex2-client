@@ -1,30 +1,21 @@
 __author__ = 'aarongary'
 
-import json
 import sys
-import os
-import errno
 import pandas as pd
 import networkx as nx
 import io
 import decimal
 import numpy as np
-import math
 import json
 import ijson
 import requests
 import base64
-from ndex2cx import known_aspects_min
-from ndex2.niceCxInterface import NiceCx
 
 if sys.version_info.major == 3:
-    from urllib.request import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
-        build_opener, install_opener, HTTPError, URLError
+    from urllib.request import urlopen, Request, HTTPError, URLError
 else:
-    from urllib2 import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
-        build_opener, install_opener, HTTPError, URLError
+    from urllib2 import urlopen, Request, HTTPError, URLError
 
-userAgent = 'NDEx-NiceCX/2.0'
 
 class NiceCXNetwork():
     def __init__(self, **attr):
@@ -55,25 +46,6 @@ class NiceCXNetwork():
         self.s = None
         self.node_name_to_id_map_cache = {}
         self.user_agent = 'ndex2-client:v2.0'
-
-        #if cx:
-        #    self.create_from_cx(cx)
-        #elif networkx_G:
-        #    self.create_from_networkx(networkx_G)
-        #elif pandas_df is not None:
-        #    self.create_from_pandas(pandas_df)
-        #elif filename is not None:
-        #    if os.path.isfile(filename):
-        #        with open(filename, 'rU') as file_cx:
-                    #====================================
-                    # BUILD NICECX FROM FILE
-                    #====================================
-        #            self.create_from_cx(json.load(file_cx))
-        #    else:
-        #        raise Exception('Input provided is not a valid file')
-        #else:
-        #    if server and uuid:
-        #        self.create_from_server(server, username, password, uuid)
 
     def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None):
         """

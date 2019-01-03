@@ -41,7 +41,8 @@ test_requirements = [
     'enum34',
     'pysolr',
     'enum; python_version == "2.6" or python_version=="2.7"',
-    'unittest2'
+    'unittest2',
+    'nose'
 ]
 
 

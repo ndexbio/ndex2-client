@@ -7,16 +7,9 @@ import logging
 import logging.handlers
 import math
 import json
-import sys
-import pickle
 import base64
-import binascii
 import numpy as np
 from ndex2cx.nice_cx_builder import NiceCXBuilder
-
-
-node_id_lookup = {}
-edge_id_counter = 0
 
 
 def get_logger(name, level=logging.DEBUG):
@@ -119,10 +112,6 @@ def __get_v_from_aspect(niceCx, aspect):
     if len(aspect_tmp) > 0:
         return aspect_tmp[0].get('v')
 
-def __string2bits(s=''):
-    return [bin(ord(x))[2:].zfill(8) for x in s]
-
-from enum import Enum
 
 known_aspects = [
     'nodes',
@@ -157,18 +146,6 @@ known_aspects_min = [
     'nodeSupports',
     'edgeSupports'
     ]
-
-
-
-
-def __add_node(nice_cx, name=None, represents=None):
-    if node_id_lookup.get(name) is None:
-        source_id = nice_cx.get_next_node_id()
-        node_id_lookup[name] = source_id
-
-        nice_cx.add_node(id=node_id_lookup.get(name), name=name, represents=represents)
-
-    return node_id_lookup.get(name)
 
 
 def create_empty_nice_cx():

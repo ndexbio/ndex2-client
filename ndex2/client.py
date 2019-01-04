@@ -3,18 +3,15 @@
 import requests
 import json
 import logging
-import ndex2
 from requests_toolbelt import MultipartEncoder
 import io
 import sys
 import decimal
 import numpy
-import base64
 
 logger = logging.getLogger(__name__)
 try:
     from urllib.parse import urljoin
-    #from urllib.parse import urlparse
 except ImportError:
      from urlparse import urljoin
 
@@ -50,7 +47,6 @@ class Ndex2:
         self.password = password
         self.user_agent = ' ' + user_agent if len(user_agent) > 0 else user_agent
 
-
         if host is None:
             host = DEFAULT_SERVER
         elif 'http' not in host:
@@ -78,7 +74,8 @@ class Ndex2:
                             self.version = pv
                             self.host = host + "/v2"
                     else:
-                        sys.stderr.write("Warning: This release doesn't fully support 1.3 version of NDEx")
+                        logger.warning("Warning: This release doesn't fully "
+                                       "support 1.3 version of NDEx")
                         self.version = "1.3"
                         self.host = host + "/rest"
 

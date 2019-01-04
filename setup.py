@@ -42,6 +42,7 @@ test_requirements = [
     'pysolr',
     'enum; python_version == "2.6" or python_version=="2.7"',
     'unittest2',
+    'requests-mock',
     'nose'
 ]
 

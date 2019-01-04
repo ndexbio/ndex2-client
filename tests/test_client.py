@@ -17,6 +17,17 @@ from ndex2.client import DecimalEncoder
 
 class TestClient(unittest.TestCase):
 
+    def get_rest_admin_status_dict(self):
+        return {"networkCount": 1321,
+                "userCount": 12,
+                "groupCount": 0,
+                "message": "Online",
+                "properties": {"ServerVersion": "2.1",
+                               "ServerResultLimit": "10000"}}
+
+    def get_rest_admin_status_url(self):
+        return client.DEFAULT_SERVER + '/rest/admin/status'
+
     def setUp(self):
         """Set up test fixtures, if any."""
         pass
@@ -77,7 +88,7 @@ class TestClient(unittest.TestCase):
 
     def test_ndex2_constructor_that_raises_httperror(self):
         with requests_mock.mock() as m:
-            m.get(client.DEFAULT_SERVER + '/rest/admin/status',
+            m.get(self.get_rest_admin_status_url(),
                   text='uhoh',
                   reason='some error',
                   status_code=404)
@@ -93,7 +104,7 @@ class TestClient(unittest.TestCase):
 
     def test_ndex2_constructor_with_defaulthost_serverversionnone(self):
         with requests_mock.mock() as m:
-            m.get(client.DEFAULT_SERVER + '/rest/admin/status',
+            m.get(self.get_rest_admin_status_url(),
                   json={"networkCount": 1321,
                         "userCount": 12,
                         "groupCount": 0,
@@ -111,7 +122,7 @@ class TestClient(unittest.TestCase):
 
     def test_ndex2_constructor_with_defaulthost_thatisversionone(self):
         with requests_mock.mock() as m:
-            m.get(client.DEFAULT_SERVER + '/rest/admin/status',
+            m.get(self.get_rest_admin_status_url(),
                   json={"networkCount": 1321,
                         "userCount": 12,
                         "groupCount": 0,
@@ -120,18 +131,14 @@ class TestClient(unittest.TestCase):
                                         "ServerResultLimit": "10000"}})
             try:
                 ndex = Ndex2()
+                self.fail('Expected exception')
             except Exception as e:
                 self.assertEqual(str(e), 'This release only supports NDEx 2.x server.')
 
-    def test_ndex2_constructore_with_defaulthost_thatisversiontwo(self):
+    def test_ndex2_constructor_with_defaulthost_thatisversiontwo(self):
         with requests_mock.mock() as m:
-            m.get(client.DEFAULT_SERVER + '/rest/admin/status',
-                  json={"networkCount": 1321,
-                        "userCount": 12,
-                        "groupCount": 0,
-                        "message": "Online",
-                        "properties": {"ServerVersion": "2.1",
-                                        "ServerResultLimit": "10000" }})
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
             ndex = Ndex2()
             self.assertEqual(ndex.debug, False)
             self.assertEqual(ndex.version, '2.1')
@@ -141,3 +148,47 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.user_agent, '')
             self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/v2')
             self.assertTrue(ndex.s is not None)
+
+    def test_ndex2_require_auth(self):
+        ndex = Ndex2(host='localhost')
+        try:
+            ndex.require_auth()
+            self.fail('Expected exception')
+        except Exception as e:
+            self.assertEqual(str(e),
+                             'this method requires user authentication')
+
+    def test_ndex2_put_no_json_empty_resp_code_204(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.put(client.DEFAULT_SERVER + '/v2/hi', status_code=204)
+            ndex = Ndex2()
+            res = ndex.put('/hi')
+            self.assertEqual(res, '')
+
+    def test_ndex2_put_no_json_empty_code_200(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.put(client.DEFAULT_SERVER + '/v2/hi',
+                  status_code=200,
+                  text='hehe',
+                  headers={'content-type': 'application/foo'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.put('/hi')
+            self.assertEqual(res, 'hehe')
+
+    def test_ndex2_put_with_json_and_json_resp(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.put(client.DEFAULT_SERVER + '/v2/hi',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'content-type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.put('/hi', put_json='{"x": "y"}')
+            self.assertEqual(res, {'hi': 'bye'})

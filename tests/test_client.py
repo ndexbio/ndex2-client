@@ -75,7 +75,23 @@ class TestClient(unittest.TestCase):
         self.assertEqual(ndex.host, 'http://localhost:8080/ndexbio-rest')
         self.assertTrue(ndex.s is not None)
 
-    def test_ndex2_constructore_with_defaulthost_serverversionnone(self):
+    def test_ndex2_constructor_that_raises_httperror(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/rest/admin/status',
+                  text='uhoh',
+                  reason='some error',
+                  status_code=404)
+            ndex = Ndex2()
+            self.assertEqual(ndex.debug, False)
+            self.assertEqual(ndex.version, '1.3')
+            self.assertEqual(ndex.status, {})
+            self.assertEqual(ndex.username, None)
+            self.assertEqual(ndex.password, None)
+            self.assertEqual(ndex.user_agent, '')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/rest')
+            self.assertTrue(ndex.s is not None)
+
+    def test_ndex2_constructor_with_defaulthost_serverversionnone(self):
         with requests_mock.mock() as m:
             m.get(client.DEFAULT_SERVER + '/rest/admin/status',
                   json={"networkCount": 1321,
@@ -93,8 +109,7 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/rest')
             self.assertTrue(ndex.s is not None)
 
-
-    def test_ndex2_constructore_with_defaulthost_thatisversionone(self):
+    def test_ndex2_constructor_with_defaulthost_thatisversionone(self):
         with requests_mock.mock() as m:
             m.get(client.DEFAULT_SERVER + '/rest/admin/status',
                   json={"networkCount": 1321,

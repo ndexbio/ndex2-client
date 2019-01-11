@@ -52,7 +52,8 @@ Misc niceCX methods
     :members: apply_template, print_summary, to_cx, to_cx_stream, to_networkx, to_pandas_dataframe, update_to, upload_to
 
 Deprecated NiceCXNetwork methods
-===========================
+================================
+
 .. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
     :members: add_edge, add_node, get_edge_attribute_objects, get_node_attribute_objects, get_summary, set_provenance, get_provenance
 
@@ -78,12 +79,12 @@ The following data types are supported in methods that accept **type**
 
 
 Methods for creating niceCX from other data models
-=============
+===================================================
 .. automodule:: ndex2
     :members: create_nice_cx_from_raw_cx, create_nice_cx_from_file, create_nice_cx_from_networkx, create_nice_cx_from_pandas, create_nice_cx_from_server
 
 Client access to NDEx server API
-===========================
+================================
 
 .. autoclass:: ndex2.client.Ndex2
     :members: add_networks_to_networkset, create_networkset, delete_network, delete_networks_from_networkset, get_neighborhood, get_neighborhood_as_cx_stream, get_network_as_cx_stream, get_network_ids_for_user, get_network_set, get_network_summary, get_sample_network, get_task_by_id, get_user_by_username, get_user_network_summaries, grant_network_to_user_by_username, grant_networks_to_group, grant_networks_to_user, make_network_private, make_network_public, save_cx_stream_as_new_network, save_new_network, search_networks, set_network_properties, set_network_system_properties, set_read_only, update_cx_network, update_network_group_permission, update_network_profile, update_network_user_permission

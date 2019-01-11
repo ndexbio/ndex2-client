@@ -13,17 +13,17 @@ see also
 
 Node methods
 ****************************
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: create_node, set_node_attribute
 
 Edge methods
 ****************************
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: create_edge, set_edge_attribute
 
 Network methods
 ****************************
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: set_context, set_name, set_network_attribute, set_opaque_aspect
 
 Methods for accessing niceCX properties
@@ -33,28 +33,28 @@ see also
 
 Node methods
 ****************************
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: get_node_attribute, get_node_attribute_value, get_node_attributes, get_nodes
 
 Edge methods
 ****************************
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: get_edge_attribute, get_edge_attribute_value, get_edge_attributes, get_edges
 
 Network methods
 ****************************
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: get_context, get_name, get_network_attribute, get_network_attributes, get_opaque_aspect
 
 Misc niceCX methods
 ========================================
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: apply_template, print_summary, to_cx, to_cx_stream, to_networkx, to_pandas_dataframe, update_to, upload_to
 
 Deprecated NiceCXNetwork methods
 ================================
 
-.. autoclass:: ndex2.NiceCXNetwork.NiceCXNetwork
+.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: add_edge, add_node, get_edge_attribute_objects, get_node_attribute_objects, get_summary, set_provenance, get_provenance
 
 Supported data types

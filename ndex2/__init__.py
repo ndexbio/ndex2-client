@@ -5,7 +5,6 @@ __version__ = '2.0.1'
 import os
 import logging
 import logging.handlers
-import math
 import json
 import base64
 import numpy as np
@@ -222,7 +221,7 @@ def create_nice_cx_from_networkx(G):
         # ADD NODE ATTRIBUTES
         # ======================
         for k, v in d.items():
-            use_this_value, attr_type = _infer_data_type(v, split_string=True)
+            use_this_value, attr_type = niceCxBuilder._infer_data_type(v, split_string=True)
 
             if k == 'citation' and not isinstance(use_this_value, list):
                 use_this_value = [use_this_value]
@@ -251,7 +250,7 @@ def create_nice_cx_from_networkx(G):
         # ==============================
         for k, val in d.items():
             if k != 'interaction':
-                use_this_value, attr_type = _infer_data_type(val, split_string=True)
+                use_this_value, attr_type = niceCxBuilder._infer_data_type(val, split_string=True)
 
                 if k == 'citation' and not isinstance(use_this_value, list):
                     use_this_value = [use_this_value]
@@ -740,43 +739,6 @@ def create_nice_cx_from_file(path):
             return my_nicecx
     else:
         raise Exception('The file ' + path + '  does not exist.')
-
-
-def _infer_data_type(val, split_string=False):
-    if val is None:
-        return None, None
-
-    attr_type = 'string'
-
-    if split_string:
-        if isinstance(val, str):
-            val = val.replace('"', '')
-            if ',' in val:
-                val = val.split(',')
-            elif ';' in val:
-                val = val.split(';')
-
-    processed_value = val
-
-    if isinstance(val, float) or isinstance(val, np.float) or isinstance(val, np.double):
-        if math.isnan(val):
-            # do something (skip?)
-            processed_value = None
-        elif math.isinf(val):
-            processed_value = 'INFINITY'
-        attr_type = 'double'  # CX spec dropped support for float and instead uses double precision
-    elif isinstance(val, int) or isinstance(val, np.int):
-        attr_type = 'integer'
-    elif isinstance(val, list):
-        if len(val) > 0:
-            if isinstance(val[0], float) or isinstance(val[0], np.float) or isinstance(val[0], np.double):
-                attr_type = 'list_of_double'
-            elif isinstance(val[0], int) or isinstance(val[0], np.int):
-                attr_type = 'list_of_integer'
-            else:
-                attr_type = 'list_of_string'
-
-    return processed_value, attr_type
 
 
 from ndex2.nice_cx_network import NiceCXNetwork

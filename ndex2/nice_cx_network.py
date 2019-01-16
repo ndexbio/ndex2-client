@@ -10,6 +10,7 @@ import json
 import ijson
 import requests
 import base64
+from ndex2.client import Ndex2
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPError, URLError
@@ -1321,7 +1322,7 @@ class NiceCXNetwork():
         if server and 'http' not in server:
             server = 'http://' + server
 
-        ndex = nc.Ndex2(server,username,password, user_agent=self.user_agent)
+        ndex = Ndex2(server,username,password, user_agent=self.user_agent)
 
         return ndex.save_new_network(self.to_cx())
 
@@ -1346,7 +1347,7 @@ class NiceCXNetwork():
 
         """
         cx = self.to_cx()
-        ndex = nc.Ndex2(server,username,password, user_agent=self.user_agent)
+        ndex = Ndex2(server,username,password, user_agent=self.user_agent)
 
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):
@@ -2141,5 +2142,3 @@ class DecimalEncoder(json.JSONEncoder):
             if isinstance(o, np.int64):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
-
-import ndex2.client as nc

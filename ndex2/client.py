@@ -56,7 +56,13 @@ class Ndex2(object):
         self.status = {}
         self.username = username
         self.password = password
-        self.user_agent = ' ' + user_agent if len(user_agent) > 0 else user_agent
+        self.user_agent = user_agent
+        if self.user_agent is None:
+            self.user_agent = ''
+        else:
+            if len(self.user_agent) > 0:
+                self.user_agent = ' ' + self.user_agent
+
         self.logger = logging.getLogger(__name__)
         self.timeout = timeout
 

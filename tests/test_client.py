@@ -90,6 +90,10 @@ class TestClient(unittest.TestCase):
         self.assertTrue(ndex.s is not None)
         self.assertTrue(ndex.timeout, 1)
 
+        # try with user_agent set to None Issue #34
+        ndex = Ndex2(user_agent=None)
+        self.assertEqual(ndex.user_agent, '')
+
 
     def test_ndex2_constructor_that_raises_httperror(self):
         with requests_mock.mock() as m:

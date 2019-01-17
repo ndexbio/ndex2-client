@@ -22,13 +22,15 @@ userAgent = 'NDEx-Python/3.0'
 DEFAULT_SERVER = "http://public.ndexbio.org"
 
 
-class Ndex2:
+class Ndex2(object):
     """ A class to facilitate communication with an NDEx server.
 
         If host is not provided it will default to the NDEx public server.  UUID is required
 
     """
-    def __init__(self, host=None, username=None, password=None, update_status=False, debug=False, user_agent=''):
+    def __init__(self, host=None, username=None, password=None,
+                 update_status=False, debug=False, user_agent='',
+                 timeout=30):
         """
         Creates a connection to a particular NDEx server.
 
@@ -38,6 +40,16 @@ class Ndex2:
         :type username: string
         :param password: The account password. (Optional)
         :type password: string
+        :param update_status: If set to True tells constructor to query
+                              service for status
+        :type update_status: bool
+        :param user_agent: Text to append to User-Agent header sent with all
+                           requests to server
+        :param timeout: Number of seconds to wait for requests to service. This is
+                        not total number of seconds to wait, but how long to wait
+                        before hearing any response from the service. See timeout
+                        parameter in requests
+        :type timeout: int
         """
         self.debug = debug
         self.version = 1.3
@@ -46,7 +58,7 @@ class Ndex2:
         self.password = password
         self.user_agent = ' ' + user_agent if len(user_agent) > 0 else user_agent
         self.logger = logging.getLogger(__name__)
-
+        self.timeout = timeout
 
         if host is None:
             host = DEFAULT_SERVER
@@ -119,6 +131,25 @@ class Ndex2:
         if not self.s.auth:
             raise Exception("this method requires user authentication")
 
+    def _return_put_post_response(self, response):
+        """
+        Give a response from a PUT or POST call
+        this method returns response.json() if the
+        headers content-type is application/json otherwise
+        response.text is returned
+        :param response: response object from requests.put or requests.post
+                         call
+        :return: response.json() or response.text
+        """
+        self.debug_response(response)
+        response.raise_for_status()
+        if response.status_code == 204:
+            return ""
+        if response.headers['content-type'] == 'application/json':
+            return response.json()
+        else:
+            return response.text
+
     def put(self, route, put_json=None):
         url = self.host + route
         self.logger.debug("PUT route: " + url)
@@ -133,14 +164,7 @@ class Ndex2:
             response = self.s.put(url, data=put_json, headers=headers)
         else:
             response = self.s.put(url, headers=headers)
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return ""
-        if response.headers['content-type'] == 'application/json':
-            return response.json()
-        else:
-            return response.text
+        return self._return_put_post_response(response)
 
     def post(self, route, post_json):
         url = self.host + route
@@ -152,14 +176,7 @@ class Ndex2:
                    'User-Agent':  userAgent + self.user_agent,
                    }
         response = self.s.post(url, data=post_json, headers=headers)
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return ""
-        if response.headers['content-type'] == 'application/json':
-            return response.json()
-        else:
-            return response.text
+        return self._return_put_post_response(response)
 
     def delete(self, route, data=None):
         url = self.host + route

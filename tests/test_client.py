@@ -73,6 +73,7 @@ class TestClient(unittest.TestCase):
         self.assertEqual(ndex.user_agent, '')
         self.assertEqual(ndex.host, 'http://localhost:8080/ndexbio-rest')
         self.assertTrue(ndex.s is not None)
+        self.assertTrue(ndex.timeout, 30)
 
         # try with user, pass and user_agent set oh and host
         # with extra text prepended to localhost

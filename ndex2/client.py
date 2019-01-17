@@ -9,7 +9,6 @@ import sys
 import decimal
 import numpy
 
-logger = logging.getLogger(__name__)
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -46,6 +45,8 @@ class Ndex2:
         self.username = username
         self.password = password
         self.user_agent = ' ' + user_agent if len(user_agent) > 0 else user_agent
+        self.logger = logging.getLogger(__name__)
+
 
         if host is None:
             host = DEFAULT_SERVER
@@ -74,14 +75,14 @@ class Ndex2:
                             self.version = pv
                             self.host = host + "/v2"
                     else:
-                        logger.warning("Warning: This release doesn't fully "
-                                       "support 1.3 version of NDEx")
+                        self.logger.warning("Warning: This release doesn't fully "
+                                            "support 1.3 version of NDEx")
                         self.version = "1.3"
                         self.host = host + "/rest"
 
             except req_except.HTTPError as he:
-                logger.warning("Can't determine server version. " + host +
-                               ' Server returned error -- ' + str(he))
+                self.logger.warning("Can't determine server version. " + host +
+                                    ' Server returned error -- ' + str(he))
                 self.version = "1.3"
                 self.host = host + "/rest"
                 # TODO - how to handle errors getting server version...
@@ -102,9 +103,9 @@ class Ndex2:
 
     def debug_response(self, response):
         if self.debug:
-            print("status code: " + str(response.status_code))
+            self.logger.debug("status code: " + str(response.status_code))
             if not response.status_code == requests.codes.ok:
-                print("response text: " + response.text)
+                self.logger.debug("response text: " + response.text)
 
     def require_auth(self):
         if not self.s.auth:
@@ -112,10 +113,8 @@ class Ndex2:
 
     def put(self, route, put_json=None):
         url = self.host + route
-        if self.debug:
-            print("PUT route: " + url)
-            if put_json is not None:
-                print("PUT json: " + put_json)
+        self.logger.debug("PUT route: " + url)
+        self.logger.debug("PUT json: " + str(put_json))
 
         headers = self.s.headers
         headers['Content-Type'] = 'application/json;charset=UTF-8'
@@ -137,9 +136,8 @@ class Ndex2:
 
     def post(self, route, post_json):
         url = self.host + route
-        if self.debug:
-            print("POST route: " + url)
-            print("POST json: " + post_json)
+        self.logger.debug("POST route: " + url)
+        self.logger.debug("POST json: " + post_json)
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json,text/plain',
                    'Cache-Control': 'no-cache',
@@ -157,8 +155,7 @@ class Ndex2:
 
     def delete(self, route, data=None):
         url = self.host + route
-        if self.debug:
-            print("DELETE route: " + url)
+        self.logger.debug("DELETE route: " + url)
         headers = self.s.headers
         headers['User-Agent'] = userAgent + self.user_agent
 
@@ -174,8 +171,7 @@ class Ndex2:
 
     def get(self, route, get_params=None):
         url = self.host + route
-        if self.debug:
-            print("GET route: " + url)
+        self.logger.debug("GET route: " + url)
         headers = self.s.headers
         headers['User-Agent'] = userAgent + self.user_agent
         response = self.s.get(url, params=get_params, headers=headers)
@@ -188,8 +184,7 @@ class Ndex2:
     # The stream refers to the Response, not the Request
     def get_stream(self, route, get_params=None):
         url = self.host + route
-        if self.debug:
-            print("GET stream route: " + url)
+        self.logger.debug("GET stream route: " + url)
         headers = self.s.headers
         headers['User-Agent'] = userAgent + self.user_agent
         response = self.s.get(url, params=get_params, stream=True, headers=headers)
@@ -202,8 +197,7 @@ class Ndex2:
     # The stream refers to the Response, not the Request
     def post_stream(self, route, post_json):
         url = self.host + route
-        if self.debug:
-            print("POST stream route: " + url)
+        self.logger.debug("POST stream route: " + url)
         headers = self.s.headers
 
         headers['Content-Type'] = 'application/json'
@@ -221,8 +215,7 @@ class Ndex2:
     def put_multipart(self, route, fields):
         url = self.host + route
         multipart_data = MultipartEncoder(fields=fields)
-        if self.debug:
-            print("PUT route: " + url)
+        self.logger.debug("PUT route: " + url)
 
         headers = {'Content-Type': multipart_data.content_type,
                    'Accept': 'application/json',
@@ -247,8 +240,7 @@ class Ndex2:
         else:
             url = self.host + route
         multipart_data = MultipartEncoder(fields=fields)
-        if self.debug:
-            print("POST route: " + url)
+        self.logger.debug("POST route: " + url)
         headers = {'Content-Type': multipart_data.content_type,
                    'User-Agent': userAgent + self.user_agent,
                    'Connection': 'close'
@@ -502,7 +494,7 @@ class Ndex2:
         return self.post(route, post_json)
 
     def find_networks(self, search_string="", account_name=None, skip_blocks=0, block_size=100):
-        print("find_networks is deprecated, please use search_networks")
+        self.logger.warning("find_networks is deprecated, please use search_networks")
         return self.search_networks(search_string, account_name, skip_blocks, block_size)
 
     def search_networks_by_property_filter(self, search_parameter_dict={}, account_name=None, limit=100):
@@ -625,7 +617,7 @@ class Ndex2:
             except Exception as inst:
                 d = json.loads(inst.response.content)
                 if d.get('errorCode').startswith("NDEx_Concurrent_Modification"):
-                    print("retry deleting network in 1 second(" + str(count) + ")")
+                    self.logger.debug("retry deleting network in 1 second(" + str(count) + ")")
                     count += 1
                     time.sleep(1)
                 else:
@@ -1034,7 +1026,7 @@ class Ndex2:
             except Exception as inst:
                 d = json.loads(inst.response.content)
                 if d.get('errorCode').startswith("NDEx_Concurrent_Modification"):
-                    print("retry deleting network in 1 second(" + str(count) + ")")
+                    self.logger.debug("retry deleting network in 1 second(" + str(count) + ")")
                     count += 1
                     time.sleep(1)
                 else:

@@ -23,16 +23,18 @@ DEFAULT_SERVER = "http://public.ndexbio.org"
 
 
 class Ndex2(object):
-    """ A class to facilitate communication with an NDEx server.
+    """ A class to facilitate communication with an
+        `NDEx server <http://ndexbio.org>`_.
 
-        If host is not provided it will default to the NDEx public server.  UUID is required
+        If host is not provided it will default to the
+        `NDEx public server <http://ndexbio.org>`_.  UUID is required
 
     """
     def __init__(self, host=None, username=None, password=None,
                  update_status=False, debug=False, user_agent='',
                  timeout=30):
         """
-        Creates a connection to a particular NDEx server.
+        Creates a connection to a particular `NDEx server <http://ndexbio.org>`_.
 
         :param host: The URL of the server.
         :type host: string
@@ -43,8 +45,10 @@ class Ndex2(object):
         :param update_status: If set to True tells constructor to query
                               service for status
         :type update_status: bool
-        :param user_agent: Text to append to User-Agent header sent with all
-                           requests to server
+        :param user_agent: String to append to
+                           `User-Agent <https://tools.ietf.org/html/rfc1945#page-46>`_
+                           header sent with all requests to server
+        :type user_agent: string
         :param timeout: Number of seconds to wait for requests to service. This is
                         not total number of seconds to wait, but how long to wait
                         before hearing any response from the service. See timeout
@@ -131,7 +135,7 @@ class Ndex2(object):
         if self.debug:
             self.logger.debug("status code: " + str(response.status_code))
             if not response.status_code == requests.codes.ok:
-                self.logger.debug("response text: " + response.text)
+                self.logger.debug("response text: " + str(response.text))
 
     def require_auth(self):
         if not self.s.auth:

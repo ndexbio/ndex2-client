@@ -15,6 +15,7 @@ from ndex2 import client
 from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
 
+
 class TestClient(unittest.TestCase):
 
     def get_rest_admin_status_dict(self):
@@ -110,6 +111,23 @@ class TestClient(unittest.TestCase):
                         "groupCount": 0,
                         "message": "Online",
                         "properties": {"ServerVersion": None}})
+            ndex = Ndex2()
+            self.assertEqual(ndex.debug, False)
+            self.assertEqual(ndex.version, '1.3')
+            self.assertEqual(ndex.status, {})
+            self.assertEqual(ndex.username, None)
+            self.assertEqual(ndex.password, None)
+            self.assertEqual(ndex.user_agent, '')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/rest')
+            self.assertTrue(ndex.s is not None)
+
+    def test_ndex2_constructor_with_defaulthost_properties_is_none(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json={"networkCount": 1321,
+                        "userCount": 12,
+                        "groupCount": 0,
+                        "message": "Online"})
             ndex = Ndex2()
             self.assertEqual(ndex.debug, False)
             self.assertEqual(ndex.version, '1.3')

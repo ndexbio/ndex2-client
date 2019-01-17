@@ -79,10 +79,18 @@ class Ndex2:
                                             "support 1.3 version of NDEx")
                         self.version = "1.3"
                         self.host = host + "/rest"
+                else:
+                    self.logger.warning("Warning: No properties found. "
+                                        "This release doesn't fully "
+                                        "support 1.3 version of NDEx")
+                    self.version = "1.3"
+                    self.host = host + "/rest"
 
             except req_except.HTTPError as he:
                 self.logger.warning("Can't determine server version. " + host +
-                                    ' Server returned error -- ' + str(he))
+                                    ' Server returned error -- ' + str(he) +
+                                    ' will assume 1.3 version of NDEx which' +
+                                    ' is not fully supported by this release')
                 self.version = "1.3"
                 self.host = host + "/rest"
                 # TODO - how to handle errors getting server version...

@@ -78,7 +78,8 @@ class TestClient(unittest.TestCase):
         # try with user, pass and user_agent set oh and host
         # with extra text prepended to localhost
         ndex = Ndex2(host='xxxlocalhost', username='bob',
-                     password='smith', user_agent='yo', debug=True)
+                     password='smith', user_agent='yo', debug=True,
+                     timeout=1)
         self.assertEqual(ndex.debug, True)
         self.assertEqual(ndex.version, 1.3)
         self.assertEqual(ndex.status, {})
@@ -87,6 +88,8 @@ class TestClient(unittest.TestCase):
         self.assertEqual(ndex.user_agent, ' yo')
         self.assertEqual(ndex.host, 'http://localhost:8080/ndexbio-rest')
         self.assertTrue(ndex.s is not None)
+        self.assertTrue(ndex.timeout, 1)
+
 
     def test_ndex2_constructor_that_raises_httperror(self):
         with requests_mock.mock() as m:

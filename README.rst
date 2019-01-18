@@ -1,6 +1,16 @@
 **NDEx2 Client v2.0**
 =====================
 
+.. image:: https://img.shields.io/travis/ndexbio/ndex2.svg
+        :target: https://travis-ci.org/ndexbio/ndex2.svg?branch=master
+
+.. image:: https://img.shields.io/pypi/v/ndex2.svg
+        :target: https://pypi.python.org/pypi/ndex2
+
+.. image:: https://coveralls.io/repos/github/ndexbio/ndex2-client/badge.svg?branch=master
+  :target: https://coveralls.io/github/ndexbio/ndex2-client?branch=master
+
+
 **Overview**
 ------------
 

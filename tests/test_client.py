@@ -3,7 +3,7 @@
 
 """Tests for `nbgwas_rest` package."""
 
-
+import sys
 import decimal
 import unittest
 import numpy as np
@@ -39,9 +39,10 @@ class TestClient(unittest.TestCase):
     def test_decimalencoder(self):
         dec = DecimalEncoder()
 
-        # test bytes is returned as string
-        res = dec.default(bytes('hello', 'utf-8'))
-        self.assertTrue(isinstance(res, str))
+        if sys.version_info.major >= 3:
+            # test bytes is returned as string
+            res = dec.default(bytes('hello', 'utf-8'))
+            self.assertTrue(isinstance(res, str))
 
         # test decimal.Decimal is float
         res = dec.default(decimal.Decimal(5))

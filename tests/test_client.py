@@ -8,9 +8,8 @@ import decimal
 import unittest
 import numpy as np
 
-import requests
 import requests_mock
-
+from requests.exceptions import HTTPError
 from ndex2 import client
 from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
@@ -74,6 +73,8 @@ class TestClient(unittest.TestCase):
         self.assertEqual(ndex.host, 'http://localhost:8080/ndexbio-rest')
         self.assertTrue(ndex.s is not None)
         self.assertTrue(ndex.timeout, 30)
+        ndex.set_request_timeout(10)
+        self.assertTrue(ndex.timeout, 30)
 
         # try with user, pass and user_agent set oh and host
         # with extra text prepended to localhost
@@ -93,7 +94,6 @@ class TestClient(unittest.TestCase):
         # try with user_agent set to None Issue #34
         ndex = Ndex2(user_agent=None)
         self.assertEqual(ndex.user_agent, '')
-
 
     def test_ndex2_constructor_that_raises_httperror(self):
         with requests_mock.mock() as m:
@@ -200,11 +200,54 @@ class TestClient(unittest.TestCase):
             m.put(client.DEFAULT_SERVER + '/v2/hi',
                   status_code=200,
                   text='hehe',
-                  headers={'content-type': 'application/foo'})
+                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                                   'Accept': 'application/json',
+                                   'User-Agent': client.userAgent},
+                  headers={'Content-Type': 'application/foo'})
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.put('/hi')
             self.assertEqual(res, 'hehe')
+
+    def test_ndex2_put_returns_code_401(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.put(client.DEFAULT_SERVER + '/v2/hi',
+                  status_code=401,
+                  text='hehe',
+                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                                   'Accept': 'application/json',
+                                   'User-Agent': client.userAgent},
+                  headers={'Content-Type': 'application/foo'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            try:
+                ndex.put('/hi')
+                self.fail('Expected HTTPError')
+            except HTTPError as he:
+                self.assertEqual(he.response.status_code, 401)
+                self.assertEqual(he.response.text, 'hehe')
+
+    def test_ndex2_put_returns_code_500(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.put(client.DEFAULT_SERVER + '/v2/hi',
+                  status_code=500,
+                  text='hehe',
+                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                                   'Accept': 'application/json',
+                                   'User-Agent': client.userAgent},
+                  headers={'Content-Type': 'application/foo'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            try:
+                ndex.put('/hi')
+                self.fail('Expected HTTPError')
+            except HTTPError as he:
+                self.assertEqual(he.response.status_code, 500)
+                self.assertEqual(he.response.text, 'hehe')
 
     def test_ndex2_put_with_json_and_json_resp(self):
         with requests_mock.mock() as m:
@@ -213,8 +256,89 @@ class TestClient(unittest.TestCase):
             m.put(client.DEFAULT_SERVER + '/v2/hi',
                   status_code=200,
                   json={'hi': 'bye'},
-                  headers={'content-type': 'application/json'})
+                  headers={'Content-Type': 'application/json'})
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.put('/hi', put_json='{"x": "y"}')
             self.assertEqual(res, {'hi': 'bye'})
+
+    def test_ndex2_post_with_json_and_json_resp(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/hi',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.post('/hi', post_json='{"x": "y"}')
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_ndex2_delete_with_json_and_json_resp(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.delete(client.DEFAULT_SERVER + '/v2/hi',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.delete('/hi', data='{"x": "y"}')
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_ndex2_delete_no_data(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.delete(client.DEFAULT_SERVER + '/v2/hi',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.delete('/hi')
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_ndex2_get_with_json_and_json_resp(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(client.DEFAULT_SERVER + '/v2/hi?x=y',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get('/hi', get_params={"x": "y"})
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_ndex2_get_stream_withparams(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(client.DEFAULT_SERVER + '/v2/hi?x=y',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_stream('/hi', get_params={"x": "y"})
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_ndex2_post_stream_withparams(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/hi',
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.post_stream('/hi', post_json={"x": "y"})
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)

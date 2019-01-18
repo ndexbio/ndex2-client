@@ -30,6 +30,8 @@ class Ndex2(object):
         `NDEx public server <http://ndexbio.org>`_.  UUID is required
 
     """
+    USER_AGENT_KEY = 'User-Agent'
+
     def __init__(self, host=None, username=None, password=None,
                  update_status=False, debug=False, user_agent='',
                  timeout=30):
@@ -49,11 +51,10 @@ class Ndex2(object):
                            `User-Agent <https://tools.ietf.org/html/rfc1945#page-46>`_
                            header sent with all requests to server
         :type user_agent: string
-        :param timeout: Number of seconds to wait for requests to service. This is
-                        not total number of seconds to wait, but how long to wait
-                        before hearing any response from the service. See timeout
-                        parameter in requests
-        :type timeout: int
+        :param timeout: The timeout in seconds value for requests to server. This value
+                        is passed to Request calls `Click here for more information
+                        <http://docs.python-requests.org/en/master/user/advanced/#timeouts>`_
+        :type timeout: float or tuple(float, float)
         """
         self.debug = debug
         self.version = 1.3
@@ -83,7 +84,9 @@ class Ndex2(object):
             try:
                 version_url = urljoin(host, status_url)
 
-                response = requests.get(version_url, headers={'User-Agent': userAgent + self.user_agent})
+                response = requests.get(version_url,
+                                        headers={Ndex2.USER_AGENT_KEY:
+                                                 userAgent + self.user_agent})
                 response.raise_for_status()
                 data = response.json()
 
@@ -128,6 +131,16 @@ class Ndex2(object):
 
 # Base methods for making requests to this NDEx
 
+    def set_request_timeout(self, time_in_secs):
+        """
+        Sets request timeout.
+        `Click here for more information <http://docs.python-requests.org/en/master/user/quickstart/#timeouts>`_
+        :param time_in_secs: Seconds to wait on a request to the
+                             service before giving up.
+        :type time_in_secs: int
+        """
+        self.timeout = time_in_secs
+
     def set_debug_mode(self, debug):
         self.debug = debug
 
@@ -141,20 +154,43 @@ class Ndex2(object):
         if not self.s.auth:
             raise Exception("this method requires user authentication")
 
-    def _return_put_post_response(self, response):
+    def _get_user_agent(self):
         """
-        Give a response from a PUT or POST call
+        Creates string to use for User-Agent header
+        :return: string containing User-Agent header value
+        """
+        return userAgent + self.user_agent
+
+    def _return_response(self, response,
+                         returnfullresponse=False,
+                         returnjsonundertry=False):
+        """
+        Given a response from service request
         this method returns response.json() if the
         headers content-type is application/json otherwise
         response.text is returned
         :param response: response object from requests.put or requests.post
                          call
-        :return: response.json() or response.text
+        :param returnfullresponse: If True then response object passed in
+                                   is returned
+        :type returnfullresponse: bool
+        :return: response.json() or response.text unless returnfullresponse
+                 then response passed in is just returned.
         """
         self.debug_response(response)
         response.raise_for_status()
         if response.status_code == 204:
             return ""
+
+        if returnjsonundertry is True:
+            try:
+                result = response.json()
+            except ValueError:
+                result = response.text
+            return result
+
+        if returnfullresponse is True:
+            return response
         if response.headers['content-type'] == 'application/json':
             return response.json()
         else:
@@ -168,13 +204,15 @@ class Ndex2(object):
         headers = self.s.headers
         headers['Content-Type'] = 'application/json;charset=UTF-8'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent + self.user_agent
+        headers[Ndex2.USER_AGENT_KEY] = self._get_user_agent()
 
         if put_json is not None:
-            response = self.s.put(url, data=put_json, headers=headers)
+            response = self.s.put(url, data=put_json, headers=headers,
+                                  timeout=self.timeout)
         else:
-            response = self.s.put(url, headers=headers)
-        return self._return_put_post_response(response)
+            response = self.s.put(url, headers=headers,
+                                  timeout=self.timeout)
+        return self._return_response(response)
 
     def post(self, route, post_json):
         url = self.host + route
@@ -183,51 +221,45 @@ class Ndex2(object):
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json,text/plain',
                    'Cache-Control': 'no-cache',
-                   'User-Agent':  userAgent + self.user_agent,
+                   Ndex2.USER_AGENT_KEY: self._get_user_agent(),
                    }
-        response = self.s.post(url, data=post_json, headers=headers)
-        return self._return_put_post_response(response)
+        response = self.s.post(url, data=post_json, headers=headers,
+                               timeout=self.timeout)
+        return self._return_response(response)
 
     def delete(self, route, data=None):
         url = self.host + route
         self.logger.debug("DELETE route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent + self.user_agent
+        headers[Ndex2.USER_AGENT_KEY] = userAgent + self.user_agent
 
         if data is not None:
-            response = self.s.delete(url, headers=headers, data=data)
+            response = self.s.delete(url, headers=headers, data=data,
+                                     timeout=self.timeout)
         else:
-            response = self.s.delete(url, headers=headers)
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return ""
-        return response.json()
+            response = self.s.delete(url, headers=headers,
+                                     timeout=self.timeout)
+        return self._return_response(response)
 
     def get(self, route, get_params=None):
         url = self.host + route
         self.logger.debug("GET route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent + self.user_agent
-        response = self.s.get(url, params=get_params, headers=headers)
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return None
-        return response.json()
+        headers[Ndex2.USER_AGENT_KEY] = self._get_user_agent()
+        response = self.s.get(url, params=get_params, headers=headers,
+                              timeout=self.timeout)
+        return self._return_response(response)
 
     # The stream refers to the Response, not the Request
     def get_stream(self, route, get_params=None):
         url = self.host + route
         self.logger.debug("GET stream route: " + url)
         headers = self.s.headers
-        headers['User-Agent'] = userAgent + self.user_agent
-        response = self.s.get(url, params=get_params, stream=True, headers=headers)
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return ""
-        return response
+        headers[Ndex2.USER_AGENT_KEY] = self._get_user_agent()
+        response = self.s.get(url, params=get_params, stream=True,
+                              headers=headers, timeout=self.timeout)
+        return self._return_response(response,
+                                     returnfullresponse=True)
 
     # The stream refers to the Response, not the Request
     def post_stream(self, route, post_json):
@@ -237,14 +269,12 @@ class Ndex2(object):
 
         headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = userAgent + self.user_agent
+        headers[Ndex2.USER_AGENT_KEY] = self._get_user_agent()
         headers['Connection'] = 'close'
-        response = self.s.post(url, data=post_json, headers=headers, stream=True)
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return ""
-        return response
+        response = self.s.post(url, data=post_json, headers=headers,
+                               stream=True, timeout=self.timeout)
+        return self._return_response(response,
+                                     returnfullresponse=True)
 
     # The Request is streamed, not the Response
     def put_multipart(self, route, fields):
@@ -258,15 +288,8 @@ class Ndex2(object):
                    'Connection': 'close'
                    }
         response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return ""
-        try:
-            result = response.json()
-        except ValueError:
-            result = response.text
-        return result
+        return self._return_response(response,
+                                     returnjsonundertry=True)
 
     # The Request is streamed, not the Response
     def post_multipart(self, route, fields, query_string=None):
@@ -281,15 +304,8 @@ class Ndex2(object):
                    'Connection': 'close'
                    }
         response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
-        self.debug_response(response)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return ""
-        try:
-            result = response.json()
-        except ValueError:
-            result = response.text
-        return result
+        return self._return_response(response,
+                                     returnjsonundertry=True)
 
 # Network methods
 

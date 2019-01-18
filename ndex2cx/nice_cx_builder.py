@@ -6,6 +6,7 @@ import requests
 import base64
 import sys
 import math
+import numpy as np
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \

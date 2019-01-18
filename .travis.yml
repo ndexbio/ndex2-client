@@ -4,7 +4,8 @@ python:
   - "3.5"
 install:
   - pip install -r requirements.txt
-  - pip install coverage
+  - pip install coveralls
 script:
-  - export PYTHONPATH=$PYTHONPATH:$TRAVIS_BUILD_DIR
-  - nosetests -v
+  - coverage run --source ndex2 setup.py test
+
+after_success: coveralls

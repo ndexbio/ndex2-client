@@ -1089,9 +1089,9 @@ class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return float(o)
-        elif isinstance(o, numpy.int64):
+        elif isinstance(o, numpy.integer):
             return int(o)
         elif isinstance(o, bytes):
             bytes_string = o.decode('ascii')
             return bytes_string
-        return super(DecimalEncoder, self).default(o)
+        return super(DecimalEncoder, self).encode(o)

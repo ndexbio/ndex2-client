@@ -54,8 +54,8 @@ class TestClient(unittest.TestCase):
 
         # test regular old int which throws TypeError
         try:
-            res = dec.default(1)
-            self.fail('Expected exception')
+            res = dec.default(np.int32(1))
+            self.assertEqual(res, int(1))
         except TypeError:
             pass
 

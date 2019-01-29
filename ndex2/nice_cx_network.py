@@ -46,7 +46,6 @@ class NiceCXNetwork():
         self.missingNodes = {}
         self.s = None
         self.node_name_to_id_map_cache = {}
-        self.user_agent = 'ndex2-client:v2.0'
 
     def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None):
         """
@@ -1302,7 +1301,8 @@ class NiceCXNetwork():
 
             return return_bytes
 
-    def upload_to(self, server, username, password):
+    def upload_to(self, server, username, password,
+                  user_agent=''):
         """
         Upload this network to the specified server to the account specified by username and password.
 
@@ -1316,20 +1316,23 @@ class NiceCXNetwork():
         :type username: string
         :param password: The password for the account.
         :type password: string
+        :param user_agent: String to append to User-Agent field sent to NDEx REST service
+        :type user_agent: string
         :return: The UUID of the network on NDEx.
         :rtype: string
         """
         if server and 'http' not in server:
             server = 'http://' + server
 
-        ndex = Ndex2(server,username,password, user_agent=self.user_agent)
+        ndex = Ndex2(server,username,password, user_agent=user_agent)
 
         return ndex.save_new_network(self.to_cx())
 
     def upload_new_network_stream(self, server, username, password):
         raise Exception('upload_new_network_stream() is no longer supported.  Please use upload_to()')
 
-    def update_to(self, uuid, server, username, password):
+    def update_to(self, uuid, server, username, password,
+                  user_agent=''):
         """ Upload this network to the specified server to the account specified by username and password.
 
         Example:
@@ -1342,12 +1345,14 @@ class NiceCXNetwork():
         :type username: str
         :param password: The password for the account.
         :type password: str
+        :param user_agent: String to append to User-Agent field sent to NDEx REST service
+        :type user_agent: string
         :return: The UUID of the network on NDEx.
         :rtype: str
 
         """
         cx = self.to_cx()
-        ndex = Ndex2(server,username,password, user_agent=self.user_agent)
+        ndex = Ndex2(server,username,password, user_agent=user_agent)
 
         if(len(cx) > 0):
             if(cx[len(cx) - 1] is not None):

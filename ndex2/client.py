@@ -9,6 +9,8 @@ import sys
 import decimal
 import numpy
 
+from .version import __version__
+
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -17,7 +19,7 @@ except ImportError:
 from requests import exceptions as req_except
 import time
 
-userAgent = 'NDEx-Python/3.0'
+userAgent = 'NDEx2-Python/' + __version__
 
 DEFAULT_SERVER = "http://public.ndexbio.org"
 

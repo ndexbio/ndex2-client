@@ -24,7 +24,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 
-with open(os.path.join('ndex2', '__init__.py')) as ver_file:
+with open(os.path.join('ndex2', 'version.py')) as ver_file:
     for line in ver_file:
         if line.startswith('__version__'):
             version=re.sub("'", "", line[line.index("'"):])

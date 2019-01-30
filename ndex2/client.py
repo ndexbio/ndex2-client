@@ -337,12 +337,12 @@ class Ndex2(object):
 
         indexed_fields = None
         #TODO add functionality for indexed_fields when it's supported by the server
-        if cx[len(cx) - 1] is not None:
-            if cx[len(cx) - 1].get('status') is None:
+        if cx[-1] is not None:
+            if cx[-1].get('status') is None:
                 cx.append({"status": [{"error": "", "success": True}]})
             else:
-                if len(cx[len(cx) - 1].get('status')) < 1:
-                    cx[len(cx) - 1].get('status').append({"error": "", "success": True})
+                if len(cx[-1].get('status')) < 1:
+                    cx[-1].get('status').append({"error": "", "success": True})
 
             if sys.version_info.major == 3:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
@@ -379,14 +379,12 @@ class Ndex2(object):
 
         if self.version == "2.0":
             route = '/network'
-            fields = {
-                'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
-            }
         else:
             route = '/network/asCX'
-            fields = {
-                'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
-            }
+
+        fields = {
+            'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
+        }
 
         return self.post_multipart(route, fields, query_string=query_string)
 

@@ -415,7 +415,7 @@ class TestClient(unittest.TestCase):
             except InvalidCXError as ice:
                 self.assertEqual(str(ice), 'CX is not a list')
 
-    def test_save_new_network_invalid_as_cx(self):
+    def test_save_new_network_empty_cx(self):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
@@ -425,3 +425,38 @@ class TestClient(unittest.TestCase):
                 self.fail('expected InvalidCXError')
             except InvalidCXError as ice:
                 self.assertEqual(str(ice), 'CX appears to be empty')
+
+    def test_save_new_network_cx_with_no_status(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/network/asCX',
+                   request_headers={'Connection': 'close'},
+                   status_code=1,
+                   text=resurl)
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            res = ndex.save_new_network([{'foo': '123'}])
+            self.assertEqual(res, resurl)
+            decode_txt = m.last_request.text.read().decode('UTF-8')
+            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('[{"foo": "123"}, {"status": [{"error": "", "success": true}]}]' in decode_txt)
+
+    def test_save_new_network_cx_with_status(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/network/asCX',
+                   request_headers={'Connection': 'close'},
+                   status_code=1,
+                   text=resurl)
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            res = ndex.save_new_network([{'foo': '123'},
+                                         {"status": [{"error": "", "success": True}]}])
+            self.assertEqual(res, resurl)
+            decode_txt = m.last_request.text.read().decode('UTF-8')
+            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('[{"foo": "123"}, {"status": [{"error": "", "success": true}]}]' in decode_txt)

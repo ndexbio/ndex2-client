@@ -62,7 +62,7 @@ version = None
 # The full version, including alpha/beta/rc tags.
 release = None
 
-init_file = os.path.join('ndex2', '__init__.py')
+init_file = os.path.join('ndex2', 'version.py')
 with open(init_file) as ver_file:
     for line in ver_file:
         if line.startswith('__version__'):

@@ -8,6 +8,12 @@ class NDExError(Exception):
     pass
 
 
+class UnauthorizedError(NDExError):
+    """
+    Unable to authenticate, either due to lack of
+    or invalid credentials.
+    """
+
 class InvalidCXError(NDExError):
     """
     Invalid CX error

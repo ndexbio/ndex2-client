@@ -181,11 +181,11 @@ class TestClient(unittest.TestCase):
     def test_ndex2_require_auth(self):
         ndex = Ndex2(host='localhost')
         try:
-            ndex.require_auth()
+            ndex._require_auth()
             self.fail('Expected exception')
         except Exception as e:
             self.assertEqual(str(e),
-                             'this method requires user authentication')
+                             'This method requires user authentication')
 
     def test_ndex2_get_user_agent(self):
         ndex = Ndex2(host='localhost')

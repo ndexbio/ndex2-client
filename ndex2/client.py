@@ -11,6 +11,8 @@ import numpy
 
 from .version import __version__
 from .exceptions import InvalidCXError
+from .exceptions import UnauthorizedError
+from .exceptions import NDExError
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -152,9 +154,12 @@ class Ndex2(object):
             if not response.status_code == requests.codes.ok:
                 self.logger.debug("response text: " + str(response.text))
 
-    def require_auth(self):
+    def _require_auth(self):
+        """
+        :raises UnauthorizedError: If no credentials are found in this object
+        """
         if not self.s.auth:
-            raise Exception("this method requires user authentication")
+            raise UnauthorizedError("This method requires user authentication")
 
     def _get_user_agent(self):
         """
@@ -354,6 +359,7 @@ class Ndex2(object):
         :type cx_stream: BytesIO
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: Response data
         :rtype: string or dict
         """
@@ -361,7 +367,7 @@ class Ndex2(object):
         indexed_fields = None
         #TODO add functionality for indexed_fields when it's supported by the server
 
-        self.require_auth()
+        self._require_auth()
         query_string = None
         if indexed_fields:
             if visibility:
@@ -391,11 +397,12 @@ class Ndex2(object):
         :param cx_stream: The network stream.
         :param network_id: The UUID of the network.
         :type network_id: str
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
         """
-        self.require_auth()
+        self._require_auth()
         fields = {
             'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
         }
@@ -557,13 +564,6 @@ class Ndex2(object):
 
     def search_networks_by_property_filter(self, search_parameter_dict={}, account_name=None, limit=100):
         raise Exception("This function is not supported in NDEx 2.0")
-        #   self.require_auth()
-        #   route = "/network/searchByProperties"
-        #   if account_name:
-        #       search_parameter_dict["admin"] = account_name
-        #   search_parameter_dict["limit"] = limit
-        #   post_json = json.dumps(search_parameter_dict)
-        #   return self.post(route, post_json)
 
     def network_summaries_to_ids(self, network_summaries):
         network_ids = []
@@ -648,10 +648,11 @@ class Ndex2(object):
 
         :param task_id: Task id
         :type task_id: string
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: Task
         :rtype: dict
         """
-        self.require_auth()
+        self._require_auth()
         route = "/task/%s" % task_id
         return self.get(route)
 
@@ -663,10 +664,11 @@ class Ndex2(object):
         :type network_id: string
         :param retry: Number of times to retry if deleting fails
         :type retry: int
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: Error json if there is an error.  Blank
         :rtype: string
         """
-        self.require_auth()
+        self._require_auth()
         route = "/network/%s" % network_id
         count = 0
         while count < retry:
@@ -714,10 +716,11 @@ class Ndex2(object):
         :type network_id: string
         :param provenance: Network provcenance
         :type provenance: dict
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: Result
         :rtype: dict
         """
-        self.require_auth()
+        self._require_auth()
         route = "/network/%s/provenance" % network_id
         if isinstance(provenance, dict):
             put_json = json.dumps(provenance)
@@ -733,10 +736,11 @@ class Ndex2(object):
         :type network_id: string
         :param value: Read only value
         :type value: bool
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: Result
         :rtype: dict
         """
-        self.require_auth()
+        self._require_auth()
         return self.set_network_system_properties(network_id, {"readOnly": value})
 
     def set_network_properties(self, network_id, network_properties):
@@ -747,10 +751,11 @@ class Ndex2(object):
         :type network_id: string
         :param network_properties: List of NDEx property value pairs
         :type network_properties: list
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return:
         :rtype:
         """
-        self.require_auth()
+        self._require_auth()
         route = "/network/%s/properties" % network_id
         if isinstance(network_properties, list):
             put_json = json.dumps(network_properties)
@@ -766,6 +771,7 @@ class Ndex2(object):
 
         :param network_id: Network id
         :type network_id: string
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: Sample network
         :rtype: list of dicts in cx format
         """
@@ -773,7 +779,14 @@ class Ndex2(object):
         return self.get(route)
 
     def set_network_sample(self, network_id, sample_cx_network_str):
-        self.require_auth()
+        """
+
+        :param network_id:
+        :param sample_cx_network_str:
+        :raises UnauthorizedError: If credentials are invalid or not set
+        :return:
+        """
+        self._require_auth()
         route = "/network/%s/sample" % network_id
     #    putJson = json.dumps(sample_cx_network_str)
         return self.put(route, sample_cx_network_str)
@@ -786,10 +799,11 @@ class Ndex2(object):
         :type network_id: string
         :param network_properties: Network properties
         :type network_properties: dict of NDEx network property value pairs
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return: Result
         :rtype: dict
         """
-        self.require_auth()
+        self._require_auth()
         route = "/network/%s/systemproperty" % network_id
         if isinstance(network_properties, dict):
             put_json = json.dumps(network_properties)
@@ -810,11 +824,12 @@ class Ndex2(object):
         :type network_id: string
         :param network_profile: Network profile
         :type network_profile: dict
+        :raises UnauthorizedError: If credentials are invalid or not set
         :return:
         :rtype:
         """
 
-        self.require_auth()
+        self._require_auth()
         if isinstance(network_profile, dict):
             if network_profile.get("visibility") and self.version.startswith("2."):
                 raise Exception("Ndex 2.x doesn't support setting visibility by this function. "
@@ -833,26 +848,9 @@ class Ndex2(object):
             return self.post(route, json_data)
 
     def upload_file(self, filename):
-        raise Exception("This function is not supported in this release. Please use the save_new_network "
+        raise NDExError("This function is not supported in this release. Please use the save_new_network "
                         "function to create new networks in NDEx server.")
-        #       self.require_auth()
-        #       fields = {
 
-        #           'fileUpload': (filename, open(filename, 'rb'), 'application/octet-stream'),
-        #           'filename': os.path.basename(filename)#filename
-        #       }
-        #       route = '/network/upload'
-        #       return self.post_multipart(route, fields)
-
-        # def update_network_membership_by_id(self, account_id, network_id, permission):
-        #     route ="/network/{networkId}/member"  % (network_id)
-        #     postData = {
-        #         "permission": permission,
-        #         "networkUUID": network_id,
-        #         "userUUID": account_id
-        #     }
-        #     postJson = json.dumps(postData)
-        #     self.post(route, postJson)
 
     def update_network_group_permission(self, groupid, networkid, permission):
         """

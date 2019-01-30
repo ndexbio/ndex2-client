@@ -13,6 +13,8 @@ from requests.exceptions import HTTPError
 from ndex2 import client
 from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
+from ndex2 import __version__
+from ndex2.exceptions import InvalidCXError
 
 
 class TestClient(unittest.TestCase):
@@ -185,6 +187,17 @@ class TestClient(unittest.TestCase):
             self.assertEqual(str(e),
                              'this method requires user authentication')
 
+    def test_ndex2_get_user_agent(self):
+        ndex = Ndex2(host='localhost')
+        # try with default
+        res = ndex._get_user_agent()
+        self.assertEqual(res, 'NDEx2-Python/' + __version__)
+
+        ndex = Ndex2(host='localhost', user_agent='hi')
+        # try with user_agent set
+        res = ndex._get_user_agent()
+        self.assertEqual(res, 'NDEx2-Python/' + __version__ + ' hi')
+
     def test_ndex2_put_no_json_empty_resp_code_204(self):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
@@ -343,3 +356,72 @@ class TestClient(unittest.TestCase):
             res = ndex.post_stream('/hi', post_json={"x": "y"})
             self.assertEqual(res.json(), {'hi': 'bye'})
             self.assertEqual(res.status_code, 200)
+
+    def test_ndex2_put_multipart(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.put(client.DEFAULT_SERVER + '/v2/hi',
+                  request_headers={'Connection': 'close'},
+                  status_code=200)
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.put_multipart('/hi', fields={"x": "y"})
+            self.assertEqual(res, '')
+
+    def test_ndex2_post_multipart(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/hi',
+                  request_headers={'Connection': 'close'},
+                  status_code=200)
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.post_multipart('/hi', fields={"x": "y"})
+            self.assertEqual(res, '')
+
+    def test_ndex2_post_multipart_with_querystring(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/hi?yo=1',
+                  request_headers={'Connection': 'close'},
+                  status_code=200)
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.post_multipart('/hi', {"x": "y"}, query_string='yo=1')
+            self.assertEqual(res, '')
+
+    def test_save_new_network_none_as_cx(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            try:
+                ndex.save_new_network(None)
+                self.fail('expected InvalidCXError')
+            except InvalidCXError as ice:
+                self.assertEqual(str(ice), 'CX is None')
+
+    def test_save_new_network_invalid_as_cx(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            try:
+                ndex.save_new_network('hi')
+                self.fail('expected InvalidCXError')
+            except InvalidCXError as ice:
+                self.assertEqual(str(ice), 'CX is not a list')
+
+    def test_save_new_network_invalid_as_cx(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            try:
+                ndex.save_new_network([])
+                self.fail('expected InvalidCXError')
+            except InvalidCXError as ice:
+                self.assertEqual(str(ice), 'CX appears to be empty')

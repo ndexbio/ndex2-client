@@ -10,7 +10,7 @@ import decimal
 import numpy
 
 from .version import __version__
-
+from .exceptions import InvalidCXError
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -286,7 +286,7 @@ class Ndex2(object):
 
         headers = {'Content-Type': multipart_data.content_type,
                    'Accept': 'application/json',
-                   'User-Agent': userAgent + self.user_agent,
+                   Ndex2.USER_AGENT_KEY: self._get_user_agent(),
                    'Connection': 'close'
                    }
         response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
@@ -302,7 +302,7 @@ class Ndex2(object):
         multipart_data = MultipartEncoder(fields=fields)
         self.logger.debug("POST route: " + url)
         headers = {'Content-Type': multipart_data.content_type,
-                   'User-Agent': userAgent + self.user_agent,
+                   Ndex2.USER_AGENT_KEY: self._get_user_agent(),
                    'Connection': 'close'
                    }
         response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
@@ -319,27 +319,32 @@ class Ndex2(object):
         :type cx: list of dicts
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
+        :raises InvalidCXError: For invalid CX data
         :return: Response data
         :rtype: string or dict
         """
+        if cx is None:
+            raise InvalidCXError('CX is None')
+        if not isinstance(cx, list):
+            raise InvalidCXError('CX is not a list')
+        if len(cx) is 0:
+            raise InvalidCXError('CX appears to be empty')
+
         indexed_fields = None
         #TODO add functionality for indexed_fields when it's supported by the server
-        if len(cx) > 0:
-            if cx[len(cx) - 1] is not None:
-                if cx[len(cx) - 1].get('status') is None:
-                    cx.append({"status": [{"error": "", "success": True}]})
-                else:
-                    if len(cx[len(cx) - 1].get('status')) < 1:
-                        cx[len(cx) - 1].get('status').append({"error": "", "success": True})
+        if cx[len(cx) - 1] is not None:
+            if cx[len(cx) - 1].get('status') is None:
+                cx.append({"status": [{"error": "", "success": True}]})
+            else:
+                if len(cx[len(cx) - 1].get('status')) < 1:
+                    cx[len(cx) - 1].get('status').append({"error": "", "success": True})
 
             if sys.version_info.major == 3:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
             else:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 
-            return self.save_cx_stream_as_new_network(stream, visibility=visibility)
-        else:
-            raise IndexError("Cannot save empty CX.  Please provide a non-empty CX document.")
+        return self.save_cx_stream_as_new_network(stream, visibility=visibility)
 
     def save_cx_stream_as_new_network(self, cx_stream, visibility=None):
         """

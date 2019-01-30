@@ -10,8 +10,8 @@ import decimal
 import numpy
 
 from .version import __version__
-from .exceptions import InvalidCXError
-from .exceptions import UnauthorizedError
+from .exceptions import NDExInvalidCXError
+from .exceptions import NDExUnauthorizedError
 from .exceptions import NDExError
 try:
     from urllib.parse import urljoin
@@ -156,10 +156,10 @@ class Ndex2(object):
 
     def _require_auth(self):
         """
-        :raises UnauthorizedError: If no credentials are found in this object
+        :raises NDExUnauthorizedError: If no credentials are found in this object
         """
         if not self.s.auth:
-            raise UnauthorizedError("This method requires user authentication")
+            raise NDExUnauthorizedError("This method requires user authentication")
 
     def _get_user_agent(self):
         """
@@ -324,16 +324,16 @@ class Ndex2(object):
         :type cx: list of dicts
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
-        :raises InvalidCXError: For invalid CX data
+        :raises NDExInvalidCXError: For invalid CX data
         :return: Response data
         :rtype: string or dict
         """
         if cx is None:
-            raise InvalidCXError('CX is None')
+            raise NDExInvalidCXError('CX is None')
         if not isinstance(cx, list):
-            raise InvalidCXError('CX is not a list')
+            raise NDExInvalidCXError('CX is not a list')
         if len(cx) is 0:
-            raise InvalidCXError('CX appears to be empty')
+            raise NDExInvalidCXError('CX appears to be empty')
 
         indexed_fields = None
         #TODO add functionality for indexed_fields when it's supported by the server
@@ -359,7 +359,7 @@ class Ndex2(object):
         :type cx_stream: BytesIO
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: string
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Response data
         :rtype: string or dict
         """
@@ -395,7 +395,7 @@ class Ndex2(object):
         :param cx_stream: The network stream.
         :param network_id: The UUID of the network.
         :type network_id: str
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
@@ -646,7 +646,7 @@ class Ndex2(object):
 
         :param task_id: Task id
         :type task_id: string
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Task
         :rtype: dict
         """
@@ -662,7 +662,7 @@ class Ndex2(object):
         :type network_id: string
         :param retry: Number of times to retry if deleting fails
         :type retry: int
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Error json if there is an error.  Blank
         :rtype: string
         """
@@ -714,7 +714,7 @@ class Ndex2(object):
         :type network_id: string
         :param provenance: Network provcenance
         :type provenance: dict
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Result
         :rtype: dict
         """
@@ -734,7 +734,7 @@ class Ndex2(object):
         :type network_id: string
         :param value: Read only value
         :type value: bool
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Result
         :rtype: dict
         """
@@ -749,7 +749,7 @@ class Ndex2(object):
         :type network_id: string
         :param network_properties: List of NDEx property value pairs
         :type network_properties: list
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return:
         :rtype:
         """
@@ -769,7 +769,7 @@ class Ndex2(object):
 
         :param network_id: Network id
         :type network_id: string
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Sample network
         :rtype: list of dicts in cx format
         """
@@ -781,7 +781,7 @@ class Ndex2(object):
 
         :param network_id:
         :param sample_cx_network_str:
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return:
         """
         self._require_auth()
@@ -797,7 +797,7 @@ class Ndex2(object):
         :type network_id: string
         :param network_properties: Network properties
         :type network_properties: dict of NDEx network property value pairs
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Result
         :rtype: dict
         """
@@ -822,7 +822,7 @@ class Ndex2(object):
         :type network_id: string
         :param network_profile: Network profile
         :type network_profile: dict
-        :raises UnauthorizedError: If credentials are invalid or not set
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return:
         :rtype:
         """

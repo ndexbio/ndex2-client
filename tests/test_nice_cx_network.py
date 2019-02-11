@@ -4,11 +4,27 @@
 """Tests for `nice_cx_network` package."""
 
 import unittest
+
+import requests_mock
+from requests.exceptions import HTTPError
+from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
 from ndex2 import constants
 
+
 class TestNiceCXNetwork(unittest.TestCase):
+
+    def get_rest_admin_status_dict(self, server_version):
+        return {"networkCount": 1321,
+                "userCount": 12,
+                "groupCount": 0,
+                "message": "Online",
+                "properties": {"ServerVersion": server_version,
+                               "ServerResultLimit": "10000"}}
+
+    def get_rest_admin_status_url(self):
+        return client.DEFAULT_SERVER + '/rest/admin/status'
 
     def setUp(self):
         """Set up test fixtures, if any."""
@@ -41,7 +57,6 @@ class TestNiceCXNetwork(unittest.TestCase):
             self.fail('Expected NDExError')
         except NDExError as ne:
             self.assertEqual(str(ne), 'No id found in Node')
-
 
     def test_set_node_attribute_passing_node_object(self):
         # try int
@@ -170,7 +185,55 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0][constants.NODE_ATTR_NAME], 'attrname')
         self.assertEqual(res[0][constants.NODE_ATTR_VALUE], 'value2')
 
+    def test_upload_to_success(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict("2.4.0"))
+            m.post(client.DEFAULT_SERVER + '/v2/network/asCX',
+                   request_headers={'Connection': 'close'},
+                   status_code=1,
+                   text=resurl)
+            net = NiceCXNetwork()
+            net.create_node('bob')
+            res = net.upload_to(client.DEFAULT_SERVER, 'bob', 'warnerbrandis',
+                                user_agent='jeez')
+            self.assertEqual(res, resurl)
+            decode_txt = m.last_request.text.read().decode('UTF-8')
+            self.assertEqual(m.last_request.headers['User-Agent'],
+                             client.userAgent + ' jeez')
+            self.assertTrue('Content-Disposition: form-data; name='
+                            '"CXNetworkStream"; filename='
+                            '"filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
+            self.assertTrue('{"nodes": [{"@id": 0, "n": "bob", "r": "bob"}]},'
+                            ' {"status": [{"error": "", "success": '
+                            'true}]}]' in decode_txt)
 
-
-
+    def test_update_to_success(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict("2.4.0"))
+            m.put(client.DEFAULT_SERVER + '/v2/network/asCX/abcd',
+                   request_headers={'Connection': 'close'},
+                   status_code=1,
+                   text=resurl)
+            net = NiceCXNetwork()
+            net.create_node('bob')
+            res = net.update_to('abcd', client.DEFAULT_SERVER, 'bob', 'warnerbrandis',
+                                user_agent='jeez')
+            self.assertEqual(res, resurl)
+            decode_txt = m.last_request.text.read().decode('UTF-8')
+            self.assertEqual(m.last_request.headers['User-Agent'],
+                             client.userAgent + ' jeez')
+            self.assertTrue('Content-Disposition: form-data; name='
+                            '"CXNetworkStream"; filename='
+                            '"filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
+            self.assertTrue('{"nodes": [{"@id": 0, "n": "bob", "r": "bob"}]},'
+                            ' {"status": [{"error": "", "success": '
+                            'true}]}]' in decode_txt)
 

@@ -1324,7 +1324,8 @@ class NiceCXNetwork():
     def upload_to(self, server, username, password,
                   user_agent=''):
         """
-        Upload this network to the specified server to the account specified by username and password.
+        Upload this network to the specified server to the account specified
+         by username and password.
 
         Example:
 
@@ -1341,11 +1342,7 @@ class NiceCXNetwork():
         :return: The UUID of the network on NDEx.
         :rtype: string
         """
-        if server and 'http' not in server:
-            server = 'http://' + server
-
-        ndex = Ndex2(server,username,password, user_agent=user_agent)
-
+        ndex = Ndex2(server, username, password, user_agent=user_agent)
         return ndex.save_new_network(self.to_cx())
 
     def upload_new_network_stream(self, server, username, password):
@@ -1353,7 +1350,8 @@ class NiceCXNetwork():
 
     def update_to(self, uuid, server, username, password,
                   user_agent=''):
-        """ Upload this network to the specified server to the account specified by username and password.
+        """ Upload this network to the specified server to the account specified
+         by username and password.
 
         Example:
 

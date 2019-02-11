@@ -11,6 +11,8 @@ import ijson
 import requests
 import base64
 from ndex2.client import Ndex2
+from ndex2.exceptions import NDExError
+from ndex2 import constants
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPError, URLError
@@ -435,16 +437,32 @@ class NiceCXNetwork():
         self.node_int_id_generator += 1
         return return_id
 
-    def add_node_attribute(self, property_of=None, name=None, values=None, type=None, subnetwork=None):
+    def add_node_attribute(self, property_of=None, name=None, values=None, type=None, subnetwork=None,
+                           overwrite=False):
         if property_of is None:
-            raise Exception('Node attribute requires property_of')
+            raise NDExError('Node attribute requires property_of')
+
+        if isinstance(property_of, dict):
+            node_id = property_of.get(constants.NODE_ID)
+            if node_id is None:
+                raise NDExError('No id found in Node')
+        else:
+            node_id = property_of
 
         if name is None or values is None:
-            raise Exception('Node attribute requires the name and values property')
+            raise NDExError('Node attribute requires the name and values property')
 
-        if self.nodeAttributes.get(property_of) is None :
-            self.nodeAttributes[property_of] = []
+        if self.nodeAttributes.get(node_id) is None:
+            self.nodeAttributes[node_id] = []
 
+        if overwrite is True:
+            for index, val in enumerate(self.nodeAttributes[node_id]):
+                if val[constants.NODE_ATTR_NAME] == name:
+                    del self.nodeAttributes[node_id][index]
+
+        n_attrib = {constants.NODE_ATTR_PROPERTYOF: node_id,
+                    constants.NODE_ATTR_NAME: name,
+                    constants.NODE_ATTR_VALUE: values}
         if type is None:
             attr_type = None
             if isinstance(values, float):
@@ -455,12 +473,11 @@ class NiceCXNetwork():
                 attr_type = 'list_of_string'
 
             if attr_type:
-                self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': attr_type})
-            else:
-                self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values})
+                n_attrib[constants.NODE_ATTR_DATATYPE] = attr_type
         else:
-            self.nodeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': type})
-            #TODO add support for subnetwork
+            n_attrib[constants.NODE_ATTR_DATATYPE] = type
+
+        self.nodeAttributes[node_id].append(n_attrib)
 
     def add_edge_attribute(self, property_of, name, values, type=None, subnetwork=None):
         if isinstance(property_of, dict):
@@ -526,7 +543,8 @@ class NiceCXNetwork():
     #=============================
     # NODE ATTRIBUTES OPERATIONS
     #=============================
-    def set_node_attribute(self, node, attribute_name, values, type=None):
+    def set_node_attribute(self, node, attribute_name, values, type=None,
+                           overwrite=False):
         """
         Set an attribute of a node, where the node may be specified by its id or passed in as a node dict.
 
@@ -546,13 +564,15 @@ class NiceCXNetwork():
         :type values: list, string, int or double
         :param type: The datatype of the attribute values, defaults is string.  See `Supported data types`_
         :type type: str
-        :param cx_fragment: CX fragment
-        :type cx_fragment: json
+        :param overwrite: If True node attribute matching 'attribute_name' is removed first otherwise
+                          code blindly adds attribute
+        :type overwrite: bool True means to overwrite node attribute named attribute_name
         :return: None
         :rtype: None
         """
 
-        self.add_node_attribute(property_of=node, name=attribute_name, values=values, type=type)
+        self.add_node_attribute(property_of=node, name=attribute_name, values=values, type=type,
+                                overwrite=overwrite)
 
     def get_node_attribute_objects(self, node, attribute_name):
         """
@@ -2134,8 +2154,6 @@ class NiceCXNetwork():
                         attr['v'] = json.dumps(attr['v'])
                     elif not isinstance(attr['v'], str):
                         attr['v'] = str(attr['v'])
-
-
 
 
 class DecimalEncoder(json.JSONEncoder):

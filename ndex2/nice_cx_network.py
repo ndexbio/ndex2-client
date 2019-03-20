@@ -1167,10 +1167,9 @@ class NiceCXNetwork():
                                   ' in opaque aspect. Removing entry')
                 self.remove_opaque_aspect(NiceCXNetwork.VISUAL_PROPERTIES)
                 if NiceCXNetwork.VISUAL_PROPERTIES in self.metadata:
-                    self.logger.debug('Removing ' +
-                                      NiceCXNetwork.VISUAL_PROPERTIES +
-                                      ' from metadata')
-                    del self.metadata[NiceCXNetwork.VISUAL_PROPERTIES]
+                    self.logger.warning(NiceCXNetwork.VISUAL_PROPERTIES +
+                                        ' found in metadata. this should'
+                                        ' be removed')
 
     def _set_visual_properties_aspect(self, visual_props_aspect):
         """

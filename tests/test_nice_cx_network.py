@@ -4,11 +4,9 @@
 """Tests for `nice_cx_network` package."""
 
 import os
-import sys
 import unittest
 
 import requests_mock
-from requests.exceptions import HTTPError
 from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
@@ -21,6 +19,9 @@ class TestNiceCXNetwork(unittest.TestCase):
     TEST_DIR = os.path.dirname(__file__)
     WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')
     DARKTHEME_FILE = os.path.join(TEST_DIR, 'data', 'darkthemefinal.cx')
+    DARKTHEMENODE_FILE = os.path.join(TEST_DIR, 'data',
+                                      'darkthemefinalwithnodevis.cx')
+    GLYPICAN_FILE = os.path.join(TEST_DIR, 'data', 'glypican2.cx')
 
     def get_rest_admin_status_dict(self, server_version):
         return {"networkCount": 1321,
@@ -244,6 +245,19 @@ class TestNiceCXNetwork(unittest.TestCase):
                             ' {"status": [{"error": "", "success": '
                             'true}]}]' in decode_txt)
 
+    def test_remove_node_and_edge_specific_visual_properties_with_none(self):
+        mynet = NiceCXNetwork()
+        res = mynet._remove_node_and_edge_specific_visual_properties(None)
+        self.assertEqual(None, res)
+
+    def test_set_visual_properties_aspect_with_none(self):
+        mynet = NiceCXNetwork()
+        try:
+            mynet._set_visual_properties_aspect(None)
+            self.fail('Expected TypeError')
+        except TypeError as e:
+            self.assertEqual('Visual Properties aspect is None', str(e))
+
     def test_apply_style_from_network_wrong_types(self):
         mynet = NiceCXNetwork()
 
@@ -259,8 +273,46 @@ class TestNiceCXNetwork(unittest.TestCase):
         except TypeError as e:
             self.assertEqual('Object passed in is not NiceCXNetwork', str(e))
 
-    def test_apply_style_from_network_valid(self):
-        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEME_FILE)
+    def test_apply_style_from_network_no_style(self):
         wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        wntcx.remove_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEME_FILE)
+        try:
+            darkcx.apply_style_from_network(wntcx)
+            self.fail('Expected NDexError')
+        except NDExError as ne:
+            self.assertEqual('No visual style found in network', str(ne))
+
+    def test_apply_style_from_wnt_network_to_dark_network(self):
+        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEME_FILE)
+        dark_vis_aspect = darkcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        self.assertEqual(9, len(dark_vis_aspect))
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        wnt_vis_aspect = wntcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        self.assertEqual(3, len(wnt_vis_aspect))
 
         darkcx.apply_style_from_network(wntcx)
+        new_dark_vis_aspect = darkcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        self.assertEqual(3, len(new_dark_vis_aspect))
+
+    def test_apply_style_with_node_and_edge_specific_visual_values(self):
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEMENODE_FILE)
+
+        wntcx.apply_style_from_network(darkcx)
+        wnt_vis_aspect = wntcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        self.assertEqual(3, len(wnt_vis_aspect))
+
+    def test_apply_style_on_network_with_old_visual_aspect(self):
+        glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        glypy.apply_style_from_network(wntcx)
+        glypy_aspect = glypy.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        self.assertEqual(3, len(glypy_aspect))
+
+    def test_apply_style_on_network_from_old_visual_aspect_network(self):
+        glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        wntcx.apply_style_from_network(glypy)
+        wnt_aspect = wntcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        self.assertEqual(3, len(wnt_aspect))

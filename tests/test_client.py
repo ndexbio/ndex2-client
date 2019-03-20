@@ -441,7 +441,10 @@ class TestClient(unittest.TestCase):
             decode_txt = m.last_request.text.read().decode('UTF-8')
             self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
             self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
-            self.assertTrue('[{"foo": "123"}, {"status": [{"error": "", "success": true}]}]' in decode_txt)
+            self.assertTrue('{"foo": "123"}' in decode_txt)
+            self.assertTrue('{"status": [{"' in decode_txt)
+            self.assertTrue('"error": ""' in decode_txt)
+            self.assertTrue('"success": true' in decode_txt)
 
     def test_save_new_network_cx_with_emptystatus_and_publicvisibility(self):
         with requests_mock.mock() as m:
@@ -460,7 +463,10 @@ class TestClient(unittest.TestCase):
             decode_txt = m.last_request.text.read().decode('UTF-8')
             self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
             self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
-            self.assertTrue('[{"foo": "123"}, {"status": [{"error": "", "success": true}]}]' in decode_txt)
+            self.assertTrue('{"foo": "123"}' in decode_txt)
+            self.assertTrue('{"status": [{"' in decode_txt)
+            self.assertTrue('"error": ""' in decode_txt)
+            self.assertTrue('"success": true' in decode_txt)
 
     def test_save_new_network_cx_with_status(self):
         with requests_mock.mock() as m:
@@ -478,4 +484,7 @@ class TestClient(unittest.TestCase):
             decode_txt = m.last_request.text.read().decode('UTF-8')
             self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
             self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
-            self.assertTrue('[{"foo": "123"}, {"status": [{"error": "", "success": true}]}]' in decode_txt)
+            self.assertTrue('{"foo": "123"}' in decode_txt)
+            self.assertTrue('{"status": [{"' in decode_txt)
+            self.assertTrue('"error": ""' in decode_txt)
+            self.assertTrue('"success": true' in decode_txt)

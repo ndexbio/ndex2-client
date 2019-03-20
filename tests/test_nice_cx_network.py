@@ -215,9 +215,13 @@ class TestNiceCXNetwork(unittest.TestCase):
                             '"filename"' in decode_txt)
             self.assertTrue('Content-Type: application/'
                             'octet-stream' in decode_txt)
-            self.assertTrue('{"nodes": [{"@id": 0, "n": "bob", "r": "bob"}]},'
-                            ' {"status": [{"error": "", "success": '
-                            'true}]}]' in decode_txt)
+            self.assertTrue('{"nodes": [{' in decode_txt)
+            self.assertTrue('"@id": 0' in decode_txt)
+            self.assertTrue('"n": "bob"' in decode_txt)
+            self.assertTrue('"r": "bob"' in decode_txt)
+            self.assertTrue('{"status": [{"' in decode_txt)
+            self.assertTrue('"error": ""' in decode_txt)
+            self.assertTrue('"success": true' in decode_txt)
 
     def test_update_to_success(self):
         with requests_mock.mock() as m:
@@ -241,9 +245,13 @@ class TestNiceCXNetwork(unittest.TestCase):
                             '"filename"' in decode_txt)
             self.assertTrue('Content-Type: application/'
                             'octet-stream' in decode_txt)
-            self.assertTrue('{"nodes": [{"@id": 0, "n": "bob", "r": "bob"}]},'
-                            ' {"status": [{"error": "", "success": '
-                            'true}]}]' in decode_txt)
+            self.assertTrue('{"nodes": [{' in decode_txt)
+            self.assertTrue('"@id": 0' in decode_txt)
+            self.assertTrue('"n": "bob"' in decode_txt)
+            self.assertTrue('"r": "bob"' in decode_txt)
+            self.assertTrue('{"status": [{"' in decode_txt)
+            self.assertTrue('"error": ""' in decode_txt)
+            self.assertTrue('"success": true' in decode_txt)
 
     def test_remove_node_and_edge_specific_visual_properties_with_none(self):
         mynet = NiceCXNetwork()

@@ -3,6 +3,8 @@
 
 """Tests for `nice_cx_network` package."""
 
+import os
+import sys
 import unittest
 
 import requests_mock
@@ -11,9 +13,14 @@ from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
 from ndex2 import constants
+import ndex2
 
 
 class TestNiceCXNetwork(unittest.TestCase):
+
+    TEST_DIR = os.path.dirname(__file__)
+    WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')
+    DARKTHEME_FILE = os.path.join(TEST_DIR, 'data', 'darkthemefinal.cx')
 
     def get_rest_admin_status_dict(self, server_version):
         return {"networkCount": 1321,
@@ -237,3 +244,23 @@ class TestNiceCXNetwork(unittest.TestCase):
                             ' {"status": [{"error": "", "success": '
                             'true}]}]' in decode_txt)
 
+    def test_apply_style_from_network_wrong_types(self):
+        mynet = NiceCXNetwork()
+
+        try:
+            mynet.apply_style_from_network(None)
+            self.fail('Expected TypeError')
+        except TypeError as e:
+            self.assertEqual('Object passed in is None', str(e))
+
+        try:
+            mynet.apply_style_from_network(str('hi'))
+            self.fail('Expected TypeError')
+        except TypeError as e:
+            self.assertEqual('Object passed in is not NiceCXNetwork', str(e))
+
+    def test_apply_style_from_network_valid(self):
+        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEME_FILE)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+
+        darkcx.apply_style_from_network(wntcx)

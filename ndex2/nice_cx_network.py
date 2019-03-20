@@ -10,6 +10,8 @@ import json
 import ijson
 import requests
 import base64
+import logging
+
 from ndex2.client import Ndex2
 from ndex2.exceptions import NDExError
 from ndex2 import constants
@@ -21,6 +23,13 @@ else:
 
 
 class NiceCXNetwork():
+
+    VISUAL_PROPERTIES = 'visualProperties'
+    CY_VISUAL_PROPERTIES = 'cyVisualProperties'
+    PROPERTIES_OF = 'properties_of'
+    PROPS_OF_NODES = 'nodes'
+    PROPS_OF_EDGES = 'edges'
+
     def __init__(self, **attr):
 
         self.metadata = {}
@@ -48,6 +57,7 @@ class NiceCXNetwork():
         self.missingNodes = {}
         self.s = None
         self.node_name_to_id_map_cache = {}
+        self.logger = logging.getLogger(__name__)
 
     def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None):
         """
@@ -1085,9 +1095,111 @@ class NiceCXNetwork():
     def get_node_citations(self):
         return self.nodeCitations
 
+    def _get_visual_properties_aspect(self):
+        """
+        Gets the visual Properties aspect (an opaque aspect) by
+        first looking for :py:const:`~.NiceCXNetwork.CY_VISUAL_PROPERTIES` aspect
+        and if not found then :py:const:`~.NiceCXNetwork.VISUAL_PROPERTIES`
+        aspect.
+
+        :return: visual properties aspect as dict or None if not found
+        """
+        opaque_aspect_names = self.get_opaque_aspect_names()
+        if NiceCXNetwork.CY_VISUAL_PROPERTIES in opaque_aspect_names:
+            return self.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        if NiceCXNetwork.VISUAL_PROPERTIES in opaque_aspect_names:
+            return self.get_opaque_aspect(NiceCXNetwork.VISUAL_PROPERTIES)
+
+    def _remove_node_and_edge_specific_visual_properties(self, vis_aspect):
+        """
+        Removes node and edge specific visual properties
+        :return:
+        """
+        if vis_aspect is None:
+            return vis_aspect
+        new_list = []
+        for entry in vis_aspect:
+            if NiceCXNetwork.PROPERTIES_OF in entry:
+                if entry[NiceCXNetwork.PROPERTIES_OF] == NiceCXNetwork.PROPS_OF_NODES:
+                    continue
+                if entry[NiceCXNetwork.PROPERTIES_OF] == NiceCXNetwork.PROPS_OF_EDGES:
+                    continue
+            new_list.append(entry)
+        return new_list
+
+    def apply_style_from_network(self, nicecxnetwork):
+        """
+        Applies Cytoscape visual properties from the network passed into this method.
+        The style is pulled from :py:const:`~.NiceCXNetwork.VISUAL_PROPERTIES` or
+        :py:const:`~.NiceCXNetwork.CY_VISUAL_PROPERTIES`
+
+        :param nicecxnetwork: Network to extract style from
+        :type nicecxnetwork: :py:class:`~.NiceCXNetwork`
+        :raises TypeError: If object passed in is NOT a :py:class:`~.NiceCXNetwork` object or if object is None
+        :raises NDExError: If :py:class:`~.NiceCXNetwork` does not have any visual styles
+        :return: None
+        :rtype: None
+        """
+        if nicecxnetwork is None:
+            raise TypeError('Object passed in is None')
+        if not isinstance(nicecxnetwork, NiceCXNetwork):
+            raise TypeError('Object passed in is not NiceCXNetwork')
+
+        vis_props_aspect = nicecxnetwork._get_visual_properties_aspect()
+        if vis_props_aspect is None:
+            raise NDExError('No visual style found in network')
+
+        clean_vis_props_aspect = self._remove_node_and_edge_specific_visual_properties(vis_props_aspect)
+
+        self._set_visual_properties_aspect(clean_vis_props_aspect)
+
+    def _delete_deprecated_visual_properties_aspect(self):
+        """
+        If found removes deprecated :py:const:`~.NiceCXNetwork.CY_VISUAL_PROPERTIES`
+        from opaque aspects and from metadata
+        :return: None
+        :rtype: None
+        """
+        opaque_aspect_names = self.get_opaque_aspect_names()
+        if opaque_aspect_names is not None:
+            if NiceCXNetwork.VISUAL_PROPERTIES in opaque_aspect_names:
+                self.logger.debug(NiceCXNetwork.VISUAL_PROPERTIES +
+                                  ' in opaque aspect. Removing entry')
+                self.remove_opaque_aspect(NiceCXNetwork.VISUAL_PROPERTIES)
+                if NiceCXNetwork.VISUAL_PROPERTIES in self.metadata:
+                    self.logger.debug('Removing ' +
+                                      NiceCXNetwork.VISUAL_PROPERTIES +
+                                      ' from metadata')
+                    del self.metadata[NiceCXNetwork.VISUAL_PROPERTIES]
+
+    def _set_visual_properties_aspect(self, visual_props_aspect):
+        """
+        Replaces existing visual properties with data passed in.
+        This method will update meta data and remove all visual aspects
+        setting the new data to :py:const:`~.NiceCXNetwork.CY_VISUAL_PROPERTIES`
+        aspect
+
+        :param visual_props_aspect:
+        :return:
+        """
+        if visual_props_aspect is None:
+            raise TypeError('Visual Properties aspect is None')
+
+        self._delete_deprecated_visual_properties_aspect()
+
+        self.set_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES, visual_props_aspect)
+        mde = {
+            'name': 'cyVisualProperties',
+            'elementCount': len(visual_props_aspect),
+            'version': "1.0",
+            'consistencyGroup': 1,
+            'properties': []
+        }
+        self.metadata[NiceCXNetwork.CY_VISUAL_PROPERTIES] = mde
+
     def apply_template(self, server, uuid, username=None, password=None):
         """
-        Applies the Cytoscape visual properties of a network from the provided uuid to this network.
+        Applies the Cytoscape visual properties of a network from the provideduuid to this network.
 
         This allows the use of networks formatted in Cytoscape as templates to apply visual styles to other networks.
 

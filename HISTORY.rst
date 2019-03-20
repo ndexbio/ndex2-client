@@ -2,6 +2,13 @@
 History
 =======
 
+3.1.0a1 (2019-03-20)
+--------------------
+
+* Add method to ndex2 python client to apply style from one NiceCXNetwork 
+  to another NiceCXNetwork
+  `Issue #43 <https://github.com/ndexbio/ndex2-client/issues/43>`_
+
 3.0.0a1 (2019-02-11)
 --------------------
 

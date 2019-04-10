@@ -19,8 +19,10 @@ import re
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('./ndex2'))
+sys.path.insert(0, os.path.abspath('..'))
+
+import ndex2
+
 print('=====================')
 print(sys.path.__str__())
 print('=====================')
@@ -62,7 +64,7 @@ version = None
 # The full version, including alpha/beta/rc tags.
 release = None
 
-init_file = os.path.join('ndex2', 'version.py')
+init_file = os.path.join('..', 'ndex2', 'version.py')
 with open(init_file) as ver_file:
     for line in ver_file:
         if line.startswith('__version__'):
@@ -87,7 +89,7 @@ autoclass_content = 'both'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', 'vpy36/src', 'ndex2/tests']
+exclude_patterns = ['_build', 'vpy36/src', '**/tests']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

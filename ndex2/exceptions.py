@@ -3,20 +3,21 @@
 
 class NDExError(Exception):
     """
-    Base Exception for all NDEx2 client exceptions
+    Base Exception for all NDEx2 Python Client Exceptions
     """
     pass
 
 
 class NDExUnauthorizedError(NDExError):
     """
-    Unable to authenticate, either due to lack of
+    Raised if unable to authenticate, either due to lack of
     or invalid credentials.
     """
+    pass
 
 
 class NDExInvalidCXError(NDExError):
     """
-    Invalid CX error
+    Raised due to invalid CX
     """
     pass

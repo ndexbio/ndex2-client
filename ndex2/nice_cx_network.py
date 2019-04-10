@@ -1504,9 +1504,26 @@ class NiceCXNetwork():
 
     def to_networkx(self):
         """
-        Returns a NetworkX graph based on the network. Elements in the CartesianCoordinates aspect
-        of the network are transformed to the NetworkX pos attribute. Node name is stored in the networkx
-        node id. Node 'represents' is stored in the networkx node attribute 'represents'
+        Returns a NetworkX ``Graph()`` object based on the network.
+
+        **WARNING:** Behavior of this method varies with version of NetworkX used.
+        See below for more information.
+
+        * Elements in the cartesianLayout aspect of the network are transformed
+        to the NetworkX pos attribute.
+
+        * For edges, the 'i' attribute is stored as an attribute named 'interaction'.
+
+        **WARNING:** NetworkX ``Graph()`` object cannot support multiple edges.
+        The first edge between the nodes is kept and the others are NOT converted.
+
+        if version of NetworkX is >= 2.0 then:
+
+            * Node name is stored in the networkx node id.
+
+            * Node attribute 'r' is stored in the networkx node attribute 'represents'
+
+            * **WARNING:** id of node is NOT stored in the NetworkX Graph()
 
         Example:
 

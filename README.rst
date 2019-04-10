@@ -1,5 +1,5 @@
-**NDEx2 Client v2.0**
-=====================
+**NDEx2 Python Client**
+=======================
 
 .. image:: https://img.shields.io/travis/ndexbio/ndex2-client.svg
         :target: https://travis-ci.org/ndexbio/ndex2-client.svg?branch=master
@@ -14,10 +14,10 @@
 **Overview**
 ------------
 
-The NDEx2 Client v2.0 Python module provides methods to access NDEx via
-the NDEx Server API. It also provides methods for common operations on
+The NDEx2 Python Client provides methods to access NDEx_ via
+the `NDEx Server API`_. It also provides methods for common operations on
 networks. It includes the NiceCX network object class for convenient
-NDEx access and as a data model for applications.
+NDEx_ access and as a data model for applications.
 
 **Jupyter Notebook Tutorials**
 ------------------------------
@@ -42,16 +42,20 @@ of the PIP Python package manager for installation. `Click
 here <https://pypi.python.org/pypi/pip>`__ to download the PIP Python
 package.
 
-**Installing the NDEx2 Client Module**
+**Installation**
 --------------------------------------
 
 The NDEx2 Client 2.0 module can be installed from the Python Package
 Index (PyPI) repository using PIP:
 
+::
+
     pip install ndex2
 
 If you already have an older version of the ndex2 module installed, you
 can use this command instead:
+
+::
 
     pip install --upgrade ndex2
 
@@ -1551,8 +1555,9 @@ this network.
 -  **uuid**: The unique identifier of the network from which the layout
    will be copied
 
-to be undocumented...
-=====================
+
+**to be undocumented...**
+
 
 \*\*any method that works with CX JSON will be an undocumented function
 for internal use
@@ -1573,3 +1578,7 @@ Used to add a node to the network.
 -  **json\_obj**: The cx representation of an edge
 
 **addNetworkAttribute(json\_obj=None)**
+
+
+.. _NDEx: http://ndexbio.org
+.. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api

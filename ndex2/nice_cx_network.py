@@ -1530,7 +1530,6 @@ class NiceCXNetwork():
         for net_a in self.networkAttributes:
             G.graph[net_a.get('n')] = net_a.get('v')
 
-
         if float(nx.__version__) >= 2.0:
             # ================================
             # PROCESS NODE & NODE ATTRIBUTES

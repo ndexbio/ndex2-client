@@ -44,7 +44,7 @@ Edge methods
 Network methods
 ****************************
 .. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
-    :members: get_context, get_name, get_network_attribute, get_network_attributes, get_opaque_aspect
+    :members: get_context, get_name, get_network_attribute, get_network_attribute_names, get_opaque_aspect
 
 Misc niceCX methods
 ========================================
@@ -110,7 +110,6 @@ application, you create an Ndex2 instance.
             my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 
-
 Ndex2 class
 ===========
 
@@ -119,6 +118,16 @@ Ndex2 class
 
 .. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api
 
+
+Conversion to other formats
+---------------------------
+
+There are several classes described below that facilitate conversion of
+:class:`ndex2.nice_cx_network.NiceCXNetwork` object to other types
+(such as NetworkX)
+
+
+.. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionOneFactory
 
 Exceptions
 ----------

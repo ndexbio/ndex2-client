@@ -59,6 +59,18 @@ class NiceCXNetwork():
         self.node_name_to_id_map_cache = {}
         self.logger = logging.getLogger(__name__)
 
+    @staticmethod
+    def _is_python_three_or_greater(self):
+        """
+        Using ``sys.version_info.major`` determines version of
+        Python
+        :return: True if Python 3 or greater is found, otherwise False
+        :rtype: bool
+        """
+        if sys.version_info.major >= 3:
+            return True
+        return False
+
     def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None):
         """
         Create a new edge in the network by specifying source-interaction-target
@@ -361,7 +373,6 @@ class NiceCXNetwork():
         if not found_context:
             self.add_network_attribute(name='@context', values=json.dumps({prefix: uri}), type='string')
 
-
     def set_namespaces(self, ns):
         self.set_context(ns)
 
@@ -399,7 +410,9 @@ class NiceCXNetwork():
         :return: Edge iterator
         :rtype: iterator
         """
-        return self.edges.items()
+        if self._is_python_three_or_greater():
+            return self.edges.items()
+        return self.edges.iteritems()
 
     def get_edge(self, edge):
         return self.edges.get(edge)
@@ -441,6 +454,18 @@ class NiceCXNetwork():
                 return n_a
 
         return None
+
+    def get_network_attribute_names(self):
+        """
+        Creates a a generator that gets network attribute names.
+
+        :return: attribute name via a generator
+        :rtype: string
+        """
+        for n_a in self.networkAttributes:
+            if constants.NET_ATTR_NAME not in n_a:
+                continue
+            yield n_a.get(constants.NET_ATTR_NAME)
 
     def get_next_node_id(self):
         return_id = self.node_int_id_generator
@@ -527,7 +552,9 @@ class NiceCXNetwork():
         :return: iterator over nodes
         :rtype: iterator
         """
-        return self.nodes.items()
+        if self._is_python_three_or_greater():
+            return self.nodes.items()
+        return self.nodes.iteritems()
 
     def get_node(self, node_id):
         return self.nodes.get(node_id)
@@ -632,7 +659,6 @@ class NiceCXNetwork():
                     return n_a
 
         return None
-
 
     def get_node_attribute_value(self, node, attribute_name):
         """
@@ -956,7 +982,9 @@ class NiceCXNetwork():
         :return: Network metadata
         :rtype: Iterator of metadata dict
         """
-        return self.metadata.items()
+        if self._is_python_three_or_greater():
+            return self.metadata.items()
+        return self.metadata.iteritems()
 
     def set_metadata(self, metadata_obj):
         """
@@ -1502,6 +1530,21 @@ class NiceCXNetwork():
         else:
             raise IndexError("Cannot save empty CX.  Please provide a non-empty CX document.")
 
+    def _get_node_and_edge_items(self):
+        """
+        Deals with differences in API of items() call
+        between Python 2 and 3
+        If Python >= 3 gets node.items() and edge.items() otherwise
+        returns node.iteritems() and edge.iteritems()
+
+        :return: tuple (node iterator, edge iterator)
+        :rtype: tuple
+        """
+        if self._is_python_three_or_greater():
+            return self.nodes.items(), self.edges.items()
+
+        return self.nodes.iteritems(), self.edges.iteritems()
+
     def to_networkx(self):
         """
         Returns a NetworkX ``Graph()`` object based on the network.
@@ -1532,20 +1575,15 @@ class NiceCXNetwork():
         :return: Networkx graph
         :rtype: networkx Graph()
         """
-        G = nx.Graph()
+        node_items, edge_items = self._get_node_and_edge_items()
 
-        if sys.version_info.major == 3:
-            node_items = self.nodes.items()
-            edge_items = self.edges.items()
-        else:
-            node_items = self.nodes.iteritems()
-            edge_items = self.edges.iteritems()
+        G = nx.Graph()
 
         #============================
         # PROCESS NETWORK ATTRIBUTES
         #============================
         for net_a in self.networkAttributes:
-            G.graph[net_a.get('n')] = net_a.get('v')
+            G.graph[net_a.get(constants.NET_ATTR_NAME)] = net_a.get(constants.NET_ATTR_VALUE)
 
         if float(nx.__version__) >= 2.0:
             # ================================
@@ -2290,3 +2328,58 @@ class DecimalEncoder(json.JSONEncoder):
             if isinstance(o, np.int64):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
+
+
+class NetworkXFactory(object):
+    """
+    Base class for subclasses that implement a
+    factory that creates NetworkX Graph objects
+    """
+
+    def __init__(self):
+        pass
+
+    def get_graph(self):
+        """
+        Creates NetworkX Graph object which can
+        be one of the multiple types of Graph objects
+
+        :return:
+        """
+        raise NotImplementedError('Must be implemented by sub class')
+
+    def add_network_attributes_from_nice_cx_network(self, nice_cx_network,
+                                                    networkx_graph):
+        """
+
+        :param nice_cx_network:
+        :param networkx_graph:
+        :return:
+        """
+
+        for net_a in self.networkAttributes:
+            G.graph[net_a.get(constants.NET_ATTR_NAME)] = net_a.get(constants.NET_ATTR_VALUE)
+
+
+class LegacyNetworkXVersionOneFactory(NetworkXFactory):
+    """
+    Converts :class:`ndex2.nice_cx_network.NiceCXNetwork` to :class:`networkx.Graph`
+    object
+    """
+    def __init__(self, nice_cx_network):
+        """
+        Constructor
+
+        :param nice_cx_network: Network to convert
+        :type nice_cx_network: :class:`ndex2.nice_cx_network.NiceCXNetwork`
+        """
+        super(LegacyNetworkXVersionOneFactory, self).__init__()
+        self._nice_cx_network = nice_cx_network
+
+    def get_graph(self):
+        """
+        Conversion done here
+
+        :return: hi
+        """
+        raise NotImplementedError('todo')

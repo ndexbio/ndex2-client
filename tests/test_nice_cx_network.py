@@ -193,6 +193,37 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0][constants.NODE_ATTR_NAME], 'attrname')
         self.assertEqual(res[0][constants.NODE_ATTR_VALUE], 'value2')
 
+    def test_get_network_attribute_names(self):
+        net = NiceCXNetwork()
+
+        # try on empty network
+        res = list(net.get_network_attribute_names())
+        self.assertEqual(0, len(res))
+
+        # try with one network attribute
+        net.add_network_attribute('foo')
+        res = list(net.get_network_attribute_names())
+        self.assertEqual(1, len(res))
+        self.assertTrue('foo' in res)
+
+        # try with two network attribute
+        net.add_network_attribute('bah', values='some value')
+        res = list(net.get_network_attribute_names())
+        self.assertEqual(2, len(res))
+        self.assertTrue('foo' in res)
+        self.assertTrue('bah' in res)
+
+        # try with 52 network attributes
+        for x in range(50):
+            net.add_network_attribute('attr' + str(x),
+                                      values='some value ' + str(x))
+        res = list(net.get_network_attribute_names())
+        self.assertEqual(52, len(res))
+        self.assertTrue('foo' in res)
+        self.assertTrue('bah' in res)
+        for x in range(50):
+            self.assertTrue('attr' + str(x) in res)
+
     def test_upload_to_success(self):
         with requests_mock.mock() as m:
             resurl = client.DEFAULT_SERVER + '/v2/network/asdf'

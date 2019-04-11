@@ -14,9 +14,24 @@ VALID_ATTRIBUTE_DATATYPES = [
     'list_of_string'
 ]
 
+# key for network attribute name
+NET_ATTR_NAME = 'n'
+
+# key for network attribute value
+NET_ATTR_VALUE = 'v'
+
+# key for id of node
 NODE_ID = '@id'
+
+# key for node attribute name
 NODE_ATTR_NAME = 'n'
+
+# key for node property of
 NODE_ATTR_PROPERTYOF = 'po'
+
+# key for node attribute value
 NODE_ATTR_VALUE = 'v'
+
+# key for node data type
 NODE_ATTR_DATATYPE = 'd'
 

@@ -133,11 +133,20 @@ There are several classes described below that facilitate conversion of
 (such as NetworkX)
 
 
+.. autoclass:: ndex2.nice_cx_network.NetworkXFactory
+    :members: add_network_attributes_from_nice_cx_network, copy_cartesian_coords_into_graph
+
 .. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionOnePointOneFactory
     :members: get_graph
 
 .. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionTwoPlusFactory
     :members: get_graph
+
+Constants
+---------
+
+.. automodule:: ndex2.constants
+    :members:
 
 Exceptions
 ----------

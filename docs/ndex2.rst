@@ -1,6 +1,12 @@
 NiceCXNetwork
 -------------
-The NiceCXNetwork class provides a data model for working with NDEx networks.  Methods are provided to add nodes, edges, node attributes, edge attributes, etc.  Once a NiceCXNetwork data object is populated it can be saved to the NDEx server by calling either **upload_to()** to create a new network or **update_to()** to update an existing network.
+
+The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working with NDEx networks.
+Methods are provided to add nodes, edges, node attributes, edge attributes, etc.
+Once a :class:`~ndex2.nice_cx_network.NiceCXNetwork` object is populated it can be saved to the NDEx server
+by calling either :func:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to()` to create a new network or
+:func:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to()` to
+update an existing network.
 
 
 To see deprecated methods go to `Deprecated NiceCXNetwork methods`_
@@ -127,7 +133,11 @@ There are several classes described below that facilitate conversion of
 (such as NetworkX)
 
 
-.. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionOneFactory
+.. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionOnePointOneFactory
+    :members: get_graph
+
+.. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionTwoPlusFactory
+    :members: get_graph
 
 Exceptions
 ----------

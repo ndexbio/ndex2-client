@@ -14,6 +14,8 @@ VALID_ATTRIBUTE_DATATYPES = [
     'list_of_string'
 ]
 
+CARTESIAN_LAYOUT_ASPECT = 'cartesianLayout'
+
 # key for network attribute name
 NET_ATTR_NAME = 'n'
 

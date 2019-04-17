@@ -1545,121 +1545,55 @@ class NiceCXNetwork():
 
         return self.nodes.iteritems(), self.edges.iteritems()
 
-    def to_networkx(self):
+    def to_networkx(self, mode='legacy'):
         """
-        Returns a NetworkX ``Graph()`` object based on the network.
+        Returns a NetworkX ``Graph()`` object or one of its subclasses
+        based on the network.
+        The `mode` parameter dictates how the translation occurs.
 
-        **WARNING:** Behavior of this method varies with version of NetworkX used.
-        See below for more information.
+        This method currently supports the following mode values:
 
-        * Elements in the cartesianLayout aspect of the network are transformed
-        to the NetworkX pos attribute.
+        **NOTE:** For backwards compatibility `mode` is set to 'legacy'
+        but there are known bugs in this implementation.
+        See the description on legacy mode below for more information.
 
-        * For edges, the 'i' attribute is stored as an attribute named 'interaction'.
+        **'legacy':** If set to 'legacy' then this method will behave
+        as it has for all versions 3.1.0 and earlier which varies
+        depending on version of networkx installed
 
-        **WARNING:** NetworkX ``Graph()`` object cannot support multiple edges.
-        The first edge between the nodes is kept and the others are NOT converted.
+        For networkx 2.0 and greater
+        (see :class:`~ndex2.nice_cx_network.LegacyNetworkXVersionTwoPlusFactory`)
 
-        if version of NetworkX is >= 2.0 then:
+        For older versions of networkx
+        (see :class:`~ndex2.nice_cx_network.LegacyNetworkXVersionOnePointOneFactory`)
 
-            * Node name is stored in the networkx node id.
+        **'default':** TODO
 
-            * Node attribute 'r' is stored in the networkx node attribute 'represents'
 
-            * **WARNING:** id of node is NOT stored in the NetworkX Graph()
+        None: Same as 'default'
 
-        Example:
+        Examples:
 
-            ``G = nice_cx.to_networkx() # G is now a networkx object``
+            ``graph = nice_cx.to_networkx() # graph is now a networkx object``
 
+            ``graph = nice_cx.to_networkx(mode='default') # same behavior as above``
+
+        :param mode: Since translation to networkx can be done in many ways this mode lets
+                     the caller dictate the method.
+        :type mode: string
         :return: Networkx graph
         :rtype: networkx Graph()
         """
-        node_items, edge_items = self._get_node_and_edge_items()
+        if mode is None or mode is 'default':
+            raise NotImplementedError('todo')
 
-        G = nx.Graph()
+        if mode is 'legacy':
+            if float(nx.__version__) >= 2.0:
+                fac = LegacyNetworkXVersionTwoPlusFactory()
+            else:
+                fac = LegacyNetworkXVersionOnePointOneFactory()
 
-        #============================
-        # PROCESS NETWORK ATTRIBUTES
-        #============================
-        for net_a in self.networkAttributes:
-            G.graph[net_a.get(constants.NET_ATTR_NAME)] = net_a.get(constants.NET_ATTR_VALUE)
-
-        if float(nx.__version__) >= 2.0:
-            # ================================
-            # PROCESS NODE & NODE ATTRIBUTES
-            # ================================
-            for k, v in node_items:
-                node_name = v.get('n')
-                G.add_node(v.get('n'))
-                n_a = self.nodeAttributes.get(k)
-                if n_a:
-                    for na_item in n_a:
-                        G.nodes[node_name][na_item.get('n')] = na_item.get('v')
-
-                if v.get('r'):
-                    G.nodes[node_name]['represents'] = v.get('r')
-
-            #================================
-            # PROCESS EDGE & EDGE ATTRIBUTES
-            #================================
-            for k, v in edge_items:
-                source_node = self.nodes.get(v.get('s')).get('n')
-                target_node = self.nodes.get(v.get('t')).get('n')
-
-                G.add_edge(source_node, target_node)
-
-                e_a = self.edgeAttributes.get(k)
-                add_this_dict = {}
-                add_this_dict['interaction'] = v.get('i')
-                G[source_node][target_node]['interaction'] = v.get('i')
-                if e_a is not None:
-                    for e_a_item in e_a:
-                        if isinstance(e_a_item.get('v'), list):
-                            G[source_node][target_node][e_a_item.get('n')] =  '"%s"' % ','.join(str(e) for e in e_a_item.get('v'))
-                        else:
-                            G[source_node][target_node][e_a_item.get('n')] =  e_a_item.get('v')
-        else:
-            print('networkx version 1.11')
-            # ================================
-            # PROCESS NODE & NODE ATTRIBUTES
-            # ================================
-            for k, v in node_items:
-                node_attrs = {}
-                n_a = self.nodeAttributes.get(k)
-                if n_a:
-                    for na_item in n_a:
-                        node_attrs[na_item.get('n')] = na_item.get('v')
-
-                G.add_node(k, node_attrs, name=v.get('n'))
-
-            # ================================
-            # PROCESS EDGE & EDGE ATTRIBUTES
-            # ================================
-            for k, v in edge_items:
-                e_a = self.edgeAttributes.get(k)
-                add_this_dict = {}
-                add_this_dict['interaction'] = v.get('i')
-                if e_a is not None:
-                    for e_a_item in e_a:
-                        if isinstance(e_a_item.get('v'), list):
-                            add_this_dict[e_a_item.get('n')] = ','.join(str(e) for e in e_a_item.get('v'))
-                            add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
-                        else:
-                            add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
-
-                G.add_edge(v.get('s'), v.get('t'), add_this_dict)
-
-        #================
-        # PROCESS LAYOUT
-        #================
-        cartesian_layout = self.opaqueAspects.get('cartesianLayout')
-        if cartesian_layout:
-            G.pos = {}
-            for x_y_pos in cartesian_layout:
-                G.pos[x_y_pos.get('node')] = (x_y_pos.get('x'), x_y_pos.get('y'))
-
-        return G
+        return fac.get_graph(self)
 
     def get_summary(self):
         """
@@ -2339,47 +2273,246 @@ class NetworkXFactory(object):
     def __init__(self):
         pass
 
-    def get_graph(self):
+    def get_graph(self, nice_cx_network):
         """
         Creates NetworkX Graph object which can
         be one of the multiple types of Graph objects
 
-        :return:
+        :return: networkx Graph object of some type
         """
         raise NotImplementedError('Must be implemented by sub class')
 
-    def add_network_attributes_from_nice_cx_network(self, nice_cx_network,
-                                                    networkx_graph):
+    def copy_cartesian_coords_into_graph(self, nice_cx_network,
+                                         networkx_graph):
         """
 
         :param nice_cx_network:
         :param networkx_graph:
         :return:
         """
+        cl = nice_cx_network.get_opaque_aspect(constants.CARTESIAN_LAYOUT_ASPECT)
+        if cl:
+            networkx_graph.pos = {}
+            for x_y_pos in cl:
+                networkx_graph.pos[x_y_pos.get('node')] = (x_y_pos.get('x'),
+                                                           x_y_pos.get('y'))
 
-        for net_a in self.networkAttributes:
-            G.graph[net_a.get(constants.NET_ATTR_NAME)] = net_a.get(constants.NET_ATTR_VALUE)
+    def add_network_attributes_from_nice_cx_network(self, nice_cx_network,
+                                                    networkx_graph):
+        """
+        Iterates through network attributes appending them to
+        the graph object passed in.
+
+        :param nice_cx_network: Network to extract network attributes from
+        :type nice_cx_network: :class:`ndex2.nice_cx_network.NiceCXNetwork`
+        :param networkx_graph: networkx Graph object, should work with
+                               any of the types of Graphs ie MultiGraph etc..
+        :type networkx_graph: :class:`networkx.Graph`
+        :return: None
+        """
+        if nice_cx_network is None:
+            return None
+
+        for name in nice_cx_network.get_network_attribute_names():
+            netattr = nice_cx_network.get_network_attribute(name)
+            if netattr is None:
+                continue
+            val = netattr[constants.NET_ATTR_VALUE]
+            if isinstance(val, list):
+                val = ','.join([str(entry) for entry in val])
+            networkx_graph.graph[name] = val
 
 
-class LegacyNetworkXVersionOneFactory(NetworkXFactory):
+class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
     """
-    Converts :class:`ndex2.nice_cx_network.NiceCXNetwork` to :class:`networkx.Graph`
-    object
+    Converts :class:`~ndex2.nice_cx_network.NiceCXNetwork` to :class:`networkx.Graph`
+    object. For details on implementation see :func:`~get_graph`
     """
-    def __init__(self, nice_cx_network):
+    def __init__(self):
+        """
+        Constructor
+        """
+        super(LegacyNetworkXVersionOnePointOneFactory, self).__init__()
+        self._node_items = None
+        self._edge_items = None
+
+    def get_graph(self, nice_cx_network):
+        """
+        Creates a :class:`networkx.Graph` object from `nice_cx_network`
+        passed in.
+
+        WARNING:
+
+        Converting large networks (10,000+ edges or nodes) may
+        take a long time and consume lots of memory.
+
+        :class:`networkx.Graph` created by this methoddoes NOT support
+        multiple edges between the same nodes. Extra edges encountered
+        are ignored and not converted.
+
+        This conversion has issues, see warning below for more details.
+
+        The conversion is done as follows:
+
+        Any network attributes are copied to the :class:`networkx.Graph`
+        verbatim except if values are a list then they are converted to a
+        string and separated by commas
+
+        For nodes:
+
+        All nodes are added setting the node id to the id or '@id'
+        of input network.
+
+        A node attribute named 'name' is set for each node with its
+        value set to the value of the 'name' attribute from the input
+        network.
+
+        All other node attributes are added using the same attribute
+        name as found in the input network. The value is directly set
+        as it was found in input network (could be single object or list)
+
+
+        For edges:
+
+        Each edge is added setting the source to the value of 's' attribute
+        and target set as 't' attribute of input network.
+
+        Any edge attributes named 'i' are renamed 'interaction' and
+        stored in the resulting :class:`networkx.Graph`
+
+        If the value of an edge attribute is a list then the list values
+        are turned into a string separated by a comma and then enclosed
+        by double quotes.
+
+        :param nice_cx_network: Network to extract graph from
+        :type nice_cx_network: :class:`NiceCXNetwork`
+        :return: Input network converted to networkx Graph
+        :rtype: :class:`networkx.Graph`
+        """
+        g = nx.Graph()
+        self._node_items = nice_cx_network.get_nodes()
+        self._edge_items = nice_cx_network.get_edges()
+        self.add_network_attributes_from_nice_cx_network(nice_cx_network,
+                                                         g)
+        self._process_nodes(g)
+        self._process_edges(g)
+        self.copy_cartesian_coords_into_graph(nice_cx_network,
+                                              g)
+        return g
+
+    def _process_nodes(self, graph):
+        """
+        Iterates through the nodes adding them to the graph object
+        using :func:`networkx.Graph.add_node()` setting name of node
+        to node id and 'name' attribute to the value of the node
+        attribute 'name'. This has a couple problems, one if the
+        attribute value is a list that list is directly set in the
+        Graph() object.
+        :return:
+        """
+        for k, v in self._node_items:
+            node_attrs = {}
+            n_a = self.nodeAttributes.get(k)
+            if n_a:
+                for na_item in n_a:
+                    node_attrs[na_item.get(constants.NODE_ATTR_NAME)] = na_item.get(constants.NODE_ATTR_VALUE)
+
+            graph.add_node(k, node_attrs, name=v.get(constants.NODE_ATTR_NAME))
+
+    def _process_edges(self, graph):
+        """
+        Adds edges by calling :func:`networkx.Graph().add_edge()` setting
+        source to the 's' attribute on the
+        :param graph: Graph to add edges to
+        :type graph: :class:`networkx.Graph`
+        :return:
+        """
+        for k, v in self._edge_items:
+            e_a = self.edgeAttributes.get(k)
+            add_this_dict = {}
+            add_this_dict['interaction'] = v.get('i')
+            if e_a is not None:
+                for e_a_item in e_a:
+                    if isinstance(e_a_item.get('v'), list):
+                        add_this_dict[e_a_item.get('n')] = ','.join(str(e) for e in e_a_item.get('v'))
+                        add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
+                    else:
+                        add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
+
+            graph.add_edge(v.get('s'), v.get('t'), add_this_dict)
+
+
+class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
+    """
+    Converts :class:`~ndex2.nice_cx_network.NiceCXNetwork` to :class:`networkx.Graph`
+    object following logic in legacy NDEx2 Python client when networkx 2.2
+    is installed.
+
+    For conversion details see :func:`~ndex2.nice_cx_network.LegacyNetworkXVersionTwoPlusFactory.get_graph`
+    """
+    def __init__(self):
         """
         Constructor
 
-        :param nice_cx_network: Network to convert
-        :type nice_cx_network: :class:`ndex2.nice_cx_network.NiceCXNetwork`
         """
-        super(LegacyNetworkXVersionOneFactory, self).__init__()
-        self._nice_cx_network = nice_cx_network
+        super(LegacyNetworkXVersionTwoPlusFactory, self).__init__()
+        self._node_items = None
+        self._edge_items = None
 
-    def get_graph(self):
+    def get_graph(self, nice_cx_network):
         """
-        Conversion done here
 
-        :return: hi
+        :param nice_cx_network: Network to convert to networkx Graph object
+        :type nice_cx_network: :class:`~ndex2.nice_cx_network.NiceCXNetwork`
+        :return: :class:`networkx.Graph`
         """
-        raise NotImplementedError('todo')
+        g = nx.Graph()
+        self._node_items = nice_cx_network.get_nodes()
+        self._edge_items = nice_cx_network.get_edges()
+        self.add_network_attributes_from_nice_cx_network(nice_cx_network,
+                                                         g)
+        self._process_nodes(g)
+        self._process_edges(g)
+        self.copy_cartesian_coords_into_graph(nice_cx_network,
+                                              g)
+        return g
+
+    def _process_nodes(self, graph):
+        """
+        Processes the nodes
+        :return:
+        """
+        for k, v in self._node_items:
+            node_name = v.get('n')
+            graph.add_node(v.get('n'))
+            n_a = self.nodeAttributes.get(k)
+            if n_a:
+                for na_item in n_a:
+                    graph.nodes[node_name][na_item.get('n')] = na_item.get('v')
+
+            if v.get('r'):
+                graph.nodes[node_name]['represents'] = v.get('r')
+
+    def _process_edges(self, graph):
+        """
+        Process edges
+        :param graph:
+        :return:
+        """
+        for k, v in self._edge_items:
+            source_node = self.nodes.get(v.get('s')).get('n')
+            target_node = self.nodes.get(v.get('t')).get('n')
+
+            graph.add_edge(source_node, target_node)
+
+            e_a = self.edgeAttributes.get(k)
+            add_this_dict = {}
+            add_this_dict['interaction'] = v.get('i')
+            g[source_node][target_node]['interaction'] = v.get('i')
+            if e_a is not None:
+                for e_a_item in e_a:
+                    if isinstance(e_a_item.get('v'), list):
+                        graph[source_node][target_node][e_a_item.get('n')] = '"%s"' % ','.join(
+                            str(e) for e in e_a_item.get('v'))
+                    else:
+                        graph[source_node][target_node][e_a_item.get('n')] = e_a_item.ge

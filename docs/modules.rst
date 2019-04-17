@@ -1,7 +1,10 @@
 ndex2
 =====
 
+Test
+
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    ndex2
+

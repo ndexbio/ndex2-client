@@ -5,6 +5,7 @@
 
 import os
 import unittest
+import sys
 
 import requests_mock
 from ndex2 import client
@@ -41,6 +42,33 @@ class TestNiceCXNetwork(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures, if any."""
         pass
+
+    def test_is_python_three_or_greater(self):
+        isThree = False
+
+        if sys.version_info.major >= 3:
+            isThree = True
+
+        self.assertEqual(isThree, NiceCXNetwork._is_python_three_or_greater())
+
+    def test_create_edge_with_int_for_edge_ids(self):
+        net = NiceCXNetwork()
+        net.create_edge(edge_source=0, edge_target=1)
+        res = net.get_edge(0)
+        self.assertEqual(0, res['@id'])
+        self.assertEqual(0, res['s'])
+        self.assertEqual(1, res['t'])
+
+    def test_create_edge_with_node_dict_passed_in_for_edge_ids(self):
+        net = NiceCXNetwork()
+
+        nodeone = net.get_node(net.create_node('node1'))
+        nodetwo = net.get_node(net.create_node('node2'))
+        net.create_edge(edge_source=nodeone, edge_target=nodetwo)
+        res = net.get_edge(0)
+        self.assertEqual(0, res['@id'])
+        self.assertEqual(0, res['s'])
+        self.assertEqual(1, res['t'])
 
     def test_set_node_attribute_none_values(self):
         net = NiceCXNetwork()

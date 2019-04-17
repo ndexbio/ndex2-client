@@ -7,7 +7,6 @@ Welcome to NDEx2 Python Client documentation!
    :caption: Contents:
 
    readme
-   installation
    usage
    modules
    contributing

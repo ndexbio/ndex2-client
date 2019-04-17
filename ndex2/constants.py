@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+"""
+Contains constants used by the NDEx2 Python Client
+"""
 
 VALID_ATTRIBUTE_DATATYPES = [
     'boolean',
@@ -13,27 +16,89 @@ VALID_ATTRIBUTE_DATATYPES = [
     'list_of_long',
     'list_of_string'
 ]
+"""
+List of valid attribute data types
+"""
 
 CARTESIAN_LAYOUT_ASPECT = 'cartesianLayout'
+"""
+Name of opaque aspect containing coordinates of nodes
+"""
 
-# key for network attribute name
 NET_ATTR_NAME = 'n'
+"""
+Key for network attribute name
+"""
 
-# key for network attribute value
 NET_ATTR_VALUE = 'v'
+"""
+Key for network attribute value
+"""
 
-# key for id of node
+EDGE_ID = '@id'
+"""
+Key for id of edge
+"""
+
+EDGE_SOURCE = 's'
+"""
+Key for edge source
+"""
+
+EDGE_TARGET = 't'
+"""
+Key for edge target
+"""
+
+EDGE_INTERACTION = 'i'
+"""
+Key for edge interaction
+"""
+
 NODE_ID = '@id'
+"""
+Key for id of node
+"""
 
-# key for node attribute name
 NODE_ATTR_NAME = 'n'
+"""
+Key for node attribute name
+"""
 
-# key for node property of
+NODE_REPRESENTS = 'r'
+"""
+Key for node represents
+"""
+
 NODE_ATTR_PROPERTYOF = 'po'
+"""
+Key for node property of
+"""
 
-# key for node attribute value
 NODE_ATTR_VALUE = 'v'
+"""
+Key for node attribute value
+"""
 
-# key for node data type
 NODE_ATTR_DATATYPE = 'd'
+"""
+Key for node attribute data type
+"""
 
+
+LAYOUT_NODE = 'node'
+"""
+Key for node id in :py:const:`CARTESIAN_LAYOUT_ASPECT` 
+opaque aspect
+"""
+LAYOUT_X = 'x'
+"""
+Key for X coordinate in :py:const:`CARTESIAN_LAYOUT_ASPECT` 
+opaque aspect
+"""
+
+LAYOUT_Y = 'y'
+"""
+Key for Y coordinate in :py:const:`CARTESIAN_LAYOUT_ASPECT` 
+opaque aspect
+"""

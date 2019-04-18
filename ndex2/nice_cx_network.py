@@ -127,7 +127,9 @@ class NiceCXNetwork():
         """
         edge_id = self.edge_int_id_generator
 
-        self.__create_edge(id=edge_id, edge_source=edge_source, edge_target=edge_target, edge_interaction=edge_interaction)
+        self.__create_edge(id=edge_id, edge_source=edge_source,
+                           edge_target=edge_target,
+                           edge_interaction=edge_interaction)
         self.edge_int_id_generator += 1
 
         return edge_id

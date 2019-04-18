@@ -55,20 +55,31 @@ class TestNiceCXNetwork(unittest.TestCase):
         net = NiceCXNetwork()
         net.create_edge(edge_source=0, edge_target=1)
         res = net.get_edge(0)
-        self.assertEqual(0, res['@id'])
-        self.assertEqual(0, res['s'])
-        self.assertEqual(1, res['t'])
+        self.assertEqual(0, res[constants.EDGE_ID])
+        self.assertEqual(0, res[constants.EDGE_SOURCE])
+        self.assertEqual(1, res[constants.EDGE_TARGET])
 
     def test_create_edge_with_node_dict_passed_in_for_edge_ids(self):
         net = NiceCXNetwork()
 
         nodeone = net.get_node(net.create_node('node1'))
         nodetwo = net.get_node(net.create_node('node2'))
-        net.create_edge(edge_source=nodeone, edge_target=nodetwo)
-        res = net.get_edge(0)
-        self.assertEqual(0, res['@id'])
-        self.assertEqual(0, res['s'])
-        self.assertEqual(1, res['t'])
+        edge_id = net.create_edge(edge_source=nodeone,
+                                  edge_target=nodetwo)
+        res = net.get_edge(edge_id)
+        self.assertEqual(edge_id, res[constants.EDGE_ID])
+        self.assertEqual(0, res[constants.EDGE_SOURCE])
+        self.assertEqual(1, res[constants.EDGE_TARGET])
+
+    def test_create_edge_with_interaction(self):
+        net = NiceCXNetwork()
+        edge_id = net.create_edge(edge_source=10, edge_target=20, edge_interaction='blah')
+
+        res = net.get_edge(edge_id)
+        self.assertEqual(edge_id, res[constants.EDGE_ID])
+        self.assertEqual(10, res[constants.EDGE_SOURCE])
+        self.assertEqual(20, res[constants.EDGE_TARGET])
+        self.assertEqual('blah', res[constants.EDGE_INTERACTION])
 
     def test_set_node_attribute_none_values(self):
         net = NiceCXNetwork()

@@ -315,6 +315,39 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(1, len(res))
         self.assertEqual(res[0], ('foo', 1))
 
+    def test_get_node_and_edge_items(self):
+        net = NiceCXNetwork()
+
+        nodeiter, edgeiter = net._get_node_and_edge_items()
+        nodelist = list(nodeiter)
+        self.assertEqual(0, len(nodelist))
+        edgelist = list(edgeiter)
+        self.assertEqual(0, len(edgelist))
+
+        net.create_node('foo')
+        net.create_edge(edge_source=0, edge_target=1)
+
+        nodeiter, edgeiter = net._get_node_and_edge_items()
+        nodelist = list(nodeiter)
+        self.assertEqual(1, len(nodelist))
+        self.assertEqual(nodelist[0], (0, {'@id': 0,
+                                           'n': 'foo', 'r': 'foo'}))
+        edgelist = list(edgeiter)
+
+        self.assertEqual(1, len(edgelist))
+        self.assertEqual(edgelist[0], (0, {'@id': 0, 's': 0, 't': 1}))
+
+    def test__str__(self):
+        net = NiceCXNetwork()
+        self.assertEqual('nodes: 0 \n edges: 0', str(net))
+        net.create_node('foo')
+        self.assertEqual('nodes: 1 \n edges: 0', str(net))
+        net.create_node('foo2')
+        net.create_node('foo3')
+        self.assertEqual('nodes: 3 \n edges: 0', str(net))
+
+        net.create_edge(edge_source=0, edge_target=1)
+        self.assertEqual('nodes: 3 \n edges: 1', str(net))
 
     def test_upload_to_success(self):
         with requests_mock.mock() as m:

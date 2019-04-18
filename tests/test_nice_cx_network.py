@@ -263,6 +263,59 @@ class TestNiceCXNetwork(unittest.TestCase):
         for x in range(50):
             self.assertTrue('attr' + str(x) in res)
 
+    def test_get_nodes(self):
+        net = NiceCXNetwork()
+
+        # Verify correct operation on empty network
+        res = list(net.get_nodes())
+        self.assertEqual(0, len(res))
+
+        # add a node
+        net.create_node('foo')
+        res = list(net.get_nodes())
+        self.assertEqual(1, len(res))
+        self.assertEqual(res[0], (0, {'@id': 0, 'n': 'foo', 'r': 'foo'}))
+
+        # add another node
+        net.create_node('bar')
+        res = list(net.get_nodes())
+        self.assertEqual(2, len(res))
+        self.assertEqual(res[0], (0, {'@id': 0, 'n': 'foo', 'r': 'foo'}))
+        self.assertEqual(res[1], (1, {'@id': 1, 'n': 'bar', 'r': 'bar'}))
+
+    def test_get_edges(self):
+        net = NiceCXNetwork()
+
+        # Verify correct operation on empty network
+        res = list(net.get_edges())
+        self.assertEqual(0, len(res))
+
+        # add an edge
+        net.create_edge(edge_source=0, edge_target=1)
+        res = list(net.get_edges())
+        self.assertEqual(1, len(res))
+        self.assertEqual(res[0], (0, {'@id': 0, 's': 0, 't': 1}))
+
+        # add another edge
+        net.create_edge(edge_source=1, edge_target=2)
+        res = list(net.get_edges())
+        self.assertEqual(2, len(res))
+        self.assertEqual(res[0], (0, {'@id': 0, 's': 0, 't': 1}))
+        self.assertEqual(res[1], (1, {'@id': 1, 's': 1, 't': 2}))
+
+    def test_get_metadata(self):
+        net = NiceCXNetwork()
+
+        # verify correct operation on empty network
+        res = list(net.get_metadata())
+        self.assertEqual(0, len(res))
+
+        net.set_metadata({'foo': 1})
+        res = list(net.get_metadata())
+        self.assertEqual(1, len(res))
+        self.assertEqual(res[0], ('foo', 1))
+
+
     def test_upload_to_success(self):
         with requests_mock.mock() as m:
             resurl = client.DEFAULT_SERVER + '/v2/network/asdf'

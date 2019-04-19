@@ -1582,24 +1582,28 @@ class NiceCXNetwork():
             For networkx 2.0 and greater:
             (see :class:`LegacyNetworkXVersionTwoPlusFactory`)
 
-            For older versions of networkx:
+            For older versions of networkx the following class is
+            used with the `legacymode` parameter set to `True`:
             (see :class:`LegacyNetworkXVersionOnePointOneFactory`)
 
         **default:**
 
-            If mode is **default** or None uses
+            If mode is **default** or None then this method uses
             :class:`LegacyNetworkXVersionOnePointOneFactory` regardless of
-            networkx installed.
+            networkx installed with `legacymode` set to `False`
 
         Examples:
 
-            ``graph = nice_cx.to_networkx() # graph is now a networkx object``
+            ``graph = nice_cx.to_networkx() # graph is now a networkx object using legacy implementation``
 
-            ``graph = nice_cx.to_networkx(mode='default') # same behavior as above``
+            ``graph = nice_cx.to_networkx(mode='default') # using ``
+
+            ``graph = nice_cx.to_networkx
 
         :param mode: Since translation to networkx can be done in many ways this mode lets
                      the caller dictate the method.
         :type mode: string
+        :raises NDExError: If `mode` is not None, 'legacy', or 'default'
         :return: Networkx graph
         :rtype: :class:`networkx.Graph` or :class:`networkx.MultiGraph`
         """
@@ -1610,6 +1614,8 @@ class NiceCXNetwork():
                 fac = LegacyNetworkXVersionTwoPlusFactory()
             else:
                 fac = LegacyNetworkXVersionOnePointOneFactory(legacymode=True)
+        else:
+            raise NDExError(str(mode) + ' is not a valid mode')
 
         return fac.get_graph(self)
 
@@ -2366,7 +2372,7 @@ class NetworkXFactory(object):
         string separated by commas.
 
         :param nice_cx_network: Network to extract network attributes from
-        :type nice_cx_network: :class:`ndex2.nice_cx_network.NiceCXNetwork`
+        :type nice_cx_network: :py:class:`NiceCXNetwork`
         :param networkx_graph: networkx Graph object, should work with
                                any of the types of Graphs ie MultiGraph etc..
         :type networkx_graph: :class:`networkx.Graph`
@@ -2387,6 +2393,122 @@ class NetworkXFactory(object):
             if isinstance(val, list):
                 val = ','.join([str(entry) for entry in val])
             networkx_graph.graph[name] = val
+
+    def add_node(self, graph, nodeid, node_attributes, name=None, represents=None):
+        """
+        Adds node to `graph` dealing with differences between
+        networkx 1.x and 2.x+
+        :param graph: networkx graph to add node to
+        :type: graph: :class:`networkx.Graph` or one of its subtypes
+        :param nodeid: node identifier can be string, int etc.
+        :param node_attr_dict: dictionary of key => value data to set
+                               set node attributes
+        :type node_attr_dict: dict
+        :return:
+        """
+
+        # if networkx version 2+
+        if float(nx.__version__) >= 2:
+            self._add_node_networkx_two_plus(graph, nodeid, node_attributes,
+                                             name=name,
+                                             represents=represents)
+            return
+
+        self._add_node_networkx_legacy(graph, nodeid, node_attributes,
+                                       name=name, represents=represents)
+
+    def _add_node_networkx_legacy(self, graph, nodeid, node_attributes,
+                                  name=None, represents=None):
+        """
+
+        :param graph:
+        :param nodeid:
+        :param node_attributes:
+        :param name:
+        :param represents:
+        :return:
+        """
+        node_attrs = None
+        if node_attributes:
+            node_attrs = {}
+            for na_item in node_attributes:
+                node_attrs[na_item.get(constants.NODE_ATTR_NAME)] = na_item.get(constants.NODE_ATTR_VALUE)
+        graph.add_node(nodeid, node_attrs, name=name)
+
+    def _add_node_networkx_two_plus(self, graph, nodeid, node_attributes,
+                                    name=None,
+                                    represents=None):
+        """
+        Adds node to `graph` assuming installed version of networkx is 2 or greater
+        :param graph: Graph to add node to
+        :type graph: :class:`networkx.Graph`
+        :param nodeid: id of node, could be str, int
+        :param node_attributes: dictionary of node attributes usually obtained by
+                                invoking :py:func:`NiceCXNetwork.get_node_attributes(nodeid)`
+        :type node_attributes: dict
+        :param name:
+        :param represents:
+        :return:
+        """
+        graph.add_node(nodeid)
+        if node_attributes:
+            for n_a in node_attributes:
+                graph.nodes[nodeid][n_a.get('n')] = n_a.get('v')
+        if represents:
+            graph.nodes[nodeid]['represents'] = represents
+        if name:
+            graph.nodes[nodeid]['name'] = name
+
+    def add_edge(self, graph, source_node, target_node, attribute_dict):
+        """
+
+        :param graph:
+        :param source_node:
+        :param target_node:
+        :param attribute_dict:
+        :return:
+        """
+        if float(nx.__version__) >= 2:
+            self._add_edge_networkx_two_plus(graph, source_node,
+                                             target_node, attribute_dict)
+            return
+
+        self._add_edge_networkx_legacy(graph, source_node, target_node,
+                                       attribute_dict)
+
+    def _add_edge_networkx_two_plus(self, graph, source_node,
+                                    target_node, attribute_dict):
+        """
+
+        :param graph:
+        :param source_node:
+        :param target_node:
+        :param attribute_dict:
+        :return:
+        """
+        edge_key = graph.add_edge(source_node, target_node)
+        if attribute_dict is None:
+            return
+
+        if edge_key is None:
+            for k in attribute_dict:
+                graph[source_node][target_node][k] = attribute_dict[k]
+            return
+
+        for k in attribute_dict:
+            graph[source_node][target_node][edge_key][k] = attribute_dict[k]
+
+    def _add_edge_networkx_legacy(self, graph, source_node,
+                                  target_node, attribute_dict):
+        """
+
+        :param graph:
+        :param source_node:
+        :param target_node:
+        :param attribute_dict:
+        :return:
+        """
+        graph.add_edge(source_node, target_node, attr_dict=attribute_dict)
 
 
 class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
@@ -2414,8 +2536,13 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
                            a :class:`networkx.MultiGraph` object is returned.
         """
         super(LegacyNetworkXVersionOnePointOneFactory, self).__init__()
-        self._node_items = None
-        self._edge_items = None
+        if legacymode is None:
+            legacymode = False
+
+        if not isinstance(legacymode, bool):
+            raise NDExError(str(legacymode) +
+                            ' not a valid value for legacymode parameter')
+
         self._legacymode = legacymode
 
     def get_graph(self, nice_cx_network):
@@ -2450,11 +2577,13 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
 
         For edges:
 
-        Each edge is added setting the source to the value of 's' attribute
-        and target set as 't' attribute of input network.
+        Each edge is added setting the source to the value of
+        :py:const:`~ndex2.constants.EDGE_SOURCE` attribute
+        and target set as :py:const:`~ndex2.constants.EDGE_TARGET`
+        attribute of input network.
 
-        Any edge attributes named 'i' are renamed 'interaction' and
-        stored as an attribute for the edge
+        Any edge attributes named :py:const:`~ndex2.constants.EDGE_INTERACTION`
+        are renamed 'interaction' and stored as an attribute for the edge
 
         If the value of an edge attribute is a list then the list values
         are turned into a string separated by a comma and then enclosed
@@ -2462,7 +2591,6 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
 
         Coordinates are copied in manner described here:
         :py:func:`~NetworkXFactory.copy_cartesian_coords_into_graph`
-
 
         .. warning::
 
@@ -2475,26 +2603,28 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
 
         :param nice_cx_network: Network to extract graph from
         :type nice_cx_network: :class:`NiceCXNetwork`
+        :raises NDExError: if input network is None
         :return: Input network converted to networkx Graph
         :rtype: :class:`networkx.Graph` if legacymode is set to True in
                 constructor otherwise :class:`networkx.MultiGraph`
         """
+        if nice_cx_network is None:
+            raise NDExError('input network is None')
+
         if self._legacymode is True:
             g = nx.Graph()
         else:
             g = nx.MultiGraph()
 
-        self._node_items = nice_cx_network.get_nodes()
-        self._edge_items = nice_cx_network.get_edges()
         self.add_network_attributes_from_nice_cx_network(nice_cx_network,
                                                          g)
-        self._process_nodes(g)
-        self._process_edges(g)
+        self._process_nodes(nice_cx_network, g)
+        self._process_edges(nice_cx_network, g)
         self.copy_cartesian_coords_into_graph(nice_cx_network,
                                               g)
         return g
 
-    def _process_nodes(self, graph):
+    def _process_nodes(self, nice_cx_network, graph):
         """
         Iterates through the nodes adding them to the graph object
         using :func:`networkx.Graph.add_node()` setting name of node
@@ -2504,20 +2634,12 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
         Graph() object.
         :return:
         """
-        for k, v in self._node_items:
-            node_attrs = {}
-            n_a = self.nodeAttributes.get(k)
-            if n_a:
-                for na_item in n_a:
-                    node_attrs[na_item.get(constants.NODE_ATTR_NAME)] = na_item.get(constants.NODE_ATTR_VALUE)
-            if self._legacymode is True:
-                val = v.get(constants.NODE_REPRESENTS)
-                if val:
-                    graph.nodes[k]['represents'] = val
+        for k, v in nice_cx_network.get_nodes():
+            self.add_node(graph, k,
+                          nice_cx_network.get_node_attributes(k),
+                          name=v.get(constants.NODE_ATTR_NAME))
 
-            graph.add_node(k, node_attrs, name=v.get(constants.NODE_ATTR_NAME))
-
-    def _process_edges(self, graph):
+    def _process_edges(self, nice_cx_network, graph):
         """
         Adds edges by calling :func:`networkx.Graph().add_edge()` setting
         source to the 's' attribute on the
@@ -2525,10 +2647,10 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
         :type graph: :class:`networkx.Graph`
         :return:
         """
-        for k, v in self._edge_items:
-            e_a = self.edgeAttributes.get(k)
+        for k, v in nice_cx_network.get_edges():
+            e_a = nice_cx_network.get_edge_attributes(k)
             add_this_dict = {}
-            add_this_dict['interaction'] = v.get('i')
+            add_this_dict['interaction'] = v.get(constants.EDGE_INTERACTION)
             if e_a is not None:
                 for e_a_item in e_a:
                     if isinstance(e_a_item.get('v'), list):
@@ -2537,7 +2659,9 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
                     else:
                         add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
 
-            graph.add_edge(v.get('s'), v.get('t'), add_this_dict)
+            self.add_edge(graph, v[constants.EDGE_SOURCE],
+                          v[constants.EDGE_TARGET],
+                          add_this_dict)
 
 
 class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
@@ -2550,6 +2674,8 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
     object following logic in legacy NDEx2 Python client when networkx 2.0+
     is installed.
 
+    .. warning:: This implementation assumes networkx 2.0+ is installed and will fail with older versions.
+
     For conversion details see :func:`~LegacyNetworkXVersionTwoPlusFactory.get_graph`
     """
     def __init__(self):
@@ -2558,8 +2684,6 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
 
         """
         super(LegacyNetworkXVersionTwoPlusFactory, self).__init__()
-        self._node_items = None
-        self._edge_items = None
 
     def get_graph(self, nice_cx_network):
         """
@@ -2600,6 +2724,7 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
 
         All other node attributes are added using the same attribute
         name as found in the input network. The value is directly set
+        name as found in the input network. The value is directly set
         as it was found in input network (could be single object or list)
 
 
@@ -2624,25 +2749,23 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
         :rtype: :class:`networkx.Graph`
         """
         g = nx.Graph()
-        self._node_items = nice_cx_network.get_nodes()
-        self._edge_items = nice_cx_network.get_edges()
         self.add_network_attributes_from_nice_cx_network(nice_cx_network,
                                                          g)
-        self._process_nodes(g)
-        self._process_edges(g)
+        self._process_nodes(nice_cx_network, g)
+        self._process_edges(nice_cx_network, g)
         self.copy_cartesian_coords_into_graph(nice_cx_network,
                                               g)
         return g
 
-    def _process_nodes(self, graph):
+    def _process_nodes(self, nice_cx_network, graph):
         """
         Processes the nodes
         :return:
         """
-        for k, v in self._node_items:
+        for k, v in nice_cx_network.get_nodes():
             node_name = v.get('n')
             graph.add_node(v.get('n'))
-            n_a = self.nodeAttributes.get(k)
+            n_a = nice_cx_network.get_node_attributes(k)
             if n_a:
                 for na_item in n_a:
                     graph.nodes[node_name][na_item.get('n')] = na_item.get('v')
@@ -2650,22 +2773,20 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
             if v.get('r'):
                 graph.nodes[node_name]['represents'] = v.get('r')
 
-    def _process_edges(self, graph):
+    def _process_edges(self, nice_cx_network, graph):
         """
         Process edges
         :param graph:
         :return:
         """
-        for k, v in self._edge_items:
-            source_node = self.nodes.get(v.get('s')).get('n')
-            target_node = self.nodes.get(v.get('t')).get('n')
+        for k, v in nice_cx_network.get_edges():
+
+            source_node = nice_cx_network.get_node(v.get('s')).get('n')
+            target_node = nice_cx_network.get_node(v.get('t')).get('n')
 
             graph.add_edge(source_node, target_node)
-
-            e_a = self.edgeAttributes.get(k)
-            add_this_dict = {}
-            add_this_dict['interaction'] = v.get('i')
-            g[source_node][target_node]['interaction'] = v.get('i')
+            e_a = nice_cx_network.get_edge_attributes(k)
+            graph[source_node][target_node]['interaction'] = v.get('i')
             if e_a is not None:
                 for e_a_item in e_a:
                     if isinstance(e_a_item.get('v'), list):

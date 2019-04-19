@@ -12,7 +12,9 @@ from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
 from ndex2 import constants
+from ndex2.nice_cx_network import LegacyNetworkXVersionOnePointOneFactory
 import ndex2
+
 
 
 class TestNiceCXNetwork(unittest.TestCase):
@@ -480,3 +482,46 @@ class TestNiceCXNetwork(unittest.TestCase):
         wntcx.apply_style_from_network(glypy)
         wnt_aspect = wntcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
         self.assertEqual(3, len(wnt_aspect))
+
+    def test_to_networkx_no_arg_on_empty_network(self):
+        net = NiceCXNetwork()
+        g = net.to_networkx()
+        self.assertEqual('{}', str(g.graph))
+
+    def test_to_networkx_none_mode_on_empty_network(self):
+        net = NiceCXNetwork()
+        g = net.to_networkx(mode=None)
+        self.assertEqual('{}', str(g.graph))
+
+    def test_to_networkx_legacy_mode_on_empty_network(self):
+        net = NiceCXNetwork()
+        g = net.to_networkx(mode='legacy')
+        self.assertEqual('{}', str(g.graph))
+
+    def test_to_networkx_invalid_mode_on_empty_network(self):
+        net = NiceCXNetwork()
+        try:
+            net.to_networkx(mode='someinvalidmode')
+            self.fail('Expected NDExError')
+        except NDExError as ne:
+            self.assertEqual('someinvalidmode is not a valid mode', str(ne))
+
+    def test_to_networkx_simple_graph_no_arg(self):
+        net = NiceCXNetwork()
+        net.set_name('mynetwork')
+        net.create_node('node0')
+        net.create_node('node1')
+        net.create_edge(edge_source=0, edge_target=1)
+        g = net.to_networkx()
+        self.assertEqual(g.graph['name'], 'mynetwork')
+        self.assertEqual(2, len(g))
+
+    def test_to_networkx_simple_graph_default_mode(self):
+        net = NiceCXNetwork(mode='default')
+        net.set_name('mynetwork')
+        net.create_node('node0')
+        net.create_node('node1')
+        net.create_edge(edge_source=0, edge_target=1)
+        g = net.to_networkx()
+        self.assertEqual(g.graph['name'], 'mynetwork')
+        self.assertEqual(2, len(g))

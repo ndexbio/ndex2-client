@@ -129,7 +129,7 @@ Conversion to other formats
 ---------------------------
 
 There are several classes described below that facilitate conversion of
-:class:`ndex2.nice_cx_network.NiceCXNetwork` object to other types
+:class:`~ndex2.nice_cx_network.NiceCXNetwork` object to other types
 (such as NetworkX)
 
 

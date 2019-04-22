@@ -289,8 +289,12 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
             if edgelist[i][0] == 1655 and edgelist[i][1] == 1654:
                 sixteenfiftyfiveedge = i
                 break
-        self.assertEqual(1655, edgelist[sixteenfiftyfiveedge][0])
-        self.assertEqual(1654, edgelist[sixteenfiftyfiveedge][1])
+
+        self.assertTrue((1655 == edgelist[sixteenfiftyfiveedge][0] and
+                        1654 == edgelist[sixteenfiftyfiveedge][1]) or
+                        (1654 == edgelist[sixteenfiftyfiveedge][0] and
+                         1655 == edgelist[sixteenfiftyfiveedge][1]))
+
         self.assertEqual('form complex', edgelist[sixteenfiftyfiveedge][2]['interaction'])
         self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
         self.assertEqual('"pubmed:15284024"', edgelist[sixteenfiftyfiveedge][2]['citation'])
@@ -338,8 +342,12 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
             if edgelist[i][0] == 1655 and edgelist[i][1] == 1654:
                 sixteenfiftyfiveedge = i
                 break
-        self.assertEqual(1655, edgelist[sixteenfiftyfiveedge][0])
-        self.assertEqual(1654, edgelist[sixteenfiftyfiveedge][1])
+
+        self.assertTrue((1655 == edgelist[sixteenfiftyfiveedge][0] and
+                         1654 == edgelist[sixteenfiftyfiveedge][1]) or
+                        (1654 == edgelist[sixteenfiftyfiveedge][0] and
+                         1655 == edgelist[sixteenfiftyfiveedge][1]))
+
         self.assertEqual('form complex', edgelist[sixteenfiftyfiveedge][2]['interaction'])
         self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
         self.assertEqual('"pubmed:15284024"', edgelist[sixteenfiftyfiveedge][2]['citation'])

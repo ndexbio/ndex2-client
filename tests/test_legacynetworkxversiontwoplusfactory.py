@@ -79,8 +79,8 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertTrue('second' in g)
         edgelist = list(g.edges(data=True))
 
-        self.assertEqual('first', edgelist[0][0])
-        self.assertEqual('second', edgelist[0][1])
+        self.assertTrue(('first' == edgelist[0][0] and 'second' == edgelist[0][1]) or
+                        ('second' == edgelist[0][0] and 'first' == edgelist[0][1]))
         self.assertEqual(None, edgelist[0][2]['interaction'])
 
     @unittest.skipIf(float(networkx.__version__) < 2,
@@ -164,7 +164,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         edgelist = list(g.edges(data=True))
 
         statthree = -1
-        for i in range(0, len(edgelist)):
+        for i in range(0, len(nodelist)):
             if edgelist[i][0] == 'STAT3':
                 statthree = i
                 break

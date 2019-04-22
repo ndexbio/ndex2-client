@@ -96,11 +96,13 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertEqual(1, len(g))
         self.assertEqual(0, g.number_of_edges())
         self.assertTrue(0 in g)
-        nodelist = g.nodes(data=True)
+
         if float(networkx.__version__) >= 2:
-            self.assertEqual('first', nodelist[0]['name'])
+            nodelist = list(g.nodes(data=True))
         else:
-            self.assertEqual('first', nodelist[0][1]['name'])
+            nodelist = g.nodes(data=True)
+
+        self.assertEqual('first', nodelist[0][1]['name'])
 
     def test_two_node_one_edge_network(self):
         net = NiceCXNetwork()
@@ -114,21 +116,19 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertEqual(2, len(g))
         self.assertEqual(1, g.number_of_edges())
         self.assertTrue(0 in g)
-        nodelist = g.nodes(data=True)
+
         if float(networkx.__version__) >= 2:
-            self.assertEqual('first', nodelist[0]['name'])
-            self.assertEqual('second', nodelist[1]['name'])
+            nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
-            self.assertEqual(0, edgelist[0][0])
-            self.assertEqual(1, edgelist[0][1])
-            self.assertEqual(None, edgelist[0][2]['interaction'])
         else:
-            self.assertEqual('first', nodelist[0][1]['name'])
-            self.assertEqual('second', nodelist[1][1]['name'])
+            nodelist = g.nodes(data=True)
             edgelist = g.edges(data=True)
-            self.assertEqual(0, edgelist[0][0])
-            self.assertEqual(1, edgelist[0][1])
-            self.assertEqual(None, edgelist[0][2]['interaction'])
+
+        self.assertEqual('first', nodelist[0][1]['name'])
+        self.assertEqual('second', nodelist[1][1]['name'])
+        self.assertEqual(0, edgelist[0][0])
+        self.assertEqual(1, edgelist[0][1])
+        self.assertEqual(None, edgelist[0][2]['interaction'])
 
     def test_glypican_network_legacyfalse(self):
         net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.GLYPICAN_FILE)
@@ -158,45 +158,30 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertEqual(1, g.number_of_edges())
         self.assertTrue(0 in g)
         self.assertTrue(1 in g)
-        nodelist = g.nodes(data=True)
         if float(networkx.__version__) >= 2:
-            self.assertEqual('MDK', nodelist[0]['name'])
-            self.assertEqual('Protein', nodelist[0]['type'])
-            aliaslist = nodelist[0]['alias']
-            self.assertEqual(2, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q2LEK4' in aliaslist)
-            self.assertTrue('uniprot knowledgebase:Q9UCC7' in aliaslist)
-
-            self.assertEqual('GPC2', nodelist[1]['name'])
-            self.assertEqual('Protein', nodelist[1]['type'])
-            aliaslist = nodelist[1]['alias']
-            self.assertEqual(1, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
-
+            nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
-            self.assertEqual(0, edgelist[0][0])
-            self.assertEqual(1, edgelist[0][1])
-            self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
-            self.assertEqual('false', edgelist[0][2]['directed'])
         else:
-            self.assertEqual('MDK', nodelist[0][1]['name'])
-            self.assertEqual('Protein', nodelist[0][1]['type'])
-            aliaslist = nodelist[0][1]['alias']
-            self.assertEqual(2, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q2LEK4' in aliaslist)
-            self.assertTrue('uniprot knowledgebase:Q9UCC7' in aliaslist)
-
-            self.assertEqual('GPC2', nodelist[1][1]['name'])
-            self.assertEqual('Protein', nodelist[1][1]['type'])
-            aliaslist = nodelist[1][1]['alias']
-            self.assertEqual(1, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
-
+            nodelist = g.nodes(data=True)
             edgelist = g.edges(data=True)
-            self.assertEqual(0, edgelist[0][0])
-            self.assertEqual(1, edgelist[0][1])
-            self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
-            self.assertEqual('false', edgelist[0][2]['directed'])
+
+        self.assertEqual('MDK', nodelist[0][1]['name'])
+        self.assertEqual('Protein', nodelist[0][1]['type'])
+        aliaslist = nodelist[0][1]['alias']
+        self.assertEqual(2, len(aliaslist))
+        self.assertTrue('uniprot knowledgebase:Q2LEK4' in aliaslist)
+        self.assertTrue('uniprot knowledgebase:Q9UCC7' in aliaslist)
+
+        self.assertEqual('GPC2', nodelist[1][1]['name'])
+        self.assertEqual('Protein', nodelist[1][1]['type'])
+        aliaslist = nodelist[1][1]['alias']
+        self.assertEqual(1, len(aliaslist))
+        self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
+
+        self.assertEqual(0, edgelist[0][0])
+        self.assertEqual(1, edgelist[0][1])
+        self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
+        self.assertEqual('false', edgelist[0][2]['directed'])
 
         # check coordinates
         self.assertTrue((g.pos[0][0] + 398.3) < 1.0)
@@ -233,48 +218,112 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertEqual(1, g.number_of_edges())
         self.assertTrue(0 in g)
         self.assertTrue(1 in g)
-        nodelist = g.nodes(data=True)
+
         if float(networkx.__version__) >= 2:
-            self.assertEqual('MDK', nodelist[0]['name'])
-            self.assertEqual('Protein', nodelist[0]['type'])
-            aliaslist = nodelist[0]['alias']
-            self.assertEqual(2, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q2LEK4' in aliaslist)
-            self.assertTrue('uniprot knowledgebase:Q9UCC7' in aliaslist)
-
-            self.assertEqual('GPC2', nodelist[1]['name'])
-            self.assertEqual('Protein', nodelist[1]['type'])
-            aliaslist = nodelist[1]['alias']
-            self.assertEqual(1, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
-
+            nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
-            self.assertEqual(0, edgelist[0][0])
-            self.assertEqual(1, edgelist[0][1])
-            self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
-            self.assertEqual('false', edgelist[0][2]['directed'])
         else:
-            self.assertEqual('MDK', nodelist[0][1]['name'])
-            self.assertEqual('Protein', nodelist[0][1]['type'])
-            aliaslist = nodelist[0][1]['alias']
-            self.assertEqual(2, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q2LEK4' in aliaslist)
-            self.assertTrue('uniprot knowledgebase:Q9UCC7' in aliaslist)
-
-            self.assertEqual('GPC2', nodelist[1][1]['name'])
-            self.assertEqual('Protein', nodelist[1][1]['type'])
-            aliaslist = nodelist[1][1]['alias']
-            self.assertEqual(1, len(aliaslist))
-            self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
-
+            nodelist = g.nodes(data=True)
             edgelist = g.edges(data=True)
-            self.assertEqual(0, edgelist[0][0])
-            self.assertEqual(1, edgelist[0][1])
-            self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
-            self.assertEqual('false', edgelist[0][2]['directed'])
+
+        self.assertEqual('MDK', nodelist[0][1]['name'])
+        self.assertEqual('Protein', nodelist[0][1]['type'])
+        aliaslist = nodelist[0][1]['alias']
+        self.assertEqual(2, len(aliaslist))
+        self.assertTrue('uniprot knowledgebase:Q2LEK4' in aliaslist)
+        self.assertTrue('uniprot knowledgebase:Q9UCC7' in aliaslist)
+
+        self.assertEqual('GPC2', nodelist[1][1]['name'])
+        self.assertEqual('Protein', nodelist[1][1]['type'])
+        aliaslist = nodelist[1][1]['alias']
+        self.assertEqual(1, len(aliaslist))
+        self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
+
+        self.assertEqual(0, edgelist[0][0])
+        self.assertEqual(1, edgelist[0][1])
+        self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
+        self.assertEqual('false', edgelist[0][2]['directed'])
 
         # check coordinates
         self.assertTrue((g.pos[0][0] + 398.3) < 1.0)
         self.assertTrue((g.pos[0][1] - 70.71) < 1.0)
         self.assertTrue((g.pos[1][0] + 353.49) < 1.0)
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
+
+    def test_darktheme_network_legacyfalse(self):
+        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.DARKTHEME_FILE)
+        fac = LegacyNetworkXVersionOnePointOneFactory()
+        g = fac.get_graph(net)
+        self.assertEqual('Dark theme final version', g.graph['name'])
+        self.assertTrue('Perfetto L.,' in g.graph['reference'])
+        self.assertEqual('Theodora Pavlidou', g.graph['author'])
+        self.assertEqual('SIGNOR-EGF', g.graph['labels'])
+        self.assertEqual('18-Jan-2019', g.graph['version'])
+        self.assertEqual('Human, 9606, Homo sapiens', g.graph['organism'])
+        self.assertEqual('SIGNOR-EGF', g.graph['labels'])
+        self.assertTrue('epidermal growth factor' in g.graph['description'])
+
+        self.assertEqual(34, len(g))
+        self.assertEqual(116, g.number_of_edges())
+        self.assertTrue(1655 in g)
+        self.assertTrue(1622 in g)
+
+        if float(networkx.__version__) >= 2:
+            nodelist = list(g.nodes(data=True))
+            edgelist = list(g.edges(data=True))
+        else:
+            nodelist = g.nodes(data=True)
+            edgelist = g.edges(data=True)
+
+        self.assertEqual('STAT3', nodelist[0][1]['name'])
+        self.assertEqual('protein', nodelist[0][1]['type'])
+        self.assertEqual('uniprot:P40763', nodelist[0][1]['represents'])
+
+        self.assertEqual(1655, edgelist[0][0])
+        self.assertEqual(1654, edgelist[0][1])
+        self.assertEqual('form complex', edgelist[0][2]['interaction'])
+        self.assertEqual('true', edgelist[0][2]['directed'])
+        self.assertEqual('"pubmed:15284024"', edgelist[0][2]['citation'])
+
+        # check coordinates
+        self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)
+        self.assertTrue((g.pos[1655][1] - 145.72) < 1.0)
+
+    def test_darktheme_network_legacytrue(self):
+        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.DARKTHEME_FILE)
+        fac = LegacyNetworkXVersionOnePointOneFactory(legacymode=True)
+        g = fac.get_graph(net)
+        self.assertEqual('Dark theme final version', g.graph['name'])
+        self.assertTrue('Perfetto L.,' in g.graph['reference'])
+        self.assertEqual('Theodora Pavlidou', g.graph['author'])
+        self.assertEqual('SIGNOR-EGF', g.graph['labels'])
+        self.assertEqual('18-Jan-2019', g.graph['version'])
+        self.assertEqual('Human, 9606, Homo sapiens', g.graph['organism'])
+        self.assertEqual('SIGNOR-EGF', g.graph['labels'])
+        self.assertTrue('epidermal growth factor' in g.graph['description'])
+
+        self.assertEqual(34, len(g))
+        self.assertEqual(50, g.number_of_edges())
+        self.assertTrue(1655 in g)
+        self.assertTrue(1622 in g)
+
+        if float(networkx.__version__) >= 2:
+            nodelist = list(g.nodes(data=True))
+            edgelist = list(g.edges(data=True))
+        else:
+            nodelist = g.nodes(data=True)
+            edgelist = g.edges(data=True)
+
+        self.assertEqual('STAT3', nodelist[0][1]['name'])
+        self.assertEqual('protein', nodelist[0][1]['type'])
+        self.assertTrue('represents' not in nodelist[0][1])
+
+        self.assertEqual(1655, edgelist[0][0])
+        self.assertEqual(1654, edgelist[0][1])
+        self.assertEqual('form complex', edgelist[0][2]['interaction'])
+        self.assertEqual('true', edgelist[0][2]['directed'])
+        self.assertEqual('"pubmed:15284024"', edgelist[0][2]['citation'])
+
+        # check coordinates
+        self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)
+        self.assertTrue((g.pos[1655][1] - 145.72) < 1.0)

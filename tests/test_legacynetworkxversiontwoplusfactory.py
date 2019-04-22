@@ -183,12 +183,15 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertEqual('protein', nodelist[statthree][1]['type'])
         self.assertEqual('uniprot:P40763', nodelist[statthree][1]['represents'])
 
-        stat_edge = -1
+        stat_edge = -2
         for i in range(0, len(edgelist)):
             if edgelist[i][0] == 'STAT3' and edgelist[i][1] == 'JAK1/STAT1/STAT3':
                 stat_edge = i
-        self.assertEqual('STAT3', edgelist[stat_edge][0])
-        self.assertEqual('JAK1/STAT1/STAT3', edgelist[stat_edge][1])
+                break
+            if edgelist[i][0] == 'JAK1/STAT1/STAT3' and edgelist[i][1] == 'STAT3':
+                stat_edge = i
+                break
+        self.assertTrue(stat_edge >= 0)
         self.assertEqual('form complex', edgelist[stat_edge][2]['interaction'])
         self.assertEqual('true', edgelist[stat_edge][2]['directed'])
         self.assertEqual('"pubmed:15284024"', edgelist[stat_edge][2]['citation'])

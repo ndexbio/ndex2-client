@@ -116,21 +116,31 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         nodelist = list(g.nodes(data=True))
         edgelist = list(g.edges(data=True))
 
-        self.assertEqual('MDK', nodelist[0][0])
-        self.assertEqual('Protein', nodelist[0][1]['type'])
-        aliaslist = nodelist[0][1]['alias']
+        mdk = -1
+        for i in range(0, len(nodelist)):
+            if nodelist[i][0] == 'MDK':
+                mdk = i
+                break
+        self.assertEqual('MDK', nodelist[mdk][0])
+        self.assertEqual('Protein', nodelist[mdk][1]['type'])
+        aliaslist = nodelist[mdk][1]['alias']
         self.assertEqual(2, len(aliaslist))
         self.assertTrue('uniprot knowledgebase:Q2LEK4' in aliaslist)
         self.assertTrue('uniprot knowledgebase:Q9UCC7' in aliaslist)
 
-        self.assertEqual('GPC2', nodelist[1][0])
-        self.assertEqual('Protein', nodelist[1][1]['type'])
-        aliaslist = nodelist[1][1]['alias']
+        gp = -1
+        for i in range(0, len(nodelist)):
+            if nodelist[i][0] == 'GPC2':
+                gp = i
+                break
+        self.assertEqual('GPC2', nodelist[gp][0])
+        self.assertEqual('Protein', nodelist[gp][1]['type'])
+        aliaslist = nodelist[gp][1]['alias']
         self.assertEqual(1, len(aliaslist))
         self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
 
-        self.assertEqual('MDK', edgelist[0][0])
-        self.assertEqual('GPC2', edgelist[0][1])
+        self.assertTrue(('MDK' == edgelist[0][0] and 'GPC2', edgelist[0][1]) or
+                        ('GPC2' == edgelist[0][0] and 'MDK', edgelist[0][1]))
         self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
         self.assertEqual('false', edgelist[0][2]['directed'])
 
@@ -165,7 +175,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
 
         statthree = -1
         for i in range(0, len(nodelist)):
-            if edgelist[i][0] == 'STAT3':
+            if nodelist[i][0] == 'STAT3':
                 statthree = i
                 break
 

@@ -1,6 +1,9 @@
 **NDEx2 Python Client**
 =======================
 
+.. _NDEx: http://ndexbio.org
+.. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api
+
 .. image:: https://img.shields.io/travis/ndexbio/ndex2-client.svg
         :target: https://travis-ci.org/ndexbio/ndex2-client.svg?branch=master
 
@@ -1578,6 +1581,3 @@ Used to add a node to the network.
 
 **addNetworkAttribute(json\_obj=None)**
 
-
-.. _NDEx: http://ndexbio.org
-.. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api

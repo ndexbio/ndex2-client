@@ -2,6 +2,22 @@
 History
 =======
 
+3.2.0 (2019-04-23)
+------------------
+
+* Verify consistent conversion of cx for networkx 1.11 and 2.0+
+  `Issue #30 <https://github.com/ndexbio/ndex2-client/issues/30>`_
+
+* NiceCXNetwork.get_nodes(), NiceCXNetwork.get_edges(),
+NiceCXNetwork.get_metadata() needs to make correct iterator call in Python 2
+  `Issue #44 <https://github.com/ndexbio/ndex2-client/issues/44>`_
+
+* Add NiceCXNetwork.get_network_attribute_names() function enhancement
+  `Issue #45 <https://github.com/ndexbio/ndex2-client/issues/45>`_
+
+* NiceCXNetwork.create_edge fails to correctly create edge when node dict passed in
+  `Issue #46 <https://github.com/ndexbio/ndex2-client/issues/46>`_
+
 3.1.0a1 (2019-03-20)
 --------------------
 

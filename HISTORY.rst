@@ -8,8 +8,7 @@ History
 * Verify consistent conversion of cx for networkx 1.11 and 2.0+
   `Issue #30 <https://github.com/ndexbio/ndex2-client/issues/30>`_
 
-* NiceCXNetwork.get_nodes(), NiceCXNetwork.get_edges(),
-NiceCXNetwork.get_metadata() needs to make correct iterator call in Python 2
+* NiceCXNetwork.get_nodes(), NiceCXNetwork.get_edges(), NiceCXNetwork.get_metadata() needs to make correct iterator call in Python 2
   `Issue #44 <https://github.com/ndexbio/ndex2-client/issues/44>`_
 
 * Add NiceCXNetwork.get_network_attribute_names() function enhancement

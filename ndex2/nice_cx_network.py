@@ -2433,7 +2433,10 @@ class NetworkXFactory(object):
             node_attrs = {}
             for na_item in node_attributes:
                 node_attrs[na_item.get(constants.NODE_ATTR_NAME)] = na_item.get(constants.NODE_ATTR_VALUE)
-        graph.add_node(nodeid, node_attrs, name=name)
+        if represents:
+            graph.add_node(nodeid, node_attrs, name=name, represents=represents)
+        else:
+            graph.add_node(nodeid, node_attrs, name=name)
 
     def _add_node_networkx_two_plus(self, graph, nodeid, node_attributes,
                                     name=None,
@@ -2453,7 +2456,7 @@ class NetworkXFactory(object):
         graph.add_node(nodeid)
         if node_attributes:
             for n_a in node_attributes:
-                graph.nodes[nodeid][n_a.get('n')] = n_a.get('v')
+                graph.nodes[nodeid][n_a.get(constants.NODE_ATTR_NAME)] = n_a.get(constants.NODE_ATTR_VALUE)
         if represents:
             graph.nodes[nodeid]['represents'] = represents
         if name:
@@ -2634,10 +2637,15 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
         Graph() object.
         :return:
         """
+        represents = None
         for k, v in nice_cx_network.get_nodes():
+            if self._legacymode is False:
+                represents = v.get(constants.NODE_REPRESENTS)
+
             self.add_node(graph, k,
                           nice_cx_network.get_node_attributes(k),
-                          name=v.get(constants.NODE_ATTR_NAME))
+                          name=v.get(constants.NODE_ATTR_NAME),
+                          represents=represents)
 
     def _process_edges(self, nice_cx_network, graph):
         """
@@ -2793,4 +2801,4 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
                         graph[source_node][target_node][e_a_item.get('n')] = '"%s"' % ','.join(
                             str(e) for e in e_a_item.get('v'))
                     else:
-                        graph[source_node][target_node][e_a_item.get('n')] = e_a_item.ge
+                        graph[source_node][target_node][e_a_item.get('n')] = e_a_item.get('v')

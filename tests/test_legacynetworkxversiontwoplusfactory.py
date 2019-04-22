@@ -189,7 +189,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
                 stat_edge = i
         self.assertEqual('STAT3', edgelist[stat_edge][0])
         self.assertEqual('JAK1/STAT1/STAT3', edgelist[stat_edge][1])
-        self.assertEqual('form complex', edgelist[0][2]['interaction'])
+        self.assertEqual('form complex', edgelist[stat_edge][2]['interaction'])
         self.assertEqual('true', edgelist[stat_edge][2]['directed'])
         self.assertEqual('"pubmed:15284024"', edgelist[stat_edge][2]['citation'])
 

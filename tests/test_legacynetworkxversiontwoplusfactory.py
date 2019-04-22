@@ -77,7 +77,6 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertEqual(1, g.number_of_edges())
         self.assertTrue('first' in g)
         self.assertTrue('second' in g)
-        nodelist = list(g.nodes(data=True))
         edgelist = list(g.edges(data=True))
 
         self.assertEqual('first', edgelist[0][0])
@@ -164,15 +163,25 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         nodelist = list(g.nodes(data=True))
         edgelist = list(g.edges(data=True))
 
-        self.assertEqual('STAT3', nodelist[0][0])
-        self.assertEqual('protein', nodelist[0][1]['type'])
-        self.assertEqual('uniprot:P40763', nodelist[0][1]['represents'])
+        statthree = -1
+        for i in range(0, len(edgelist)):
+            if edgelist[i][0] == 'STAT3':
+                statthree = i
+                break
 
-        self.assertEqual('STAT3', edgelist[0][0])
-        self.assertEqual('JAK1/STAT1/STAT3', edgelist[0][1])
+        self.assertEqual('STAT3', nodelist[statthree][0])
+        self.assertEqual('protein', nodelist[statthree][1]['type'])
+        self.assertEqual('uniprot:P40763', nodelist[statthree][1]['represents'])
+
+        stat_edge = -1
+        for i in range(0, len(edgelist)):
+            if edgelist[i][0] == 'STAT3' and edgelist[i][1] == 'JAK1/STAT1/STAT3':
+                stat_edge = i
+        self.assertEqual('STAT3', edgelist[stat_edge][0])
+        self.assertEqual('JAK1/STAT1/STAT3', edgelist[stat_edge][1])
         self.assertEqual('form complex', edgelist[0][2]['interaction'])
-        self.assertEqual('true', edgelist[0][2]['directed'])
-        self.assertEqual('"pubmed:15284024"', edgelist[0][2]['citation'])
+        self.assertEqual('true', edgelist[stat_edge][2]['directed'])
+        self.assertEqual('"pubmed:15284024"', edgelist[stat_edge][2]['citation'])
 
         # check coordinates
         self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)

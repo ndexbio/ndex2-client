@@ -284,11 +284,16 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertEqual('protein', nodelist[stat_three_index][1]['type'])
         self.assertEqual('uniprot:P40763', nodelist[stat_three_index][1]['represents'])
 
-        self.assertEqual(1655, edgelist[0][0])
-        self.assertEqual(1654, edgelist[0][1])
-        self.assertEqual('form complex', edgelist[0][2]['interaction'])
-        self.assertEqual('true', edgelist[0][2]['directed'])
-        self.assertEqual('"pubmed:15284024"', edgelist[0][2]['citation'])
+        sixteenfiftyfiveedge = -1
+        for i in range(len(edgelist)):
+            if edgelist[i][0] == 1655 and edgelist[i][1] == 1654:
+                sixteenfiftyfiveedge = i
+                break
+        self.assertEqual(1655, edgelist[sixteenfiftyfiveedge][0])
+        self.assertEqual(1654, edgelist[sixteenfiftyfiveedge][1])
+        self.assertEqual('form complex', edgelist[sixteenfiftyfiveedge][2]['interaction'])
+        self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
+        self.assertEqual('"pubmed:15284024"', edgelist[sixteenfiftyfiveedge][2]['citation'])
 
         # check coordinates
         self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)
@@ -328,11 +333,16 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertEqual('protein', nodelist[stat_three_index][1]['type'])
         self.assertTrue('represents' not in nodelist[stat_three_index][1])
 
-        self.assertEqual(1655, edgelist[0][0])
-        self.assertEqual(1654, edgelist[0][1])
-        self.assertEqual('form complex', edgelist[0][2]['interaction'])
-        self.assertEqual('true', edgelist[0][2]['directed'])
-        self.assertEqual('"pubmed:15284024"', edgelist[0][2]['citation'])
+        sixteenfiftyfiveedge = -1
+        for i in range(len(edgelist)):
+            if edgelist[i][0] == 1655 and edgelist[i][1] == 1654:
+                sixteenfiftyfiveedge = i
+                break
+        self.assertEqual(1655, edgelist[sixteenfiftyfiveedge][0])
+        self.assertEqual(1654, edgelist[sixteenfiftyfiveedge][1])
+        self.assertEqual('form complex', edgelist[sixteenfiftyfiveedge][2]['interaction'])
+        self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
+        self.assertEqual('"pubmed:15284024"', edgelist[sixteenfiftyfiveedge][2]['citation'])
 
         # check coordinates
         self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)

@@ -275,9 +275,14 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
             nodelist = g.nodes(data=True)
             edgelist = g.edges(data=True)
 
-        self.assertEqual('STAT3', nodelist[0][1]['name'])
-        self.assertEqual('protein', nodelist[0][1]['type'])
-        self.assertEqual('uniprot:P40763', nodelist[0][1]['represents'])
+        stat_three_index = -1
+        for i in range(0, len(nodelist)):
+            if nodelist[i][1]['name'] == 'STAT3':
+                stat_three_index = i
+                break
+        self.assertEqual('STAT3', nodelist[stat_three_index][1]['name'])
+        self.assertEqual('protein', nodelist[stat_three_index][1]['type'])
+        self.assertEqual('uniprot:P40763', nodelist[stat_three_index][1]['represents'])
 
         self.assertEqual(1655, edgelist[0][0])
         self.assertEqual(1654, edgelist[0][1])
@@ -314,9 +319,14 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
             nodelist = g.nodes(data=True)
             edgelist = g.edges(data=True)
 
-        self.assertEqual('STAT3', nodelist[0][1]['name'])
-        self.assertEqual('protein', nodelist[0][1]['type'])
-        self.assertTrue('represents' not in nodelist[0][1])
+        stat_three_index = -1
+        for i in range(0, len(nodelist)):
+            if nodelist[i][1]['name'] == 'STAT3':
+                stat_three_index = i
+                break
+        self.assertEqual('STAT3', nodelist[stat_three_index][1]['name'])
+        self.assertEqual('protein', nodelist[stat_three_index][1]['type'])
+        self.assertTrue('represents' not in nodelist[stat_three_index][1])
 
         self.assertEqual(1655, edgelist[0][0])
         self.assertEqual(1654, edgelist[0][1])

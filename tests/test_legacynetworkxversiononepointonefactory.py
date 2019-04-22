@@ -86,6 +86,13 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         else:
             self.assertEqual('first', nodelist[0][1]['name'])
 
+        # TODO Fix Issue #51
+        # network name is not properly set.
+        # see https://github.com/ndexbio/ndex2-client/issues/51
+        # net_two = ndex2.create_nice_cx_from_networkx(g)
+        # self.assertEqual('bob', net_two.get_name())
+
+
     def test_one_node_no_edge_network_legacytrue(self):
         net = NiceCXNetwork()
         net.create_node('first')

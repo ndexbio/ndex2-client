@@ -60,6 +60,11 @@ NODE_ID = '@id'
 Key for id of node
 """
 
+NODE_NAME = 'n'
+"""
+Key for node name
+"""
+
 NODE_ATTR_NAME = 'n'
 """
 Key for node attribute name

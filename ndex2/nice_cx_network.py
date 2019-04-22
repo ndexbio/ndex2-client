@@ -1564,11 +1564,12 @@ class NiceCXNetwork():
 
         This method currently supports the following mode values:
 
-        .. note::
+        .. warning::
 
             For backwards compatibility `mode` is set to **legacy**
             but there are known bugs in this implementation when
             networkx 2.0+ or greater is installed.
+
             See the description on **legacy** mode below for more information.
 
         **Modes:**
@@ -1576,8 +1577,9 @@ class NiceCXNetwork():
         **legacy:**
 
             If mode set to **legacy** then this method will behave
-            as it has for all versions 3.1.0 and earlier which varies
-            depending on version of networkx installed as described here:
+            as it has for all versions of NDEx2 Python Client 3.1.0 and
+            earlier which varies depending on version of networkx installed
+            as described here:
 
             For networkx 2.0 and greater:
             (see :class:`LegacyNetworkXVersionTwoPlusFactory`)
@@ -1592,13 +1594,17 @@ class NiceCXNetwork():
             :class:`LegacyNetworkXVersionOnePointOneFactory` regardless of
             networkx installed with `legacymode` set to `False`
 
+            .. note::
+
+                It is **highly** recommended that this mode is used
+
         Examples:
 
-            ``graph = nice_cx.to_networkx() # graph is now a networkx object using legacy implementation``
+            ``graph = nice_cx.to_networkx() # returns networkx graph using legacy implementation``
 
-            ``graph = nice_cx.to_networkx(mode='default') # using ``
+            ``graph = nice_cx.to_networkx(mode='default') # returns networkx graph using improved converter``
 
-            ``graph = nice_cx.to_networkx
+            ``graph = nice_cx.to_networkx # returns networkx graph using legacy implementation``
 
         :param mode: Since translation to networkx can be done in many ways this mode lets
                      the caller dictate the method.

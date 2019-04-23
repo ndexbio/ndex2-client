@@ -514,6 +514,71 @@ class Ndex2(object):
             raise Exception("get_neighborhood is not supported for versions prior to 2.0, "
                             "use get_neighborhood_as_cx_stream")
 
+    def get_interconnectquery_as_cx_stream(self, network_id, search_string,
+                                           search_depth=1, edge_limit=2500,
+                                           error_when_limit=True):
+        """
+        Get a CX stream for a neighborhood subnetwork where all the
+        paths must start and end at one of the query nodes in the network
+        specified by networkid.
+
+        :param network_id: The UUID of the network.
+        :type network_id: str
+        :param search_string: The search string used to identify the network neighborhood.
+        :type search_string: str
+        :param search_depth: The depth of the neighborhood from the core nodes identified.
+        :type search_depth: int
+        :param edge_limit: The maximum size of the neighborhood.
+        :type edge_limit: int
+        :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
+        :type error_when_limit: boolean
+        :return: The response.
+        :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
+
+        """
+        route = "/search/network/%s/interconnectquery" % network_id
+
+        post_data = {'searchString': search_string,
+                     'searchDepth': search_depth,
+                     'edgeLimit': edge_limit,
+                     'errorWhenLimitIsOver': error_when_limit}
+        post_json = json.dumps(post_data)
+        return self.post_stream(route, post_json=post_json)
+
+    def get_interconnectquery(self, network_id, search_string,
+                              search_depth=1, edge_limit=2500,
+                              error_when_limit=True):
+        """
+        Gets a CX network for a neighborhood subnetwork where all the
+        paths must start and end at one of the query nodes in the network
+        specified by networkid.
+
+        :param network_id: The UUID of the network.
+        :type network_id: str
+        :param search_string: The search string used to identify the network neighborhood.
+        :type search_string: str
+        :param search_depth: The depth of the neighborhood from the core nodes identified.
+        :type search_depth: int
+        :param edge_limit: The maximum size of the neighborhood.
+        :type edge_limit: int
+        :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
+        :type error_when_limit: boolean
+        :return: The CX json object.
+        :rtype: list
+        """
+        response = self.get_interconnectquery_as_cx_stream(network_id,
+                                                           search_string,
+                                                           search_depth=search_depth,
+                                                           edge_limit=edge_limit,
+                                                           error_when_limit=error_when_limit)
+        response_json = response.json()
+        if isinstance(response_json, dict):
+            return response_json.get('data')
+        elif isinstance(response_json, list):
+            return response_json
+        else:
+            return response_json
+
     def search_networks(self, search_string="", account_name=None, start=0, size=100, include_groups=False):
         """
         Search for networks based on the search_text, optionally limited to networks owned by the specified

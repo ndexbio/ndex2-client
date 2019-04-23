@@ -1,7 +1,16 @@
 NiceCXNetwork
 -------------
 
-The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working with NDEx networks.
+The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working with NDEx networks
+that are stored in CX format.
+
+`Click here for more information about CX format <http://www.home.ndexbio.org/data-model>`_.
+
+.. note::
+
+    The term **niceCX** is CX with no duplicate aspects.
+
+
 Methods are provided to add nodes, edges, node attributes, edge attributes, etc.
 Once a :class:`~ndex2.nice_cx_network.NiceCXNetwork` object is populated it can be saved to the NDEx server
 by calling either :func:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to()` to create a new network or
@@ -57,6 +66,28 @@ Misc niceCX methods
 .. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: apply_template, print_summary, to_cx, to_cx_stream, to_networkx, to_pandas_dataframe, update_to, upload_to
 
+Conversion of niceCX to other formats
+=======================================
+
+There are several classes described below that facilitate conversion of
+:class:`~ndex2.nice_cx_network.NiceCXNetwork` object to other types
+(such as NetworkX)
+
+Networkx
+**********
+
+.. autoclass:: ndex2.nice_cx_network.DefaultNetworkXFactory
+    :members: get_graph
+
+Deprecated
+************
+
+These networkx converters are still callable, but have been deprecated
+
+.. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionTwoPlusFactory
+    :members: get_graph
+
+
 Deprecated NiceCXNetwork methods
 ================================
 
@@ -83,6 +114,7 @@ The following data types are supported in methods that accept **type**
 * list_of_integer
 * list_of_long
 
+These constants are defined here: :py:const:`~ndex2.constants.VALID_ATTRIBUTE_DATATYPES`
 
 Methods for creating niceCX from other data models
 ===================================================
@@ -93,10 +125,10 @@ Client access to NDEx server API
 --------------------------------
 
 The Ndex2 class provides methods to interface with the
-`NDEx REST Server API`_  The Ndex2 object can be used to access
+`NDEx REST Server API`_  The :py:class:`~ndex2.client.Ndex2` object can be used to access
 an NDEx server either anonymously or using a specific user account. For
 each NDEx server and user account that you want to use in your script or
-application, you create an Ndex2 instance.
+application, you create an :py:class:`~ndex2.client.Ndex2` instance.
 
     Example creating anonymous connection:
 
@@ -116,31 +148,10 @@ application, you create an Ndex2 instance.
             my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 
-Ndex2 class
-===========
-
 .. autoclass:: ndex2.client.Ndex2
     :members: add_networks_to_networkset, create_networkset, delete_network, delete_networks_from_networkset, get_neighborhood, get_neighborhood_as_cx_stream, get_network_as_cx_stream, get_network_ids_for_user, get_network_set, get_network_summary, get_sample_network, get_task_by_id, get_user_by_username, get_user_network_summaries, grant_network_to_user_by_username, grant_networks_to_group, grant_networks_to_user, make_network_private, make_network_public, save_cx_stream_as_new_network, save_new_network, search_networks, set_network_properties, set_network_system_properties, set_read_only, update_cx_network, update_network_group_permission, update_network_profile, update_network_user_permission
 
 .. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api
-
-
-Conversion to other formats
----------------------------
-
-There are several classes described below that facilitate conversion of
-:class:`~ndex2.nice_cx_network.NiceCXNetwork` object to other types
-(such as NetworkX)
-
-
-.. autoclass:: ndex2.nice_cx_network.NetworkXFactory
-    :members: add_network_attributes_from_nice_cx_network, copy_cartesian_coords_into_graph
-
-.. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionOnePointOneFactory
-    :members: get_graph
-
-.. autoclass:: ndex2.nice_cx_network.LegacyNetworkXVersionTwoPlusFactory
-    :members: get_graph
 
 Constants
 ---------

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for `LegacyNetworkXVersionOnePointOneFactory` class."""
+"""Tests for `DefaultNetworkXFactory` class."""
 
 import os
 import unittest

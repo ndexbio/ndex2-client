@@ -12,7 +12,7 @@ from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
 from ndex2 import constants
-from ndex2.nice_cx_network import LegacyNetworkXVersionOnePointOneFactory
+from ndex2.nice_cx_network import DefaultNetworkXFactory
 import ndex2
 
 

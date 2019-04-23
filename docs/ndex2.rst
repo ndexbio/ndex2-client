@@ -64,7 +64,7 @@ Network methods
 Misc niceCX methods
 ========================================
 .. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
-    :members: apply_template, print_summary, to_cx, to_cx_stream, to_networkx, to_pandas_dataframe, update_to, upload_to
+    :members: apply_template, apply_style_from_network, print_summary, to_cx, to_cx_stream, to_networkx, to_pandas_dataframe, update_to, upload_to
 
 Conversion of niceCX to other formats
 =======================================

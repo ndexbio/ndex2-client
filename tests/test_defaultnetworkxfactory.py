@@ -12,7 +12,7 @@ from ndex2.nice_cx_network import DefaultNetworkXFactory
 from ndex2.nice_cx_network import NiceCXNetwork
 
 
-class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
+class TestDefaultNetworkXFactory(unittest.TestCase):
 
     TEST_DIR = os.path.dirname(__file__)
     WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')
@@ -138,7 +138,7 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertEqual(None, edgelist[0][2]['interaction'])
 
     def test_glypican_network_legacyfalse_and_multigraph_passed_in(self):
-        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.GLYPICAN_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.GLYPICAN_FILE)
         fac = DefaultNetworkXFactory()
         g = fac.get_graph(net, networkx_graph=networkx.MultiGraph())
         self.assertEqual('Glypican 2 network', g.graph['name'])
@@ -197,7 +197,7 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
     def test_glypican_network_legacyfalse(self):
-        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.GLYPICAN_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.GLYPICAN_FILE)
         fac = DefaultNetworkXFactory()
         g = fac.get_graph(net)
         self.assertEqual('Glypican 2 network', g.graph['name'])
@@ -255,7 +255,7 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
     def test_glypican_network_legacymode_true(self):
-        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.GLYPICAN_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.GLYPICAN_FILE)
         fac = DefaultNetworkXFactory(legacymode=True)
         g = fac.get_graph(net)
         self.assertTrue(isinstance(g, networkx.Graph))
@@ -316,7 +316,7 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
     def test_darktheme_network_legacyfalse(self):
-        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.DARKTHEME_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.DARKTHEME_FILE)
         fac = DefaultNetworkXFactory()
         g = fac.get_graph(net)
         self.assertEqual('Dark theme final version', g.graph['name'])
@@ -369,7 +369,7 @@ class TestLegacyNetworkXVersionOnePointOneFactory(unittest.TestCase):
         self.assertTrue((g.pos[1655][1] - 145.72) < 1.0)
 
     def test_darktheme_network_legacytrue(self):
-        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionOnePointOneFactory.DARKTHEME_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.DARKTHEME_FILE)
         fac = DefaultNetworkXFactory(legacymode=True)
         g = fac.get_graph(net)
         self.assertEqual('Dark theme final version', g.graph['name'])

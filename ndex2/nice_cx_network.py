@@ -2309,6 +2309,7 @@ class NetworkXFactory(object):
         """
         Creates NetworkX Graph object which can
         be one of the multiple types of Graph objects
+
         :raises NotImplementedError: Subclasses should implement this method
         :return: networkx Graph object of some type
         :type: :class:`networkx.Graph`
@@ -2343,7 +2344,7 @@ class NetworkXFactory(object):
         :param nice_cx_network: Input network
         :type nice_cx_network: :py:class:`NiceCXNetwork`
         :param networkx_graph: Network to append coordinates to
-        :raises NDexError: If either input parameter is None
+        :raises NDExError: If either input parameter is None
         :type networkx_graph: :class:`networkx.Graph`
         :return: None
         """
@@ -2366,8 +2367,9 @@ class NetworkXFactory(object):
     def add_network_attributes_from_nice_cx_network(self, nice_cx_network,
                                                     networkx_graph):
         """
-        Iterates through network attributes appending them to
-        the graph object passed in setting the values like so:
+        Iterates through network attributes of input `nice_cx_network`
+        appending the attributes to the graph object passed in
+        setting the values like so:
 
         .. code-block:: python
 
@@ -2382,7 +2384,7 @@ class NetworkXFactory(object):
         :param networkx_graph: networkx Graph object, should work with
                                any of the types of Graphs ie MultiGraph etc..
         :type networkx_graph: :class:`networkx.Graph`
-        :raises NDexError: If either input parameter is None
+        :raises NDExError: If either input parameter is None
         :return: None
         """
         if nice_cx_network is None:
@@ -2400,27 +2402,31 @@ class NetworkXFactory(object):
                 val = ','.join([str(entry) for entry in val])
             networkx_graph.graph[name] = val
 
-    def add_node(self, graph, nodeid, node_attributes, name=None, represents=None):
+    def add_node(self, networkx_graph, nodeid, node_attributes, name=None, represents=None):
         """
         Adds node to `graph` dealing with differences between
         networkx 1.x and 2.x+
-        :param graph: networkx graph to add node to
-        :type: graph: :class:`networkx.Graph` or one of its subtypes
-        :param nodeid: node identifier can be string, int etc.
-        :param node_attr_dict: dictionary of key => value data to set
-                               set node attributes
-        :type node_attr_dict: dict
-        :return:
-        """
 
-        # if networkx version 2+
+        :param networkx_graph: networkx graph to add node to
+        :type networkx_graph: :class:`networkx.Graph` or one of its subtypes
+        :param nodeid: node identifier can be string, int etc.
+        :param node_attributes: dictionary of key => value data to set
+                               set node attributes with
+        :type node_attributes: dict
+        :param name: name of node that is set as attribute with key 'name' on
+                     node
+        :type name: string
+        :param represents: represents value for node that is set as attribute
+                           with key 'represents' on node
+        :return: None
+        """
         if float(nx.__version__) >= 2:
-            self._add_node_networkx_two_plus(graph, nodeid, node_attributes,
+            self._add_node_networkx_two_plus(networkx_graph, nodeid, node_attributes,
                                              name=name,
                                              represents=represents)
             return
 
-        self._add_node_networkx_legacy(graph, nodeid, node_attributes,
+        self._add_node_networkx_legacy(networkx_graph, nodeid, node_attributes,
                                        name=name, represents=represents)
 
     def _add_node_networkx_legacy(self, graph, nodeid, node_attributes,
@@ -2449,6 +2455,7 @@ class NetworkXFactory(object):
                                     represents=None):
         """
         Adds node to `graph` assuming installed version of networkx is 2 or greater
+
         :param graph: Graph to add node to
         :type graph: :class:`networkx.Graph`
         :param nodeid: id of node, could be str, int
@@ -2468,21 +2475,25 @@ class NetworkXFactory(object):
         if name:
             graph.nodes[nodeid]['name'] = name
 
-    def add_edge(self, graph, source_node, target_node, attribute_dict):
+    def add_edge(self, networkx_graph, source_node, target_node, attribute_dict):
         """
+        Adds edge to `graph` dealing with differences between
+        networkx 1.x and 2.x+
 
-        :param graph:
-        :param source_node:
-        :param target_node:
-        :param attribute_dict:
-        :return:
+        :param networkx_graph: networkx graph to add node to
+        :type networkx_graph: :class:`networkx.Graph` or one of its subtypes
+        :param source_node: id of source node
+        :param target_node: id of target node
+        :param attribute_dict: dictionary of edge attributes
+        :type attribute_dict: dict
+        :return: None
         """
         if float(nx.__version__) >= 2:
-            self._add_edge_networkx_two_plus(graph, source_node,
+            self._add_edge_networkx_two_plus(networkx_graph, source_node,
                                              target_node, attribute_dict)
             return
 
-        self._add_edge_networkx_legacy(graph, source_node, target_node,
+        self._add_edge_networkx_legacy(networkx_graph, source_node, target_node,
                                        attribute_dict)
 
     def _add_edge_networkx_two_plus(self, graph, source_node,
@@ -2524,12 +2535,9 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
     """
 
     Converts :class:`NiceCXNetwork` to :class:`networkx.Graph`
-    object.
-
-    This class is named as such because it follows the original
-    implementation (NDEx2 Python client 3.1 and earlier)
-    run when :func:`NiceCXNetwork.to_networkx()` was invoked
-    where the version of networkx installed was less then 2.0
+    object using original algorithm written in
+    :func:`NiceCXNetwork.to_networkx()` of NDEx2 Python client
+    3.1 and earlier.
 
     For details on implementation see :func:`~get_graph`
 
@@ -2542,7 +2550,11 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
                            :py:func:`~LegacyNetworkXVersionOnePointOneFactory.get_graph`
                            behaves like NDEx2 Python client 3.1 and earlier in that
                            this method returns a :class:`networkx.Graph` object. Otherwise
-                           a :class:`networkx.MultiGraph` object is returned.
+                           a :class:`networkx.MultiGraph` object is returned and
+                           the represents node attribute is properly added as an attribute
+                           to the resulting graph.
+
+        :raises NDExError: If invalid value is set in `legacymode` parameter
         """
         super(LegacyNetworkXVersionOnePointOneFactory, self).__init__()
         if legacymode is None:
@@ -2578,6 +2590,10 @@ class LegacyNetworkXVersionOnePointOneFactory(NetworkXFactory):
         A node attribute named 'name' is set for each node with its
         value set to the value of the 'name' attribute from the input
         network.
+
+        If 'r' exists on node, the value is added as a node attribute
+        named 'represents' (unless `legacymode` is set to `True` in
+        constructor)
 
         All other node attributes are added using the same attribute
         name as found in the input network. The value is directly set
@@ -2735,6 +2751,9 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
         A node attribute named 'name' is set for each node with its
         value set to the value of the 'name' attribute from the input
         network.
+
+        If 'r' exists on node, the value is added as a node attribute
+        named 'represents'
 
         All other node attributes are added using the same attribute
         name as found in the input network. The value is directly set

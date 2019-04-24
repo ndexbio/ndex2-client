@@ -10,6 +10,7 @@ Welcome to NDEx2 Python Client documentation!
    usage
    modules
    contributing
+   license
    history
 
 Indices and tables

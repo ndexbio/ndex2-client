@@ -5,7 +5,7 @@ dist/
 _build
 _static
 buildclear
-docs
+docs/_build
 *egg*
 publish*
 vpy*

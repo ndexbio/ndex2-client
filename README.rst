@@ -21,6 +21,7 @@ The NDEx2 Python Client provides methods to access NDEx_ via
 the `NDEx REST Server API`_. As well as methods for common operations on
 networks via the NiceCXNetwork class.
 
+
 **Jupyter Notebook Tutorials**
 ------------------------------
 
@@ -60,6 +61,13 @@ can use this command instead:
 ::
 
     pip install --upgrade ndex2
+
+
+**License**
+--------------------------------------
+
+See `LICENSE.txt <https://github.com/ndexbio/blob/master/ndex2-client/LICENSE.txt`_
+
 
 **NDEx2 Client Objects**
 ------------------------

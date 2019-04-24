@@ -70,7 +70,7 @@ can use this command instead:
 **License**
 --------------------------------------
 
-See `LICENSE.txt <https://github.com/ndexbio/blob/master/ndex2-client/LICENSE.txt`_
+See `LICENSE.txt <https://github.com/ndexbio/ndex2-client/blob/master/LICENSE.txt>`_
 
 
 **NDEx2 Client Objects**

@@ -11,7 +11,11 @@
         :target: https://pypi.python.org/pypi/ndex2
 
 .. image:: https://coveralls.io/repos/github/ndexbio/ndex2-client/badge.svg?branch=master
-  :target: https://coveralls.io/github/ndexbio/ndex2-client?branch=master
+        :target: https://coveralls.io/github/ndexbio/ndex2-client?branch=master
+
+.. image:: https://readthedocs.org/projects/ndex2/badge/?version=latest
+        :target: https://ndex2.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
 
 
 **Overview**

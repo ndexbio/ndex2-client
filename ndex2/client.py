@@ -323,15 +323,17 @@ class Ndex2(object):
        
 	 .. code-block:: python
 		
+		from ndex2.nice_cx_network import NiceCXNetwork
 		import ndex2.client
 		my_account="your account"
 		my_password="your password"
 		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
-		#this method  creates a new network from cx, a python dict in CX format
-
-		# Query the network from my NDEx account, get small subset in cx format
-		query_result_cx=my_ndex.get_neighborhood('INSERT NETWORK UUID HERE','INSERT NODE NAME HERE')
+		#Directly creates a single node network to upload
+		my_net = NiceCXNetwork()
+		my_net.create_node('testnode1')
+		my_net.set_name('testnetwork')
+		uri_subset = my_ndex.save_new_network(my_net.to_cx())
 
 		#this method return the URI of the subset
 		uri_subset = my_ndex.save_new_network(query_result_cx)
@@ -386,14 +388,18 @@ class Ndex2(object):
 	
 	.. code-block:: python
 	
+		from ndex2.nice_cx_network import NiceCXNetwork
 		import ndex2.client
 		my_account="your account"
 		my_password="your password"
 		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
-		node_name = 'INSERT NODE NAME HERE'
-		network_uuid = 'INSERT NETWORK UUID HERE'
-		query_result_cx_stream = my_ndex.get_neighborhood_as_cx_stream(network_uuid, node_name)
+		#Directly creates a single node network to upload
+		my_net = NiceCXNetwork()
+		my_net.create_node('testnode1')
+		my_net.set_name('testnetwork')
+		uri_subset = my_ndex.save_new_network(my_net.to_cx())
+		
 		#visibility is either PUBLIC or PRIVATE
 		my_ndex.save_cx_stream_as_new_network(query_result_cx_stream, visibility=PUBLIC)
 
@@ -600,14 +606,17 @@ m		y_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_passwor
 
         .. code-block:: python
 
+		
+		from ndex2.nice_cx_network import NiceCXNetwork
 		import ndex2.client
 		my_account="your account"
 		my_password="your password"
 		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
-
-		# Query the network from my NDEx account, get small subset
-		query_result_cx=my_ndex.get_neighborhood('INSERT NETWORK UUID HERE','INSERT NODE NAME HERE')
+		my_net = NiceCXNetwork()
+		my_net.create_node('testnode1')
+		my_net.set_name('testnetwork')
+		uri_subset = my_ndex.save_new_network(my_net.to_cx())
 
 		#find out the number of nodes and edges in the subset
 		for aspect in query_result_cx:
@@ -964,15 +973,12 @@ m		y_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_passwor
         Deletes the specified network from the server
 
         .. code-block:: python
-            	
+  
+  		from ndex2.nice_cx_network import NiceCXNetwork
 		import ndex2.client
 		my_account="your account"
 		my_password="your password"
 		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
-
-
-		# Query the network from my NDEx account, get a small subset
-		query_result_cx=my_ndex.get_neighborhood('INSERT NETWORK UUID HERE','ENTER NODE NAME HERE')
 
 		#find the subset uuid
 		uri_subset = my_ndex.save_new_network(query_result_cx)

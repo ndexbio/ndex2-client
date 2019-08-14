@@ -323,12 +323,10 @@ class Ndex2(object):
        
 	 .. code-block:: python
 		
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		#this method  creates a new network from cx, a python dict in CX format
 
@@ -388,12 +386,10 @@ class Ndex2(object):
 	
 	.. code-block:: python
 	
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		node_name = 'INSERT NODE NAME HERE'
 		network_uuid = 'INSERT NETWORK UUID HERE'
@@ -440,11 +436,10 @@ class Ndex2(object):
 	
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+m		y_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		cx_stream = 'INSERT CX STREAM HERE'
 		network_id = 'INSERT NETWORK UUID HERE'
@@ -477,13 +472,13 @@ class Ndex2(object):
 
 	.. code-block:: python
 
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+
 		import json
+		import ndex2.client
+
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		#this method returns the network specified by network_id as a CX byte stream
 		response = my_ndex.get_network_as_cx_stream('INSERT NETWORK UUID HERE')
@@ -553,13 +548,14 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+
 		import json
+		import ndex2.client
+
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		network_uuid = 'INSERT NETWORK UUID HERE'
 		server = 'public.ndexbio.org'
@@ -604,12 +600,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		# Query the network from my NDEx account, get small subset
 		query_result_cx=my_ndex.get_neighborhood('INSERT NETWORK UUID HERE','INSERT NODE NAME HERE')
@@ -726,11 +721,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		#search network by key word 'tutorial', return a list of networks with network summary
 		list_networks=my_ndex.search_networks('INSERT KEY WORD HERE')
@@ -798,12 +793,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		new_summary=my_ndex.get_network_summary('INSERT NETWORK UUID HERE')
 		 
@@ -857,11 +851,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 
 		network_id = "INSERT NETWORK UUID HERE"
@@ -912,12 +906,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		network_id = "INSERT NETWORK UUID HERE"
 		my_ndex.make_network_private(network_id)
@@ -945,11 +938,11 @@ class Ndex2(object):
 
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		task_id = 'INSERT TASK ID HERE'
 		task = my_ndex.get_task_by_id(task_id)
@@ -972,12 +965,11 @@ class Ndex2(object):
 
         .. code-block:: python
             	
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		# Query the network from my NDEx account, get a small subset
 		query_result_cx=my_ndex.get_neighborhood('INSERT NETWORK UUID HERE','ENTER NODE NAME HERE')
@@ -1030,11 +1022,11 @@ class Ndex2(object):
 
         .. code-block:: python
          
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
             my_ndex.get_provenance('INSERT NETWORK UUID HERE') 
 
@@ -1085,11 +1077,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		network_id = 'INSERT NETWORK UUID'
 
@@ -1118,11 +1110,11 @@ class Ndex2(object):
 	
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		network_id = 'INSERT NETWORK UUID HERE'
 
@@ -1170,12 +1162,11 @@ class Ndex2(object):
 	
 	.. code-block:: python
 
-		from ndex2.nice_cx_network import NiceCXNetwork
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		network_id = 'INSERT NETWORK UUID HERE'
 
@@ -1219,11 +1210,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		#note: cannot use this method to update visibility，
 		#Please use make_network_public/private function to set network visibility.
@@ -1272,11 +1263,11 @@ class Ndex2(object):
 
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		groupid = 'INSERT USER ID HERE'
 		networkid = 'INSERT NETWORK UUID HERE'
@@ -1301,11 +1292,11 @@ class Ndex2(object):
 	
 	.. code-block:: python
 	
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		userid = 'INSERT USER ID HERE'
 		networkid = 'INSERT NETWORK UUID HERE'
@@ -1330,11 +1321,11 @@ class Ndex2(object):
 	
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		#find the group id by the username
 		user = "INSERT YOUR USERNAME HERE"
@@ -1367,11 +1358,11 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		print("Please enter your user name:")
 		name = input()
@@ -1419,11 +1410,11 @@ class Ndex2(object):
 
 	.. code-block:: python
 	
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+
 
 		username = "ENTER YOUR USER"
 		#offset is how far you start looking for user network summaries
@@ -1466,11 +1457,10 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		#For all networks in the current account, display a list of newtwork summaries 
 		#network_list = my_ndex.get_network_summaries_for_user("ENTER YOUR USERNAME HERE")
@@ -1508,11 +1498,10 @@ class Ndex2(object):
 
 	.. code-block:: python
 		
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		username = "INSERT USERNAME HERE"
 		network_id = 'INSERT NETWORK UUID HERE'
@@ -1536,11 +1525,10 @@ class Ndex2(object):
 
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		userid = 'INSERT USERNAME HERE'
 		networkids = 'INSERT NETWORK UUID HERE'
@@ -1565,11 +1553,10 @@ class Ndex2(object):
 
         .. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
             try:
                 my_ndex=nc.Ndex2("http://public.ndexbio.org", my_account, my_password)
@@ -1595,11 +1582,10 @@ class Ndex2(object):
 
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		#create an empty network set in my account set_name is unique. The following code can only run once. 
 		#You have to change the set name if want to retry the code
@@ -1630,11 +1616,10 @@ class Ndex2(object):
 	
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		set_id = 'INSERT SET UUID HERE'
 
@@ -1661,11 +1646,10 @@ class Ndex2(object):
 	
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		set_id = 'INSERT SET UUID HERE'
 
@@ -1693,11 +1677,10 @@ class Ndex2(object):
 	
 	.. code-block:: python
 
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		set_id = 'INSERT SET UUID HERE'
 
@@ -1754,11 +1737,10 @@ class Ndex2(object):
 
 	.. code-block:: python
 	
-		import ndex2.client as nc
-		import ndex2
-		import networkx as nx
-		import pandas as pd
-		import os
+		import ndex2.client
+		my_account="your account"
+		my_password="your password"
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		network_id = 'INSERT NETWORK UUID HERE'
 		sample_network = my_ndex.get_sample_network(network_id)

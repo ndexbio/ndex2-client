@@ -478,8 +478,6 @@ m		y_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_passwor
 
 	.. code-block:: python
 
-
-		import json
 		import ndex2.client
 
 		my_account="your account"
@@ -554,8 +552,6 @@ m		y_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_passwor
 
         .. code-block:: python
 
-
-		import json
 		import ndex2.client
 
 		my_account="your account"

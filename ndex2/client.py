@@ -445,7 +445,7 @@ class Ndex2(object):
 		import ndex2.client
 		my_account="your account"
 		my_password="your password"
-m		y_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
+		my_ndex=ndex2.client.Ndex2("http://public.ndexbio.org", my_account, my_password)
 
 		cx_stream = 'INSERT CX STREAM HERE'
 		network_id = 'INSERT NETWORK UUID HERE'

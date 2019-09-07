@@ -356,7 +356,7 @@ class TestNiceCXNetwork(unittest.TestCase):
             resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict("2.4.0"))
-            m.post(client.DEFAULT_SERVER + '/v2/network/asCX',
+            m.post(client.DEFAULT_SERVER + '/v2/network',
                    request_headers={'Connection': 'close'},
                    status_code=1,
                    text=resurl)
@@ -386,7 +386,7 @@ class TestNiceCXNetwork(unittest.TestCase):
             resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict("2.4.0"))
-            m.put(client.DEFAULT_SERVER + '/v2/network/asCX/abcd',
+            m.put(client.DEFAULT_SERVER + '/v2/network/abcd',
                    request_headers={'Connection': 'close'},
                    status_code=1,
                    text=resurl)

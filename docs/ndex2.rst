@@ -168,4 +168,8 @@ Exceptions
 
 .. autoclass:: ndex2.exceptions.NDExUnauthorizedError
 
+.. autoclass:: ndex2.exceptions.NDExInvalidParameterError
+
 .. autoclass:: ndex2.exceptions.NDExInvalidCXError
+
+.. autoclass:: ndex2.exceptions.NDExUnsupportedCallError

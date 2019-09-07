@@ -20,6 +20,7 @@ from ndex2.exceptions import NDExInvalidCXError
 from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExInvalidParameterError
 from ndex2.exceptions import NDExUnsupportedCallError
+from ndex2.exceptions import NDExError
 
 
 class TestClient(unittest.TestCase):
@@ -850,7 +851,6 @@ class TestClient(unittest.TestCase):
                 self.assertEqual('Only 2+ of NDEx supports '
                                  'setting/changing index level', str(ne))
 
-
     def test_set_read_only_noauth(self):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
@@ -988,3 +988,72 @@ class TestClient(unittest.TestCase):
                                                      'query')
             self.assertEqual(res.json(), {'hi': 'bye'})
             self.assertEqual(res.status_code, 200)
+
+    def test_get_neighborhood(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/query',
+                   status_code=200,
+                   json={'data': [{'hi': 'bye'}]},
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_neighborhood('someid', 'query')
+            self.assertEqual(res, [{'hi': 'bye'}])
+
+    def test_get_neighborhood_list_return(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/query',
+                   status_code=200,
+                   json=[{'hi': 'bye'}],
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_neighborhood('someid', 'query')
+            self.assertEqual(res, [{'hi': 'bye'}])
+
+    def test_get_neighborhood_str_return(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/query',
+                   status_code=200,
+                   json='blah',
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_neighborhood('someid', 'query')
+            self.assertEqual(res, 'blah')
+
+    def test_get_neighborhood_ndexv1(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            try:
+                ndex.get_neighborhood('someid', 'query')
+                self.fail('Expected Exception')
+            except Exception as e:
+                self.assertEqual('get_neighborhood is not supported for '
+                                 'versions prior to 2.0, use '
+                                 'get_neighborhood_as_cx_stream', str(e))
+
+    def test_upload_file(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            try:
+                ndex.upload_file('foo')
+                self.fail('Expected NDExError')
+            except NDExError:
+                pass
+

@@ -1057,3 +1057,128 @@ class TestClient(unittest.TestCase):
             except NDExError:
                 pass
 
+    def test_get_interconnectquery_as_cx_stream(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/interconnectquery',
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_interconnectquery_as_cx_stream('someid',
+                                                          'query')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_interconnectquery(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/interconnectquery',
+                   status_code=200,
+                   json={'data': [{'hi': 'bye'}]},
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_interconnectquery('someid', 'query')
+            self.assertEqual(res, [{'hi': 'bye'}])
+
+    def test_get_interconnectquery_as_list(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/interconnectquery',
+                   status_code=200,
+                   json=[{'hi': 'bye'}],
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_interconnectquery('someid', 'query')
+            self.assertEqual(res, [{'hi': 'bye'}])
+
+    def test_get_interconnectquery_as_str(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER +
+                   '/v2/search/network/someid/interconnectquery',
+                   status_code=200,
+                   json='foo',
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_interconnectquery('someid', 'query')
+            self.assertEqual(res, 'foo')
+
+    def test_search_networks(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network?start=0&size=100',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.search_networks(search_string='hi',
+                                       account_name='bob',
+                                       include_groups=True)
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_search_networks_ndexv1(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+            m.post(client.DEFAULT_SERVER + '/rest/network/search/0/100',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.search_networks(search_string='hi',
+                                       account_name='bob',
+                                       include_groups=True)
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_search_networks_by_property_filter(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            try:
+                ndex.search_networks_by_property_filter()
+                self.fail('Expected Exception')
+            except Exception:
+                pass
+
+    def test_get_network_summary(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(client.DEFAULT_SERVER + '/v2/network/someid/summary',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_summary('someid')
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_get_network_summary_ndexv1(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+            m.get(client.DEFAULT_SERVER + '/rest/network/someid',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_summary('someid')
+            self.assertEqual(res, {'hi': 'bye'})

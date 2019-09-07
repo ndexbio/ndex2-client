@@ -19,6 +19,7 @@ from ndex2 import __version__
 from ndex2.exceptions import NDExInvalidCXError
 from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExInvalidParameterError
+from ndex2.exceptions import NDExUnsupportedCallError
 
 
 class TestClient(unittest.TestCase):
@@ -698,6 +699,26 @@ class TestClient(unittest.TestCase):
                 self.assertEqual('network_properties '
                                  'must be a string or a dict', str(ne))
 
+    def test_set_network_system_properties_ndexv1(self):
+        theuuid = '236ecfce-be48-4652-b488-b08f0cc9c795'
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+
+            valid_dict = {'showcase': True,
+                          'visibility': 'PUBLIC',
+                          'index_level': 'ALL',
+                          'readOnly': True}
+            try:
+                ndex.set_network_system_properties(theuuid,
+                                                   valid_dict)
+                self.fail('Expected NDExUnsupportedCallError')
+            except NDExUnsupportedCallError as ne:
+                self.assertEqual('This call only works with NDEx 2+',
+                                 str(ne))
+
     def test_set_network_system_properties_success(self):
         theuuid = '236ecfce-be48-4652-b488-b08f0cc9c795'
         with requests_mock.mock() as m:
@@ -815,6 +836,21 @@ class TestClient(unittest.TestCase):
                               'index_level': 'ALL',
                               'showcase': True}, checkdict)
 
+    def test_make_network_public_indexed_ndexv1(self):
+        theuuid = '236ecfce-be48-4652-b488-b08f0cc9c795'
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            try:
+                ndex._make_network_public_indexed(theuuid)
+                self.fail('Expected NDExUnsupportedCallError')
+            except NDExUnsupportedCallError as ne:
+                self.assertEqual('Only 2+ of NDEx supports '
+                                 'setting/changing index level', str(ne))
+
+
     def test_set_read_only_noauth(self):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
@@ -865,3 +901,90 @@ class TestClient(unittest.TestCase):
             checkdict = json.loads(m.last_request.text)
             self.assertEqual({'readOnly': False}, checkdict)
 
+    def test_get_network_as_cx_stream_success(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(client.DEFAULT_SERVER + '/v2/network/someid',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_as_cx_stream('someid')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_network_as_cx_stream_success_ndexv1(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+            m.get(client.DEFAULT_SERVER + '/rest/network/someid/asCX',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_as_cx_stream('someid')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_network_aspect_as_cx_stream_success(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(client.DEFAULT_SERVER + '/v2/network/someid/aspect/sa',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_aspect_as_cx_stream('someid', 'sa')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_network_aspect_as_cx_stream_success_ndexv1(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+            m.get(client.DEFAULT_SERVER + '/rest/network/someid/asCX',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_aspect_as_cx_stream('someid', 'sa')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_neighborhood_as_cx_stream(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/query',
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_neighborhood_as_cx_stream('someid',
+                                                     'query')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_neighborhood_as_cx_stream_ndexv1(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version=None))
+            m.post(client.DEFAULT_SERVER + '/rest/network/someid/query',
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   request_headers={'Connection': 'close'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.get_neighborhood_as_cx_stream('someid',
+                                                     'query')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)

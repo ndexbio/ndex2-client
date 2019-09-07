@@ -492,12 +492,12 @@ class Ndex2(object):
         :return: The CX json object.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
         """
-        response = self.get_neighborhood_as_cx_stream(network_id, search_string, search_depth=search_depth,
-                                                      edge_limit=edge_limit)
-
         if self.version.startswith('1.'):
             raise Exception("get_neighborhood is not supported for versions prior to 2.0, "
                             "use get_neighborhood_as_cx_stream")
+
+        response = self.get_neighborhood_as_cx_stream(network_id, search_string, search_depth=search_depth,
+                                                      edge_limit=edge_limit)
 
         response_json = response.json()
         if isinstance(response_json, dict):

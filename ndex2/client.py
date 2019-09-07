@@ -9,10 +9,13 @@ import sys
 import decimal
 import numpy
 
-from .version import __version__
-from .exceptions import NDExInvalidCXError
-from .exceptions import NDExUnauthorizedError
-from .exceptions import NDExError
+from ndex2.version import __version__
+from ndex2.exceptions import NDExInvalidCXError
+from ndex2.exceptions import NDExUnauthorizedError
+from ndex2.exceptions import NDExError
+from ndex2.exceptions import NDExUnsupportedCallError
+from ndex2.exceptions import NDExInvalidParameterError
+
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -35,6 +38,8 @@ class Ndex2(object):
 
     """
     USER_AGENT_KEY = 'User-Agent'
+    VALID_NETWORK_SYSTEM_PROPERTIES = ['showcase', 'visibility',
+                                       'index_level', 'readOnly']
 
     def __init__(self, host=None, username=None, password=None,
                  update_status=False, debug=False, user_agent='',
@@ -363,24 +368,15 @@ class Ndex2(object):
         :return: Response data
         :rtype: string or dict
         """
-
-        indexed_fields = None
-        #TODO add functionality for indexed_fields when it's supported by the server
-
         self._require_auth()
         query_string = None
-        if indexed_fields:
-            if visibility:
-                query_string = 'indexedfields=' + ','.join(indexed_fields)
-            else:
-                query_string = 'visibility=' + str(visibility) + '&indexedfields=' + ','.join(indexed_fields)
-        elif visibility:
+        if visibility:
                 query_string = 'visibility=' + str(visibility)
 
-        if self.version == "2.0":
-            route = '/network'
-        else:
+        if self.version.startswith('1.'):
             route = '/network/asCX'
+        else:
+            route = '/network'
 
         fields = {
             'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
@@ -405,10 +401,10 @@ class Ndex2(object):
             'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
         }
 
-        if self.version == "2.0":
-            route = "/network/%s" % network_id
-        else:
+        if self.version.startswith('1.'):
             route = '/network/asCX/%s' % network_id
+        else:
+            route = "/network/%s" % network_id
 
         return self.put_multipart(route, fields)
 
@@ -423,10 +419,10 @@ class Ndex2(object):
 
         """
 
-        if self.version == "2.0":
-            route = "/network/%s" % network_id
-        else:
+        if self.version.startswith('1.'):
             route = "/network/%s/asCX" % network_id
+        else:
+            route = "/network/%s" % network_id
 
         return self.get_stream(route)
 
@@ -442,10 +438,10 @@ class Ndex2(object):
 
         """
 
-        if self.version == "2.0":
-            route = "/network/%s/aspect/%s" % (network_id, aspect_name)
-        else:
+        if self.version.startswith('1.'):
             route = "/network/%s/asCX" % network_id
+        else:
+            route = "/network/%s/aspect/%s" % (network_id, aspect_name)
 
         return self.get_stream(route)
 
@@ -468,10 +464,10 @@ class Ndex2(object):
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
         """
-        if self.version == "2.0":
-            route = "/search/network/%s/query" % network_id
-        else:
+        if self.version.startswith('1.'):
             route = "/network/%s/query" % network_id
+        else:
+            route = "/search/network/%s/query" % network_id
 
         post_data = {'searchString': search_string,
                      'searchDepth': search_depth,
@@ -499,20 +495,16 @@ class Ndex2(object):
         response = self.get_neighborhood_as_cx_stream(network_id, search_string, search_depth=search_depth,
                                                       edge_limit=edge_limit)
 
-        if self.version == "2.0":
-            # response_in_json = response.json()
-            # data =  response_in_json["data"]
-            # return data
-            response_json = response.json()
-            if isinstance(response_json, dict):
-                return response_json.get('data')
-            elif isinstance(response_json, list):
-                return response_json
-            else:
-                return response_json
-        else:
+        if self.version.startswith('1.'):
             raise Exception("get_neighborhood is not supported for versions prior to 2.0, "
                             "use get_neighborhood_as_cx_stream")
+
+        response_json = response.json()
+        if isinstance(response_json, dict):
+            return response_json.get('data')
+        elif isinstance(response_json, list):
+            return response_json
+        return response_json
 
     def get_interconnectquery_as_cx_stream(self, network_id, search_string,
                                            search_depth=1, edge_limit=2500,
@@ -599,12 +591,12 @@ class Ndex2(object):
 
         """
         post_data = {"searchString": search_string}
-        if self.version == "2.0":
+        if self.version.startswith('1.'):
+            route = "/network/search/%s/%s" % (start, size)
+        else:
             route = "/search/network?start=%s&size=%s" % (start, size)
             if include_groups:
                 post_data["includeGroups"] = True
-        else:
-            route = "/network/search/%s/%s" % (start, size)
 
         if account_name:
             post_data["accountName"] = account_name
@@ -613,10 +605,10 @@ class Ndex2(object):
 
     def search_network_nodes(self, network_id, search_string='', limit=5):
         post_data = {"searchString": search_string}
-        if self.version == "2.0":
-            route = "/search/network/%s/nodes?limit=%s" % (network_id, limit)
-        else:
+        if self.version.startswith('1.'):
             route = "/network/%s/nodes/%s" % (network_id, limit)
+        else:
+            route = "/search/network/%s/nodes?limit=%s" % (network_id, limit)
 
         post_json = json.dumps(post_data)
         return self.post(route, post_json)
@@ -644,66 +636,68 @@ class Ndex2(object):
         :rtype: dict
 
         """
-        if self.version == "2.0":
-            route = "/network/%s/summary" % network_id
-        else:
+        if self.version.startswith('1.'):
             route = "/network/%s" % network_id
+        else:
+            route = "/network/%s/summary" % network_id
 
         return self.get(route)
 
     def make_network_public(self, network_id):
         """
-        Makes the network specified by the network_id public.
+        Makes the network specified by the **network_id** public.
 
         :param network_id: The UUID of the network.
         :type network_id: str
-        :return: The response.
-        :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
-
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
+        :raises requests.exception.HTTPError: If there is some other error
+        :return: empty string upon success
+        :rtype: str
         """
-        if self.version == "2.0":
-            return self.set_network_system_properties(network_id, {'visibility': 'PUBLIC'})
-
-        else:
+        if self.version.startswith('1.'):
             return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
+
+        return self.set_network_system_properties(network_id, {'visibility': 'PUBLIC'})
 
     def _make_network_public_indexed(self, network_id):
         """
-        Makes the network specified by the network_id public.
+        Makes the network specified by the **network_id** public.
 
         :param network_id: The UUID of the network.
         :type network_id: str
-        :return: The response.
-        :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
-
+        :raises NDExUnsupportedCallError: If version of NDEx server is < 2
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
+        :raises requests.exception.HTTPError: If there is some other error
+        :return: empty string upon success
+        :rtype: str
         """
-        if self.version == "2.0":
-            for i in range(0, 4):
-                try:
-                    return_message = self.set_network_system_properties(network_id, {'visibility': 'PUBLIC', 'index_level': 'ALL', 'showcase': True})
-                except Exception as exc:
-                    time.sleep(1)
+        if self.version.startswith('1.'):
+            raise NDExUnsupportedCallError('Only 2+ of NDEx supports '
+                                           'setting/changing index level')
 
-            return return_message
-
-        else:
-            return self.update_network_profile(network_id, {'visibility': 'PUBLIC'})
+        return self.set_network_system_properties(network_id,
+                                                  {'visibility': 'PUBLIC',
+                                                   'index_level': 'ALL',
+                                                   'showcase': True})
 
     def make_network_private(self, network_id):
         """
-        Makes the network specified by the network_id private.
+        Makes the network specified by the **network_id** private.
 
         :param network_id: The UUID of the network.
         :type network_id: str
-        :return: The response.
-        :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
+        :raises requests.exception.HTTPError: If there is some other error
+        :return: empty string upon success
+        :rtype: str
 
         """
-        if self.version == "2.0":
-            return self.set_network_system_properties(network_id, {'visibility': 'PRIVATE'})
+        if self.version.startswith('1.'):
+            return self.update_network_profile(network_id,
+                                               {'visibility': 'PRIVATE'})
 
-        else:
-            return self.update_network_profile(network_id, {'visibility': 'PRIVATE'})
+        return self.set_network_system_properties(network_id,
+                                                  {'visibility': 'PRIVATE'})
 
     def get_task_by_id(self, task_id):
         """
@@ -793,18 +787,22 @@ class Ndex2(object):
 
     def set_read_only(self, network_id, value):
         """
-        Sets the read only flag on the specified network
+        Sets the read only flag to **value** on the network specified by
+        **network_id**
 
         :param network_id: Network id
-        :type network_id: string
-        :param value: Read only value
+        :type network_id: str
+        :param value: Must :py:const:`True` for read only, :py:const:`False` otherwise
         :type value: bool
         :raises NDExUnauthorizedError: If credentials are invalid or not set
-        :return: Result
-        :rtype: dict
+        :raises NDExInvalidParameterError: If non bool is set in
+                                           **valid** parameter
+        :raises requests.exception.HTTPError: If there is some other error
+        :return: empty string upon success
+        :rtype: str
         """
-        self._require_auth()
-        return self.set_network_system_properties(network_id, {"readOnly": value})
+        return self.set_network_system_properties(network_id,
+                                                  {"readOnly": value})
 
     def set_network_properties(self, network_id, network_properties):
         """
@@ -825,7 +823,8 @@ class Ndex2(object):
         elif isinstance(network_properties, str):
             put_json = network_properties
         else:
-            raise Exception("network_properties must be a string or a list of NdexPropertyValuePair objects")
+            raise Exception("network_properties must be a string or a list "
+                            "of NdexPropertyValuePair objects")
         return self.put(route, put_json)
 
     def get_sample_network(self, network_id):
@@ -854,26 +853,139 @@ class Ndex2(object):
     #    putJson = json.dumps(sample_cx_network_str)
         return self.put(route, sample_cx_network_str)
 
-    def set_network_system_properties(self, network_id, network_properties):
+    def _validate_network_system_properties(self, network_properties,
+                                            skipvalidation=False):
         """
-        Set network system properties
+        Verifies 'network_properties' passed in is a valid dict that
+        can be set as network system properties. The dict should
+        be of format:
+
+        {'showcase': (boolean True or False),
+         'visibility': (str set to 'PUBLIC' or 'PRIVATE'),
+         'index_level': (str set to 'NONE', 'META', 'ALL'),
+         'readOnly': (boolean True or False)}
+
+        :param network_properties:
+        :type network_properties: dict
+        :raises NDExInvalidParameterError: If 'network_properties' is invalid
+        :return: JSON string of 'network_properties'
+        :rtype: str
+        """
+
+        if isinstance(network_properties, dict):
+            net_props = network_properties
+        elif isinstance(network_properties, str):
+            try:
+                net_props = json.loads(network_properties)
+            except Exception as e:
+                raise NDExInvalidParameterError('Error parsing json string: ' +
+                                                str(network_properties) +
+                                                ' : ' + str(e))
+        else:
+            raise NDExInvalidParameterError("network_properties must be "
+                                            "a string or a dict")
+
+        if skipvalidation is not None and skipvalidation is True:
+            return json.dumps(net_props)
+
+        if len(net_props.keys()) == 0:
+            raise NDExInvalidParameterError('network_properties '
+                                            'appears to be empty')
+
+        for key in net_props.keys():
+            if key not in Ndex2.VALID_NETWORK_SYSTEM_PROPERTIES:
+                raise NDExInvalidParameterError(key + ' is not a valid network '
+                                                      'system property')
+            if key == 'readOnly' or key == 'showcase':
+                if not isinstance(net_props[key], bool):
+                    raise NDExInvalidParameterError(key + ' value must be a '
+                                                          'bool set to True '
+                                                          'or False')
+            elif key == 'index_level':
+                if not isinstance(net_props[key], str) \
+                        or net_props[key] not in ['NONE', 'META', 'ALL']:
+                    raise NDExInvalidParameterError(key + ' value must be a '
+                                                          'string set to '
+                                                          'NONE, META, or ALL')
+            elif key == 'visibility':
+                if not isinstance(net_props[key], str) \
+                        or net_props[key] not in ['PUBLIC', 'PRIVATE']:
+                    raise NDExInvalidParameterError(key + ' value must be a '
+                                                          'string set to '
+                                                          'PUBLIC or PRIVATE')
+        return json.dumps(net_props)
+
+    def set_network_system_properties(self, network_id, network_properties,
+                                      skipvalidation=False):
+        """
+        Set network system properties on network with UUID specified by
+        **network_id**
+
+        The network properties should be a :py:func:`dict` or a json string of a :py:func:`dict`
+        in this format:
+
+        .. code-block:: json-object
+
+            {'showcase': (boolean True or False),
+             'visibility': (str 'PUBLIC' or 'PRIVATE'),
+             'index_level': (str  'NONE', 'META', or 'ALL'),
+             'readOnly': (boolean True or False)}
+
+        .. note::
+
+            Omit any values from :py:func:`dict` that you do NOT want changed
+
+        Definition of **showcase** values:
+
+            :py:const:`True` - means network will display in her home page for other users and :py:const:`False` hides the network for other users. where other users includes anonymous users
+
+        Definition of **visibility** values:
+
+            'PUBLIC' - means it can be found or read by anyone, including anonymous users
+
+            'PRIVATE' - is the default, means that it can only be found or read by users according to their permissions
+
+        Definition of **index_level** values:
+
+            'NONE' - no index
+
+            'META' - only index network attributes
+
+            'ALL' - full index on the network
+
+        Definition of **readOnly** values:
+
+            :py:const:`True` - means network is only readonly, False is NOT readonly
+
+        This method will validate **network_properties** matches above :py:func:`dict`
+        unless **skipvalidation** is set to :py:const:`True` in which case the code
+        only verifies the **network_properties** is valid JSON
 
         :param network_id: Network id
-        :type network_id: string
-        :param network_properties: Network properties
-        :type network_properties: dict of NDEx network property value pairs
+        :type network_id: str
+        :param network_properties: Network properties as :py:func:`dict` or a JSON string
+                                   of :py:func:`dict` adhering to structure above.
+        :type network_properties: dict or str
+        :param skipvalidation: If :py:const:`True`, only verify **network_properties**
+                               can be parsed/converted to valid JSON
+        :raises NDExUnsupportedCallError: If version of NDEx server is < 2
         :raises NDExUnauthorizedError: If credentials are invalid or not set
-        :return: Result
-        :rtype: dict
+        :raises NDExInvalidParameterError: If invalid data is set in
+                                           **network_properties** parameter
+        :raises requests.exception.HTTPError: If there is some other error
+        :return: empty string upon success
+        :rtype: str
         """
+        if self.version.startswith('1.'):
+            raise NDExUnsupportedCallError('This call only works with NDEx 2+')
+
         self._require_auth()
         route = "/network/%s/systemproperty" % network_id
-        if isinstance(network_properties, dict):
-            put_json = json.dumps(network_properties)
-        elif isinstance(network_properties, str):
-            put_json = network_properties
-        else:
-            raise Exception("network_properties must be a string or a dict")
+
+        # check that the properties are valid
+        put_json = self._validate_network_system_properties(network_properties,
+                                                            skipvalidation=
+                                                            skipvalidation)
         return self.put(route, put_json)
 
     def update_network_profile(self, network_id, network_profile):
@@ -903,17 +1015,16 @@ class Ndex2(object):
         else:
             raise Exception("network_profile must be a string or a dict")
 
-        if self.version == "2.0":
-            route = "/network/%s/profile" % network_id
-            return self.put(route, json_data)
-        else:
+        if self.version.startswith('1.'):
             route = "/network/%s/summary" % network_id
             return self.post(route, json_data)
+        else:
+            route = "/network/%s/profile" % network_id
+            return self.put(route, json_data)
 
     def upload_file(self, filename):
         raise NDExError("This function is not supported in this release. Please use the save_new_network "
                         "function to create new networks in NDEx server.")
-
 
     def update_network_group_permission(self, groupid, networkid, permission):
         """
@@ -1001,13 +1112,11 @@ class Ndex2(object):
         :return: list of uuids
         :rtype: list
         """
-
-        route = ""
         user = self.get_user_by_username(username)#.json
-        if self.version == "2.0":
-            route = "/user/%s/networksummary?offset=%s&limit=%s" % (user['externalId'], offset, limit)
-        else:
+        if self.version.startswith('1.'):
             route = "/user/%s/networksummary/asCX?offset=%s&limit=%s" % (user['externalId'], offset, limit)
+        else:
+            route = "/user/%s/networksummary?offset=%s&limit=%s" % (user['externalId'], offset, limit)
 
         network_summaries = self.get_stream(route)
 
@@ -1065,10 +1174,10 @@ class Ndex2(object):
 
     def update_status(self):
         """
-        Updates the admin status
+        Updates the admin status, storing the status in the client
+        object self.status
 
-        :return: None (however the status is stored in the client object self.status)
-        :rtype:
+        :return: None
         """
         route = "/admin/status"
         self.status = self.get(route)
@@ -1085,7 +1194,8 @@ class Ndex2(object):
         :rtype: string
         """
         route = '/networkset'
-        return self.post(route, json.dumps({"name": name, "description": description}))
+        return self.post(route, json.dumps({"name": name,
+                                            "description": description}))
 
     def get_network_set(self, set_id):
         """

@@ -11,7 +11,11 @@ from ndex2.exceptions import NDExError
 from ndex2.nice_cx_network import DefaultNetworkXFactory
 from ndex2.nice_cx_network import NiceCXNetwork
 
+SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
+              'skipping for integration tests'
 
+
+@unittest.skipIf(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
 class TestDefaultNetworkXFactory(unittest.TestCase):
 
     TEST_DIR = os.path.dirname(__file__)

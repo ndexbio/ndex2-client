@@ -166,6 +166,8 @@ Exceptions
 
 .. autoclass:: ndex2.exceptions.NDExError
 
+.. autoclass:: ndex2.exceptions.NDExNotFoundError
+
 .. autoclass:: ndex2.exceptions.NDExUnauthorizedError
 
 .. autoclass:: ndex2.exceptions.NDExInvalidParameterError

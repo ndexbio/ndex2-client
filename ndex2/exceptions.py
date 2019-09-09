@@ -5,6 +5,12 @@ class NDExError(Exception):
     """
     Base Exception for all NDEx2 Python Client Exceptions
     """
+
+
+class NDExNotFoundError(NDExError):
+    """
+    Raised if resource requested was not found
+    """
     pass
 
 

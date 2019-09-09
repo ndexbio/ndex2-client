@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `nbgwas_rest` package."""
+"""Tests for `ndex2.client` package."""
 
+import os
 import sys
 import io
 import decimal
@@ -17,12 +18,17 @@ from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
 from ndex2 import __version__
 from ndex2.exceptions import NDExInvalidCXError
+from ndex2.exceptions import NDExNotFoundError
 from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExInvalidParameterError
 from ndex2.exceptions import NDExUnsupportedCallError
 from ndex2.exceptions import NDExError
 
+SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
+              'skipping for integration tests'
 
+
+@unittest.skipIf(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
 class TestClient(unittest.TestCase):
 
     def get_rest_admin_status_dict(self, version='2.1'):
@@ -1182,3 +1188,120 @@ class TestClient(unittest.TestCase):
             ndex.set_debug_mode(True)
             res = ndex.get_network_summary('someid')
             self.assertEqual(res, {'hi': 'bye'})
+
+    def test_delete_networkset_none_passed_in(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            try:
+                ndex.delete_networkset(None)
+                self.fail('Expected exception')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('networkset id cannot be None',
+                                 str(ne))
+
+    def test_delete_networkset_non_string_passed_in(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            try:
+                ndex.delete_networkset(True)
+                self.fail('Expected exception')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('networkset id must be a string',
+                                 str(ne))
+
+    def test_delete_networkset_not_authorized(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+
+            ndex = Ndex2()
+            try:
+                ndex.delete_networkset('someid')
+                self.fail('Expected exception')
+            except NDExUnauthorizedError as ne:
+                self.assertEqual('This method requires user authentication',
+                                 str(ne))
+
+    def test_delete_networkset_success(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.delete(client.DEFAULT_SERVER + '/v2/networkset/someid',
+                     status_code=204,
+                     headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            self.assertEqual(None, ndex.delete_networkset('someid'))
+
+    def test_delete_networkset_server_says_not_authorized(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.delete(client.DEFAULT_SERVER + '/v2/networkset/someid',
+                     status_code=401,
+                     headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            try:
+                ndex.delete_networkset('someid')
+                self.fail('Expected exception')
+            except NDExUnauthorizedError as ne:
+                self.assertEqual('Not authorized', str(ne))
+
+    def test_delete_networkset_server_says_not_found(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.delete(client.DEFAULT_SERVER + '/v2/networkset/someid',
+                     status_code=404,
+                     headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            try:
+                ndex.delete_networkset('someid')
+                self.fail('Expected exception')
+            except NDExNotFoundError as ne:
+                self.assertEqual('Network set with id: someid not found',
+                                 str(ne))
+
+    def test_delete_networkset_server_500_error_no_json(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.delete(client.DEFAULT_SERVER + '/v2/networkset/someid',
+                     status_code=500,
+                     headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            try:
+                ndex.delete_networkset('someid')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertEqual('Unknown error server returned '
+                                 'status code: 500',
+                                 str(ne))
+
+    def test_delete_networkset_server_503_with_json(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.delete(client.DEFAULT_SERVER + '/v2/networkset/someid',
+                     status_code=503,
+                     json={"errorCode": "string",
+                           "message": "string",
+                           "description": "string",
+                           "stackTrace": "string",
+                           "threadId": "string",
+                           "timeStamp": "2019-09-09T16:36:25.699Z"},
+                     headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            try:
+                ndex.delete_networkset('someid')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertTrue('Unknown error server returned '
+                                'status code: 503 : ' in str(ne))

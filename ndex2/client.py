@@ -15,6 +15,7 @@ from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExError
 from ndex2.exceptions import NDExUnsupportedCallError
 from ndex2.exceptions import NDExInvalidParameterError
+from ndex2.exceptions import NDExNotFoundError
 
 try:
     from urllib.parse import urljoin
@@ -174,6 +175,7 @@ class Ndex2(object):
         return userAgent + self.user_agent
 
     def _return_response(self, response,
+                         raiseforstatus=True,
                          returnfullresponse=False,
                          returnjsonundertry=False):
         """
@@ -190,7 +192,10 @@ class Ndex2(object):
                  then response passed in is just returned.
         """
         self.debug_response(response)
-        response.raise_for_status()
+        if raiseforstatus:
+            response.raise_for_status()
+        if returnfullresponse is True:
+            return response
         if response.status_code == 204:
             return ""
 
@@ -200,9 +205,6 @@ class Ndex2(object):
             except ValueError:
                 result = response.text
             return result
-
-        if returnfullresponse is True:
-            return response
         if response.headers['content-type'] == 'application/json':
             return response.json()
         else:
@@ -239,19 +241,25 @@ class Ndex2(object):
                                timeout=self.timeout)
         return self._return_response(response)
 
-    def delete(self, route, data=None):
+    def delete(self, route, data=None,
+               raiseforstatus=True,
+               returnfullresponse=False,
+               returnjsonundertry=False):
         url = self.host + route
         self.logger.debug("DELETE route: " + url)
         headers = self.s.headers
         headers[Ndex2.USER_AGENT_KEY] = userAgent + self.user_agent
-
+        headers['Connection'] = 'close'
         if data is not None:
             response = self.s.delete(url, headers=headers, data=data,
                                      timeout=self.timeout)
         else:
             response = self.s.delete(url, headers=headers,
                                      timeout=self.timeout)
-        return self._return_response(response)
+        return self._return_response(response,
+                                     raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
     def get(self, route, get_params=None):
         url = self.host + route
@@ -1209,6 +1217,47 @@ class Ndex2(object):
         route = '/networkset/%s' % set_id
 
         return self.get(route)
+
+    def delete_networkset(self, networkset_id):
+        """
+        Deletes the network set, requires credentials
+
+        :param networkset_id: networkset UUID id
+        :type networkset_id: str
+        :raises NDExInvalidParameterError: for invalid networkset id parameter
+        :raises NDExUnauthorizedError: If no credentials or user is not authorized
+        :raises NDExNotFoundError: If no networkset with id passed in found
+        :raises NDExError: For any other error with contents of error in message
+        :return: None upon success
+        """
+        if networkset_id is None:
+            raise NDExInvalidParameterError('networkset id cannot be None')
+        if not isinstance(networkset_id, str):
+            raise NDExInvalidParameterError('networkset id must be a string')
+
+        self._require_auth()
+        route = '/networkset/%s' % networkset_id
+        res = self.delete(route, raiseforstatus=False,
+                          returnfullresponse=True)
+
+        if res.status_code == 204 or res.status_code == 200:
+            return None
+
+        if res.status_code == 401:
+            raise NDExUnauthorizedError('Not authorized')
+        if res.status_code == 404:
+            raise NDExNotFoundError('Network set with id: ' +
+                                    str(networkset_id) + ' not found')
+
+        msg = 'Unknown error server returned ' \
+              'status code: ' + str(res.status_code)
+        try:
+            jsondata = res.json()
+            msg += ' : ' + json.dumps(jsondata)
+        except Exception:
+             pass
+
+        raise NDExError(msg)
 
     def add_networks_to_networkset(self, set_id, networks):
         """

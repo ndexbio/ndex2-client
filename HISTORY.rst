@@ -2,6 +2,18 @@
 History
 =======
 
+3.3.0 (2019-09-10)
+------------------
+
+* Fixed bug where if server version is not 2.0 exactly then Ndex2() object incorrectly falls back to version of 1.3 of REST calls
+  `Issue #40 <https://github.com/ndexbio/ndex2-client/issues/40>`_
+
+* Fixed bug in NiceCXNetwork.add_network_attribute() method where type not properly reset when adding duplicate attribute
+  `Issue #50 <https://github.com/ndexbio/ndex2-client/issues/50>`_
+
+* Added delete_networksets() method to Ndex2 client to allow deletion of networksets `Issue #59 <https://github.com/ndexbio/ndex2-client/issues/59>`_
+
+
 3.2.0 (2019-04-23)
 ------------------
 

@@ -50,7 +50,7 @@ class TestClient(unittest.TestCase):
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PRIVATE')
         try:
-            self.assertTrue(os.getenv('NDEX2_TEST_SERVER') in res)
+            self.assertTrue('http' in res)
             netid = re.sub('^.*\/', '', res)
 
             netsum = client.get_network_summary(network_id=netid)
@@ -101,7 +101,7 @@ class TestClient(unittest.TestCase):
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
         try:
-            self.assertTrue(os.getenv('NDEX2_TEST_SERVER') in res)
+            self.assertTrue('http' in res)
             netid = re.sub('^.*\/', '', res)
 
             # verify network was uploaded
@@ -169,7 +169,7 @@ class TestClient(unittest.TestCase):
         # create networkset
         netsetname = 'testnetworkset: ' + str(datetime.now())
         res = client.create_networkset(netsetname, 'some description')
-        self.assertTrue(os.getenv('NDEX2_TEST_SERVER') in res)
+        self.assertTrue('http' in res)
         netset_id = re.sub('^.*\/', '', res)
 
         net = ndex2.create_nice_cx_from_file(TestClient.WNT_SIGNAL_FILE)

@@ -238,6 +238,26 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0][constants.NODE_ATTR_NAME], 'attrname')
         self.assertEqual(res[0][constants.NODE_ATTR_VALUE], 'value2')
 
+    def test_add_network_attribute_duplicate_add(self):
+        net = NiceCXNetwork()
+        net.add_network_attribute(name='foo',
+                                  values=['a', 'b'],
+                                  type='list_of_string')
+        res = net.get_network_attribute('foo')
+        self.assertEqual('list_of_string', res['d'])
+
+        # add duplicate with no type
+        net.add_network_attribute(name='foo',
+                                  values=['a', 'b'])
+        res = net.get_network_attribute('foo')
+        self.assertTrue('d' not in res)
+
+        net.add_network_attribute(name='foo',
+                                  values=4,
+                                  type='integer')
+        res = net.get_network_attribute('foo')
+        self.assertEqual('integer', res['d'])
+
     def test_get_network_attribute_names(self):
         net = NiceCXNetwork()
 

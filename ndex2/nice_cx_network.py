@@ -231,6 +231,9 @@ class NiceCXNetwork():
             if n_a.get('n') == name:
                 n_a['v'] = values
 
+                if 'd' in n_a:
+                    del n_a['d']
+
                 if type is not None:
                     n_a['d'] = type
 

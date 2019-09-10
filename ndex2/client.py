@@ -266,6 +266,7 @@ class Ndex2(object):
         self.logger.debug("GET route: " + url)
         headers = self.s.headers
         headers[Ndex2.USER_AGENT_KEY] = self._get_user_agent()
+        headers['Connection'] = 'close'
         response = self.s.get(url, params=get_params, headers=headers,
                               timeout=self.timeout)
         return self._return_response(response)
@@ -1084,12 +1085,29 @@ class Ndex2(object):
 
     def get_user_by_username(self, username):
         """
-        Gets the user id by user name
+        Gets user information as a dict in format:
+
+        .. code-block:: json-object
+
+            {'properties': {},
+             'isIndividual': True,
+             'userName': 'bsmith',
+             'isVerified': True,
+             'firstName': 'bob',
+             'lastName': 'smith',
+             'emailAddress': 'bob.smith@ndexbio.org',
+             'diskQuota': 10000000000,
+             'diskUsed': 3971183103,
+             'externalId': 'f2c3a7ef-b0d9-4c61-bf31-4c9fcabe4173',
+             'isDeleted': False,
+             'modificationTime': 1554410147104,
+             'creationTime': 1554410138498
+            }
 
         :param username: User name
         :type username: string
-        :return: User id
-        :rtype: string
+        :return: user information as dict
+        :rtype: dict
         """
         route = "/user?username=%s" % username
         return self.get(route)
@@ -1206,6 +1224,20 @@ class Ndex2(object):
                                             "description": description}))
 
     def get_network_set(self, set_id):
+        """
+        Gets the network set information including the list of networks
+
+        .. deprecated:: 3.2.0
+        Use :func:`get_networkset` instead.
+
+        :param set_id: network set id
+        :type set_id: basestring
+        :return: network set information
+        :rtype: dict
+        """
+        return self.get_networkset(set_id)
+
+    def get_networkset(self, set_id):
         """
         Gets the network set information including the list of networks
 

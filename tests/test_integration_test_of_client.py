@@ -207,3 +207,20 @@ class TestClient(unittest.TestCase):
                 self.fail('Expected Exception')
             except HTTPError:
                 pass
+
+    def test_get_user_by_username(self):
+        client = self.get_ndex2_client()
+        theuser = os.getenv('NDEX2_TEST_USER')
+        res = client.get_user_by_username(theuser)
+        """
+        {'properties': {}, 'isIndividual': True, 
+        'userName': 'cbass', 'isVerified': True, 
+        'firstName': 'cbass', 'lastName': 'test', 
+        'emailAddress': 'churas.camera+cbassprod@gmail.com', 
+        'diskQuota': 10000000000, 'diskUsed': 3971183103, 
+        'externalId': '34e8c717-5719-11e9-9f06-0ac135e8bacf', 
+        'isDeleted': False, 'modificationTime': 1554410147104, 
+        'creationTime': 1554410138498}
+        """
+        self.assertEqual(theuser, res['userName'])
+        self.assertTrue('externalId' in res)

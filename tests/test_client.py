@@ -175,12 +175,13 @@ class TestClient(unittest.TestCase):
                         "groupCount": 0,
                         "message": "Online",
                         "properties": {"ServerVersion": "1.1",
-                                        "ServerResultLimit": "10000"}})
+                                       "ServerResultLimit": "10000"}})
             try:
-                ndex = Ndex2()
+                Ndex2()
                 self.fail('Expected exception')
             except Exception as e:
-                self.assertEqual(str(e), 'This release only supports NDEx 2.x server.')
+                self.assertEqual(str(e),
+                                 'This release only supports NDEx 2.x server.')
 
     def test_ndex2_constructor_with_defaulthost_thatisversiontwo(self):
         with requests_mock.mock() as m:
@@ -232,7 +233,8 @@ class TestClient(unittest.TestCase):
             m.put(client.DEFAULT_SERVER + '/v2/hi',
                   status_code=200,
                   text='hehe',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/'
+                                                   'json;charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'})
@@ -248,7 +250,8 @@ class TestClient(unittest.TestCase):
             m.put(client.DEFAULT_SERVER + '/v2/hi',
                   status_code=401,
                   text='hehe',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/'
+                                                   'json;charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'})
@@ -268,7 +271,8 @@ class TestClient(unittest.TestCase):
             m.put(client.DEFAULT_SERVER + '/v2/hi',
                   status_code=500,
                   text='hehe',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/'
+                                                   'json;charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'})
@@ -299,9 +303,9 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
             m.post(client.DEFAULT_SERVER + '/v2/hi',
-                  status_code=200,
-                  json={'hi': 'bye'},
-                  headers={'Content-Type': 'application/json'})
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   headers={'Content-Type': 'application/json'})
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.post('/hi', post_json='{"x": "y"}')
@@ -312,9 +316,9 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
             m.delete(client.DEFAULT_SERVER + '/v2/hi',
-                  status_code=200,
-                  json={'hi': 'bye'},
-                  headers={'Content-Type': 'application/json'})
+                     status_code=200,
+                     json={'hi': 'bye'},
+                     headers={'Content-Type': 'application/json'})
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.delete('/hi', data='{"x": "y"}')
@@ -325,9 +329,9 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
             m.delete(client.DEFAULT_SERVER + '/v2/hi',
-                  status_code=200,
-                  json={'hi': 'bye'},
-                  headers={'Content-Type': 'application/json'})
+                     status_code=200,
+                     json={'hi': 'bye'},
+                     headers={'Content-Type': 'application/json'})
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.delete('/hi')
@@ -392,8 +396,8 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
             m.post(client.DEFAULT_SERVER + '/v2/hi',
-                  request_headers={'Connection': 'close'},
-                  status_code=200)
+                   request_headers={'Connection': 'close'},
+                   status_code=200)
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.post_multipart('/hi', fields={"x": "y"})
@@ -404,8 +408,8 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
             m.post(client.DEFAULT_SERVER + '/v2/hi?yo=1',
-                  request_headers={'Connection': 'close'},
-                  status_code=200)
+                   request_headers={'Connection': 'close'},
+                   status_code=200)
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.post_multipart('/hi', {"x": "y"}, query_string='yo=1')
@@ -457,8 +461,11 @@ class TestClient(unittest.TestCase):
             res = ndex.save_new_network([{'foo': '123'}])
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
-            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
-            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
             self.assertTrue('{"foo": "123"}' in decode_txt)
             self.assertTrue('{"status": [{"' in decode_txt)
             self.assertTrue('"error": ""' in decode_txt)
@@ -477,8 +484,11 @@ class TestClient(unittest.TestCase):
             res = ndex.save_new_network([{'foo': '123'}])
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
-            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
-            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
             self.assertTrue('{"foo": "123"}' in decode_txt)
             self.assertTrue('{"status": [{"' in decode_txt)
             self.assertTrue('"error": ""' in decode_txt)
@@ -499,8 +509,11 @@ class TestClient(unittest.TestCase):
                                         visibility='PUBLIC')
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
-            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
-            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
             self.assertTrue('{"foo": "123"}' in decode_txt)
             self.assertTrue('{"status": [{"' in decode_txt)
             self.assertTrue('"error": ""' in decode_txt)
@@ -517,11 +530,15 @@ class TestClient(unittest.TestCase):
                    text=resurl)
             ndex = Ndex2(username='bob', password='warnerbrandis')
             res = ndex.save_new_network([{'foo': '123'},
-                                         {"status": [{"error": "", "success": True}]}])
+                                         {"status": [{"error": "",
+                                                      "success": True}]}])
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
-            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
-            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('Content-Disposition: '
+                            'form-data; name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
             self.assertTrue('{"foo": "123"}' in decode_txt)
             self.assertTrue('{"status": [{"' in decode_txt)
             self.assertTrue('"error": ""' in decode_txt)
@@ -533,22 +550,27 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
             m.put(client.DEFAULT_SERVER + '/v2/network/someid',
-                   request_headers={'Connection': 'close'},
-                   status_code=1,
-                   text=resurl)
+                  request_headers={'Connection': 'close'},
+                  status_code=1,
+                  text=resurl)
             ndex = Ndex2(username='bob', password='warnerbrandis')
             cx = [{'foo': '123'},
                   {"status": [{"error": "", "success": True}]}]
 
             if sys.version_info.major == 3:
-                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
+                stream = io.BytesIO(json.dumps(cx,
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
             else:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
             res = ndex.update_cx_network(stream, 'someid')
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
-            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
-            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
             self.assertTrue('{"foo": "123"}' in decode_txt)
             self.assertTrue('{"status": [{"' in decode_txt)
             self.assertTrue('"error": ""' in decode_txt)
@@ -560,22 +582,27 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict(version=None))
             m.put(client.DEFAULT_SERVER + '/rest/network/asCX/someid',
-                   request_headers={'Connection': 'close'},
-                   status_code=1,
-                   text=resurl)
+                  request_headers={'Connection': 'close'},
+                  status_code=1,
+                  text=resurl)
             ndex = Ndex2(username='bob', password='warnerbrandis')
             cx = [{'foo': '123'},
                   {"status": [{"error": "", "success": True}]}]
 
             if sys.version_info.major == 3:
-                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
+                stream = io.BytesIO(json.dumps(cx,
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
             else:
                 stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
             res = ndex.update_cx_network(stream, 'someid')
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
-            self.assertTrue('Content-Disposition: form-data; name="CXNetworkStream"; filename="filename"' in decode_txt)
-            self.assertTrue('Content-Type: application/octet-stream' in decode_txt)
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
             self.assertTrue('{"foo": "123"}' in decode_txt)
             self.assertTrue('{"status": [{"' in decode_txt)
             self.assertTrue('"error": ""' in decode_txt)
@@ -592,7 +619,8 @@ class TestClient(unittest.TestCase):
                 ndex._validate_network_system_properties(None)
                 self.fail('Expected exception')
             except NDExInvalidParameterError as ne:
-                self.assertEqual('network_properties must be a string or a dict', str(ne))
+                self.assertEqual('network_properties must be a '
+                                 'string or a dict', str(ne))
 
             # try passing empty string
             try:
@@ -606,7 +634,8 @@ class TestClient(unittest.TestCase):
                 ndex._validate_network_system_properties({})
                 self.fail('Expected exception')
             except NDExInvalidParameterError as ne:
-                self.assertTrue('network_properties appears to be empty' in str(ne))
+                self.assertTrue('network_properties appears to '
+                                'be empty' in str(ne))
 
             # try passing invalid property
             try:
@@ -636,7 +665,8 @@ class TestClient(unittest.TestCase):
 
             # try passing invalid index_level property as bool
             try:
-                ndex._validate_network_system_properties({'index_level': False})
+                ndex._validate_network_system_properties({'index_level':
+                                                          False})
                 self.fail('Expected exception')
             except NDExInvalidParameterError as ne:
                 self.assertEqual('index_level value must be '
@@ -644,7 +674,8 @@ class TestClient(unittest.TestCase):
 
             # try passing invalid index_level property
             try:
-                ndex._validate_network_system_properties({'index_level': 'blah'})
+                ndex._validate_network_system_properties({'index_level':
+                                                          'blah'})
                 self.fail('Expected exception')
             except NDExInvalidParameterError as ne:
                 self.assertEqual('index_level value must be '
@@ -656,15 +687,18 @@ class TestClient(unittest.TestCase):
                 self.fail('Expected exception')
             except NDExInvalidParameterError as ne:
                 self.assertEqual('visibility value must be '
-                                 'a string set to PUBLIC or PRIVATE', str(ne))
+                                 'a string set to PUBLIC or PRIVATE',
+                                 str(ne))
 
             # try passing invalid visibility property
             try:
-                ndex._validate_network_system_properties({'visibility': 'ha'})
+                ndex._validate_network_system_properties({'visibility':
+                                                          'ha'})
                 self.fail('Expected exception')
             except NDExInvalidParameterError as ne:
                 self.assertEqual('visibility value must be '
-                                 'a string set to PUBLIC or PRIVATE', str(ne))
+                                 'a string set to PUBLIC or PRIVATE',
+                                 str(ne))
 
             # try passing valid dict
             valid_dict = {'showcase': True,
@@ -687,11 +721,13 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             ndex = Ndex2()
             try:
-                ndex.set_network_system_properties('236ecfce-be48-4652-b488-b08f0cc9c795',
+                ndex.set_network_system_properties('236ecfce-be48-4652-'
+                                                   'b488-b08f0cc9c795',
                                                    {'visibility': 'PUBLIC'})
                 self.fail('Expected exception')
             except NDExUnauthorizedError as ne:
-                self.assertEqual('This method requires user authentication', str(ne))
+                self.assertEqual('This method requires user '
+                                 'authentication', str(ne))
 
     def test_set_network_system_properties_invalid_propertytype(self):
         with requests_mock.mock() as m:
@@ -699,7 +735,8 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             ndex = Ndex2(username='bob', password='warnerbrandis')
             try:
-                ndex.set_network_system_properties('236ecfce-be48-4652-b488-b08f0cc9c795',
+                ndex.set_network_system_properties('236ecfce-be48-4652-b488-'
+                                                   'b08f0cc9c795',
                                                    True)
                 self.fail('Expected exception')
             except NDExInvalidParameterError as ne:
@@ -733,7 +770,8 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             m.put(client.DEFAULT_SERVER + '/v2/network/' +
                   theuuid + '/systemproperty',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/json;'
+                                                   'charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'},
@@ -757,10 +795,12 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             ndex = Ndex2()
             try:
-                ndex.make_network_public('236ecfce-be48-4652-b488-b08f0cc9c795')
+                ndex.make_network_public('236ecfce-be48-4652-b488-'
+                                         'b08f0cc9c795')
                 self.fail('Expected exception')
             except NDExUnauthorizedError as ne:
-                self.assertEqual('This method requires user authentication', str(ne))
+                self.assertEqual('This method requires user authentication',
+                                 str(ne))
 
     def test_make_network_public_success(self):
         theuuid = '236ecfce-be48-4652-b488-b08f0cc9c795'
@@ -769,7 +809,8 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             m.put(client.DEFAULT_SERVER + '/v2/network/' +
                   theuuid + '/systemproperty',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/json;'
+                                                   'charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'},
@@ -787,10 +828,12 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             ndex = Ndex2()
             try:
-                ndex.make_network_private('236ecfce-be48-4652-b488-b08f0cc9c795')
+                ndex.make_network_private('236ecfce-be48-4652-b488-'
+                                          'b08f0cc9c795')
                 self.fail('Expected exception')
             except NDExUnauthorizedError as ne:
-                self.assertEqual('This method requires user authentication', str(ne))
+                self.assertEqual('This method requires user authentication',
+                                 str(ne))
 
     def test_make_network_private_success(self):
         theuuid = '236ecfce-be48-4652-b488-b08f0cc9c795'
@@ -799,7 +842,8 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             m.put(client.DEFAULT_SERVER + '/v2/network/' +
                   theuuid + '/systemproperty',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/json;'
+                                                   'charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'},
@@ -817,10 +861,12 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             ndex = Ndex2()
             try:
-                ndex._make_network_public_indexed('236ecfce-be48-4652-b488-b08f0cc9c795')
+                ndex._make_network_public_indexed('236ecfce-be48-4652-'
+                                                  'b488-b08f0cc9c795')
                 self.fail('Expected exception')
             except NDExUnauthorizedError as ne:
-                self.assertEqual('This method requires user authentication', str(ne))
+                self.assertEqual('This method requires user authentication',
+                                 str(ne))
 
     def test_make_network_public_indexed_success(self):
         theuuid = '236ecfce-be48-4652-b488-b08f0cc9c795'
@@ -829,7 +875,8 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             m.put(client.DEFAULT_SERVER + '/v2/network/' +
                   theuuid + '/systemproperty',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/json;'
+                                                   'charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'},
@@ -867,7 +914,8 @@ class TestClient(unittest.TestCase):
                                    True)
                 self.fail('Expected exception')
             except NDExUnauthorizedError as ne:
-                self.assertEqual('This method requires user authentication', str(ne))
+                self.assertEqual('This method requires user authentication',
+                                 str(ne))
 
     def test_set_read_only_true_success(self):
         theuuid = '236ecfce-be48-4652-b488-b08f0cc9c795'
@@ -876,7 +924,8 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             m.put(client.DEFAULT_SERVER + '/v2/network/' +
                   theuuid + '/systemproperty',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/json;'
+                                                   'charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'},
@@ -895,7 +944,8 @@ class TestClient(unittest.TestCase):
                   json=self.get_rest_admin_status_dict())
             m.put(client.DEFAULT_SERVER + '/v2/network/' +
                   theuuid + '/systemproperty',
-                  request_headers={'Content-Type': 'application/json;charset=UTF-8',
+                  request_headers={'Content-Type': 'application/json;'
+                                                   'charset=UTF-8',
                                    'Accept': 'application/json',
                                    'User-Agent': client.userAgent},
                   headers={'Content-Type': 'application/foo'},
@@ -1067,7 +1117,8 @@ class TestClient(unittest.TestCase):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
-            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/interconnectquery',
+            m.post(client.DEFAULT_SERVER +
+                   '/v2/search/network/someid/interconnectquery',
                    status_code=200,
                    json={'hi': 'bye'},
                    request_headers={'Connection': 'close'},
@@ -1083,7 +1134,8 @@ class TestClient(unittest.TestCase):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
-            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/interconnectquery',
+            m.post(client.DEFAULT_SERVER +
+                   '/v2/search/network/someid/interconnectquery',
                    status_code=200,
                    json={'data': [{'hi': 'bye'}]},
                    request_headers={'Connection': 'close'},
@@ -1097,7 +1149,8 @@ class TestClient(unittest.TestCase):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
-            m.post(client.DEFAULT_SERVER + '/v2/search/network/someid/interconnectquery',
+            m.post(client.DEFAULT_SERVER +
+                   '/v2/search/network/someid/interconnectquery',
                    status_code=200,
                    json=[{'hi': 'bye'}],
                    request_headers={'Connection': 'close'},
@@ -1126,10 +1179,11 @@ class TestClient(unittest.TestCase):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict())
-            m.post(client.DEFAULT_SERVER + '/v2/search/network?start=0&size=100',
-                  status_code=200,
-                  json={'hi': 'bye'},
-                  headers={'Content-Type': 'application/json'})
+            m.post(client.DEFAULT_SERVER +
+                   '/v2/search/network?start=0&size=100',
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   headers={'Content-Type': 'application/json'})
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.search_networks(search_string='hi',
@@ -1142,9 +1196,9 @@ class TestClient(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict(version=None))
             m.post(client.DEFAULT_SERVER + '/rest/network/search/0/100',
-                  status_code=200,
-                  json={'hi': 'bye'},
-                  headers={'Content-Type': 'application/json'})
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   headers={'Content-Type': 'application/json'})
             ndex = Ndex2()
             ndex.set_debug_mode(True)
             res = ndex.search_networks(search_string='hi',

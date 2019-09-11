@@ -1359,3 +1359,39 @@ class TestClient(unittest.TestCase):
             except NDExError as ne:
                 self.assertTrue('Unknown error server returned '
                                 'status code: 503 : ' in str(ne))
+
+    def test_get_task_by_id_no_auth(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            try:
+                ndex.get_task_by_id('someid')
+                self.fail('Expected Exception')
+            except NDExUnauthorizedError:
+                pass
+
+    def test_get_task_by_id_success(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(client.DEFAULT_SERVER + '/v2/task/someid',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            res = ndex.get_task_by_id('someid')
+            self.assertEqual('bye', res['hi'])
+
+    def test_add_networks_to_networkset(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.post(client.DEFAULT_SERVER + '/v2/networkset/aid/members',
+                  status_code=200,
+                  json='',
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(username='bob', password='warnerbrandis')
+            res = ndex.add_networks_to_networkset('aid', ['someid'])
+            self.assertEqual('', res)
+

@@ -2,7 +2,7 @@
 History
 =======
 
-3.3.0 (2019-09-10)
+3.3.0 (2019-09-11)
 ------------------
 
 * Fixed bug where if server version is not 2.0 exactly then Ndex2() object incorrectly falls back to version of 1.3 of REST calls

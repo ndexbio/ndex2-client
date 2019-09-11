@@ -96,7 +96,6 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         # net_two = ndex2.create_nice_cx_from_networkx(g)
         # self.assertEqual('bob', net_two.get_name())
 
-
     def test_one_node_no_edge_network_legacytrue(self):
         net = NiceCXNetwork()
         net.create_node('first')
@@ -142,7 +141,8 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual(None, edgelist[0][2]['interaction'])
 
     def test_glypican_network_legacyfalse_and_multigraph_passed_in(self):
-        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.GLYPICAN_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory
+                                             .GLYPICAN_FILE)
         fac = DefaultNetworkXFactory()
         g = fac.get_graph(net, networkx_graph=networkx.MultiGraph())
         self.assertEqual('Glypican 2 network', g.graph['name'])
@@ -201,7 +201,8 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
     def test_glypican_network_legacyfalse(self):
-        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.GLYPICAN_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory
+                                             .GLYPICAN_FILE)
         fac = DefaultNetworkXFactory()
         g = fac.get_graph(net)
         self.assertEqual('Glypican 2 network', g.graph['name'])
@@ -259,7 +260,8 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
     def test_glypican_network_legacymode_true(self):
-        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.GLYPICAN_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory
+                                             .GLYPICAN_FILE)
         fac = DefaultNetworkXFactory(legacymode=True)
         g = fac.get_graph(net)
         self.assertTrue(isinstance(g, networkx.Graph))
@@ -320,7 +322,8 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
     def test_darktheme_network_legacyfalse(self):
-        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.DARKTHEME_FILE)
+        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory
+                                             .DARKTHEME_FILE)
         fac = DefaultNetworkXFactory()
         g = fac.get_graph(net)
         self.assertEqual('Dark theme final version', g.graph['name'])
@@ -351,7 +354,8 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
                 break
         self.assertEqual('STAT3', nodelist[stat_three_index][1]['name'])
         self.assertEqual('protein', nodelist[stat_three_index][1]['type'])
-        self.assertEqual('uniprot:P40763', nodelist[stat_three_index][1]['represents'])
+        self.assertEqual('uniprot:P40763',
+                         nodelist[stat_three_index][1]['represents'])
 
         sixteenfiftyfiveedge = -1
         for i in range(len(edgelist)):
@@ -364,16 +368,20 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
                         (1654 == edgelist[sixteenfiftyfiveedge][0] and
                          1655 == edgelist[sixteenfiftyfiveedge][1]))
 
-        self.assertEqual('form complex', edgelist[sixteenfiftyfiveedge][2]['interaction'])
+        self.assertEqual('form complex',
+                         edgelist[sixteenfiftyfiveedge][2]['interaction'])
         self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
-        self.assertEqual('"pubmed:15284024"', edgelist[sixteenfiftyfiveedge][2]['citation'])
+        self.assertEqual('"pubmed:15284024"',
+                         edgelist[sixteenfiftyfiveedge][2]['citation'])
 
         # check coordinates
         self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)
         self.assertTrue((g.pos[1655][1] - 145.72) < 1.0)
 
     def test_darktheme_network_legacytrue(self):
-        net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory.DARKTHEME_FILE)
+        net = ndex2\
+            .create_nice_cx_from_file(TestDefaultNetworkXFactory
+                                      .DARKTHEME_FILE)
         fac = DefaultNetworkXFactory(legacymode=True)
         g = fac.get_graph(net)
         self.assertEqual('Dark theme final version', g.graph['name'])
@@ -417,9 +425,11 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
                         (1654 == edgelist[sixteenfiftyfiveedge][0] and
                          1655 == edgelist[sixteenfiftyfiveedge][1]))
 
-        self.assertEqual('form complex', edgelist[sixteenfiftyfiveedge][2]['interaction'])
+        self.assertEqual('form complex',
+                         edgelist[sixteenfiftyfiveedge][2]['interaction'])
         self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
-        self.assertEqual('"pubmed:15284024"', edgelist[sixteenfiftyfiveedge][2]['citation'])
+        self.assertEqual('"pubmed:15284024"',
+                         edgelist[sixteenfiftyfiveedge][2]['citation'])
 
         # check coordinates
         self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)

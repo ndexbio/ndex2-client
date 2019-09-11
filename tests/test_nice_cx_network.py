@@ -12,7 +12,6 @@ from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
 from ndex2 import constants
-from ndex2.nice_cx_network import DefaultNetworkXFactory
 import ndex2
 
 
@@ -79,7 +78,8 @@ class TestNiceCXNetwork(unittest.TestCase):
 
     def test_create_edge_with_interaction(self):
         net = NiceCXNetwork()
-        edge_id = net.create_edge(edge_source=10, edge_target=20, edge_interaction='blah')
+        edge_id = net.create_edge(edge_source=10,
+                                  edge_target=20, edge_interaction='blah')
 
         res = net.get_edge(edge_id)
         self.assertEqual(edge_id, res[constants.EDGE_ID])
@@ -154,7 +154,8 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0][constants.NODE_ATTR_PROPERTYOF], 1)
         self.assertEqual(res[0][constants.NODE_ATTR_NAME], 'attrname')
         self.assertEqual(res[0][constants.NODE_ATTR_VALUE], ['hi', 'bye'])
-        self.assertEqual(res[0][constants.NODE_ATTR_DATATYPE], 'list_of_string')
+        self.assertEqual(res[0][constants.NODE_ATTR_DATATYPE],
+                         'list_of_string')
 
     def test_set_node_attribute_empty_add_overwrite_toggled(self):
         net = NiceCXNetwork()
@@ -411,12 +412,13 @@ class TestNiceCXNetwork(unittest.TestCase):
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict("2.4.0"))
             m.put(client.DEFAULT_SERVER + '/v2/network/abcd',
-                   request_headers={'Connection': 'close'},
-                   status_code=1,
-                   text=resurl)
+                  request_headers={'Connection': 'close'},
+                  status_code=1,
+                  text=resurl)
             net = NiceCXNetwork()
             net.create_node('bob')
-            res = net.update_to('abcd', client.DEFAULT_SERVER, 'bob', 'warnerbrandis',
+            res = net.update_to('abcd', client.DEFAULT_SERVER,
+                                'bob', 'warnerbrandis',
                                 user_agent='jeez')
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
@@ -464,9 +466,11 @@ class TestNiceCXNetwork(unittest.TestCase):
             self.assertEqual('Object passed in is not NiceCXNetwork', str(e))
 
     def test_apply_style_from_network_no_style(self):
-        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                               .WNT_SIGNAL_FILE)
         wntcx.remove_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
-        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEME_FILE)
+        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                                .DARKTHEME_FILE)
         try:
             darkcx.apply_style_from_network(wntcx)
             self.fail('Expected NDexError')
@@ -474,37 +478,49 @@ class TestNiceCXNetwork(unittest.TestCase):
             self.assertEqual('No visual style found in network', str(ne))
 
     def test_apply_style_from_wnt_network_to_dark_network(self):
-        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEME_FILE)
-        dark_vis_aspect = darkcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                                .DARKTHEME_FILE)
+        dark_vis_aspect = darkcx.get_opaque_aspect(NiceCXNetwork
+                                                   .CY_VISUAL_PROPERTIES)
         self.assertEqual(9, len(dark_vis_aspect))
-        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
-        wnt_vis_aspect = wntcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                               .WNT_SIGNAL_FILE)
+        wnt_vis_aspect = wntcx.get_opaque_aspect(NiceCXNetwork
+                                                 .CY_VISUAL_PROPERTIES)
         self.assertEqual(3, len(wnt_vis_aspect))
 
         darkcx.apply_style_from_network(wntcx)
-        new_dark_vis_aspect = darkcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        new_dark_vis_aspect = darkcx.get_opaque_aspect(NiceCXNetwork
+                                                       .CY_VISUAL_PROPERTIES)
         self.assertEqual(3, len(new_dark_vis_aspect))
 
     def test_apply_style_with_node_and_edge_specific_visual_values(self):
-        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
-        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.DARKTHEMENODE_FILE)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                               .WNT_SIGNAL_FILE)
+        darkcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                                .DARKTHEMENODE_FILE)
 
         wntcx.apply_style_from_network(darkcx)
-        wnt_vis_aspect = wntcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        wnt_vis_aspect = wntcx.get_opaque_aspect(NiceCXNetwork
+                                                 .CY_VISUAL_PROPERTIES)
         self.assertEqual(3, len(wnt_vis_aspect))
 
     def test_apply_style_on_network_with_old_visual_aspect(self):
         glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
-        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                               .WNT_SIGNAL_FILE)
         glypy.apply_style_from_network(wntcx)
-        glypy_aspect = glypy.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        glypy_aspect = glypy.get_opaque_aspect(NiceCXNetwork
+                                               .CY_VISUAL_PROPERTIES)
         self.assertEqual(3, len(glypy_aspect))
 
     def test_apply_style_on_network_from_old_visual_aspect_network(self):
         glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
-        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        wntcx = ndex2.create_nice_cx_from_file(TestNiceCXNetwork
+                                               .WNT_SIGNAL_FILE)
         wntcx.apply_style_from_network(glypy)
-        wnt_aspect = wntcx.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES)
+        wnt_aspect = wntcx.get_opaque_aspect(NiceCXNetwork
+                                             .CY_VISUAL_PROPERTIES)
         self.assertEqual(3, len(wnt_aspect))
 
     def test_to_networkx_no_arg_on_empty_network(self):

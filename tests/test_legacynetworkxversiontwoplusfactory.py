@@ -83,14 +83,18 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertTrue('second' in g)
         edgelist = list(g.edges(data=True))
 
-        self.assertTrue(('first' == edgelist[0][0] and 'second' == edgelist[0][1]) or
-                        ('second' == edgelist[0][0] and 'first' == edgelist[0][1]))
+        self.assertTrue(('first' == edgelist[0][0]
+                         and 'second' == edgelist[0][1]) or
+                        ('second' == edgelist[0][0]
+                         and 'first' == edgelist[0][1]))
         self.assertEqual(None, edgelist[0][2]['interaction'])
 
     @unittest.skipIf(float(networkx.__version__) < 2,
                      'test only works with networkx 2+ installed')
     def test_glypican_network_legacyfalse(self):
-        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionTwoPlusFactory.GLYPICAN_FILE)
+        net = ndex2\
+            .create_nice_cx_from_file(TestLegacyNetworkXVersionTwoPlusFactory
+                                      .GLYPICAN_FILE)
         fac = LegacyNetworkXVersionTwoPlusFactory()
         g = fac.get_graph(net)
         self.assertEqual('Glypican 2 network', g.graph['name'])
@@ -143,8 +147,10 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertEqual(1, len(aliaslist))
         self.assertTrue('uniprot knowledgebase:Q8N158' in aliaslist)
 
-        self.assertTrue(('MDK' == edgelist[0][0] and 'GPC2', edgelist[0][1]) or
-                        ('GPC2' == edgelist[0][0] and 'MDK', edgelist[0][1]))
+        self.assertTrue(('MDK' == edgelist[0][0] and 'GPC2',
+                         edgelist[0][1]) or
+                        ('GPC2' == edgelist[0][0] and 'MDK',
+                         edgelist[0][1]))
         self.assertEqual('in-complex-with', edgelist[0][2]['interaction'])
         self.assertEqual('false', edgelist[0][2]['directed'])
 
@@ -155,9 +161,12 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
     @unittest.skipIf(float(networkx.__version__) < 2,
-                     'test only works with networkx 2+ installed: ' + networkx.__version__)
+                     'test only works with networkx 2+ installed: ' +
+                     networkx.__version__)
     def test_darktheme_network(self):
-        net = ndex2.create_nice_cx_from_file(TestLegacyNetworkXVersionTwoPlusFactory.DARKTHEME_FILE)
+        net = ndex2\
+            .create_nice_cx_from_file(TestLegacyNetworkXVersionTwoPlusFactory
+                                      .DARKTHEME_FILE)
         fac = LegacyNetworkXVersionTwoPlusFactory()
         g = fac.get_graph(net)
         self.assertEqual('Dark theme final version', g.graph['name'])
@@ -185,20 +194,24 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
 
         self.assertEqual('STAT3', nodelist[statthree][0])
         self.assertEqual('protein', nodelist[statthree][1]['type'])
-        self.assertEqual('uniprot:P40763', nodelist[statthree][1]['represents'])
+        self.assertEqual('uniprot:P40763',
+                         nodelist[statthree][1]['represents'])
 
         stat_edge = -2
         for i in range(0, len(edgelist)):
-            if edgelist[i][0] == 'STAT3' and edgelist[i][1] == 'JAK1/STAT1/STAT3':
+            if edgelist[i][0] == 'STAT3' and edgelist[i][1] == 'JAK1/' \
+                                                               'STAT1/STAT3':
                 stat_edge = i
                 break
-            if edgelist[i][0] == 'JAK1/STAT1/STAT3' and edgelist[i][1] == 'STAT3':
+            if edgelist[i][0] == 'JAK1/STAT1/' \
+                                 'STAT3' and edgelist[i][1] == 'STAT3':
                 stat_edge = i
                 break
         self.assertTrue(stat_edge >= 0)
         self.assertEqual('form complex', edgelist[stat_edge][2]['interaction'])
         self.assertEqual('true', edgelist[stat_edge][2]['directed'])
-        self.assertEqual('"pubmed:15284024"', edgelist[stat_edge][2]['citation'])
+        self.assertEqual('"pubmed:15284024"',
+                         edgelist[stat_edge][2]['citation'])
 
         # check coordinates
         self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)

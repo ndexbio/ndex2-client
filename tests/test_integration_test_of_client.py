@@ -6,9 +6,7 @@ import os
 import re
 import sys
 import io
-import decimal
 import unittest
-import numpy as np
 import json
 import uuid
 from datetime import datetime
@@ -18,12 +16,11 @@ import ndex2
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
-from ndex2.exceptions import NDExNotFoundError
 from ndex2.exceptions import NDExUnauthorizedError
 
-SKIP_REASON='NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
-            'environment variables not set, cannot run integration' \
-            ' tests with server'
+SKIP_REASON = 'NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
+              'environment variables not set, cannot run integration' \
+              ' tests with server'
 
 
 @unittest.skipUnless(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
@@ -51,7 +48,7 @@ class TestClient(unittest.TestCase):
         res = client.save_new_network(net.to_cx(), visibility='PRIVATE')
         try:
             self.assertTrue('http' in res)
-            netid = re.sub('^.*\/', '', res)
+            netid = re.sub('^.*/', '', res)
 
             netsum = client.get_network_summary(network_id=netid)
             self.assertEqual(netid, netsum['externalId'])
@@ -70,7 +67,8 @@ class TestClient(unittest.TestCase):
             net.set_name(newnetname)
             if sys.version_info.major == 3:
                 stream = io.BytesIO(json.dumps(net.to_cx(),
-                                               cls=DecimalEncoder).encode('utf-8'))
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
             else:
                 stream = io.BytesIO(json.dumps(net.to_cx(),
                                                cls=DecimalEncoder))
@@ -102,7 +100,7 @@ class TestClient(unittest.TestCase):
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
         try:
             self.assertTrue('http' in res)
-            netid = re.sub('^.*\/', '', res)
+            netid = re.sub('^.*/', '', res)
 
             # verify network was uploaded
             netsum = client.get_network_summary(network_id=netid)
@@ -170,13 +168,13 @@ class TestClient(unittest.TestCase):
         netsetname = 'testnetworkset: ' + str(datetime.now())
         res = client.create_networkset(netsetname, 'some description')
         self.assertTrue('http' in res)
-        netset_id = re.sub('^.*\/', '', res)
+        netset_id = re.sub('^.*/', '', res)
 
         net = ndex2.create_nice_cx_from_file(TestClient.WNT_SIGNAL_FILE)
         netname = 'ndex2-client integration test network' + str(datetime.now())
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
-        net_id = re.sub('^.*\/', '', res)
+        net_id = re.sub('^.*/', '', res)
         try:
             # get the networkset back
             res = client.get_network_set(netset_id)
@@ -212,15 +210,5 @@ class TestClient(unittest.TestCase):
         client = self.get_ndex2_client()
         theuser = os.getenv('NDEX2_TEST_USER')
         res = client.get_user_by_username(theuser)
-        """
-        {'properties': {}, 'isIndividual': True, 
-        'userName': 'cbass', 'isVerified': True, 
-        'firstName': 'cbass', 'lastName': 'test', 
-        'emailAddress': 'churas.camera+cbassprod@gmail.com', 
-        'diskQuota': 10000000000, 'diskUsed': 3971183103, 
-        'externalId': '34e8c717-5719-11e9-9f06-0ac135e8bacf', 
-        'isDeleted': False, 'modificationTime': 1554410147104, 
-        'creationTime': 1554410138498}
-        """
         self.assertEqual(theuser, res['userName'])
         self.assertTrue('externalId' in res)

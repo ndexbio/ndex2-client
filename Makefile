@@ -53,10 +53,10 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 ndex2 tests
 
-systemtest: ## run system tests (under ndex2/tests/) and unit tests via nose
+systemtest: ## run legacy system tests (under ndex2/tests/) and unit tests via nose
 	nosetests -v
 
-test: ## run tests quickly with the default Python
+test: ## run tests with default Python, for system tests set NDEX2_TEST_SERVER, ..._USER, ..._PASS env variables
 	python setup.py test
 
 test-all: ## run tests on every Python version with tox

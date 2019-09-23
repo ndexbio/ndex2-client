@@ -25,16 +25,16 @@ The NDEx2 Python Client provides methods to access NDEx_ via
 the `NDEx REST Server API`_. As well as methods for common operations on
 networks via the NiceCXNetwork class.
 
-
 **Jupyter Notebook Tutorials**
 ------------------------------
+
 
 -  Basic Use of the NDEx2 Python Client:  `NDEx2 Client v2.0
    Tutorial <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDEx2%20Client%20v2.0%20Tutorial.ipynb>`__
 -  Working with the NiceCX Network Class: `NiceCX v2.0
    Tutorial <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20Tutorial.ipynb>`__
 
-To use these tutorials, clone the `ndex-jupyter-notebooks
+To use these tutorials or if Github isn't showing the above notebooks in the browser, clone the `ndex-jupyter-notebooks
 repository <https://github.com/ndexbio/ndex-jupyter-notebooks>`__ to
 your local machine and start Jupyter Notebooks in the project directory.
 

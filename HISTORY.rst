@@ -6,7 +6,9 @@ History
 -------------------
 
 * Added `MANIFEST.in` file to include `README.rst, HISTORY.rst, and LICENSE.txt`  files as well as documentation and tests so `python setup.py install` would work properly on distribution of this client on PyPI. Thanks to Ben G. for catching this. `Issue #62 <https://github.com/ndexbio/ndex2-client/pull/62>`_
- 
+
+* Minor updates to `README.rst`
+
 3.3.0 (2019-09-11)
 ------------------
 

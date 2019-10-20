@@ -600,27 +600,6 @@ class NiceCXNetwork():
         self.add_node_attribute(property_of=node, name=attribute_name, values=values, type=type,
                                 overwrite=overwrite)
 
-    def get_node_attribute_objects(self, node, attribute_name):
-        """
-        .. warning::
-
-           This method has been deprecated.  Please use **get_node_attribute()**
-
-        ..
-
-        """
-
-        raise Warning('get_node_attribute_objects() is deprecated.  Please use get_node_attribute() instead')
-
-        #node_attrs = self.get_node_attributes(node)
-
-        #if node_attrs:
-        #    for n_a in node_attrs:
-        #        if n_a.get('n') == attribute_name:
-        #            return n_a
-
-        #return None
-
     def get_node_attribute(self, node, attribute_name):
         """
         Get the node attribute of a node, where the node may be specified by its id or passed in as an object.

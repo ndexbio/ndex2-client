@@ -153,9 +153,9 @@ class NiceCXNetwork():
             node_id=self.get_next_node_id()
 
         if node_represents is not None:
-            self.nodes[node_id] = {'@node_id': node_id, 'n': node_name, 'r': node_represents}
+            self.nodes[node_id] = {'@id': node_id, 'n': node_name, 'r': node_represents}
         else:
-            self.nodes[node_id] = {'@node_id': node_id, 'n': node_name, 'r': node_name}
+            self.nodes[node_id] = {'@id': node_id, 'n': node_name, 'r': node_name}
 
         return node_id
 

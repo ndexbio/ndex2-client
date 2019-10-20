@@ -88,7 +88,6 @@ class NiceCXNetwork():
         :return: Edge ID
         :rtype: int
         """
-
         if isinstance(edge_source, dict):
             src_id = edge_source.get(constants.EDGE_ID)
         else:
@@ -174,7 +173,6 @@ class NiceCXNetwork():
         :return: Node ID
         :rtype: int
         """
-
         new_node_id = self.node_int_id_generator
         self.__create_node(node_id=new_node_id, node_name=node_name, node_represents=node_represents)
         self.node_int_id_generator += 1
@@ -191,16 +189,6 @@ class NiceCXNetwork():
 
         """
         raise Warning('add_node() is deprecated.  Please use create_node().')
-
-        #if represents is not None:
-        #    self.nodes[id] = {'@id': id, 'n': name, 'r': represents}
-        #else:
-        #    self.nodes[id] = {'@id': id, 'n': name, 'r': name}
-
-        #if data_type is not None:
-        #    self.nodes[id]['d'] = data_type
-
-        #return id
 
     def add_network_attribute(self, name=None, values=None, type=None, subnetwork=None):
         """
@@ -317,6 +305,7 @@ class NiceCXNetwork():
     # TODO
     # make opaque aspect into a one shot method to set the whole aspect.
     # i.e. not one element at a time
+
     def add_opaque_aspect(self, aspect_name, aspect):
         if isinstance(aspect, list):
             self.opaqueAspects[aspect_name] = aspect
@@ -345,8 +334,6 @@ class NiceCXNetwork():
         :rtype: None
 
         """
-        #add_this_network_attribute = NetworkAttributesElement(name='name', values=network_name, type=ATTRIBUTE_DATA_TYPE.STRING)
-
         self.add_network_attribute(name='name', values=network_name, type='string')
 
     def get_name(self):

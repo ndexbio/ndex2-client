@@ -80,7 +80,6 @@ def load_matrix_to_ndex(x, x_cols, x_rows, server, username, password, name):
 
     nice_cx = nice_cx_builder.get_nice_cx()
 
-    #print(x)
     ont_url = nice_cx.upload_to(server, username, password)
 
     return ont_url

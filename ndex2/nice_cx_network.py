@@ -384,26 +384,6 @@ class NiceCXNetwork():
     def get_edge(self, edge):
         return self.edges.get(edge)
 
-    def get_edge_attribute_object(self, edge, attribute_name):
-        """
-        .. warning::
-
-           This method has been deprecated.  Please use **get_edge_attribute()**
-
-        ..
-
-        """
-        raise Warning('get_edge_attribute_object() is deprecated.  Please use get_edge_attribute().')
-
-        #edge_attrs = self.edgeAttributes.get(edge)
-
-        #if edge_attrs:
-        #    for e_a in edge_attrs:
-        #        if e_a.get('n') == attribute_name:
-        #            return e_a
-
-        #return None
-
     #==============================
     # NETWORK PROPERTY OPERATIONS
     #==============================

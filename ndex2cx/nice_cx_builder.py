@@ -1,5 +1,6 @@
 __author__ = 'aarongary'
 
+import logging
 import json
 import ijson
 import requests
@@ -19,6 +20,8 @@ else:
 class NiceCXBuilder(object):
     def __init__(self, cx=None, server=None, username='scratch', password='scratch', uuid=None, networkx_G=None, data=None, **attr):
         from ndex2.nice_cx_network import NiceCXNetwork
+
+        self.logger = logging.getLogger(__name__)
 
         self.nice_cx = NiceCXNetwork(user_agent='niceCx Builder')
         self.node_id_lookup = {}
@@ -431,7 +434,7 @@ class NiceCXBuilder(object):
 
     def stream_aspect(self, uuid, aspect_name):
         if aspect_name == 'metaData':
-            print('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
+            self.logger.debug('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
             md_response = requests.get('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
             json_respone = md_response.json()
             return json_respone.get('metaData')
@@ -466,11 +469,11 @@ class NiceCXBuilder(object):
             try:
                 urlopen_result = urlopen(request) #'http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
             except HTTPError as e:
-                print(e.code)
+                self.logger.error(str(e.code))
                 return []
             except URLError as e:
-                print('Other error')
-                print('URL Error %s' % e.message())
+                self.logger.error('Other error')
+                self.logger.error('URL Error ' + str(e.message()))
                 return []
 
             return ijson.items(urlopen_result, 'item')

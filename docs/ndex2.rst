@@ -18,7 +18,7 @@ by calling either :func:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to()` to cr
 update an existing network.
 
 
-To see deprecated methods go to `Deprecated NiceCXNetwork methods`_
+To see deprecated methods go to `Deprecated and Removed NiceCXNetwork methods`_
 
 
 Methods for building niceCX
@@ -88,11 +88,23 @@ These networkx converters are still callable, but have been deprecated
     :members: get_graph
 
 
-Deprecated NiceCXNetwork methods
-================================
+Deprecated and Removed NiceCXNetwork methods
+===================================================
 
-.. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
-    :members: add_edge, add_node, get_edge_attribute_objects, get_node_attribute_objects, get_summary, set_provenance, get_provenance
+These methods have been removed from :class:`~ndex2.nice_cx_network.NiceCXNetwork`
+
+* *add_edge()* replaced by :func:`~ndex2.nice_cx_network.NiceCXNetwork.create_edge()`
+* *add_node()* replaced by :func:`~ndex2.nice_cx_network.NiceCXNetwork.create_node()`
+* *get_edge_attribute_objects()* replaced by :func:`~ndex2.nice_cx_network.NiceCXNetwork.get_edge_attributes()`
+* *get_node_attribute_objects()* replaced by :func:`~ndex2.nice_cx_network.NiceCXNetwork.get_node_attributes()`
+* *get_summary()* replaced by :func:`~ndex2.nice_cx_network.NiceCXNetwork.print_summary()`
+
+* *set_provenance()* replaced by :func:`~ndex2.nice_cx_network.NiceCXNetwork.set_opaque_aspect()` using **provenanceHistory** as aspect name
+* *get_provenance()* replaced by :func:`~ndex2.nice_cx_network.NiceCXNetwork.get_opaque_aspect()` using **provenanceHistory** as aspect name
+
+.. note::
+    Provenance is no longer formerly supported in `CX`_, but is still accessible as an opaque aspect
+
 
 Supported data types
 =====================
@@ -152,7 +164,7 @@ application, you create an :py:class:`~ndex2.client.Ndex2` instance.
     :members: add_networks_to_networkset, create_networkset, delete_network, delete_networks_from_networkset, delete_networkset, get_neighborhood, get_neighborhood_as_cx_stream, get_network_as_cx_stream, get_network_ids_for_user, get_networkset, get_network_set, get_network_summary, get_sample_network, get_task_by_id, get_user_by_username, get_user_network_summaries, grant_network_to_user_by_username, grant_networks_to_group, grant_networks_to_user, make_network_private, make_network_public, save_cx_stream_as_new_network, save_new_network, search_networks, set_network_properties, set_network_system_properties, set_read_only, update_cx_network, update_network_group_permission, update_network_profile, update_network_user_permission
 
 .. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api
-
+.. _CX:  https://home.ndexbio.org/data-model/
 Constants
 ---------
 

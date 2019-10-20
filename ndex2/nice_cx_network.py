@@ -133,17 +133,6 @@ class NiceCXNetwork():
 
         return edge_id
 
-    def add_edge(self, id=None, source=None, target=None, interaction=None):
-        """
-        .. warning::
-
-           This method has been deprecated.  Please use **create_edge()**
-
-        ..
-
-        """
-        raise Warning('add_edge() is deprecated.  Please use create_edge().')
-
     #==================
     # NODE OPERATIONS
     #==================
@@ -178,17 +167,6 @@ class NiceCXNetwork():
         self.node_int_id_generator += 1
 
         return new_node_id
-
-    def add_node(self, id=None, name=None, represents=None):
-        """
-        .. warning::
-
-           This method has been deprecated.  Please use **create_node()**
-
-        ..
-
-        """
-        raise Warning('add_node() is deprecated.  Please use create_node().')
 
     def add_network_attribute(self, name=None, values=None, type=None, subnetwork=None):
         """

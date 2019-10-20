@@ -295,9 +295,6 @@ class NiceCXNetwork():
         else:
             raise Exception('Provided input was not of type list.')
 
-    def add_opaque_aspect_element(self, opaque_element):
-        raise Exception('add_opaque_aspect_element() is deprecated.  Please use add_opaque_aspect()')
-
     def set_name(self, network_name):
         """
         Set the network name
@@ -875,7 +872,6 @@ class NiceCXNetwork():
         else:
             raise Exception('Context provided is not of type list or dict')
 
-
     def get_metadata(self):
         """
         Get the network metadata
@@ -900,21 +896,6 @@ class NiceCXNetwork():
             self.metadata = metadata_obj
         else:
             raise Exception('Set metadata input was not of type <dict>')
-
-    def add_metadata(self, md):
-        raise Exception('add_metadata() is deprecated')
-
-    def get_provenance(self):
-        """
-        .. warning::
-
-           This method has been deprecated.
-
-        ..
-
-        """
-        raise Warning('getProvenance() is deprecated')
-        #return self.provenance
 
     def get_opaque_aspect_table(self):
         return self.opaqueAspects
@@ -1002,21 +983,6 @@ class NiceCXNetwork():
 
     def get_missing_nodes(self):
         return self.missingNodes
-
-    def set_provenance(self, provenance):
-        """
-        .. warning::
-
-           This method has been deprecated.
-
-        ..
-
-        """
-        raise Warning('set_provenance() is deprecated.')
-        #if isinstance(provenance, list):
-        #    self.provenance = provenance
-        #else:
-        #    raise Exception('Provided provenance was not of type <list>')
 
     def get_edge_citations(self):
         return self.edgeCitations
@@ -1211,43 +1177,6 @@ class NiceCXNetwork():
         else:
             raise Exception(', '.join(error_message) + 'not specified in apply_template')
 
-    def __merge_node_attributes(self, source_attribute1, source_attribute2, target_attribute):
-        """
-        Checks 2 attribute fields for values and merges them into one attribute.  The best use is when one attribute
-        is empty which occurs when loading from an edge file.  Use with caution
-
-        :param source_attribute1: The name of the first attribute
-        :type source_attribute1: basestring
-        :param source_attribute2: The name of the second attribute
-        :type source_attribute2: basestring
-        :param target_attribute: The desired name for the merged data
-        :type target_attribute: basestring
-        :return:
-        :rtype:
-        """
-        raise Warning('merge_node_attributes() is deprecated')
-
-        #for node_id, node in self.nodes.items():
-        #    value1 = self.get_node_attribute(node, source_attribute1)
-        #    value2 = self.get_node_attribute(node, source_attribute2)
-        #    merged_value = value1 or value2
-        #    if merged_value:
-        #        self.set_node_attribute(node, target_attribute, merged_value)
-        #        self.remove_node_attribute(node, source_attribute1)
-        #        self.remove_node_attribute(node, source_attribute2)
-
-    def create_from_pandas(self, df, source_field=None, target_field=None, source_node_attr=[], target_node_attr=[], edge_attr=[], edge_interaction=None):
-        raise Exception('create_from_pandas() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_pandas()')
-
-    def create_from_networkx(self, G):
-        raise Exception('create_from_networkx() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_networkx()')
-
-    def create_from_server(self, server, username, password, uuid):
-        raise Exception('create_from_server() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_server()')
-
-    def create_from_cx(self, cx):
-        raise Exception('create_from_cx() is no longer supported in NiceCXNetwork.  Please use ndex2.create_nice_cx_from_raw_cx()')
-
     def get_frag_from_list_by_key(self, cx, key):
         for aspect in cx:
             if key in aspect:
@@ -1385,9 +1314,6 @@ class NiceCXNetwork():
         ndex = Ndex2(server, username, password, user_agent=user_agent)
         return ndex.save_new_network(self.to_cx())
 
-    def upload_new_network_stream(self, server, username, password):
-        raise Exception('upload_new_network_stream() is no longer supported.  Please use upload_to()')
-
     def update_to(self, uuid, server, username, password,
                   user_agent=''):
         """ Upload this network to the specified server to the account specified
@@ -1515,40 +1441,6 @@ class NiceCXNetwork():
 
         return fac.get_graph(self)
 
-    def get_summary(self):
-        """
-        .. warning::
-
-           This method has been deprecated.  Please use **print_summary()**
-
-        ..
-
-        """
-
-        raise Warning('get_summary() is deprecated.  Please use print_summary() instead')
-
-        n_a_count = 0
-        for k, v in self.nodeAttributes.items():
-            n_a_count += len(v)
-
-        e_a_count = 0
-        for k, v in self.edgeAttributes.items():
-            e_a_count += len(v)
-
-        network_name = self.get_name()
-        if not network_name:
-            network_name = 'Untitled'
-
-        summary_json = {
-            'Name': network_name,
-            'Nodes': len(self.nodes),
-            'Edges': + len(self.edges),
-            'Node Attributes': n_a_count,
-            'Edge Attributes': e_a_count
-        }
-
-        return summary_json
-
     def print_summary(self):
         """
         Print a network summary
@@ -1578,7 +1470,7 @@ class NiceCXNetwork():
         print(summary_string)
 
     def __str__(self):
-        return 'nodes: %d \n edges: %d' % (len(self.nodes), len(self.edges)) #f'nodes: {len(self.nodes)} edges: {len(self.edges)}'
+        return 'nodes: %d \n edges: %d' % (len(self.nodes), len(self.edges))
 
     def to_cx(self):
         """

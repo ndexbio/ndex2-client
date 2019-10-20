@@ -144,17 +144,6 @@ class NiceCXNetwork():
 
         """
         raise Warning('add_edge() is deprecated.  Please use create_edge().')
-        #if id is None:
-        #    raise Exception('No ID provided')
-
-        #if source is None or target is None or interaction is None:
-        #    print('source: %s, target: %s or target: %s was None.  Skipping edge' % (source, target, interaction))
-        #    return None
-            #raise Exception('Source, Target and Interaction are required to create an edge')
-
-        #self.edges[id] = {'@id': id, 's': source, 't': target, 'i': interaction}
-
-        #return id
 
     #==================
     # NODE OPERATIONS
@@ -1466,11 +1455,11 @@ class NiceCXNetwork():
             try:
                 return_bytes = io.BytesIO(json.dumps(cx))
             except UnicodeDecodeError as err1:
-                print("Detected invalid encoding. Trying latin-1 encoding.")
+                self.logger.error("Detected invalid encoding. Trying latin-1 encoding.")
                 return_bytes = io.BytesIO(json.dumps(cx, encoding="latin-1"))
-                print("Success")
+                self.logger.info("Success")
             except Exception as err2:
-                print(err2.message)
+                self.logger.error(str(err2.message))
 
             return return_bytes
 
@@ -1704,7 +1693,7 @@ class NiceCXNetwork():
         #TODO - when server is compatible remove numberVerification and alter metadata insert() to position 0
         output_cx = [{"numberVerification": [{"longNumber": 281474976710655}]}]
 
-        print('Generating CX')
+        self.logger.debug('Generating CX')
 
         #=====================================================
         # IF THE @ID IS NOT NUMERIC WE NEED TO CONVERT IT TO
@@ -1888,15 +1877,9 @@ class NiceCXNetwork():
             consistency_group += 1 # bump the consistency group up by one
 
             for mi_k, mi_v in self.metadata.items():
-                #print mi_k
-                #print mi_v
                 mi_v.set_consistency_group(consistency_group)
 
     def generate_metadata(self, G, unclassified_cx):
-        #if self.metadata:
-        #    for k, v in self.metadata.iteritems():
-
-
         return_metadata = []
         consistency_group = 1
         if(self.metadata_original is not None):
@@ -1907,23 +1890,7 @@ class NiceCXNetwork():
                 else:
                     mi['consistencyGroup'] = 0
 
-            consistency_group += 1 # bump the consistency group up by one
-
-            #print("consistency group max: " + str(consistency_group))
-
-        # ========================
-        # @context metadata
-        # ========================
-        #if self.context: # REPLACED BY NETWORK ATTRIBUTE: @context
-        #    return_metadata.append(
-        #        {
-        #            "consistencyGroup": consistency_group,
-        #            "elementCount": 1,
-        #            "name": "@context",
-        #            "properties": [],
-        #            "version": "1.0"
-        #        }
-        #    )
+            consistency_group += 1  # bump the consistency group up by one
 
         #========================
         # Nodes metadata
@@ -2186,7 +2153,7 @@ class NiceCXNetwork():
                          }
                     )
             except Exception as e:
-                print(e.message)
+                self.logger.error(str(e.message))
 
         return [{'metaData': return_metadata}]
 
@@ -2247,7 +2214,7 @@ class NiceCXNetwork():
         if 'http' not in server:
             server = 'http://' + server
         if aspect_name == 'metaData':
-            print(server + '/v2/network/' + uuid + '/aspect')
+            self.logger.debug(server + '/v2/network/' + uuid + '/aspect')
 
             s = requests.session()
             if username and password:
@@ -2266,11 +2233,11 @@ class NiceCXNetwork():
             try:
                 urlopen_result = urlopen(request) #'http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
             except HTTPError as e:
-                print(e.code)
+                self.logger.error(str(e.code))
                 return []
             except URLError as e:
-                print('Other error')
-                print('URL Error %s' % e.message())
+                self.logger.error('Other error')
+                self.logger.error('URL Error ' + str(e.message()))
                 return []
 
             return_items = ijson.items(urlopen_result, 'item')

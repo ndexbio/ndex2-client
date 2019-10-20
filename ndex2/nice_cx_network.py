@@ -71,15 +71,15 @@ class NiceCXNetwork():
             return True
         return False
 
-    def __create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None):
+    def __create_edge(self, edge_id=None, edge_source=None, edge_target=None, edge_interaction=None):
         """
         Create a new edge in the network by specifying source-interaction-target
 
-        :param id:
-        :type id:
-        :param edge_source: The source node this edge, either its id or the node object itself.
+        :param edge_id:
+        :type edge_id:
+        :param edge_source: The source node this edge, either its edge_id or the node object itself.
         :type edge_source: int
-        :param edge_target: The target node this edge, either its id or the node object itself.
+        :param edge_target: The target node this edge, either its edge_id or the node object itself.
         :type edge_target: int
         :param edge_interaction: The interaction that describes the relationship between the source and target nodes
         :type edge_interaction: string
@@ -99,14 +99,14 @@ class NiceCXNetwork():
         else:
             target_id = edge_target
 
-        self.edges[id] = {constants.EDGE_ID: id,
-                          constants.EDGE_SOURCE: src_id,
-                          constants.EDGE_TARGET: target_id}
+        self.edges[edge_id] = {constants.EDGE_ID: edge_id,
+                               constants.EDGE_SOURCE: src_id,
+                               constants.EDGE_TARGET: target_id}
 
         if edge_interaction is not None:
-            self.edges[id][constants.EDGE_INTERACTION] = edge_interaction
+            self.edges[edge_id][constants.EDGE_INTERACTION] = edge_interaction
 
-        return id
+        return edge_id
 
     def create_edge(self, edge_source=None, edge_target=None, edge_interaction=None):
         """
@@ -127,7 +127,7 @@ class NiceCXNetwork():
         """
         edge_id = self.edge_int_id_generator
 
-        self.__create_edge(id=edge_id, edge_source=edge_source,
+        self.__create_edge(edge_id=edge_id, edge_source=edge_source,
                            edge_target=edge_target,
                            edge_interaction=edge_interaction)
         self.edge_int_id_generator += 1
@@ -148,16 +148,16 @@ class NiceCXNetwork():
     #==================
     # NODE OPERATIONS
     #==================
-    def __create_node(self, id=None, node_name=None, node_represents=None):
-        if id is None:
-            id=self.get_next_node_id()
+    def __create_node(self, node_id=None, node_name=None, node_represents=None):
+        if node_id is None:
+            node_id=self.get_next_node_id()
 
         if node_represents is not None:
-            self.nodes[id] = {'@id': id, 'n': node_name, 'r': node_represents}
+            self.nodes[node_id] = {'@node_id': node_id, 'n': node_name, 'r': node_represents}
         else:
-            self.nodes[id] = {'@id': id, 'n': node_name, 'r': node_name}
+            self.nodes[node_id] = {'@node_id': node_id, 'n': node_name, 'r': node_name}
 
-        return id
+        return node_id
 
     def create_node(self, node_name=None, node_represents=None):
         """
@@ -175,11 +175,11 @@ class NiceCXNetwork():
         :rtype: int
         """
 
-        id = self.node_int_id_generator
-        self.__create_node(id=id, node_name=node_name, node_represents=node_represents)
+        new_node_id = self.node_int_id_generator
+        self.__create_node(node_id=new_node_id, node_name=node_name, node_represents=node_represents)
         self.node_int_id_generator += 1
 
-        return id
+        return new_node_id
 
     def add_node(self, id=None, name=None, represents=None):
         """
@@ -285,7 +285,6 @@ class NiceCXNetwork():
 
         if props is not None and len(props) > 0:
             add_this_supports['properties'] = props
-
 
         self.supports[id] = add_this_supports
 

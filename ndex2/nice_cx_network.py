@@ -614,8 +614,6 @@ class NiceCXNetwork():
 
         return None
 
-
-
     def get_node_attributes(self, node):
         """
         Get the attribute objects of a node, where the node may be specified by its id or passed in as an object.
@@ -634,7 +632,6 @@ class NiceCXNetwork():
             return self.nodeAttributes.get(node.get('@id'))
         else:
             return self.nodeAttributes.get(node)
-
 
     def set_network_attribute(self, name, values=None, type=None):
         """
@@ -693,7 +690,6 @@ class NiceCXNetwork():
 
             self.networkAttributes.append(net_attr)
 
-
     def set_edge_attribute(self, edge, attribute_name, values, type=None):
         """
         Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
@@ -741,27 +737,6 @@ class NiceCXNetwork():
             return self.edgeAttributes.get(edge.get('@id'))
 
         return self.edgeAttributes.get(edge)
-
-    def get_edge_attribute_objects(self, edge, attribute_name):
-        """
-        .. warning::
-
-           This method has been deprecated.  Please use **get_edge_attributes()**
-
-        ..
-
-        """
-
-        raise Warning('get_edge_attribute_objects() is deprecated')
-        #edge_attrs = self.get_edge_attributes(edge)
-
-        #if edge_attrs:
-        #    for e_a in edge_attrs:
-        #        if e_a.get('n') == attribute_name:
-        #            return e_a
-
-        #return None
-
 
     def get_edge_attribute(self, edge, attribute_name):
         """

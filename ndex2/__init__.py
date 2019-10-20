@@ -11,6 +11,9 @@ import numpy as np
 from ndex2cx.nice_cx_builder import NiceCXBuilder
 
 
+logging.getLogger(__name__).addHandler(logging.NullHandler())
+
+
 def get_logger(name, level=logging.DEBUG):
     # TODO Creating a logs directory within the package installation of Python is bad
     root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -430,7 +433,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     if source_field and target_field:
         for index, row in df.iterrows():
             if count % 1000 == 0:
-                print(count)
+                logging.info(str(count))
             count += 1
             # =============
             # ADD NODES

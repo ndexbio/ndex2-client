@@ -11,7 +11,8 @@ import numpy as np
 from ndex2cx.nice_cx_builder import NiceCXBuilder
 
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 def get_logger(name, level=logging.DEBUG):
@@ -433,7 +434,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     if source_field and target_field:
         for index, row in df.iterrows():
             if count % 1000 == 0:
-                logging.info(str(count))
+                logger.info(str(count))
             count += 1
             # =============
             # ADD NODES

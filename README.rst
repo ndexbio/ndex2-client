@@ -25,8 +25,8 @@ The NDEx2 Python Client provides methods to access NDEx_ via
 the `NDEx REST Server API`_. As well as methods for common operations on
 networks via the NiceCXNetwork class.
 
-**Jupyter Notebook Tutorials**
-------------------------------
+**Jupyter Notebook Tutorials and Examples**
+-------------------------------------------------
 
 
 -  Basic Use of the NDEx2 Python Client:  `NDEx2 Client v2.0
@@ -40,6 +40,8 @@ your local machine and start Jupyter Notebooks in the project directory.
 
 For information on installing and using Jupyter Notebooks, go to
 `jupyter.org <http://jupyter.org/>`__
+
+- `Click here <https://github.com/ndexcontent/ndexncipidloader>`__ for example code to load content into `NDEx`_
 
 **Requirements**
 ----------------

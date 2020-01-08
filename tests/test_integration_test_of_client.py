@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import io
+import time
 import unittest
 import json
 import uuid
@@ -36,6 +37,17 @@ class TestClient(unittest.TestCase):
                      debug=True,
                      user_agent='ndex2-client integration test')
 
+    def wait_for_network_to_be_ready(self, client, netid,
+                                     num_retries=3, retry_weight=0.5):
+        retrycount = 1
+        while retrycount < num_retries:
+            netsum = client.get_network_summary(network_id=netid)
+            if netsum['completed'] is True:
+                return netsum
+            retrycount += 1
+            time.sleep(retry_weight)
+        return None
+
     def test_update_network(self):
         client = self.get_ndex2_client()
         # create network and add it
@@ -49,10 +61,12 @@ class TestClient(unittest.TestCase):
         try:
             self.assertTrue('http' in res)
             netid = re.sub('^.*/', '', res)
-
-            netsum = client.get_network_summary(network_id=netid)
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
             self.assertEqual(netid, netsum['externalId'])
-            self.assertEqual(netname, netsum['name'])
+            self.assertTrue('name' in netsum, msg=str(netsum))
+            self.assertEqual(netname, netsum['name'], str(netsum))
             self.assertEqual('PRIVATE', netsum['visibility'])
             self.assertEqual(False, netsum['isReadOnly'])
             self.assertEqual(1, netsum['edgeCount'])
@@ -74,7 +88,11 @@ class TestClient(unittest.TestCase):
                                                cls=DecimalEncoder))
             newres = client.update_cx_network(stream, netid)
             self.assertEqual('', newres)
-            netsum = client.get_network_summary(network_id=netid)
+            netsum = self.wait_for_network_to_be_ready(client, netid,
+                                                       num_retries=5,
+                                                       retry_weight=1)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
             self.assertEqual(netid, netsum['externalId'])
             self.assertEqual(newnetname, netsum['name'])
             self.assertEqual('PRIVATE', netsum['visibility'])
@@ -84,6 +102,7 @@ class TestClient(unittest.TestCase):
             self.assertEqual(False, netsum['isShowcase'])
             self.assertEqual('NONE', netsum['indexLevel'])
         finally:
+            pass
             client.delete_network(netid)
             try:
                 client.get_network_as_cx_stream(netid)
@@ -103,9 +122,12 @@ class TestClient(unittest.TestCase):
             netid = re.sub('^.*/', '', res)
 
             # verify network was uploaded
-            netsum = client.get_network_summary(network_id=netid)
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
             self.assertEqual(netid, netsum['externalId'])
-            self.assertEqual(netname, netsum['name'])
+            self.assertTrue('name' in netsum, str(netsum))
+            self.assertEqual(netname, netsum['name'], str(netsum))
             self.assertEqual('PUBLIC', netsum['visibility'])
             self.assertEqual(False, netsum['isReadOnly'])
             self.assertEqual(74, netsum['edgeCount'])

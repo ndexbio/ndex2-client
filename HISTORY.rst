@@ -2,6 +2,32 @@
 History
 =======
 
+4.0.0a1 (2020-02-12)
+---------------------
+
+**Note this release contains breaking changes**
+
+* Remove ``add_edge()`` and ``add_node()`` since they always raise Warning
+  `Issue #47 <https://github.com/ndexbio/ndex2-client/issues/47>`_
+
+* Remove ``NiceCXNetwork.get_edge_attribute_object()`` since it always raises Warning
+  `Issue #48 <https://github.com/ndexbio/ndex2-client/issues/48>`_
+
+* ``NiceCXNetwork.get_node_attribute_objects()`` incorrectly raises Warning bug
+  `Issue #49 <https://github.com/ndexbio/ndex2-client/issues/49>`_
+
+* Convert all print calls to use logging framework
+  `Issue #63 <https://github.com/ndexbio/ndex2-client/issues/63>`_
+
+* In ``NiceCXNetwork`` remove ``get_edge_attribute_objects()`` since it always raises Warning (which is incorrect behavior anyways)
+  `Issue #67 <https://github.com/ndexbio/ndex2-client/issues/67>`_
+
+* Remove deprecated methods from ``NiceCXNetwork``
+  `Issue #68 <https://github.com/ndexbio/ndex2-client/issues/68>`_
+
+* Remove forced setting of localhost url if ``localhost`` in host name in Ndex2 client constructor bug
+  `Issue #69 <https://github.com/ndexbio/ndex2-client/issues/69>`_
+
 3.3.1 (2019-09-23)
 -------------------
 

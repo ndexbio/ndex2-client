@@ -168,7 +168,7 @@ class NiceCXNetwork():
 
         return new_node_id
 
-    def add_network_attribute(self, name=None, values=None, type=None, subnetwork=None):
+    def add_network_attribute(self, name=None, values=None, attribute_type=None, subnetwork=None):
         """
         Add an attribute to the network
 
@@ -176,8 +176,8 @@ class NiceCXNetwork():
         :type name: str
         :param values:  The value(s) of the attribute
         :type values: One of the allowable CX types.  See `Supported data types`_
-        :param type: They type of data supplied in values. Default is string.  See `Supported data types`_
-        :type type: str
+        :param attribute_type: They type of data supplied in values. Default is string.  See `Supported data types`_
+        :type attribute_type: str
         :return: None
         :rtype: None
         """
@@ -189,22 +189,22 @@ class NiceCXNetwork():
                 if 'd' in n_a:
                     del n_a['d']
 
-                if type is not None:
-                    n_a['d'] = type
+                if attribute_type is not None:
+                    n_a['d'] = attribute_type
 
                 found_attr = True
 
                 break
 
         if not found_attr:
-            if type is not None:
-                network_attribute = {'n': name, 'v': values, 'd': type}
+            if attribute_type is not None:
+                network_attribute = {'n': name, 'v': values, 'd': attribute_type}
             else:
                 network_attribute = {'n': name, 'v': values}
 
             self.networkAttributes.append(network_attribute)
 
-    def add_citation(self, id, title=None, contributor=None, identifier=None, type=None, description=None, attributes=None):
+    def add_citation(self, id, title=None, contributor=None, identifier=None, citation_type=None, description=None, attributes=None):
         add_this_citation = {'@id': id}
 
         if contributor is not None:
@@ -213,8 +213,8 @@ class NiceCXNetwork():
         if identifier is not None:
             add_this_citation['dc:identifier'] = identifier
 
-        if type is not None:
-            add_this_citation['dc:type'] = type
+        if citation_type is not None:
+            add_this_citation['dc:citation_type'] = citation_type
 
         if title is not None:
             add_this_citation['dc:title'] = title
@@ -309,7 +309,7 @@ class NiceCXNetwork():
         :rtype: None
 
         """
-        self.add_network_attribute(name='name', values=network_name, type='string')
+        self.add_network_attribute(name='name', values=network_name, attribute_type='string')
 
     def get_name(self):
         """
@@ -335,7 +335,7 @@ class NiceCXNetwork():
                 break
 
         if not found_context:
-            self.add_network_attribute(name='@context', values=json.dumps({prefix: uri}), type='string')
+            self.add_network_attribute(name='@context', values=json.dumps({prefix: uri}), attribute_type='string')
 
     def set_namespaces(self, ns):
         self.set_context(ns)
@@ -346,9 +346,9 @@ class NiceCXNetwork():
         #    for c in ns:
         #        for k, v in c.items():
         #            add_this_context[k] = v
-        #    self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
+        #    self.add_network_attribute(name='@context', values=json.dumps(add_this_context), attribute_type='string')
         #elif isinstance(ns, dict):
-        #    self.add_network_attribute(name='@context', values=json.dumps(ns), type='string')
+        #    self.add_network_attribute(name='@context', values=json.dumps(ns), attribute_type='string')
         #else:
         #    raise Exception('Namespace must be of type dict or list')
 
@@ -416,7 +416,7 @@ class NiceCXNetwork():
         self.node_int_id_generator += 1
         return return_id
 
-    def add_node_attribute(self, property_of=None, name=None, values=None, type=None, subnetwork=None,
+    def add_node_attribute(self, property_of=None, name=None, values=None, attribute_type=None, subnetwork=None,
                            overwrite=False):
         if property_of is None:
             raise NDExError('Node attribute requires property_of')
@@ -442,7 +442,7 @@ class NiceCXNetwork():
         n_attrib = {constants.NODE_ATTR_PROPERTYOF: node_id,
                     constants.NODE_ATTR_NAME: name,
                     constants.NODE_ATTR_VALUE: values}
-        if type is None:
+        if attribute_type is None:
             attr_type = None
             if isinstance(values, float):
                 attr_type = 'double'
@@ -454,11 +454,11 @@ class NiceCXNetwork():
             if attr_type:
                 n_attrib[constants.NODE_ATTR_DATATYPE] = attr_type
         else:
-            n_attrib[constants.NODE_ATTR_DATATYPE] = type
+            n_attrib[constants.NODE_ATTR_DATATYPE] = attribute_type
 
         self.nodeAttributes[node_id].append(n_attrib)
 
-    def add_edge_attribute(self, property_of, name, values, type=None, subnetwork=None):
+    def add_edge_attribute(self, property_of, name, values, attribute_type=None, subnetwork=None):
         if isinstance(property_of, dict):
             property_of = property_of.get('@id')
 
@@ -471,13 +471,13 @@ class NiceCXNetwork():
         if self.edgeAttributes.get(property_of) is None :
             self.edgeAttributes[property_of] = []
 
-        if type is None:
+        if attribute_type is None:
             self.edgeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values})
         else:
             #TODO check for float --> double and numpy types
-            if type == 'float' or type == 'list_of_float':
-                type = 'float'
-            self.edgeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': type})
+            if attribute_type == 'float' or attribute_type == 'list_of_float':
+                attribute_type = 'float'
+            self.edgeAttributes[property_of].append({'po': property_of, 'n': name, 'v': values, 'd': attribute_type})
 
     def get_nodes(self):
         """
@@ -524,7 +524,7 @@ class NiceCXNetwork():
     #=============================
     # NODE ATTRIBUTES OPERATIONS
     #=============================
-    def set_node_attribute(self, node, attribute_name, values, type=None,
+    def set_node_attribute(self, node, attribute_name, values, attribute_type=None,
                            overwrite=False):
         """
         Set an attribute of a node, where the node may be specified by its id or passed in as a node dict.
@@ -535,7 +535,7 @@ class NiceCXNetwork():
 
             or
 
-            ``set_node_attribute(my_node, 'Mutation Frequency', 0.007, type='double')``
+            ``set_node_attribute(my_node, 'Mutation Frequency', 0.007, attribute_type='double')``
 
         :param node: Node to add the attribute to
         :type node: int or node dict with @id attribute
@@ -543,8 +543,8 @@ class NiceCXNetwork():
         :type attribute_name: string
         :param values: A value or list of values of the attribute
         :type values: list, string, int or double
-        :param type: The datatype of the attribute values, defaults is string.  See `Supported data types`_
-        :type type: str
+        :param attribute_type: The datatype of the attribute values, defaults is string.  See `Supported data types`_
+        :type attribute_type: str
         :param overwrite: If True node attribute matching 'attribute_name' is removed first otherwise
                           code blindly adds attribute
         :type overwrite: bool True means to overwrite node attribute named attribute_name
@@ -552,7 +552,7 @@ class NiceCXNetwork():
         :rtype: None
         """
 
-        self.add_node_attribute(property_of=node, name=attribute_name, values=values, type=type,
+        self.add_node_attribute(property_of=node, name=attribute_name, values=values, attribute_type=attribute_type,
                                 overwrite=overwrite)
 
     def get_node_attribute(self, node, attribute_name):
@@ -630,7 +630,7 @@ class NiceCXNetwork():
         else:
             return self.nodeAttributes.get(node)
 
-    def set_network_attribute(self, name, values=None, type=None):
+    def set_network_attribute(self, name, values=None, attribute_type=None):
         """
         Set an attribute of the network
 
@@ -642,8 +642,8 @@ class NiceCXNetwork():
         :type name: string
         :param values: The values of the attribute
         :type values: list, string, double or int
-        :param type: The datatype of the attribute values.  See `Supported data types`_
-        :type type: str
+        :param attribute_type: The datatype of the attribute values.  See `Supported data types`_
+        :type attribute_type: str
         :return: None
         :rtype: none
         """
@@ -653,12 +653,12 @@ class NiceCXNetwork():
         for n_a in self.networkAttributes:
             if n_a.get('n') == name:
                 n_a['v'] = values
-                if type is not None:
-                    if type == 'float':
-                        type = 'double'
-                    elif type == 'list_of_float':
-                        type = 'list_of_double'
-                    n_a['d'] = type
+                if attribute_type is not None:
+                    if attribute_type == 'float':
+                        attribute_type = 'double'
+                    elif attribute_type == 'list_of_float':
+                        attribute_type = 'list_of_double'
+                    n_a['d'] = attribute_type
 
                 if subnetwork:
                     n_a['s'] = subnetwork
@@ -668,16 +668,16 @@ class NiceCXNetwork():
                 break
 
         if not found_attr:
-            if type is not None:
-                if type == 'float':
-                    type = 'double'
-                elif type == 'list_of_float':
-                    type = 'list_of_double'
+            if attribute_type is not None:
+                if attribute_type == 'float':
+                    attribute_type = 'double'
+                elif attribute_type == 'list_of_float':
+                    attribute_type = 'list_of_double'
 
                 net_attr = {
                     'n': name,
                     'v': values,
-                    'd': type
+                    'd': attribute_type
                 }
             else:
                 net_attr = {
@@ -687,13 +687,13 @@ class NiceCXNetwork():
 
             self.networkAttributes.append(net_attr)
 
-    def set_edge_attribute(self, edge, attribute_name, values, type=None):
+    def set_edge_attribute(self, edge, attribute_name, values, attribute_type=None):
         """
         Set the value(s) of attribute of an edge, where the edge may be specified by its id or passed in an object.
 
         Example:
 
-            ``set_edge_attribute(0, 'weight', 0.5, type='double')``
+            ``set_edge_attribute(0, 'weight', 0.5, attribute_type='double')``
 
             or
 
@@ -706,13 +706,13 @@ class NiceCXNetwork():
         :type attribute_name: str
         :param values: A value or list of values of the attribute
         :type values: list
-        :param type: The datatype of the attribute values, defaults to the python datatype of the values.  See `Supported data types`_
-        :type type: str
+        :param attribute_type: The datatype of the attribute values, defaults to the python datatype of the values.  See `Supported data types`_
+        :type attribute_type: str
         :return: None
         :rtype: None
         """
 
-        self.add_edge_attribute(property_of=edge, name=attribute_name, values=values, type=type)
+        self.add_edge_attribute(property_of=edge, name=attribute_name, values=values, attribute_type=attribute_type)
         #TODO add support for subnetworks
 
     def get_edge_attributes(self, edge):
@@ -864,11 +864,11 @@ class NiceCXNetwork():
             for c in context:
                 for k, v in c.items():
                     add_this_context[k] = v
-            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
+            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(add_this_context), attribute_type='string')
         elif isinstance(context, dict):
             self.context = [context]
 
-            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(context), type='string')
+            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(context), attribute_type='string')
         else:
             raise Exception('Context provided is not of type list or dict')
 

@@ -167,7 +167,7 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0][constants.NODE_ATTR_VALUE], 'value')
 
         net = NiceCXNetwork()
-        net.set_node_attribute(1, 'attrname', 1, type='double')
+        net.set_node_attribute(1, 'attrname', 1, attribute_type='double')
         res = net.get_node_attributes(1)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0][constants.NODE_ATTR_PROPERTYOF], 1)
@@ -183,7 +183,7 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0][constants.NODE_ATTR_VALUE], 'value')
 
         net = NiceCXNetwork()
-        net.set_node_attribute(1, 'attrname', 1, type='double',
+        net.set_node_attribute(1, 'attrname', 1, attribute_type='double',
                                overwrite=True)
         res = net.get_node_attributes(1)
         self.assertEqual(len(res), 1)
@@ -243,7 +243,7 @@ class TestNiceCXNetwork(unittest.TestCase):
         net = NiceCXNetwork()
         net.add_network_attribute(name='foo',
                                   values=['a', 'b'],
-                                  type='list_of_string')
+                                  attribute_type='list_of_string')
         res = net.get_network_attribute('foo')
         self.assertEqual('list_of_string', res['d'])
 
@@ -255,7 +255,7 @@ class TestNiceCXNetwork(unittest.TestCase):
 
         net.add_network_attribute(name='foo',
                                   values=4,
-                                  type='integer')
+                                  attribute_type='integer')
         res = net.get_network_attribute('foo')
         self.assertEqual('integer', res['d'])
 

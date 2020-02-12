@@ -8,7 +8,7 @@ import logging.handlers
 import json
 import base64
 import numpy as np
-from ndex2cx.nice_cx_builder import NiceCXBuilder
+from ndex2.nice_cx_builder import NiceCXBuilder
 
 
 logger = logging.getLogger(__name__)
@@ -216,7 +216,7 @@ def create_nice_cx_from_networkx(G):
         #            node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), map_node_ids=True)
         #else:
         if isinstance(n, int):
-            node_id = niceCxBuilder.add_node(name=n,represents=d.get('represents'), id=n, map_node_ids=True)
+            node_id = niceCxBuilder.add_node(name=n, represents=d.get('represents'), node_id=n, map_node_ids=True)
         else:
             node_id = niceCxBuilder.add_node(name=n, represents=d.get('represents'), map_node_ids=True)
 
@@ -230,7 +230,7 @@ def create_nice_cx_from_networkx(G):
                 use_this_value = [use_this_value]
                 attr_type = 'list_of_string'
             if use_this_value is not None:
-                niceCxBuilder.add_node_attribute(node_id, k, use_this_value, type=attr_type)
+                niceCxBuilder.add_node_attribute(node_id, k, use_this_value, attribute_type=attr_type)
 
     index = 0
     for u, v, d in G.edges(data=True):
@@ -243,10 +243,10 @@ def create_nice_cx_from_networkx(G):
             interaction = d.get('interaction')
 
         if isinstance(u, int):
-            niceCxBuilder.add_edge(source=u, target=v, interaction=interaction, id=index)
+            niceCxBuilder.add_edge(source=u, target=v, interaction=interaction, edge_id=index)
         else:
             niceCxBuilder.add_edge(source=niceCxBuilder.node_id_lookup.get(u), target=niceCxBuilder.node_id_lookup.get(v),
-                               interaction=interaction, id=index)
+                                   interaction=interaction, edge_id=index)
 
         # ==============================
         # ADD EDGE ATTRIBUTES
@@ -260,7 +260,7 @@ def create_nice_cx_from_networkx(G):
                     attr_type = 'list_of_string'
 
                 if use_this_value is not None:
-                    niceCxBuilder.add_edge_attribute(property_of=index, name=k, values=use_this_value, type=attr_type)
+                    niceCxBuilder.add_edge_attribute(property_of=index, name=k, values=use_this_value, attribute_type=attr_type)
 
         index += 1
 
@@ -461,7 +461,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             else:
                 use_this_interaction = 'interacts-with'
 
-            niceCxBuilder.add_edge(id=index, source=source_node_id, target=target_node_id, interaction=use_this_interaction)
+            niceCxBuilder.add_edge(edge_id=index, source=source_node_id, target=target_node_id, interaction=use_this_interaction)
 
             # ==============================
             # ADD SOURCE NODE ATTRIBUTES
@@ -487,7 +487,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                 if sp == 'citation' and not isinstance(row[sp], list):
                     row[sp] = [row[sp]]
                     attr_type = 'list_of_string'
-                niceCxBuilder.add_node_attribute(source_node_id, sp, str(row[sp]), type=attr_type)
+                niceCxBuilder.add_node_attribute(source_node_id, sp, str(row[sp]), attribute_type=attr_type)
 
             # ==============================
             # ADD TARGET NODE ATTRIBUTES
@@ -513,7 +513,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                 if tp == 'citation' and not isinstance(row[tp], list):
                     row[tp] = [row[tp]]
                     attr_type = 'list_of_string'
-                niceCxBuilder.add_node_attribute(target_node_id, tp, str(row[tp]), type=attr_type)
+                niceCxBuilder.add_node_attribute(target_node_id, tp, str(row[tp]), attribute_type=attr_type)
 
             # ==============================
             # ADD EDGE ATTRIBUTES
@@ -536,7 +536,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                     row[ep] = [row[ep]]
                     attr_type = 'list_of_string'
 
-                niceCxBuilder.add_edge_attribute(property_of=index, name=ep, values=row[ep], type=attr_type)
+                niceCxBuilder.add_edge_attribute(property_of=index, name=ep, values=row[ep], attribute_type=attr_type)
 
     else:
         for index, row in df.iterrows():
@@ -551,9 +551,9 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # ADD EDGES
             # =============
             if len(row) > 2:
-                niceCxBuilder.add_edge(id=index, source=source_node_id, target=target_node_id, interaction=row[2])
+                niceCxBuilder.add_edge(edge_id=index, source=source_node_id, target=target_node_id, interaction=row[2])
             else:
-                niceCxBuilder.add_edge(id=index, source=source_node_id, target=target_node_id, interaction='interacts-with')
+                niceCxBuilder.add_edge(edge_id=index, source=source_node_id, target=target_node_id, interaction='interacts-with')
 
     return niceCxBuilder.get_nice_cx()  # my_nicecx
 
@@ -617,7 +617,7 @@ def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
             objects = my_nicecx.get_aspect(uuid, 'nodes', server, username, password)
             for node_item in objects:
                 niceCxBuilder._add_node_from_fragment(node_item)
-                #niceCxBuilder.add_node(node_item.get('n'), node_item.get('r'), id=node_item.get('@id'))
+                #niceCxBuilder.add_node(node_item.get('n'), node_item.get('r'), node_id=node_item.get('@id'))
 
         # ===================
         # EDGES
@@ -628,7 +628,7 @@ def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
                 niceCxBuilder._add_edge_from_fragment(edge_item)
 
                 #niceCxBuilder.add_edge(source=edge_item.get('s'), target=edge_item.get('t'),
-                #                       interaction=edge_item.get('i'), id=edge_item.get('@id'))
+                #                       interaction=edge_item.get('i'), edge_id=edge_item.get('@id'))
 
         # ===================
         # NODE ATTRIBUTES
@@ -638,7 +638,7 @@ def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
             for att in objects:
                 niceCxBuilder._add_node_attribute_from_fragment(att)
 
-                #niceCxBuilder.add_node_attribute(att.get('po'), att.get('n'), att.get('v'), type=att.get('d'))
+                #niceCxBuilder.add_node_attribute(att.get('po'), att.get('n'), att.get('v'), attribute_type=att.get('d'))
 
         # ===================
         # EDGE ATTRIBUTES
@@ -649,7 +649,7 @@ def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
                 niceCxBuilder._add_edge_attribute_from_fragment(att)
 
                 #niceCxBuilder.add_edge_attribute(property_of=att.get('po'), name=att.get('n'),
-                #                                 values=att.get('v'), type=att.get('d'))
+                #                                 values=att.get('v'), attribute_type=att.get('d'))
 
         # ===================
         # CITATIONS

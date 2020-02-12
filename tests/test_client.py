@@ -42,8 +42,11 @@ class TestClient(unittest.TestCase):
     def get_rest_admin_v1_empty_dict(self):
         return {}
 
-    def get_rest_admin_status_url(self):
-        return client.DEFAULT_SERVER + '/rest/admin/status'
+    def get_rest_admin_status_url(self, altserver=None):
+        urlprefix = client.DEFAULT_SERVER
+        if altserver is not None:
+            urlprefix = altserver
+        return urlprefix + '/rest/admin/status'
 
     def setUp(self):
         """Set up test fixtures, if any."""
@@ -81,33 +84,39 @@ class TestClient(unittest.TestCase):
         # this is invasive, but there isn't really a good way
         # to test the constructor
         # try with nothing set
-        ndex = Ndex2(host='localhost')
-        self.assertEqual(ndex.debug, False)
-        self.assertEqual(ndex.version, 1.3)
-        self.assertEqual(ndex.status, {})
-        self.assertEqual(ndex.username, None)
-        self.assertEqual(ndex.password, None)
-        self.assertEqual(ndex.user_agent, '')
-        self.assertEqual(ndex.host, 'http://localhost:8080/ndexbio-rest')
-        self.assertTrue(ndex.s is not None)
-        self.assertTrue(ndex.timeout, 30)
-        ndex.set_request_timeout(10)
-        self.assertTrue(ndex.timeout, 30)
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(altserver='http://localhost'),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2(host='localhost')
+            self.assertEqual(ndex.debug, False)
+            self.assertEqual(ndex.version, '2.1')
+            self.assertEqual(ndex.status, {})
+            self.assertEqual(ndex.username, None)
+            self.assertEqual(ndex.password, None)
+            self.assertEqual(ndex.user_agent, '')
+            self.assertEqual(ndex.host, 'http://localhost/v2')
+            self.assertTrue(ndex.s is not None)
+            self.assertTrue(ndex.timeout, 30)
+            ndex.set_request_timeout(10)
+            self.assertTrue(ndex.timeout, 30)
 
         # try with user, pass and user_agent set oh and host
         # with extra text prepended to localhost
-        ndex = Ndex2(host='xxxlocalhost', username='bob',
-                     password='smith', user_agent='yo', debug=True,
-                     timeout=1)
-        self.assertEqual(ndex.debug, True)
-        self.assertEqual(ndex.version, 1.3)
-        self.assertEqual(ndex.status, {})
-        self.assertEqual(ndex.username, 'bob')
-        self.assertEqual(ndex.password, 'smith')
-        self.assertEqual(ndex.user_agent, ' yo')
-        self.assertEqual(ndex.host, 'http://localhost:8080/ndexbio-rest')
-        self.assertTrue(ndex.s is not None)
-        self.assertTrue(ndex.timeout, 1)
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(altserver='http://xxxlocalhost'),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2(host='xxxlocalhost', username='bob',
+                         password='smith', user_agent='yo', debug=True,
+                         timeout=1)
+            self.assertEqual(ndex.debug, True)
+            self.assertEqual(ndex.version, '2.1')
+            self.assertEqual(ndex.status, {})
+            self.assertEqual(ndex.username, 'bob')
+            self.assertEqual(ndex.password, 'smith')
+            self.assertEqual(ndex.user_agent, ' yo')
+            self.assertEqual(ndex.host, 'http://xxxlocalhost/v2')
+            self.assertTrue(ndex.s is not None)
+            self.assertTrue(ndex.timeout, 1)
 
         # try with user_agent set to None Issue #34
         with requests_mock.mock() as m:
@@ -198,24 +207,31 @@ class TestClient(unittest.TestCase):
             self.assertTrue(ndex.s is not None)
 
     def test_ndex2_require_auth(self):
-        ndex = Ndex2(host='localhost')
-        try:
-            ndex._require_auth()
-            self.fail('Expected exception')
-        except Exception as e:
-            self.assertEqual(str(e),
-                             'This method requires user authentication')
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(altserver='http://localhost'),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2(host='localhost')
+            try:
+                ndex._require_auth()
+                self.fail('Expected exception')
+            except Exception as e:
+                self.assertEqual(str(e),
+                                 'This method requires '
+                                 'user authentication')
 
     def test_ndex2_get_user_agent(self):
-        ndex = Ndex2(host='localhost')
-        # try with default
-        res = ndex._get_user_agent()
-        self.assertEqual(res, 'NDEx2-Python/' + __version__)
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(altserver='http://localhost'),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2(host='localhost')
+            # try with default
+            res = ndex._get_user_agent()
+            self.assertEqual(res, 'NDEx2-Python/' + __version__)
 
-        ndex = Ndex2(host='localhost', user_agent='hi')
-        # try with user_agent set
-        res = ndex._get_user_agent()
-        self.assertEqual(res, 'NDEx2-Python/' + __version__ + ' hi')
+            ndex = Ndex2(host='localhost', user_agent='hi')
+            # try with user_agent set
+            res = ndex._get_user_agent()
+            self.assertEqual(res, 'NDEx2-Python/' + __version__ + ' hi')
 
     def test_ndex2_put_no_json_empty_resp_code_204(self):
         with requests_mock.mock() as m:

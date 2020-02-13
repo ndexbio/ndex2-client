@@ -1,6 +1,6 @@
 six
 ijson
-requests
+requests>=1.0.0
 requests_toolbelt
 networkx
 urllib3>=1.16

@@ -90,7 +90,6 @@ NODE_ATTR_DATATYPE = 'd'
 Key for node attribute data type
 """
 
-
 LAYOUT_NODE = 'node'
 """
 Key for node id in :py:const:`CARTESIAN_LAYOUT_ASPECT` 
@@ -104,6 +103,18 @@ opaque aspect
 
 LAYOUT_Y = 'y'
 """
-Key for Y coordinate in :py:const:`CARTESIAN_LAYOUT_ASPECT` 
+Key for Y coordinate in :py:const:`CARTESIAN_LAYOUT_ASPECT`
 opaque aspect
+"""
+
+DEFAULT_SERVER = 'https://public.ndexbio.org/v2'
+"""
+Default production NDEx REST service endpoint used in \
+:py:class:`~ndex2.client.Ndex2()` constructor
+"""
+
+USERAGENT_PREFIX = 'NDEx2-Python/'
+"""
+User agent prefix for requests sent to NDEx REST Service used by \
+:py:class:`~ndex2.client.Ndex2()` object
 """

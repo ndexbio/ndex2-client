@@ -9,6 +9,7 @@ import sys
 
 import requests_mock
 from ndex2 import client
+from ndex2.client import Ndex2
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
 from ndex2 import constants
@@ -38,7 +39,7 @@ class TestNiceCXNetwork(unittest.TestCase):
                                "ServerResultLimit": "10000"}}
 
     def get_rest_admin_status_url(self):
-        return client.DEFAULT_SERVER + '/rest/admin/status'
+        return constants.DEFAULT_SERVER + '/rest/admin/status'
 
     def setUp(self):
         """Set up test fixtures, if any."""
@@ -378,21 +379,21 @@ class TestNiceCXNetwork(unittest.TestCase):
 
     def test_upload_to_success(self):
         with requests_mock.mock() as m:
-            resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
+            resurl = constants.DEFAULT_SERVER + '/network/asdf'
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict("2.4.0"))
-            m.post(client.DEFAULT_SERVER + '/v2/network',
+            m.post(constants.DEFAULT_SERVER + '/network',
                    request_headers={'Connection': 'close'},
                    status_code=1,
                    text=resurl)
             net = NiceCXNetwork()
             net.create_node('bob')
-            res = net.upload_to(client.DEFAULT_SERVER, 'bob', 'warnerbrandis',
+            res = net.upload_to(constants.DEFAULT_SERVER, 'bob', 'warnerbrandis',
                                 user_agent='jeez')
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
             self.assertEqual(m.last_request.headers['User-Agent'],
-                             client.userAgent + ' jeez')
+                             Ndex2.USER_AGENT + ' jeez')
             self.assertTrue('Content-Disposition: form-data; name='
                             '"CXNetworkStream"; filename='
                             '"filename"' in decode_txt)
@@ -408,22 +409,22 @@ class TestNiceCXNetwork(unittest.TestCase):
 
     def test_update_to_success(self):
         with requests_mock.mock() as m:
-            resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
+            resurl = constants.DEFAULT_SERVER + '/network/asdf'
             m.get(self.get_rest_admin_status_url(),
                   json=self.get_rest_admin_status_dict("2.4.0"))
-            m.put(client.DEFAULT_SERVER + '/v2/network/abcd',
+            m.put(constants.DEFAULT_SERVER + '/network/abcd',
                   request_headers={'Connection': 'close'},
                   status_code=1,
                   text=resurl)
             net = NiceCXNetwork()
             net.create_node('bob')
-            res = net.update_to('abcd', client.DEFAULT_SERVER,
+            res = net.update_to('abcd', constants.DEFAULT_SERVER,
                                 'bob', 'warnerbrandis',
                                 user_agent='jeez')
             self.assertEqual(res, resurl)
             decode_txt = m.last_request.text.read().decode('UTF-8')
             self.assertEqual(m.last_request.headers['User-Agent'],
-                             client.userAgent + ' jeez')
+                             Ndex2.USER_AGENT + ' jeez')
             self.assertTrue('Content-Disposition: form-data; name='
                             '"CXNetworkStream"; filename='
                             '"filename"' in decode_txt)

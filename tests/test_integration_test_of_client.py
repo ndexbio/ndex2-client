@@ -174,6 +174,7 @@ class TestClient(unittest.TestCase):
             # delete network
             client.delete_network(netid)
 
+
     def test_deletenetworkset_nonexistant(self):
         client = self.get_ndex2_client()
         invalidnetworksetid = str(uuid.uuid4())

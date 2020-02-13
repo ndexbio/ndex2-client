@@ -204,8 +204,8 @@ class NiceCXNetwork():
 
             self.networkAttributes.append(network_attribute)
 
-    def add_citation(self, id, title=None, contributor=None, identifier=None, citation_type=None, description=None, attributes=None):
-        add_this_citation = {'@id': id}
+    def add_citation(self, citation_id, title=None, contributor=None, identifier=None, citation_type=None, description=None, attributes=None):
+        add_this_citation = {'@citation_id': citation_id}
 
         if contributor is not None:
             add_this_citation['dc:contributor'] = contributor
@@ -225,7 +225,7 @@ class NiceCXNetwork():
         if attributes is not None:
             add_this_citation[attributes] = attributes
 
-        self.citations[id] = add_this_citation
+        self.citations[citation_id] = add_this_citation
 
         return add_this_citation
 
@@ -237,8 +237,8 @@ class NiceCXNetwork():
 
         self.build_many_to_many_relation('edgeCitations', edge_citation_element, 'citations')
 
-    def add_support(self, id=None, text=None, citation_id=None, attributes=None, props=None):
-        add_this_supports = {'@id': id}
+    def add_support(self, support_id=None, text=None, citation_id=None, attributes=None, props=None):
+        add_this_supports = {'@support_id': support_id}
 
         if text is not None:
             add_this_supports['text'] = text
@@ -252,7 +252,7 @@ class NiceCXNetwork():
         if props is not None and len(props) > 0:
             add_this_supports['properties'] = props
 
-        self.supports[id] = add_this_supports
+        self.supports[support_id] = add_this_supports
 
         return add_this_supports
 
@@ -507,7 +507,7 @@ class NiceCXNetwork():
         self.node_name_to_id_map_cache = {node.get('n'): node_id for node_id, node in self.get_nodes()}
 
     def get_node_by_name(self, node_name):
-        if(len(self.node_name_to_id_map_cache) < 1):
+        if len(self.node_name_to_id_map_cache) < 1:
             self._generate_node_name_to_id_map()
 
         node_id_lookup = self.node_name_to_id_map_cache.get(node_name)
@@ -963,8 +963,8 @@ class NiceCXNetwork():
 
         return None
 
-    def get_edge_attributes_by_id(self, id):
-        return self.edgeAttributes.get(id)
+    def get_edge_attributes_by_id(self, edge_id):
+        return self.edgeAttributes.get(edge_id)
 
     def get_node_associated_aspects(self):
         return self.nodeAssociatedAspects

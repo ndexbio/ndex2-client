@@ -14,6 +14,8 @@ from datetime import datetime
 
 from requests.exceptions import HTTPError
 import ndex2
+from ndex2.exceptions import NDExInvalidCXError
+from ndex2.exceptions import NDExError
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
@@ -47,6 +49,54 @@ class TestClient(unittest.TestCase):
             retrycount += 1
             time.sleep(retry_weight)
         return None
+
+
+    def test_set_network_properties_network_not_found(self):
+        client = self.get_ndex2_client()
+        net_props = {'predicateString': 'foo',
+                     'value': 'thevalue'}
+        try:
+            client.set_network_properties(str(uuid.uuid4()), [net_props])
+            self.fail('Expected HTTPError')
+        except HTTPError as e:
+            self.assertTrue('not found in NDEx' in e.response.json()['message'])
+
+    def test_set_network_properties(self):
+        client = self.get_ndex2_client()
+        net = NiceCXNetwork()
+        oneid = net.create_node('node1')
+        twoid = net.create_node('node2')
+        net.create_edge(oneid, twoid, 'hello')
+        netname = 'ndex2-client integration test network' + str(datetime.now())
+        net.set_name(netname)
+        res = client.save_new_network(net.to_cx(), visibility='PRIVATE')
+        try:
+            self.assertTrue('http' in res)
+            netid = re.sub('^.*/', '', res)
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            self.assertEqual(netid, netsum['externalId'])
+
+            net_props = {'predicateString': 'foo',
+                         'value': 'thevalue'}
+            client.set_network_properties(netid, [net_props])
+            res = client.get_network_aspect_as_cx_stream(netid, 'networkAttributes')
+            self.assertEquals(200, res.status_code)
+            data = res.json()
+            foo_found = False
+            for element in data:
+                if element['n'] == 'foo':
+                    self.assertEquals('thevalue', element['v'])
+                    foo_found = True
+            self.assertTrue(foo_found)
+        finally:
+            client.delete_network(netid)
+            try:
+                client.get_network_as_cx_stream(netid)
+                self.fail('Expected exception')
+            except HTTPError:
+                pass
 
     def test_update_network(self):
         client = self.get_ndex2_client()
@@ -174,7 +224,6 @@ class TestClient(unittest.TestCase):
             # delete network
             client.delete_network(netid)
 
-
     def test_deletenetworkset_nonexistant(self):
         client = self.get_ndex2_client()
         invalidnetworksetid = str(uuid.uuid4())
@@ -228,6 +277,26 @@ class TestClient(unittest.TestCase):
                 self.fail('Expected Exception')
             except HTTPError:
                 pass
+
+    def test_save_new_network_invalid_cx(self):
+        client = self.get_ndex2_client()
+        try:
+            client.save_new_network(None)
+            self.fail('Expected NDExInvalidCXError')
+        except NDExInvalidCXError as ce:
+            self.assertEquals('CX is None', str(ce))
+
+        try:
+            client.save_new_network('hi')
+            self.fail('Expected NDExInvalidCXError')
+        except NDExInvalidCXError as ce:
+            self.assertEquals('CX is not a list', str(ce))
+
+        try:
+            client.save_new_network([])
+            self.fail('Expected NDExInvalidCXError')
+        except NDExInvalidCXError as ce:
+            self.assertEquals('CX appears to be empty', str(ce))
 
     def test_get_user_by_username(self):
         client = self.get_ndex2_client()

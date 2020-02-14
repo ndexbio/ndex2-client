@@ -749,9 +749,11 @@ class Ndex2(object):
         This method will **NOT** work for ``name, version, description``
         To change those parameters use :py:func:`~update_network_profile`
 
-        Expected format of `network_properties` :py:func:`dict` parameter:
+        Expected format of `network_properties`
+        (:py:func:`list` of :py:func:`dict`) parameter:
 
         .. code-block:: json-object
+
            [
             {
              'subNetworkId': '',
@@ -761,13 +763,18 @@ class Ndex2(object):
             }
            ]
 
+        The ``subNetworkId`` and ``dataType`` can be omitted. If done so datatype is assumed
+        to be a string.
+
         :param network_id: Network id
         :type network_id: str
         :param network_properties: List of NDEx property value pairs
         :type network_properties: list
         :raises NDExUnauthorizedError: If credentials are invalid or not set
-        :return:
-        :rtype:
+        :raises NDExError: If network_properties is not a
+                           :py:func:`list` or :py:func:`str`
+        :raises requests.exceptions.HTTPError: If there is some server side error
+        :return: None
         """
         self._require_auth()
         route = "/network/%s/properties" % network_id
@@ -776,9 +783,10 @@ class Ndex2(object):
         elif isinstance(network_properties, str):
             put_json = network_properties
         else:
-            raise Exception("network_properties must be a string or a list "
-                            "of NdexPropertyValuePair objects")
-        return self.put(route, put_json)
+            raise NDExError('network_properties must be a string or a list '
+                            'of NdexPropertyValuePair objects')
+
+        self.put(route, put_json)
 
     def get_sample_network(self, network_id):
         """

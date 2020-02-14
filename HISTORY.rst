@@ -7,6 +7,9 @@ History
 
 **Note this release contains breaking changes**
 
+* Improved documentation of ``ndex2.client.Ndex2.set_network_properties()`
+  and changed raise of Exception to an NDExError
+
 * Remove ``add_edge()`` and ``add_node()`` since they always raise Warning
   `Issue #47 <https://github.com/ndexbio/ndex2-client/issues/47>`_
 

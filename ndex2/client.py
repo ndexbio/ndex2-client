@@ -746,6 +746,21 @@ class Ndex2(object):
         """
         Sets network properties
 
+        This method will **NOT** work for ``name, version, description``
+        To change those parameters use :py:func:`~update_network_profile`
+
+        Expected format of `network_properties` :py:func:`dict` parameter:
+
+        .. code-block:: json-object
+           [
+            {
+             'subNetworkId': '',
+             'predicateString': '',
+             'dataType': '',
+             'value': ''
+            }
+           ]
+
         :param network_id: Network id
         :type network_id: str
         :param network_properties: List of NDEx property value pairs
@@ -931,7 +946,7 @@ class Ndex2(object):
         that are not specified will have no effect - omission of an attribute \
         does not mean deletion of that attribute.
         The network profile attributes that can be updated by this method \
-        are: 'name', 'description' and 'version'.
+        are: ``name``, ``description`` and ``version``.
 
         .. note::
 

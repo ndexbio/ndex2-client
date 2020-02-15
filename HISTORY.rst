@@ -2,12 +2,12 @@
 History
 =======
 
-4.0.0a2 (2020-02-12)
+4.0.0 (2020-02-15)
 ---------------------
 
 **Note this release contains breaking changes**
 
-* Improved documentation of ``ndex2.client.Ndex2.set_network_properties()`
+* Improved documentation of ``ndex2.client.Ndex2.set_network_properties()``
   and changed raise of Exception to an NDExError
 
 * Remove ``add_edge()`` and ``add_node()`` since they always raise Warning
@@ -19,6 +19,10 @@ History
 * ``NiceCXNetwork.get_node_attribute_objects()`` incorrectly raises Warning bug
   `Issue #49 <https://github.com/ndexbio/ndex2-client/issues/49>`_
 
+* Update documentation for ``ndex2client.Ndex2.update_network_profile()`` to
+  let caller know that network must be properly loaded before use
+  `Issue #54 <https://github.com/ndexbio/ndex2-client/issues/54>`_
+
 * Avoid using `id` as a variable name
   `Issue #55 <https://github.com/ndexbio/ndex2-client/issues/55>`_
 
@@ -27,6 +31,9 @@ History
 
 * Avoid using `type` as variable name
   `Issue #65 <https://github.com/ndexbio/ndex2-client/issues/65>`_
+
+* Update client to use SSL to connect to REST service by default
+  `Issue #66 <https://github.com/ndexbio/ndex2-client/issues/66>`_
 
 * In ``NiceCXNetwork`` remove ``get_edge_attribute_objects()`` since it always raises Warning (which is incorrect behavior anyways)
   `Issue #67 <https://github.com/ndexbio/ndex2-client/issues/67>`_
@@ -43,6 +50,11 @@ History
 * Move ``ndex2cx.nice_cx_builder.py`` to ``ndex2`` and remove ``ndex2cx``
   `Issue #73 <https://github.com/ndexbio/ndex2-client/issues/73>`_
 
+* Drop support for v1 of NDEx
+  `Issue #74 <https://github.com/ndexbio/ndex2-client/issues/74>`_
+
+* Remove ``ndex2.client.Ndex2.search_networks_by_property_filter()`` since it always raises an exception
+  `Issue #75 <https://github.com/ndexbio/ndex2-client/issues/75>`_
 
 3.3.1 (2019-09-23)
 -------------------

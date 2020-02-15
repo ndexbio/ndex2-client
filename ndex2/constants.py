@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Contains constants used by the NDEx2 Python Client
+Contains constants used by the :py:mod:`ndex2` package
 """
 
 VALID_ATTRIBUTE_DATATYPES = [

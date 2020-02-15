@@ -421,66 +421,6 @@ class NiceCXBuilder(object):
 
         return return_list
 
-    def load_aspect(self, aspect_name):
-        #with open('Signal1.cx', mode='r') as cx_f:
-        with open('network1.cx', mode='r') as cx_f:
-            aspect_json = json.loads(cx_f.read())
-            for aspect in aspect_json:
-                if aspect.get(aspect_name) is not None:
-                    return aspect.get(aspect_name)
-
-    def stream_all_aspects(self, uuid):
-        return ijson.items(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid), 'item')
-
-    def stream_aspect(self, uuid, aspect_name):
-        if aspect_name == 'metaData':
-            self.logger.debug('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
-            md_response = requests.get('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
-            json_respone = md_response.json()
-            return json_respone.get('metaData')
-        else:
-            #password_mgr = HTTPPasswordMgrWithDefaultRealm()
-
-            #top_level_url = 'http://dev2.ndexbio.org'
-            #password_mgr.add_password(None, top_level_url, self.username, self.password)
-            #handler = HTTPBasicAuthHandler(password_mgr)
-            #opener = build_opener(handler)
-            #install_opener(opener)
-
-
-
-
-
-            # Create an OpenerDirector with support for Basic HTTP Authentication...
-            #auth_handler = HTTPBasicAuthHandler()
-            #auth_handler.add_password(None, 'http://dev2.ndexbio.org', 'scratch', 'scratch')
-            #opener = build_opener(auth_handler)
-            # ...and install it globally so it can be used with urlopen.
-            #install_opener(opener)
-
-
-            request = Request('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
-            base64string = base64.b64encode('%s:%s' % ('scratch', 'scratch'))
-            request.add_header("Authorization", "Basic %s" % base64string)
-            #result = urllib2.urlopen(request)
-
-
-            urlopen_result = None
-            try:
-                urlopen_result = urlopen(request) #'http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
-            except HTTPError as e:
-                self.logger.error(str(e.code))
-                return []
-            except URLError as e:
-                self.logger.error('Other error')
-                self.logger.error('URL Error ' + str(e.message()))
-                return []
-
-            return ijson.items(urlopen_result, 'item')
-
-    def stream_aspect_raw(self, uuid, aspect_name):
-        return ijson.parse(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name))
-
     def _infer_data_type(self, val, split_string=False):
         if val is None:
             return None, None

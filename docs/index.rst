@@ -7,8 +7,7 @@ Welcome to NDEx2 Python Client documentation!
    :caption: Contents:
 
    readme
-   usage
-   modules
+   reference
    contributing
    license
    history

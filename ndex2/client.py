@@ -21,7 +21,7 @@ from ndex2.exceptions import NDExNotFoundError
 
 class Ndex2(object):
     """ A class to facilitate communication with a
-        `NDEx server <http://ndexbio.org>`_.
+        `NDEx REST server <https://ndexbio.org>`_.
 
     """
     USER_AGENT_KEY = 'User-Agent'
@@ -33,13 +33,38 @@ class Ndex2(object):
                  update_status=False, debug=False, user_agent='',
                  timeout=30):
         """
-        Constructor which creates a connection to a particular \
-        `NDEx server <https://ndexbio.org>`_.
 
+        Example creating anonymous connection:
+
+        .. code-block:: python
+
+            from ndex2 import client
+            anon_ndex = client.Ndex2()
+
+
+        Example creating connection with username and password:
+
+        .. code-block:: python
+
+            from ndex2import client
+            my_ndex = client.Ndex2(username='your account', password='your password')
+
+
+        Example creating connection to alternate host with username and password:
+
+        .. code-block:: python
+
+            from ndex2 import client
+            my_ndex = client.Ndex2(host='https://localhost/v2', username='your account',\
+                          password='your password')
+        .. note::
+
+          If `host` parameter is set it must be the full URL to REST server.
+          For production `NDEx REST server <https://ndexbio.org>`_ it is
+          the value of: :py:data:`~ndex2.constants.DEFAULT_SERVER`
 
         :param host: The full URL of NDEx REST service endpoint. If set to `None` \
                      :py:data:`~ndex2.constants.DEFAULT_SERVER` is used.
-                     (example: https://public.ndexbio.org/v2)
         :type host: str
         :param username: The username of the NDEx account to use. (Optional)
         :type username: str
@@ -283,9 +308,12 @@ class Ndex2(object):
 
     def save_new_network(self, cx, visibility=None):
         """
-        Create a new network (cx) on the server
+        Create a new network on the server with CX passed in via
+        *cx* parameter.
 
-        :param cx: Network cx
+        Click here for information about CX format <https://home.ndexbio.org/data-model/>`_
+
+        :param cx: Network in CX format. See
         :type cx: list of dicts
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: str
@@ -343,12 +371,16 @@ class Ndex2(object):
 
     def update_cx_network(self, cx_stream, network_id):
         """
-        Update the network specified by UUID network_id using the CX stream cx_stream.
+        Update the network specified by UUID network_id
+        using the CX stream *cx_stream*
 
         :param cx_stream: The network stream.
         :param network_id: The UUID of the network.
         :type network_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
+        :raises requests.exception.HTTPError: If there is some other error like
+                                              network is too large or insufficient
+                                              permission
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
@@ -364,7 +396,12 @@ class Ndex2(object):
 
     def get_network_as_cx_stream(self, network_id):
         """
-        Get the existing network with UUID network_id from the NDEx connection as a CX stream.
+        Get the existing network with UUID `network_id`
+        from the NDEx connection as a CX stream.
+        This is performed as a monolithic operation, so it is typically
+        advisable for applications to first use the
+        :py:func:`get_network_summary` method to check the node and
+        edge counts for a network before retrieving the network.
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -513,7 +550,8 @@ class Ndex2(object):
         else:
             return response_json
 
-    def search_networks(self, search_string="", account_name=None, start=0, size=100, include_groups=False):
+    def search_networks(self, search_string="", account_name=None, start=0,
+                        size=100, include_groups=False):
         """
         Search for networks based on the search_text, optionally limited to networks owned by the specified
         account_name.
@@ -526,8 +564,10 @@ class Ndex2(object):
         :type start: int
         :param size: The size of the block.
         :type size: int
-        :param include_groups:
-        :type include_groups:
+        :param include_groups: If True enables this method to return
+                               networks where the user has group
+                               permission to access
+        :type include_groups: bool
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
@@ -590,6 +630,9 @@ class Ndex2(object):
         """
         Makes the network specified by the **network_id** public.
 
+        .. deprecated:: 4.0.0
+        Use :py:func:`set_network_system_properties`
+
         :param network_id: The UUID of the network.
         :type network_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
@@ -602,6 +645,9 @@ class Ndex2(object):
     def _make_network_public_indexed(self, network_id):
         """
         Makes the network specified by the **network_id** public.
+
+        .. deprecated:: 4.0.0
+        Use :py:func:`set_network_system_properties`
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -620,6 +666,9 @@ class Ndex2(object):
         """
         Makes the network specified by the **network_id** private.
 
+        .. deprecated:: 4.0.0
+        Use :py:func:`set_network_system_properties`
+
         :param network_id: The UUID of the network.
         :type network_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
@@ -635,6 +684,34 @@ class Ndex2(object):
         """
         Retrieves a task by id
 
+        ..code-block:: json-object
+
+          {
+              "startTime": "2020-02-14T20:31:10.412Z",
+              "finishTime": "2020-02-14T20:31:10.412Z",
+              "ownerProperties": {
+                "newTask": true
+              },
+              "taskOwnerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "taskType": "string",
+              "progress": 0,
+              "resource": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "attributes": {
+                "name": "string",
+                "downloadFileName": "string",
+                "downloadFileExtension": "string"
+              },
+              "format": "string",
+              "description": "string",
+              "status": "string",
+              "message": "string",
+              "priority": "string",
+              "externalId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "isDeleted": true,
+              "modificationTime": "2020-02-14T20:31:10.412Z",
+              "creationTime": "2020-02-14T20:31:10.412Z"
+            }
+
         :param task_id: Task id
         :type task_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
@@ -647,7 +724,12 @@ class Ndex2(object):
 
     def delete_network(self, network_id, retry=5):
         """
-        Deletes the specified network from the server
+        Deletes the specified network from the server which
+        must be owned by the authenticated user
+
+        .. warning::
+
+           There is no undo operation
 
         :param network_id: Network id
         :type network_id: str
@@ -763,8 +845,36 @@ class Ndex2(object):
             }
            ]
 
-        The ``subNetworkId`` and ``dataType`` can be omitted. If done so datatype is assumed
-        to be a string.
+        Definitions:
+
+        ``subNetworkId`` - Optional identifier of the subnetwork to which \
+                           the property applies
+
+        ``predicateString`` - Name of the attribute.
+
+        ``dataType`` - Data type of this property. Has to be one of the CX supported \
+                       types. If unset, string is assumed.
+
+        ``value`` - String representation of the property value.
+
+        .. note::
+           Many networks in NDEx have no subnetworks
+           and in those cases the ``subNetworkId`` attribute of every
+           NdexPropertyValuePair should not be set. Some networks,
+           including some saved from Cytoscape have one subnetwork.
+           In those cases, every NdexPropertyValuePair should have
+           the ``subNetworkId`` attribute set to the id of that subNetwork.
+           Other networks originating in Cytoscape Desktop correspond
+           to Cytoscape "collections" and may have multiple
+           subnetworks. Each subnetwork may have NdexPropertyValuePairs
+           associated with it and these will be visible in the
+           Cytoscape network viewer. The collection itself may
+           have NdexPropertyValuePairs associated with it and
+           these are not visible in the Cytoscape network viewer
+           but may be set or read by specific Cytoscape Apps. In
+           these cases, we strongly recommend that you edit these
+           network attributes in Cytoscape rather than via this API
+           unless you are very familiar with the Cytoscape data model.
 
         :param network_id: Network id
         :type network_id: str
@@ -1064,7 +1174,7 @@ class Ndex2(object):
 
     def get_user_by_username(self, username):
         """
-        Gets user information as a dict in format:
+        Gets user information as a :py:func:`dict` example format:
 
         .. code-block:: json-object
 
@@ -1084,30 +1194,84 @@ class Ndex2(object):
              'creationTime': 1554410138498
             }
 
+        If the user account has not been verified by the user yet, the
+        returned object will contain no user UUID and the *isVerified* field
+        will be ``False``.
+
         :param username: User name
         :type username: str
+        :raises requests.exception.HTTPError: If there is some other error
         :return: user information as dict
         :rtype: dict
         """
         route = "/user?username=%s" % username
         return self.get(route)
 
-    def get_network_summaries_for_user(self, username):
-        network_summaries = self.get_user_network_summaries(username)
-        # self.search_networks("", username, size=1000)
+    def get_user_network_summaries(self, username):
+        """
+        This method invokes :py:func:`get_network_summaries_for_user` with
+        default `offset` and `limit`
 
-        # if (network_summaries and network_summaries['networks']):
-        #    network_summaries_list = network_summaries['networks']
-        # else:
-        #    network_summaries_list = []
+        .. deprecated:: 4.0.0
+        Use :func:`get_network_summaries_for_user` instead.
 
+        :param username: the username of the network owner
+        :type username: str
+        :return: list of network summaries
+        :rtype: list
+        """
+        network_summaries = self.get_network_summaries_for_user(username)
         return network_summaries
 
-    def get_user_network_summaries(self, username, offset=0, limit=1000):
+    def get_network_summaries_for_user(self, username, offset=0, limit=1000):
         """
         Get a list of network summaries for networks owned by specified user.
         It returns not only the networks that the user owns but also the networks that are
         shared with them directly.
+
+        Example result:
+
+        .. code-block:: json-object
+
+           [
+              {
+                "ownerUUID": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "isReadOnly": false,
+                "subnetworkIds": [
+                  "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                ],
+                "errorMessage": "string",
+                "isValid": true,
+                "warnings": [
+                  "string"
+                ],
+                "isShowcase": false,
+                "doi": "string",
+                "isCertified": false,
+                "visibility": "PUBLIC",
+                "indexed": true,
+                "completed": true,
+                "edgeCount": 0,
+                "nodeCount": 0,
+                "version": "string",
+                "uri": "string",
+                "owner": "string",
+                "name": "string",
+                "properties": [
+                  {
+                    "subNetworkId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "predicateString": "string",
+                    "dataType": "string",
+                    "value": "string"
+                  }
+                ],
+                "description": "string",
+                "externalId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "isDeleted": false,
+                "modificationTime": "2020-02-14T21:59:24.648Z",
+                "creationTime": "2020-02-14T21:59:24.648Z"
+              }
+           ]
 
         :param username: the username of the network owner
         :type username: str
@@ -1115,7 +1279,7 @@ class Ndex2(object):
         :type offset: int
         :param limit:
         :type limit:
-        :return: list of uuids
+        :return: :py:func:`list` of network summaries as :py:func:`dict`
         :rtype: list
         """
         user = self.get_user_by_username(username)#.json
@@ -1134,11 +1298,17 @@ class Ndex2(object):
 
     def get_network_ids_for_user(self, username):
         """
-        Get the network uuids owned by the user
+        Get the network uuids owned by the user as a :py:func:`list`
+
+        .. note::
+
+          This method only returns the first 1000 ids. To
+          get more results see :py:func:`get_user_network_summaries`
 
         :param username: users NDEx username
         :type username: str
         :return: list of uuids
+        :rtype: list
         """
         network_summaries_list = self.get_network_summaries_for_user(username)
 
@@ -1166,10 +1336,10 @@ class Ndex2(object):
 
         :param userid: User id
         :type userid: str
-        :param networkids: Network ids
-        :type networkids: list of strs
+        :param networkids: list of network ids as strings
+        :type networkids: list
         :param permission: Network permissions
-        :type permission: str (default is READ)
+        :type permission: str
         :return: none
         :rtype: none
         """

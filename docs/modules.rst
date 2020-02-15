@@ -1,9 +1,7 @@
-Reference
-=========
-
-NDEx2 Python Client documentation
+ndex2
+=====
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    ndex2

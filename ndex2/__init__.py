@@ -278,11 +278,7 @@ def create_nice_cx_from_raw_cx(cx):
     :param cx: a valid CX document
     :return: NiceCXNetwork
     """
-
     niceCxBuilder = NiceCXBuilder()
-
-    #my_nicecx = NiceCXNetwork()
-
     if cx:
         # ===================
         # METADATA

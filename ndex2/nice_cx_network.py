@@ -1298,7 +1298,7 @@ class NiceCXNetwork():
 
         Example:
 
-            ``nice_cx.upload_to('http://public.ndexbio.org', username, password)``
+            ``nice_cx.upload_to('https://public.ndexbio.org/v2', username, password)``
 
         :param server: The NDEx server to upload the network to.
         :type server: string
@@ -1321,7 +1321,7 @@ class NiceCXNetwork():
 
         Example:
 
-            ``nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22', 'public.ndexbio.org, username, password)``
+            ``nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22', 'https://public.ndexbio.org/v2', username, password)``
 
         :param server: The NDEx server to upload the network to.
         :type server: str
@@ -1475,11 +1475,12 @@ class NiceCXNetwork():
     def to_cx(self):
         """
         Return the CX corresponding to the network.
+        Can be used to post to endpoints that can
+        accept streaming inputs
 
         :return: CX representation of the network
         :rtype: CX (list of dict aspects)
         """
-
         #TODO - when server is compatible remove numberVerification and alter metadata insert() to position 0
         output_cx = [{"numberVerification": [{"longNumber": 281474976710655}]}]
 
@@ -2241,7 +2242,7 @@ class NetworkXFactory(object):
 
     def add_edge(self, networkx_graph, source_node, target_node, attribute_dict):
         """
-        Adds edge to `graph` dealing with differences between
+        Adds edge to `networkx_graph` dealing with differences between
         networkx 1.x and 2.x+
 
         :param networkx_graph: networkx graph to add node to

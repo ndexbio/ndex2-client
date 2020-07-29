@@ -20,13 +20,14 @@ from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
 from ndex2.exceptions import NDExUnauthorizedError
+from ndex2.exceptions import NDExServerError
 
 SKIP_REASON = 'NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
               'environment variables not set, cannot run integration' \
               ' tests with server'
 
 
-@unittest.skipUnless(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
+@unittest.skipUnless(os.getenv('NDEX2_TEST_USER') is not None, SKIP_REASON)
 class TestClient(unittest.TestCase):
 
     TEST_DIR = os.path.dirname(__file__)
@@ -49,7 +50,6 @@ class TestClient(unittest.TestCase):
             retrycount += 1
             time.sleep(retry_weight)
         return None
-
 
     def test_set_network_properties_network_not_found(self):
         client = self.get_ndex2_client()
@@ -233,6 +233,32 @@ class TestClient(unittest.TestCase):
         except NDExUnauthorizedError as ne:
             self.assertEqual('Not authorized', str(ne))
 
+    def test_delete_nonexistant_network(self):
+        client = self.get_ndex2_client()
+        invalidnetwork = str(uuid.uuid4())
+        try:
+            client.delete_network(invalidnetwork)
+            self.fail('Expected NDExServerError')
+        except NDExServerError as ne:
+            # seems invalid uuid kicks this message
+            # back even if we know this network does
+            # not exist
+            self.assertEqual('Only network owner can '
+                             'delete a network.', str(ne))
+
+    def test_delete_nonexistant_with_too_long_uuid(self):
+        client = self.get_ndex2_client()
+        invalidnetwork = str(uuid.uuid4()) + 'asdfasdf'
+        try:
+            client.delete_network(invalidnetwork)
+            self.fail('Expected NDExServerError')
+        except NDExServerError as ne:
+            self.assertEqual('Uncaught exception '
+                             'java.lang.Illegal'
+                             'ArgumentException: '
+                             'UUID string too '
+                             'large', str(ne))
+
     def test_networksets(self):
         client = self.get_ndex2_client()
 
@@ -304,3 +330,5 @@ class TestClient(unittest.TestCase):
         res = client.get_user_by_username(theuser)
         self.assertEqual(theuser, res['userName'])
         self.assertTrue('externalId' in res)
+
+

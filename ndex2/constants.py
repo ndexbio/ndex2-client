@@ -113,6 +113,12 @@ Default production NDEx REST service endpoint used in \
 :py:class:`~ndex2.client.Ndex2()` constructor
 """
 
+TEST_SERVER = 'https://test.ndexbio.org/v2'
+"""
+Test NDEx REST service endpoint that can be used in \
+:py:class:`~ndex2.client.Ndex2()` constructor
+"""
+
 USERAGENT_PREFIX = 'NDEx2-Python/'
 """
 User agent prefix for requests sent to NDEx REST Service used by \

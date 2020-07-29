@@ -5,6 +5,4 @@ requests_toolbelt
 networkx
 urllib3>=1.16
 pandas
-enum34
 numpy
-enum; python_version == '2.6' or python_version=='2.7'

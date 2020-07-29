@@ -60,9 +60,7 @@ These packages will automatically be installed when installing the NDEx2 Python 
 * networkx
 * urllib3
 * pandas
-* enum34
 * numpy
-* enum (for Python 2.6|2.7)
 
 **Installation**
 --------------------------------------
@@ -90,12 +88,4 @@ can use this command instead:
 --------------------------------------
 
 See `LICENSE.txt <https://github.com/ndexbio/ndex2-client/blob/master/LICENSE.txt>`_
-
-
-
-
-
-
-
-
 

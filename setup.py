@@ -38,9 +38,7 @@ test_requirements = [
     'networkx',
     'urllib3>=1.16',
     'pandas',
-    'enum34',
     'pysolr',
-    'enum; python_version == "2.6" or python_version=="2.7"',
     'unittest2',
     'requests-mock',
     'nose'
@@ -106,11 +104,9 @@ if __name__ == '__main__':
             'requests',
             'requests_toolbelt',
             'networkx',
-            'urllib3>=1.16',
+            'urllib3',
             'pandas',
-            'enum34',
-            'numpy',
-            'enum; python_version == "2.6" or python_version=="2.7"'
+            'numpy'
         ],
 
         include_package_data=True

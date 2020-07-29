@@ -28,7 +28,7 @@ SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
               'skipping for integration tests'
 
 
-@unittest.skipIf(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
+@unittest.skipIf(os.getenv('NDEX2_TEST_USER') is not None, SKIP_REASON)
 class TestClient(unittest.TestCase):
 
     def setUp(self):
@@ -61,6 +61,10 @@ class TestClient(unittest.TestCase):
             self.assertEqual(res, int(1))
         except TypeError:
             pass
+
+        # try a string
+        res = dec.default('some string')
+        self.assertEqual('"some string"', res)
 
     def test_ndex2_constructor_with_localhost(self):
         # this is invasive, but there isn't really a good way
@@ -96,6 +100,11 @@ class TestClient(unittest.TestCase):
         with requests_mock.mock() as m:
             ndex = Ndex2(user_agent=None)
             self.assertEqual(ndex.user_agent, '')
+
+    def test_close(self):
+        ndex = Ndex2()
+        ndex.close()
+        ndex.close()
 
     def test_ndex2_require_auth(self):
         with requests_mock.mock() as m:
@@ -853,6 +862,31 @@ class TestClient(unittest.TestCase):
                                        account_name='bob',
                                        include_groups=True)
             self.assertEqual(res, {'hi': 'bye'})
+
+    def test_find_networks(self):
+        with requests_mock.mock() as m:
+            m.post(constants.DEFAULT_SERVER +
+                   '/search/network?start=0&size=100',
+                   status_code=200,
+                   json={'hi': 'bye'},
+                   headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            ndex.set_debug_mode(True)
+            res = ndex.find_networks(search_string='hi',
+                                     account_name='bob',)
+            self.assertEqual(res, {'hi': 'bye'})
+
+    def test_network_summaries_to_ids(self):
+        net_sum = []
+        net_sum.append({'externalId': 1})
+        net_sum.append({'externalId': 2})
+        net_sum.append({'externalId': 3})
+        ndex = Ndex2()
+        res = ndex.network_summaries_to_ids(net_sum)
+        self.assertEqual(3, len(res))
+        self.assertTrue(1 in res)
+        self.assertTrue(2 in res)
+        self.assertTrue(3 in res)
 
     def test_get_network_summary(self):
         with requests_mock.mock() as m:

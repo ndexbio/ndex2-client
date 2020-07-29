@@ -1,12 +1,16 @@
 language: python
+
 python:
-  - "2.7"
   - "3.5"
+  - "3.6"
+  - "3.7"
 env:
-  - NETX=1.11
+  - NETX=2.2
+  - NETX=2.3
   - NETX=true
 install:
-  - if [ $NETX = 1.11 ] ; then echo 'installing networkx 1.11' ; pip install networkx==1.11 ; fi
+  - if [ $NETX = 2.2 ] ; then echo 'installing networkx 2.2' ; pip install networkx==2.2 ; fi
+  - if [ $NETX = 2.3 ] ; then echo 'installing networkx 2.3' ; pip install networkx==2.3 ; fi
   - pip install -r requirements.txt
   - pip install coveralls
 script:

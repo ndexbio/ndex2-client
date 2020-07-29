@@ -7,6 +7,14 @@ class NDExError(Exception):
     """
 
 
+class NDExServerError(NDExError):
+    """
+    Raised if server returned error in json
+    format
+    """
+    pass
+
+
 class NDExNotFoundError(NDExError):
     """
     Raised if resource requested was not found
@@ -41,5 +49,13 @@ class NDExUnsupportedCallError(NDExError):
     Raised if call is unsupported, for example a
     method that is only supported in 2.0+ of NDEx server
     is attempted against a server running 1.0
+    """
+    pass
+
+
+class NDExLockedError(NDExError):
+    """
+    Raised if server denotes entity is locked
+    and cannot be modified
     """
     pass

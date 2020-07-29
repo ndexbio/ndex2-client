@@ -6,6 +6,8 @@ by the :py:mod:`ndex2`
 
 .. autoclass:: ndex2.exceptions.NDExError
 
+.. autoclass:: ndex2.exceptions.NDExServerError
+
 .. autoclass:: ndex2.exceptions.NDExNotFoundError
 
 .. autoclass:: ndex2.exceptions.NDExUnauthorizedError
@@ -15,3 +17,5 @@ by the :py:mod:`ndex2`
 .. autoclass:: ndex2.exceptions.NDExInvalidCXError
 
 .. autoclass:: ndex2.exceptions.NDExUnsupportedCallError
+
+.. autoclass:: ndex2.exceptions.NDExLockedError

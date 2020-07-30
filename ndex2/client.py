@@ -5,7 +5,6 @@ import json
 import logging
 from requests_toolbelt import MultipartEncoder
 import io
-import sys
 import decimal
 import time
 import numpy
@@ -15,6 +14,8 @@ from ndex2 import constants
 from ndex2.exceptions import NDExInvalidCXError
 from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExError
+from ndex2.exceptions import NDExLockedError
+from ndex2.exceptions import NDExServerError
 from ndex2.exceptions import NDExInvalidParameterError
 from ndex2.exceptions import NDExNotFoundError
 
@@ -46,7 +47,7 @@ class Ndex2(object):
 
         .. code-block:: python
 
-            from ndex2import client
+            from ndex2 import client
             my_ndex = client.Ndex2(username='your account', password='your password')
 
 
@@ -186,7 +187,10 @@ class Ndex2(object):
         else:
             return response.text
 
-    def put(self, route, put_json=None):
+    def put(self, route, put_json=None,
+            raiseforstatus=True,
+            returnfullresponse=False,
+            returnjsonundertry=False):
         url = self.host + route
         self.logger.debug("PUT route: " + url)
         self.logger.debug("PUT json: " + str(put_json))
@@ -202,9 +206,14 @@ class Ndex2(object):
         else:
             response = self.s.put(url, headers=headers,
                                   timeout=self.timeout)
-        return self._return_response(response)
+        return self._return_response(response, raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
-    def post(self, route, post_json):
+    def post(self, route, post_json,
+             raiseforstatus=True,
+             returnfullresponse=False,
+             returnjsonundertry=False):
         url = self.host + route
         self.logger.debug("POST route: " + url)
         self.logger.debug("POST json: " + post_json)
@@ -215,7 +224,10 @@ class Ndex2(object):
                    }
         response = self.s.post(url, data=post_json, headers=headers,
                                timeout=self.timeout)
-        return self._return_response(response)
+        return self._return_response(response,
+                                     raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
     def delete(self, route, data=None,
                raiseforstatus=True,
@@ -237,7 +249,10 @@ class Ndex2(object):
                                      returnfullresponse=returnfullresponse,
                                      returnjsonundertry=returnjsonundertry)
 
-    def get(self, route, get_params=None):
+    def get(self, route, get_params=None,
+            raiseforstatus=True,
+            returnfullresponse=False,
+            returnjsonundertry=False):
         url = self.host + route
         self.logger.debug("GET route: " + url)
         headers = self.s.headers
@@ -245,10 +260,16 @@ class Ndex2(object):
         headers['Connection'] = 'close'
         response = self.s.get(url, params=get_params, headers=headers,
                               timeout=self.timeout)
-        return self._return_response(response)
+        return self._return_response(response,
+                                     raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
     # The stream refers to the Response, not the Request
-    def get_stream(self, route, get_params=None):
+    def get_stream(self, route, get_params=None,
+                   raiseforstatus=True,
+                   returnfullresponse=True,
+                   returnjsonundertry=False):
         url = self.host + route
         self.logger.debug("GET stream route: " + url)
         headers = self.s.headers
@@ -256,10 +277,15 @@ class Ndex2(object):
         response = self.s.get(url, params=get_params, stream=True,
                               headers=headers, timeout=self.timeout)
         return self._return_response(response,
-                                     returnfullresponse=True)
+                                     raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
     # The stream refers to the Response, not the Request
-    def post_stream(self, route, post_json):
+    def post_stream(self, route, post_json,
+                    raiseforstatus=True,
+                    returnfullresponse=True,
+                    returnjsonundertry=False):
         url = self.host + route
         self.logger.debug("POST stream route: " + url)
         headers = self.s.headers
@@ -271,10 +297,15 @@ class Ndex2(object):
         response = self.s.post(url, data=post_json, headers=headers,
                                stream=True, timeout=self.timeout)
         return self._return_response(response,
-                                     returnfullresponse=True)
+                                     raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
     # The Request is streamed, not the Response
-    def put_multipart(self, route, fields):
+    def put_multipart(self, route, fields,
+                      raiseforstatus=True,
+                      returnfullresponse=False,
+                      returnjsonundertry=True):
         url = self.host + route
         multipart_data = MultipartEncoder(fields=fields)
         self.logger.debug("PUT route: " + url)
@@ -286,10 +317,15 @@ class Ndex2(object):
                    }
         response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         return self._return_response(response,
-                                     returnjsonundertry=True)
+                                     raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
     # The Request is streamed, not the Response
-    def post_multipart(self, route, fields, query_string=None):
+    def post_multipart(self, route, fields, query_string=None,
+                       raiseforstatus=True,
+                       returnfullresponse=False,
+                       returnjsonundertry=True):
         if query_string:
             url = self.host + route + '?' + query_string
         else:
@@ -302,18 +338,26 @@ class Ndex2(object):
                    }
         response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         return self._return_response(response,
-                                     returnjsonundertry=True)
+                                     raiseforstatus=raiseforstatus,
+                                     returnfullresponse=returnfullresponse,
+                                     returnjsonundertry=returnjsonundertry)
 
 # Network methods
 
     def save_new_network(self, cx, visibility=None):
         """
         Create a new network on the server with CX passed in via
-        *cx* parameter.
+        *cx* parameter that is a :func:`list` of :func:`dict`
 
-        Click here for information about CX format <https://home.ndexbio.org/data-model/>`_
+        Click here for information about
+        `CX format <https://home.ndexbio.org/data-model/>`_
 
-        :param cx: Network in CX format. See
+        .. note::
+
+           For very large networks (millions of edges) it will be more efficient
+           to use :func:`save_cx_stream_as_new_network`
+
+        :param cx: Network in `CX format <https://home.ndexbio.org/data-model/>`_
         :type cx: list of dicts
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: str
@@ -328,8 +372,6 @@ class Ndex2(object):
         if len(cx) is 0:
             raise NDExInvalidCXError('CX appears to be empty')
 
-        indexed_fields = None
-        #TODO add functionality for indexed_fields when it's supported by the server
         if cx[-1] is not None:
             if cx[-1].get('status') is None:
                 cx.append({"status": [{"error": "", "success": True}]})
@@ -337,19 +379,17 @@ class Ndex2(object):
                 if len(cx[-1].get('status')) < 1:
                     cx[-1].get('status').append({"error": "", "success": True})
 
-            if sys.version_info.major == 3:
-                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
-            else:
-                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
+            stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
 
         return self.save_cx_stream_as_new_network(stream, visibility=visibility)
 
     def save_cx_stream_as_new_network(self, cx_stream, visibility=None):
         """
-        Create a new network from a CX stream.
+        Create a new network from a CX stream that should be in JSON
+        following the `CX format <https://home.ndexbio.org/data-model/>`_
 
         :param cx_stream:  IO stream of cx
-        :type cx_stream: BytesIO
+        :type cx_stream: stream like BytesIO
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
@@ -403,6 +443,20 @@ class Ndex2(object):
         :py:func:`get_network_summary` method to check the node and
         edge counts for a network before retrieving the network.
 
+        To download CX to a file:
+
+        .. code-block:: python
+
+           from ndex2 import client
+
+           anon_ndex = client.Ndex2()
+           client_resp = anon_ndex.get_network_as_cx_stream('<UUID OF NETWORK>')
+           with open('/tmp/REPLACE_WITH_DESIRED_FILE_NAME', 'wb') as f:
+           for chunk in client_resp.iter_content(chunk_size=8096):
+               if chunk:  # filter out keep-alive new chunks
+                   f.write(chunk)
+                   f.flush()
+
         :param network_id: The UUID of the network.
         :type network_id: str
         :return: The response.
@@ -441,7 +495,15 @@ class Ndex2(object):
         :type search_depth: int
         :param edge_limit: The maximum size of the neighborhood.
         :type edge_limit: int
-        :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
+        :param error_when_limit: Default value is true. If this value is True, the server
+                                 will stop streaming the network when it hits the edgeLimit,
+                                 and add `success: false and error: "EdgeLimitExceeded"`
+                                 in the status aspect and close the CX stream.
+                                 If this value is set to False the server will
+                                 return a subnetwork with edge count up to edgeLimit.
+                                 The status aspect will be a success, and a network
+                                 attribute `{"EdgeLimitExceeded": "true"}` will be added to
+                                 the returned network only if the server hits the edgeLimit.
         :type error_when_limit: boolean
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
@@ -583,7 +645,21 @@ class Ndex2(object):
         post_json = json.dumps(post_data)
         return self.post(route, post_json)
 
-    def search_network_nodes(self, network_id, search_string='', limit=5):
+    def search_network_nodes(self, network_id,
+                             search_string='', limit=5):
+        """
+        This does not appear to be in public REST API for
+        NDEx 2.4+. Slating for removal, pending feedback
+        from Jing
+
+        .. deprecated:: 4.0.0
+
+
+        :param network_id:
+        :param search_string:
+        :param limit:
+        :return:
+        """
         post_data = {"searchString": search_string}
 
         route = "/search/network/%s/nodes?limit=%s" % (network_id, limit)
@@ -607,6 +683,14 @@ class Ndex2(object):
         return self.search_networks(search_string, account_name, skip_blocks, block_size)
 
     def network_summaries_to_ids(self, network_summaries):
+        """
+        Internal method used by get_network_ids_for_user to
+        extract a list of network ids from a list of
+        summary objects
+
+        :param network_summaries:
+        :return:
+        """
         network_ids = []
         for network in network_summaries:
             network_ids.append(network['externalId'])
@@ -684,33 +768,33 @@ class Ndex2(object):
         """
         Retrieves a task by id
 
-        ..code-block:: json-object
+        .. code-block:: json-object
 
-          {
-              "startTime": "2020-02-14T20:31:10.412Z",
-              "finishTime": "2020-02-14T20:31:10.412Z",
-              "ownerProperties": {
-                "newTask": true
-              },
-              "taskOwnerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "taskType": "string",
-              "progress": 0,
-              "resource": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "attributes": {
-                "name": "string",
-                "downloadFileName": "string",
-                "downloadFileExtension": "string"
-              },
-              "format": "string",
-              "description": "string",
-              "status": "string",
-              "message": "string",
-              "priority": "string",
-              "externalId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "isDeleted": true,
-              "modificationTime": "2020-02-14T20:31:10.412Z",
-              "creationTime": "2020-02-14T20:31:10.412Z"
-            }
+           {
+               "startTime": "2020-02-14T20:31:10.412Z",
+               "finishTime": "2020-02-14T20:31:10.412Z",
+               "ownerProperties": {
+                 "newTask": true
+               },
+               "taskOwnerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+               "taskType": "string",
+               "progress": 0,
+               "resource": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+               "attributes": {
+                 "name": "string",
+                 "downloadFileName": "string",
+                 "downloadFileExtension": "string"
+               },
+               "format": "string",
+               "description": "string",
+               "status": "string",
+               "message": "string",
+               "priority": "string",
+               "externalId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+               "isDeleted": true,
+               "modificationTime": "2020-02-14T20:31:10.412Z",
+               "creationTime": "2020-02-14T20:31:10.412Z"
+             }
 
         :param task_id: Task id
         :type task_id: str
@@ -722,7 +806,62 @@ class Ndex2(object):
         route = "/task/%s" % task_id
         return self.get(route)
 
-    def delete_network(self, network_id, retry=5):
+    def _delete_with_lock_check(self, route=None, data=None):
+        """
+        Internal call that raises the proper exceptions
+        for all the cases when invoking delete on a
+        network, networkset, or members of a networkset
+
+        :param route:
+        :type route: str
+        :return: True if delete succeeded, False if object was locked
+        """
+        try:
+            resp = self.delete(route, data=data,
+                               raiseforstatus=False,
+                               returnjsonundertry=False,
+                               returnfullresponse=True)
+
+            if resp.status_code == 204:
+                return True
+            if resp.status_code == 401:
+                raise NDExUnauthorizedError('Server returned'
+                                            'unauthorized error')
+            if resp.status_code == 404:
+                raise NDExNotFoundError('Server returned not '
+                                        'found error')
+            if resp.status_code == 500:
+                ecode = 'unknown'
+                d = None
+                try:
+                    d = json.loads(resp.content)
+                    ecode = d.get('errorCode')
+                except Exception as e:
+                    self.logger.error('Caught exception trying '
+                                      'to get '
+                                      'erorcode from server error: ' +
+                                      str(e))
+                if ecode.startswith('NDEx_Concurrent_'
+                                    'Modification'):
+                    return False
+                else:
+                    msg = 'Unknown server error'
+                    try:
+                        msg = d.get('message')
+                    except Exception as e:
+                        self.logger.error('Caught exception trying '
+                                          'to get '
+                                          'message from server error: ' +
+                                          str(e))
+                    raise NDExServerError(msg)
+
+            raise NDExError('Unknown status code received: ' +
+                            str(resp.status_code))
+        except requests.RequestException as re:
+            raise NDExError('Exception from requests call: ' + str(re))
+
+    def delete_network(self, network_id, retry=5,
+                       retry_wait=1):
         """
         Deletes the specified network from the server which
         must be owned by the authenticated user
@@ -735,25 +874,38 @@ class Ndex2(object):
         :type network_id: str
         :param retry: Number of times to retry if deleting fails
         :type retry: int
-        :raises NDExUnauthorizedError: If credentials are invalid or not set
-        :return: Error json if there is an error.  Blank
-        :rtype: str
+        :param retry_wait: Time to wait in seconds between retries
+        :type retry_wait: int
+        :raises NDExUnauthorizedError: If server returns 401 status code which
+                                       means credentials are invalid or not set
+        :raises NDExNotFoundError: If server returns 404 status code
+        :raises NDExServerError: If server returns 500 status code with message
+                                 set to message content returned from server
+        :raises NDExLockedError: If network is still locked after all retries
+        :raises NDExError: If server return an unexpected status code or
+                           there was a communication error with
+                           server
+        :return: None
         """
+        if retry_wait is None:
+            retry_wait = 1
+
         self._require_auth()
         route = "/network/%s" % network_id
         count = 0
         while count < retry:
-            try:
-                return self.delete(route)
-            except Exception as inst:
-                d = json.loads(inst.response.content)
-                if d.get('errorCode').startswith("NDEx_Concurrent_Modification"):
-                    self.logger.debug("retry deleting network in 1 second(" + str(count) + ")")
-                    count += 1
-                    time.sleep(1)
-                else:
-                    raise inst
-        raise Exception("Network is locked after " + str(retry) + " retry.")
+            res = self._delete_with_lock_check(route=route)
+            if res is True:
+                return
+
+            self.logger.debug('retry deleting network in ' +
+                              str(retry_wait) + ' second(s) (' +
+                              str(count) + ')')
+            count += 1
+            time.sleep(retry_wait)
+
+        raise NDExLockedError("Network is locked after " +
+                              str(retry) + " retry(s)")
 
     def get_provenance(self, network_id):
         """
@@ -1380,12 +1532,11 @@ class Ndex2(object):
         Gets the network set information including the list of networks
 
         :param set_id: network set id
-        :type set_id: basestring
+        :type set_id: str
         :return: network set information
         :rtype: dict
         """
         route = '/networkset/%s' % set_id
-
         return self.get(route)
 
     def delete_networkset(self, networkset_id):
@@ -1398,7 +1549,7 @@ class Ndex2(object):
         :raises NDExUnauthorizedError: If no credentials or user is not authorized
         :raises NDExNotFoundError: If no networkset with id passed in found
         :raises NDExError: For any other error with contents of error in message
-        :return: None upon success
+        :return: None
         """
         if networkset_id is None:
             raise NDExInvalidParameterError('networkset id cannot be None')
@@ -1445,7 +1596,8 @@ class Ndex2(object):
         post_json = json.dumps(networks)
         return self.post(route, post_json)
 
-    def delete_networks_from_networkset(self, set_id, networks, retry=5):
+    def delete_networks_from_networkset(self, set_id, networks,
+                                        retry=5, retry_wait=1):
         """
         Removes network(s) from a network set.
 
@@ -1455,8 +1607,19 @@ class Ndex2(object):
         :type networks: list of strings
         :param retry: Number of times to retry
         :type retry: int
+        :param retry_wait: Time to wait in seconds between retries
+        :type retry_wait: int
+        :raises NDExUnauthorizedError: If server returns 401 status code which
+                                       means credentials are invalid or not set
+        :raises NDExNotFoundError: If server returns 404 status code
+        :raises NDExServerError: If server returns 500 status code with message
+                                 set to message content returned from server
+        :raises NDExLockedError: If network(s) are still locked after all
+                                 retries
+        :raises NDExError: If server return an unexpected status code or
+                           there was a communication error with
+                           server
         :return: None
-        :rtype: None
         """
 
         route = '/networkset/%s/members' % set_id
@@ -1466,19 +1629,24 @@ class Ndex2(object):
         headers['Accept'] = 'application/json'
         headers['User-Agent'] = self._get_user_agent()
 
+        if retry_wait is None:
+            retry_wait = 1
+
         count = 0
         while count < retry:
-            try:
-                return self.delete(route, data=post_json)
-            except Exception as inst:
-                d = json.loads(inst.response.content)
-                if d.get('errorCode').startswith("NDEx_Concurrent_Modification"):
-                    self.logger.debug("retry deleting network in 1 second(" + str(count) + ")")
-                    count += 1
-                    time.sleep(1)
-                else:
-                    raise inst
-        raise Exception("Network is locked after " + str(retry) + " retry.")
+            res = self._delete_with_lock_check(route=route,
+                                               data=post_json)
+            if res is True:
+                return
+
+            self.logger.debug('retry deleting network(s) from networkset '
+                              'in ' + str(retry_wait) + ' second(s) (' +
+                              str(count) + ')')
+            count += 1
+            time.sleep(retry_wait)
+
+        raise NDExLockedError("Network(s) are locked after " +
+                              str(retry) + " retry(s)")
 
 
 class DecimalEncoder(json.JSONEncoder):

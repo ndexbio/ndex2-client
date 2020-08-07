@@ -107,13 +107,18 @@ Key for Y coordinate in :py:const:`CARTESIAN_LAYOUT_ASPECT`
 opaque aspect
 """
 
-DEFAULT_SERVER = 'https://public.ndexbio.org/v2'
+VERSION_TWO_SUFFIX = '/v2'
+"""
+Version two suffix path of NDEx REST service
+"""
+
+DEFAULT_SERVER = 'https://public.ndexbio.org' + VERSION_TWO_SUFFIX
 """
 Default production NDEx REST service endpoint used in \
 :py:class:`~ndex2.client.Ndex2()` constructor
 """
 
-TEST_SERVER = 'https://test.ndexbio.org/v2'
+TEST_SERVER = 'https://test.ndexbio.org' + VERSION_TWO_SUFFIX
 """
 Test NDEx REST service endpoint that can be used in \
 :py:class:`~ndex2.client.Ndex2()` constructor

@@ -66,6 +66,54 @@ class TestClient(unittest.TestCase):
         res = dec.default('some string')
         self.assertEqual('"some string"', res)
 
+    def test_ndex2_constructor_with_host_that_has_http(self):
+        # this is invasive, but there isn't really a good way
+        # to test the constructor
+        # try with nothing set
+        with requests_mock.mock() as m:
+            ndex = Ndex2(host='http://foo')
+            self.assertEqual(ndex.host, 'http://foo')
+
+    def test_ndex2_constructor_with_host_that_has_https(self):
+        # this is invasive, but there isn't really a good way
+        # to test the constructor
+        # try with nothing set
+        with requests_mock.mock() as m:
+            ndex = Ndex2(host='https://foo')
+            self.assertEqual(ndex.host, 'https://foo')
+
+    def test_ndex2_constructor_with_host_that_has_production_hostname(self):
+        # this is invasive, but there isn't really a good way
+        # to test the constructor
+        # try with nothing set
+        with requests_mock.mock() as m:
+            ndex = Ndex2(host='public.ndexbio.org')
+            self.assertEqual(ndex.host, constants.DEFAULT_SERVER)
+
+    def test_ndex2_constructor_with_host_that_has_test_hostname(self):
+        # this is invasive, but there isn't really a good way
+        # to test the constructor
+        # try with nothing set
+        with requests_mock.mock() as m:
+            ndex = Ndex2(host='test.ndexbio.org')
+            self.assertEqual(ndex.host, constants.TEST_SERVER)
+
+    def test_ndex2_constructor_with_host_that_has_production_hostname(self):
+        # this is invasive, but there isn't really a good way
+        # to test the constructor
+        # try with nothing set
+        with requests_mock.mock() as m:
+            ndex = Ndex2(host='public.ndexbio.org')
+            self.assertEqual(ndex.debug, False)
+            self.assertEqual(ndex.username, None)
+            self.assertEqual(ndex.password, None)
+            self.assertEqual(ndex.user_agent, '')
+            self.assertEqual(ndex.host, constants.DEFAULT_SERVER)
+            self.assertTrue(ndex.s is not None)
+            self.assertTrue(ndex.timeout, 30)
+            ndex.set_request_timeout(10)
+            self.assertTrue(ndex.timeout, 30)
+
     def test_ndex2_constructor_with_localhost(self):
         # this is invasive, but there isn't really a good way
         # to test the constructor
@@ -76,7 +124,7 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.username, None)
             self.assertEqual(ndex.password, None)
             self.assertEqual(ndex.user_agent, '')
-            self.assertEqual(ndex.host, 'localhost')
+            self.assertEqual(ndex.host, 'https://localhost/v2')
             self.assertTrue(ndex.s is not None)
             self.assertTrue(ndex.timeout, 30)
             ndex.set_request_timeout(10)
@@ -92,7 +140,7 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.username, 'bob')
             self.assertEqual(ndex.password, 'smith')
             self.assertEqual(ndex.user_agent, ' yo')
-            self.assertEqual(ndex.host, 'xxxlocalhost')
+            self.assertEqual(ndex.host, 'https://xxxlocalhost/v2')
             self.assertTrue(ndex.s is not None)
             self.assertTrue(ndex.timeout, 1)
 

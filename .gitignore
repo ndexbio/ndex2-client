@@ -71,3 +71,4 @@ ENV/
 
 # file kicked out by system tests into base directory
 pandas_to_cx_to_tsv_results.txt
+.DS_Store

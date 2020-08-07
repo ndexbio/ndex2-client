@@ -50,6 +50,13 @@ class Ndex2(object):
             from ndex2 import client
             my_ndex = client.Ndex2(username='your account', password='your password')
 
+        Example creating connection to test server, letting constructor prepend `https://`
+        and append `/v2`
+
+        .. code-block:: python
+
+            from ndex2 import client
+            my_ndex = client.Ndex2(host='test.ndexbio.org')
 
         Example creating connection to alternate host with username and password:
 
@@ -60,11 +67,14 @@ class Ndex2(object):
                           password='your password')
         .. note::
 
-          If `host` parameter is set it must be the full URL to REST server.
-          For production `NDEx REST server <https://ndexbio.org>`_ it is
+          If `host` parameter starts with `http(s)://` the parameter will
+          be used as is, otherwise `https://` will be added to the prefix and `/v2` to
+          the suffix. For production `NDEx REST server <https://ndexbio.org>`_ it is
           the value of: :py:data:`~ndex2.constants.DEFAULT_SERVER`
 
-        :param host: The full URL of NDEx REST service endpoint. If set to `None` \
+        :param host: Host of NDEx REST service endpoint. If parameter starts with
+                     `http(s)://` it will be used as is, otherwise `https://` will
+                     be prepended and `/v2` will be appended. If set to `None`
                      :py:data:`~ndex2.constants.DEFAULT_SERVER` is used.
         :type host: str
         :param username: The username of the NDEx account to use. (Optional)
@@ -98,8 +108,13 @@ class Ndex2(object):
         if host is None:
             self.host = constants.DEFAULT_SERVER
         else:
-            self.host = host
+            if (host.startswith('http://') is True or
+                    host.startswith('https://') is True):
+                self.host = host
+            else:
+                self.host = 'https://' + host + constants.VERSION_TWO_SUFFIX
 
+        self.logger.debug('Host set to: ' + self.host)
         # create a session for this Ndex object
         self.s = requests.Session()
         if username and password:
@@ -110,12 +125,15 @@ class Ndex2(object):
 
     def close(self):
         """
-        Closes session associated with this object
+        Calls `close()` on :py:class:`requests.Session` used
+        for all web requests
 
         .. versionadded:: 4.0.0
-        :return:
+
+        :return: None
         """
         if self.s is not None:
+            self.logger.debug('Calling close on session')
             self.s.close()
 
     def set_request_timeout(self, time_in_secs):
@@ -1047,8 +1065,11 @@ class Ndex2(object):
         else:
             raise NDExError('network_properties must be a string or a list '
                             'of NdexPropertyValuePair objects')
-
-        self.put(route, put_json)
+        try:
+            self.put(route, put_json)
+        except Exception as e:
+            raise NDExError('Caught exception trying to '
+                            'update network properties: ' + str(e))
 
     def get_sample_network(self, network_id):
         """

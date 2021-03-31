@@ -1616,9 +1616,9 @@ class NiceCXNetwork():
         :return: Networkx graph
         :rtype: :class:`networkx.Graph` or :class:`networkx.MultiGraph`
         """
-        if mode is None or mode is 'default':
+        if mode is None or mode == 'default':
             fac = DefaultNetworkXFactory()
-        elif mode is 'legacy':
+        elif mode == 'legacy':
             if float(nx.__version__) >= 2.0:
                 fac = LegacyNetworkXVersionTwoPlusFactory()
             else:
@@ -1630,11 +1630,10 @@ class NiceCXNetwork():
 
     def get_summary(self):
         """
-        .. warning::
+        .. deprecated:: 3.3.2
 
-           This method has been deprecated.  Please use **print_summary()**
+            This method has been deprecated.  Please use :func:`print_summary`
 
-        ..
 
         """
 
@@ -2715,6 +2714,7 @@ class DefaultNetworkXFactory(NetworkXFactory):
 class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
     """
     .. deprecated:: 3.2.0
+
             This implementation contains errors, but is left for backwards
             compatibility of :func:`NiceCXNetwork.to_networkx`
 
@@ -2739,6 +2739,7 @@ class LegacyNetworkXVersionTwoPlusFactory(NetworkXFactory):
         passed in.
 
         .. deprecated:: 3.2.0
+
             This implementation contains errors, but is left for backwards
             compatibility of :func:`NiceCXNetwork.to_networkx`
 

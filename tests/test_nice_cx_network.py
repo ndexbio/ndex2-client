@@ -6,6 +6,7 @@
 import os
 import unittest
 import sys
+import warnings
 
 import requests_mock
 from ndex2 import client
@@ -55,6 +56,74 @@ class TestNiceCXNetwork(unittest.TestCase):
             isThree = True
 
         self.assertEqual(isThree, NiceCXNetwork._is_python_three_or_greater())
+
+    def test_add_edge(self):
+        net_cx = NiceCXNetwork()
+        try:
+            net_cx.add_edge()
+            self.fail('Expected Warning')
+        except Warning as we:
+            self.assertTrue('add_edge() is deprecated' in str(we))
+
+    def test_add_node(self):
+        net_cx = NiceCXNetwork()
+        try:
+            net_cx.add_node()
+            self.fail('Expected Warning')
+        except Warning as we:
+            self.assertTrue('add_node() is deprecated' in str(we))
+
+    def test_add_opaque_aspect_invalid_type(self):
+        net_cx = NiceCXNetwork()
+        try:
+            net_cx.add_opaque_aspect('foo', 'invalid data')
+            self.fail('Expected Exception')
+        except Exception as e:
+            self.assertEqual('Provided input was not of type list.', str(e))
+
+    def test_add_opaque_aspect_success(self):
+        net_cx = NiceCXNetwork()
+        data = ['hi']
+        net_cx.add_opaque_aspect('hi', data)
+        res = net_cx.get_opaque_aspect('hi')
+        self.assertEqual(data, res)
+
+    def test_add_opaque_aspect_with_dict_with_error(self):
+        net_cx = NiceCXNetwork()
+        data = {'error': '', 'hi': 'blah'}
+        net_cx.add_opaque_aspect('hi', data)
+        res = net_cx.get_opaque_aspect('hi')
+        self.assertEqual(None, res)
+
+    def test_add_opaque_aspect_with_dict(self):
+        net_cx = NiceCXNetwork()
+        data = {'hi': 'blah'}
+        net_cx.add_opaque_aspect('hi', data)
+        res = net_cx.get_opaque_aspect('hi')
+        self.assertEqual([data], res)
+
+    def test_add_opaque_aspect_element(self):
+        try:
+            net_cx = NiceCXNetwork()
+            net_cx.add_opaque_aspect_element('foo')
+            self.fail('Expected Exception')
+        except Exception as e:
+            self.assertTrue('add_opaque_aspect_element() is '
+                            'deprecated' in str(e))
+
+    def test_get_name(self):
+        net_cx = NiceCXNetwork()
+        self.assertEqual(None, net_cx.get_name())
+
+        net_cx.set_name('name1')
+        self.assertEqual('name1', net_cx.get_name())
+
+        net_cx.set_name('name2')
+        self.assertEqual('name2', net_cx.get_name())
+
+        net_cx.set_name(None)
+        self.assertEqual(None, net_cx.get_name())
+
 
     def test_create_edge_with_int_for_edge_ids(self):
         net = NiceCXNetwork()

@@ -99,7 +99,6 @@ if __name__ == '__main__':
             'urllib3>=1.16',
             'pandas',
             'enum34; python_version < "3.4"',
-            'pysolr',
             'numpy',
             'enum; python_version == "2.6" or python_version=="2.7"'
         ],

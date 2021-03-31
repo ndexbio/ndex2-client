@@ -623,6 +623,17 @@ class Ndex2(object):
         return self.post(route, post_json)
 
     def find_networks(self, search_string="", account_name=None, skip_blocks=0, block_size=100):
+        """
+        .. deprecated:: 3.3.2
+
+            Use :func:`search_networks` instead.
+
+        :param search_string:
+        :param account_name:
+        :param skip_blocks:
+        :param block_size:
+        :return:
+        """
         self.logger.warning("find_networks is deprecated, please use search_networks")
         return self.search_networks(search_string, account_name, skip_blocks, block_size)
 
@@ -754,11 +765,9 @@ class Ndex2(object):
         """
         Gets the network provenance
 
-        .. warning::
+        .. deprecated:: 3.3.2
 
-           This method has been deprecated.
-
-        ..
+            This method has been deprecated.
 
         :param network_id: Network id
         :type network_id: string
@@ -772,11 +781,9 @@ class Ndex2(object):
         """
         Sets the network provenance
 
-        .. warning::
+        .. deprecated:: 3.3.2
 
-           This method has been deprecated.
-
-        ..
+            This method has been deprecated.
 
         :param network_id: Network id
         :type network_id: string
@@ -1228,7 +1235,8 @@ class Ndex2(object):
         Gets the network set information including the list of networks
 
         .. deprecated:: 3.2.0
-        Use :func:`get_networkset` instead.
+
+            Use :func:`get_networkset` instead.
 
         :param set_id: network set id
         :type set_id: basestring

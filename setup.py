@@ -31,16 +31,6 @@ with open(os.path.join('ndex2', 'version.py')) as ver_file:
 
 
 test_requirements = [
-    'six',
-    'ijson',
-    'requests',
-    'requests_toolbelt',
-    'networkx',
-    'urllib3>=1.16',
-    'pandas',
-    'enum34',
-    'pysolr',
-    'enum; python_version == "2.6" or python_version=="2.7"',
     'unittest2',
     'requests-mock',
     'nose'
@@ -108,7 +98,7 @@ if __name__ == '__main__':
             'networkx',
             'urllib3>=1.16',
             'pandas',
-            'enum34',
+            'enum34; python_version < "3.4"',
             'pysolr',
             'numpy',
             'enum; python_version == "2.6" or python_version=="2.7"'

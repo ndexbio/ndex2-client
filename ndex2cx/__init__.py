@@ -1,5 +1,6 @@
 __author__ = 'aarongary'
 
+
 def get_status():
     """
     Gets the status
@@ -7,7 +8,6 @@ def get_status():
     :rtype: string
     """
     return 'status good'
-
 
 
 known_aspects = [
@@ -40,8 +40,5 @@ known_aspects_min = [
     ]
 
 
-
-
-
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     print('in main')

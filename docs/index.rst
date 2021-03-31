@@ -1,15 +1,12 @@
-Welcome to NDEx2 Python Client documentation!
-=============================================
-
+.. include:: ../README.rst
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   readme
-   usage
+   installation
+   quicktutorial
    modules
-   contributing
    license
    history
 

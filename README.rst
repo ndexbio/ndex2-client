@@ -25,31 +25,28 @@ The NDEx2 Python Client provides methods to access NDEx_ via
 the `NDEx REST Server API`_. As well as methods for common operations on
 networks via the NiceCXNetwork class.
 
-**Jupyter Notebook Tutorials and Examples**
--------------------------------------------------
+**Dependencies**
+-----------------
 
+* `six <https://pypi.org/project/six>`__
+* `ijson <https://pypi.org/project/ijson>`__
+* `requests <https://pypi.org/project/requests>`__
+* `requests_toolbelt <https://pypi.org/project/requests_toolbelt>`__
+* `networkx <https://pypi.org/project/networkx>`__
+* `urllib3 <https://pypi.org/project/urllib3>`__
+* `pandas <https://pypi.org/project/pandas>`__
+* `enum34 <https://pypi.org/project/enum34>`__ (Python < 3.4)
+* `numpy <https://pypi.org/project/numpy>`__
+* `enum <https://pypi.org/project/enum>`__ (Python 2.6 & 2.7)
 
--  Basic Use of the NDEx2 Python Client:  `NDEx2 Client v2.0
-   Tutorial <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NDEx2%20Client%20v2.0%20Tutorial.ipynb>`__
--  Working with the NiceCX Network Class: `NiceCX v2.0
-   Tutorial <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20Tutorial.ipynb>`__
-
-To use these tutorials or if Github isn't showing the above notebooks in the browser, clone the `ndex-jupyter-notebooks
-repository <https://github.com/ndexbio/ndex-jupyter-notebooks>`__ to
-your local machine and start Jupyter Notebooks in the project directory.
-
-For information on installing and using Jupyter Notebooks, go to
-`jupyter.org <http://jupyter.org/>`__
-
-- `Click here <https://github.com/ndexcontent/ndexncipidloader>`__ for example code to load content into `NDEx`_
-
-**Requirements**
+**Compatibility**
 ----------------
 
-The NDEx2 Python Client module works best with Python 3.6+ and the latest version
-of the PIP Python package manager for installation. `Click
-here <https://pypi.python.org/pypi/pip>`__ to download the PIP Python
-package.
+Python 2.7+
+
+.. note::
+
+    Python 2.7 may have some issues, Python 3.6+ is preferred
 
 **Installation**
 --------------------------------------

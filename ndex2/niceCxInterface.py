@@ -1,4 +1,4 @@
-class NiceCx(object):
+class NiceCx(object):  # pragma: no cover
     def create_edge(self, id=None, edge_source=None, edge_target=None, edge_interaction=None, cx_fragment=None):
         '''
         Create a new edge in the network by specifying source-interaction-target

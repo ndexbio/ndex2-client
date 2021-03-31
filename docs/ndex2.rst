@@ -4,7 +4,7 @@ NiceCXNetwork
 The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working with NDEx networks
 that are stored in CX format.
 
-`Click here for more information about CX format <http://www.home.ndexbio.org/data-model>`_.
+`Click here for more information about CX format <http://www.home.ndexbio.org/data-model>`__.
 
 .. note::
 
@@ -24,7 +24,7 @@ To see deprecated methods go to `Deprecated NiceCXNetwork methods`_
 Methods for building niceCX
 ===========================
 see also
-`this notebook <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20Tutorial.ipynb>`_
+`this notebook <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20Tutorial.ipynb>`__
 
 Node methods
 ****************************
@@ -44,7 +44,7 @@ Network methods
 Methods for accessing niceCX properties
 ========================================
 see also
-`this notebook <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20navigating%20the%20network.ipynb>`_
+`this notebook <https://github.com/ndexbio/ndex-jupyter-notebooks/blob/master/notebooks/NiceCX%20v2.0%20navigating%20the%20network.ipynb>`__
 
 Node methods
 ****************************

@@ -1,5 +1,5 @@
 **NDEx2 Python Client**
-=======================
+=========================
 
 .. _NDEx: http://ndexbio.org
 .. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api
@@ -19,14 +19,14 @@
 
 
 **Overview**
-------------
+--------------
 
 The NDEx2 Python Client provides methods to access NDEx_ via
 the `NDEx REST Server API`_. As well as methods for common operations on
 networks via the NiceCXNetwork class.
 
 **Dependencies**
------------------
+---------------------
 
 * `six <https://pypi.org/project/six>`__
 * `ijson <https://pypi.org/project/ijson>`__
@@ -40,7 +40,7 @@ networks via the NiceCXNetwork class.
 * `enum <https://pypi.org/project/enum>`__ (Python 2.6 & 2.7)
 
 **Compatibility**
-----------------
+-----------------------
 
 Python 2.7+
 

@@ -7,6 +7,7 @@ Download network from `NDEx <https://ndexbio.org>`__
 The code blocks below uses the `NDEx2 Python client <https://pypi.org/ndex2-client>`_ to download
 `BioGRID: Protein-Protein Interactions (SARS-CoV) <http://ndexbio.org/viewer/networks/669f30a3-cee6-11ea-aaef-0ac135e8bacf>`_
 network from `NDEx <https://ndexbio.org>`_ as a `NiceCXNetwork <https://ndex2.readthedocs.io/en/latest/ndex2.html#nicecxnetwork>`_.
+
 The number of nodes and edges are then printed out and the network is converted to `Networkx <https://networkx.org>`__
 object.
 

@@ -4,6 +4,12 @@
 class NDExError(Exception):
     """
     Base Exception for all NDEx2 Python Client Exceptions
+
+    .. warning::
+
+        Many methods in this code base still incorrectly
+        raise errors not derived from this base class
+
     """
 
 

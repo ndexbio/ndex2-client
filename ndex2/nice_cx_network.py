@@ -1508,7 +1508,9 @@ class NiceCXNetwork():
 
         Example:
 
-            ``nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22', 'public.ndexbio.org, username, password)``
+        .. code-block:: python
+
+            nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22', 'public.ndexbio.org', username, password)
 
         :param server: The NDEx server to upload the network to.
         :type server: str
@@ -1599,15 +1601,20 @@ class NiceCXNetwork():
 
             .. note::
 
-                It is **highly** recommended that this mode is used
+                ``default`` mode is the preferred mode to use
 
         Examples:
 
-            ``graph = nice_cx.to_networkx() # returns networkx graph using legacy implementation``
+        .. code-block:: python
 
-            ``graph = nice_cx.to_networkx(mode='default') # returns networkx graph using improved converter``
+            # returns networkx graph using improved converter
+            graph = nice_cx.to_networkx(mode='default')
 
-            ``graph = nice_cx.to_networkx # returns networkx graph using legacy implementation``
+            # returns networkx graph using legacy implementation
+            graph = nice_cx.to_networkx()
+
+            # returns networkx graph using legacy implementation
+            graph = nice_cx.to_networkx()
 
         :param mode: Since translation to networkx can be done in many ways this mode lets
                      the caller dictate the method.
@@ -2302,6 +2309,7 @@ class NetworkXFactory(object):
     factory that creates :class:`networkx.Graph` objects
     and contains a couple utility methods used by
     implementing factory classes
+
     """
 
     def __init__(self):

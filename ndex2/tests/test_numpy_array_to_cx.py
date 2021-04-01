@@ -5,9 +5,11 @@ import numpy as np
 import base64
 import ndex2
 import time
-import scipy
-from scipy import sparse, io
+# import scipy
+# from scipy import sparse, io
 
+
+@unittest.skip('Test needs to be moved and refactored')
 class TestLoadMatrixBasedContent(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

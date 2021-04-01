@@ -19,6 +19,7 @@ upload_password = 'cc.zhang'
 
 path_this = os.path.dirname(os.path.abspath(__file__))
 
+@unittest.skip('Test needs to be moved and refactored')
 class TestNdex2Release(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
     def test_load_from_pandas(self):

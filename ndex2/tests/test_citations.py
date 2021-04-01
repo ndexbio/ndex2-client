@@ -19,6 +19,7 @@ upload_password = 'password'
 
 path_this = os.path.dirname(os.path.abspath(__file__))
 
+@unittest.skip('Test needs to be moved and refactored')
 class TestCitations(unittest.TestCase):
     # @unittest.skip("Temporary skipping")
     def test_load_edges(self):

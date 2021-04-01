@@ -15,6 +15,8 @@ upload_password = 'scratch'
 
 path_this = os.path.dirname(os.path.abspath(__file__))
 
+
+@unittest.skip('Test needs to be moved and refactored')
 class TestNodes(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
     def test_add_int_attr(self):

@@ -13,6 +13,8 @@ upload_username = 'scratch'
 upload_password = 'scratch'
 here = os.path.dirname(__file__)
 
+
+@unittest.skip('Test needs to be moved and refactored')
 class TestLoadByAspects(unittest.TestCase):
 
     #@unittest.skip("Temporary skipping")

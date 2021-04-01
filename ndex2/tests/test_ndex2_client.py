@@ -7,6 +7,8 @@ import ndex2
 
 here = os.path.dirname(__file__)
 
+
+@unittest.skip('Test needs to be moved and refactored')
 class TestNdex2Client(unittest.TestCase):
     #@unittest.skip("Temporary skipping")
     def test_get_set(self):

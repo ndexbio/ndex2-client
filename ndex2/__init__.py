@@ -159,16 +159,20 @@ def _create_cartesian_coordinates_aspect_from_networkx(G):
 
 def create_nice_cx_from_networkx(G):
     """
-    Creates a NiceCXNetwork based on a networkx graph. The resulting NiceCXNetwork
-    contains the nodes edges and their attributes from the networkx graph and also
+    Creates a :py:class:`~ndex2.nice_cx_network.NiceCXNetwork` based on a
+    networkx graph.
+
+    The resulting :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+    contains the nodes, edges and their attributes from the networkx graph and also
     preserves the graph 'pos' attribute as a CX cartesian coordinates aspect.
-    Node name is taken from the networkx node id. Node 'represents' is
+
+    The node name is taken from the networkx node id. Node 'represents' is
     taken from the networkx node attribute 'represents'
 
     :param G: networkx graph
     :type G: networkx graph
     :return: NiceCXNetwork
-    :rtype: NiceCXNetwork
+    :rtype: :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
 
     niceCxBuilder = NiceCXBuilder()
@@ -269,128 +273,141 @@ def create_nice_cx_from_networkx(G):
 
 def create_nice_cx_from_raw_cx(cx):
     """
-    Create a NiceCXNetwork from a CX json object. (see http://www.home.ndexbio.org/data-model)
+    Create a :py:func:`~ndex2.nice_cx_network.NiceCXNetwork` from a
+    as a `list` of `dict` objects in
+    `CX format <https://www.home.ndexbio.org/data-model/>`__
 
-    :param cx: a valid CX document
+    Example:
+
+    .. code-block:: python
+
+        import json
+        import ndex2
+
+        # cx_as_str is a str containing JSON in CX format above
+        net_cx = ndex2.create_nice_cx_from_raw_cx(json.loads(cx_as_str))
+
+
+
+    :param cx: CX as a `list` of `dict` objects
+    :type cx: list
     :return: NiceCXNetwork
+    :rtype: :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
+    if not cx:
+        raise Exception('CX is empty')
 
     niceCxBuilder = NiceCXBuilder()
 
-    #my_nicecx = NiceCXNetwork()
+    # ===================
+    # METADATA
+    # ===================
+    available_aspects = []
+    for ae in (o for o in niceCxBuilder.get_frag_from_list_by_key(cx, 'metaData')):
+        available_aspects.append(ae.get('name'))
 
-    if cx:
-        # ===================
-        # METADATA
-        # ===================
-        available_aspects = []
-        for ae in (o for o in niceCxBuilder.get_frag_from_list_by_key(cx, 'metaData')):
-            available_aspects.append(ae.get('name'))
+    opaque_aspects = set(available_aspects).difference(known_aspects_min)
 
-        opaque_aspects = set(available_aspects).difference(known_aspects_min)
+    # ====================
+    # NETWORK ATTRIBUTES
+    # ====================
+    if 'networkAttributes' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'networkAttributes')
+        for network_item in objects:
+            niceCxBuilder._add_network_attributes_from_fragment(network_item)
 
-        # ====================
-        # NETWORK ATTRIBUTES
-        # ====================
-        if 'networkAttributes' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'networkAttributes')
-            for network_item in objects:
-                niceCxBuilder._add_network_attributes_from_fragment(network_item)
+    # ===================
+    # NODES
+    # ===================
+    if 'nodes' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodes')
+        for node_item in objects:
+            niceCxBuilder._add_node_from_fragment(node_item)
 
-        # ===================
-        # NODES
-        # ===================
-        if 'nodes' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodes')
-            for node_item in objects:
-                niceCxBuilder._add_node_from_fragment(node_item)
+    # ===================
+    # EDGES
+    # ===================
+    if 'edges' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edges')
+        for edge_item in objects:
+            niceCxBuilder._add_edge_from_fragment(edge_item)
 
-        # ===================
-        # EDGES
-        # ===================
-        if 'edges' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edges')
-            for edge_item in objects:
-                niceCxBuilder._add_edge_from_fragment(edge_item)
+    # ===================
+    # NODE ATTRIBUTES
+    # ===================
+    if 'nodeAttributes' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeAttributes')
+        for att in objects:
+            niceCxBuilder._add_node_attribute_from_fragment(att)
 
-        # ===================
-        # NODE ATTRIBUTES
-        # ===================
-        if 'nodeAttributes' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeAttributes')
-            for att in objects:
-                niceCxBuilder._add_node_attribute_from_fragment(att)
+    # ===================
+    # EDGE ATTRIBUTES
+    # ===================
+    if 'edgeAttributes' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeAttributes')
+        for att in objects:
+            niceCxBuilder._add_edge_attribute_from_fragment(att)
 
-        # ===================
-        # EDGE ATTRIBUTES
-        # ===================
-        if 'edgeAttributes' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeAttributes')
-            for att in objects:
-                niceCxBuilder._add_edge_attribute_from_fragment(att)
+    # ===================
+    # CITATIONS
+    # ===================
+    if 'citations' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'citations')
+        for cit in objects:
+            niceCxBuilder._add_citation_from_fragment(cit)
 
-        # ===================
-        # CITATIONS
-        # ===================
-        if 'citations' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'citations')
-            for cit in objects:
-                niceCxBuilder._add_citation_from_fragment(cit)
+    # ===================
+    # SUPPORTS
+    # ===================
+    if 'supports' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'supports')
+        for sup in objects:
+            niceCxBuilder._add_supports_from_fragment(sup)
 
-        # ===================
-        # SUPPORTS
-        # ===================
-        if 'supports' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'supports')
-            for sup in objects:
-                niceCxBuilder._add_supports_from_fragment(sup)
+    # ===================
+    # EDGE SUPPORTS
+    # ===================
+    if 'edgeSupports' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeSupports')
+        for add_this_edge_sup in objects:
+            niceCxBuilder._add_edge_supports_from_fragment(add_this_edge_sup)
 
-        # ===================
-        # EDGE SUPPORTS
-        # ===================
-        if 'edgeSupports' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeSupports')
-            for add_this_edge_sup in objects:
-                niceCxBuilder._add_edge_supports_from_fragment(add_this_edge_sup)
+    # ===================
+    # NODE CITATIONS
+    # ===================
+    if 'nodeCitations' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeCitations')
+        for node_cit in objects:
+            niceCxBuilder._add_node_citations_from_fragment(node_cit)
 
-        # ===================
-        # NODE CITATIONS
-        # ===================
-        if 'nodeCitations' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'nodeCitations')
-            for node_cit in objects:
-                niceCxBuilder._add_node_citations_from_fragment(node_cit)
+    # ===================
+    # EDGE CITATIONS
+    # ===================
+    if 'edgeCitations' in available_aspects:
+        objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeCitations')
+        for edge_cit in objects:
+            niceCxBuilder._add_edge_citations_from_fragment(edge_cit)
 
-        # ===================
-        # EDGE CITATIONS
-        # ===================
-        if 'edgeCitations' in available_aspects:
-            objects = niceCxBuilder.get_frag_from_list_by_key(cx, 'edgeCitations')
-            for edge_cit in objects:
-                niceCxBuilder._add_edge_citations_from_fragment(edge_cit)
+    # ===================
+    # OPAQUE ASPECTS
+    # ===================
+    for oa in opaque_aspects:
+        #TODO - Add context to builder
+        if oa == '@context':
+            objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
+            niceCxBuilder.set_context(objects) #nice_cx.set_namespaces(objects)
+        else:
+            objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
+            niceCxBuilder.add_opaque_aspect(oa, objects)
 
-        # ===================
-        # OPAQUE ASPECTS
-        # ===================
-        for oa in opaque_aspects:
-            #TODO - Add context to builder
-            if oa == '@context':
-                objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
-                niceCxBuilder.set_context(objects) #nice_cx.set_namespaces(objects)
-            else:
-                objects = niceCxBuilder.get_frag_from_list_by_key(cx, oa)
-                niceCxBuilder.add_opaque_aspect(oa, objects)
-
-        return niceCxBuilder.get_nice_cx()
-    else:
-        raise Exception('CX is empty')
+    return niceCxBuilder.get_nice_cx()
 
 
 def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                                source_node_attr=[], target_node_attr=[],
                                edge_attr=[], edge_interaction=None, source_represents=None, target_represents=None):
     """
-    Create a NiceCXNetwork from a pandas dataframe in which each row
+    Create a :py:func:`~ndex2.nice_cx_network.NiceCXNetwork` from a pandas dataframe in which each row
     specifies one edge in the network.
 
     If only the df argument is provided the dataframe is treated as 'SIF' format,
@@ -399,7 +416,8 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
 
     If both the source_field and target_field arguments are provided, the those and any other
     arguments refer to headers in the dataframe, controlling the mapping of columns to
-    the attributes of nodes, and edges in the resulting NiceCXNetwork. If a header is not
+    the attributes of nodes, and edges in the resulting
+    :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`. If a header is not
     mapped the corresponding column is ignored. If the edge_interaction is not specified it
     defaults to "interacts-with"
 
@@ -411,6 +429,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     :param edge_attr: list of header names specifying attributes of the edge.
     :param edge_interaction: the relationship between the source node and the target node, defaulting to "interacts-with"
     :return: NiceCXNetwork
+    :rtype: :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
 
     my_nicecx = NiceCXNetwork()
@@ -556,7 +575,8 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
 
 def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
     """
-    Create a NiceCXNetwork based on a network retrieved from NDEx, specified by its UUID.
+    Create a :py:func:`~ndex2.nice_cx_network.NiceCXNetwork` based on a network
+    retrieved from NDEx, specified by its UUID.
     If the network is not public, then username and password arguments for an account on
     the server with permission to access the network must be supplied.
 
@@ -565,6 +585,7 @@ def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
     :param password: the password of an account with permission to access the network.
     :param uuid: the UUID of the network.
     :return: NiceCXNetwork
+    :rtype: :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
 
     niceCxBuilder = NiceCXBuilder()
@@ -723,10 +744,17 @@ def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
 
 def create_nice_cx_from_file(path):
     """
-    Create a NiceCXNetwork from a file that is in the CX format.
+    Create a :py:func:`~ndex2.nice_cx_network.NiceCXNetwork` from a file
+    that is in the `CX format <https://home.ndexbio.org/data-model/>`__
 
     :param path: the path of the CX file
+    :type path: str
+    :raises Exception: if `path` is not a file
+    :raises OSError: if there is an error opening the `path` file
+    :raises JSONDecodeError: if there is an error parsing the `path` file with
+                             `json.load() <https://docs.python.org/3/library/json.html#json.load>`__
     :return: NiceCXNetwork
+    :rtype: :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
     if os.path.isfile(path):
         with open(path, 'r') as file_cx:

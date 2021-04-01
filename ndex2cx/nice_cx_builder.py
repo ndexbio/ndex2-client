@@ -1,5 +1,6 @@
 __author__ = 'aarongary'
 
+import logging
 import json
 import ijson
 import requests
@@ -9,21 +10,25 @@ import math
 import numpy as np
 
 if sys.version_info.major == 3:
-    from urllib.request import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
-        build_opener, install_opener, HTTPError, URLError
+    from urllib.request import urlopen, Request, HTTPError, URLError
 else:
-    from urllib2 import urlopen, Request, HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, \
-        build_opener, install_opener, HTTPError, URLError
+    from urllib2 import urlopen, Request, HTTPError, URLError
 
 
 class NiceCXBuilder(object):
-    def __init__(self, cx=None, server=None, username='scratch', password='scratch', uuid=None, networkx_G=None, data=None, **attr):
+    def __init__(self, cx=None, server=None, username='scratch',
+                 password='scratch', uuid=None,
+                 networkx_G=None, data=None, **attr):
         from ndex2.nice_cx_network import NiceCXNetwork
+
+        self.logger = logging.getLogger(__name__)
 
         self.nice_cx = NiceCXNetwork(user_agent='niceCx Builder')
         self.node_id_lookup = {}
         self.node_id_counter = 0
         self.edge_id_counter = 0
+        self.max_node_id = 0
+        self.max_edge_id = 0
 
         self.node_inventory = {}
         self.node_attribute_inventory = []
@@ -50,7 +55,7 @@ class NiceCXBuilder(object):
                 byte_string = encode_string.encode()
                 self.user_base64 = base64.b64encode(byte_string)#.replace('\n', '')
             else:
-                self.user_base64 = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+                self.user_base64 = base64.encodestring('%s:%s' % (username,password)).replace('\n', '')
 
     def set_context(self, context):
         """
@@ -125,6 +130,9 @@ class NiceCXBuilder(object):
             node_id = self.node_id_counter
             self.node_id_counter += 1
 
+        if node_id > self.max_node_id:
+            self.max_node_id = node_id
+
         add_this_node = {'@id': node_id, 'n': name}
         if represents:
             add_this_node['r'] = represents
@@ -159,6 +167,9 @@ class NiceCXBuilder(object):
         else:
             edge_id = self.edge_id_counter
             self.edge_id_counter += 1
+
+        if edge_id > self.max_edge_id:
+            self.max_edge_id = edge_id
 
         add_this_edge = {'@id': edge_id, 's': source, 't': target}
         if interaction:
@@ -311,10 +322,16 @@ class NiceCXBuilder(object):
         self.nice_cx.networkAttributes.append(fragment)
 
     def _add_node_from_fragment(self, fragment):
-        self.nice_cx.nodes[fragment.get('@id')] = fragment
+        node_id = fragment.get('@id')
+        if node_id > self.max_node_id:
+            self.max_node_id = node_id
+        self.nice_cx.nodes[node_id] = fragment
 
     def _add_edge_from_fragment(self, fragment):
-        self.nice_cx.edges[fragment.get('@id')] = fragment
+        edge_id = fragment.get('@id')
+        if edge_id > self.max_edge_id:
+            self.max_edge_id = edge_id
+        self.nice_cx.edges[edge_id] = fragment
 
     def _add_node_attribute_from_fragment(self, fragment):
         if self.nice_cx.nodeAttributes.get(fragment.get('po')) is None:
@@ -404,6 +421,12 @@ class NiceCXBuilder(object):
             for k, v in oa.items():
                 self.nice_cx.add_opaque_aspect(k, v)
 
+        # Fixes issue #60 where there are problems adding
+        # new nodes/edges to networks generated
+        #
+        self.nice_cx.node_int_id_generator = self.max_node_id + 1
+        self.nice_cx.edge_int_id_generator = self.max_edge_id + 1
+
         return self.nice_cx
 
     def get_frag_from_list_by_key(self, cx, key):
@@ -431,46 +454,24 @@ class NiceCXBuilder(object):
 
     def stream_aspect(self, uuid, aspect_name):
         if aspect_name == 'metaData':
-            print('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
+            self.logger.debug('http://dev2.ndexbio.org/v2/network/' + str(uuid) + '/aspect')
             md_response = requests.get('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect')
             json_respone = md_response.json()
             return json_respone.get('metaData')
         else:
-            #password_mgr = HTTPPasswordMgrWithDefaultRealm()
-
-            #top_level_url = 'http://dev2.ndexbio.org'
-            #password_mgr.add_password(None, top_level_url, self.username, self.password)
-            #handler = HTTPBasicAuthHandler(password_mgr)
-            #opener = build_opener(handler)
-            #install_opener(opener)
-
-
-
-
-
-            # Create an OpenerDirector with support for Basic HTTP Authentication...
-            #auth_handler = HTTPBasicAuthHandler()
-            #auth_handler.add_password(None, 'http://dev2.ndexbio.org', 'scratch', 'scratch')
-            #opener = build_opener(auth_handler)
-            # ...and install it globally so it can be used with urlopen.
-            #install_opener(opener)
-
-
             request = Request('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
             base64string = base64.b64encode('%s:%s' % ('scratch', 'scratch'))
             request.add_header("Authorization", "Basic %s" % base64string)
             #result = urllib2.urlopen(request)
-
-
             urlopen_result = None
             try:
                 urlopen_result = urlopen(request) #'http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name)
             except HTTPError as e:
-                print(e.code)
+                self.logger.error(str(e.code))
                 return []
             except URLError as e:
-                print('Other error')
-                print('URL Error %s' % e.message())
+                self.logger.error('Other error')
+                self.logger.error('URL Error ' + str(e.message()))
                 return []
 
             return ijson.items(urlopen_result, 'item')

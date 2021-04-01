@@ -2,6 +2,15 @@
 History
 =======
 
+3.3.2 (2021-04-01)
+-------------------
+
+* Fixed bug where `NiceCXNetwork.create_node()` and `.create_edge()` overwrote existing nodes/edges.
+  `Issue #60 <https://github.com/ndexbio/ndex2-client/issues/60>`_
+
+* Fixed bug where `enum34` package would be unnecessarily installed on versions of Python 3.4 and newer.
+  `Issue #76 <https://github.com/ndexbio/ndex2-client/issues/76>`_
+
 3.3.1 (2019-09-23)
 -------------------
 

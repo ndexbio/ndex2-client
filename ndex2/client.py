@@ -439,6 +439,9 @@ class Ndex2(object):
         """
         Get the specified aspect of the existing network with UUID network_id from the NDEx connection as a CX stream.
 
+        For a list of aspect names look at **Core Aspects** section of
+        `CX Data Model Documentation <https://home.ndexbio.org/data-model/>`__
+
         :param network_id: The UUID of the network.
         :param aspect_name: The aspect NAME.
         :type network_id: str
@@ -665,7 +668,10 @@ class Ndex2(object):
 
     def make_network_public(self, network_id):
         """
-        Makes the network specified by the **network_id** public.
+        Makes the network specified by the **network_id** public
+        by invoking :py:func:`set_network_system_properties` with
+
+        ``{'visibility': 'PUBLIC'}``
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -681,7 +687,10 @@ class Ndex2(object):
 
     def _make_network_public_indexed(self, network_id):
         """
-        Makes the network specified by the **network_id** public.
+        Makes the network specified by the **network_id** public
+        by invoking :py:func:`set_network_system_properties` with
+
+        ``{'visibility': 'PUBLIC', 'index_level': 'ALL', 'showcase': True}``
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -702,7 +711,10 @@ class Ndex2(object):
 
     def make_network_private(self, network_id):
         """
-        Makes the network specified by the **network_id** private.
+        Makes the network specified by the **network_id** private
+        by invoking :py:func:`set_network_system_properties` with
+
+        ``{'visibility': 'PRIVATE'}``
 
         :param network_id: The UUID of the network.
         :type network_id: str
@@ -822,15 +834,65 @@ class Ndex2(object):
 
     def set_network_properties(self, network_id, network_properties):
         """
-        Sets network properties
+        Updates properties of network
+
+        As of NDEx 2.5 server, existing network properties that are not set in
+        the `network_properties` parameter are not touched.
+
+        .. warning::
+
+            ``name, description, version`` network attributes/properties cannot be updated by this method.
+            Please use :py:func:`update_network_profile` to update these values.
+
+        The format of `network_properties` should be a :py:func:`list` of :py:func:`dict`
+        objects in this format:
+
+        .. code-block::
+
+            [{
+                'subNetworkId': '',
+                'predicateString': '',
+                'dataType': '',
+                'value': ''
+            }]
+
+        The ``predicateString`` field above is the network attribute/property name.
+
+        The ``dataType`` field above must be one of the following
+        `types <https://ndex2.readthedocs.io/en/latest/ndex2.html?highlight=list_of_string#supported-data-types>`__
+
+        For more information please visit the underlying
+        `REST call documentation <http://openapi.ndextools.org/#/Network/put_network__networkid__properties>`__
+
+        Example to add two network properties (``foo``, ``bar``):
+
+        .. code-block::
+
+                [{
+                'subNetworkId': '',
+                'predicateString': 'foo',
+                'dataType': 'string',
+                'value': 'some value for foo'
+                },{
+                'subNetworkId': '',
+                'predicateString': 'bar',
+                'dataType': 'string',
+                'value': 'a value for bar'
+                }]
+
 
         :param network_id: Network id
-        :type network_id: string
-        :param network_properties: List of NDEx property value pairs
-        :type network_properties: list
+        :type network_id: str
+        :param network_properties: List of NDEx property value pairs aka network properties
+                                   to set on the network. This can also be a :py:func:`str`
+                                   JSON format
+        :type network_properties: list or str
+        :raises Exception: If `network_properties` is not a :py:func:`str` or
+                           :py:func:`list`
         :raises NDExUnauthorizedError: If credentials are invalid or not set
-        :return:
-        :rtype:
+        :raises requests.HTTPError: If there is an error with the request or if ``name, version, description``
+                                    is set in `network_properties` as a value to ``predicateString``
+        :return: Empty string or None
         """
         self._require_auth()
         route = "/network/%s/properties" % network_id
@@ -1010,6 +1072,23 @@ class Ndex2(object):
         Any profile attributes specified will be updated but attributes that are not specified will
         have no effect - omission of an attribute does not mean deletion of that attribute.
         The network profile attributes that can be updated by this method are: 'name', 'description' and 'version'.
+
+        .. code-block:: python
+
+            {
+              "name": "string",
+              "description": "string",
+              "version": "string",
+              "visibility": "string",
+              "properties": [
+                {
+                  "subNetworkId": "",
+                  "predicateString": "string",
+                  "dataType": "string",
+                  "value": "string"
+                }
+              ]
+            }
 
         :param network_id: Network id
         :type network_id: string

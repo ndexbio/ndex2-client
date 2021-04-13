@@ -836,8 +836,8 @@ class Ndex2(object):
         """
         Updates properties of network
 
-        As of NDEx 2.5 server, existing network properties that are not set in
-        the `network_properties` parameter are not touched.
+        Starting with version 2.5 of NDEx, any network properties
+        not in the `network_properties` parameter are left unchanged.
 
         .. warning::
 
@@ -861,6 +861,9 @@ class Ndex2(object):
         The ``dataType`` field above must be one of the following
         `types <https://ndex2.readthedocs.io/en/latest/ndex2.html?highlight=list_of_string#supported-data-types>`__
 
+        Regardless of ``dataType``, ``value`` should be converted to :py:func:`str` or :py:func:`list` of
+        :py:func:`str`
+
         For more information please visit the underlying
         `REST call documentation <http://openapi.ndextools.org/#/Network/put_network__networkid__properties>`__
 
@@ -871,28 +874,31 @@ class Ndex2(object):
                 [{
                 'subNetworkId': '',
                 'predicateString': 'foo',
-                'dataType': 'string',
-                'value': 'some value for foo'
+                'dataType': 'list_of_integer',
+                'value': ['1', '2', '3']
                 },{
                 'subNetworkId': '',
                 'predicateString': 'bar',
                 'dataType': 'string',
-                'value': 'a value for bar'
+                'value': 'a value for bar as str'
                 }]
 
 
         :param network_id: Network id
         :type network_id: str
-        :param network_properties: List of NDEx property value pairs aka network properties
-                                   to set on the network. This can also be a :py:func:`str`
-                                   JSON format
+        :param network_properties: List of NDEx property value pairs aka network
+                                   properties to set on the network. This can
+                                   also be a :py:func:`str` in JSON format
         :type network_properties: list or str
         :raises Exception: If `network_properties` is not a :py:func:`str` or
                            :py:func:`list`
         :raises NDExUnauthorizedError: If credentials are invalid or not set
-        :raises requests.HTTPError: If there is an error with the request or if ``name, version, description``
-                                    is set in `network_properties` as a value to ``predicateString``
-        :return: Empty string or None
+        :raises requests.HTTPError: If there is an error with the request or
+                                    if ``name, version, description`` is set
+                                    in `network_properties` as a value to
+                                    ``predicateString``
+        :return: Empty string or ``1``
+        :rtype: str or int
         """
         self._require_auth()
         route = "/network/%s/properties" % network_id

@@ -11,6 +11,7 @@ import unittest
 import json
 import uuid
 from datetime import datetime
+import requests
 
 from requests.exceptions import HTTPError
 import ndex2
@@ -29,6 +30,7 @@ class TestClient(unittest.TestCase):
 
     TEST_DIR = os.path.dirname(__file__)
     WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')
+    GLYPICAN2_FILE = os.path.join(TEST_DIR, 'data', 'glypican2.cx')
 
     def get_ndex2_client(self):
         return Ndex2(os.getenv('NDEX2_TEST_SERVER'),
@@ -113,7 +115,7 @@ class TestClient(unittest.TestCase):
     def test_network_permissions(self):
         client = self.get_ndex2_client()
         # create network and add it
-        net = ndex2.create_nice_cx_from_file(TestClient.WNT_SIGNAL_FILE)
+        net = ndex2.create_nice_cx_from_file(TestClient.GLYPICAN2_FILE)
         netname = 'ndex2-client integration test network' + str(datetime.now())
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
@@ -130,8 +132,8 @@ class TestClient(unittest.TestCase):
             self.assertEqual(netname, netsum['name'], str(netsum))
             self.assertEqual('PUBLIC', netsum['visibility'])
             self.assertEqual(False, netsum['isReadOnly'])
-            self.assertEqual(74, netsum['edgeCount'])
-            self.assertEqual(32, netsum['nodeCount'])
+            self.assertEqual(1, netsum['edgeCount'])
+            self.assertEqual(2, netsum['nodeCount'])
             self.assertEqual(False, netsum['isShowcase'])
             self.assertEqual('NONE', netsum['indexLevel'])
 
@@ -192,7 +194,7 @@ class TestClient(unittest.TestCase):
         self.assertTrue('http' in res)
         netset_id = re.sub('^.*/', '', res)
 
-        net = ndex2.create_nice_cx_from_file(TestClient.WNT_SIGNAL_FILE)
+        net = ndex2.create_nice_cx_from_file(TestClient.GLYPICAN2_FILE)
         netname = 'ndex2-client integration test network' + str(datetime.now())
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
@@ -234,3 +236,52 @@ class TestClient(unittest.TestCase):
         res = client.get_user_by_username(theuser)
         self.assertEqual(theuser, res['userName'])
         self.assertTrue('externalId' in res)
+
+    def test_set_network_properties(self):
+        client = self.get_ndex2_client()
+        # create network and add it
+        net = ndex2.create_nice_cx_from_file(TestClient.GLYPICAN2_FILE)
+        netname = 'ndex2-client integration test network2' + str(datetime.now())
+        net.set_name(netname)
+        res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
+        try:
+            self.assertTrue('http' in res)
+            netid = re.sub('^.*/', '', res)
+
+            # verify network was uploaded
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            self.assertEqual(netid, netsum['externalId'])
+            self.assertTrue('name' in netsum, str(netsum))
+
+            # get all network attributes
+            res = client.get_network_aspect_as_cx_stream(netid, 'networkAttributes')
+            net_attrs = res.json()
+
+            # Versions of NDEx server pre 2.5.1 will add a new description attribute
+            # but it is a duplicate
+            netprops = [{'subNetworkId': '',
+                         'predicateString': 'fookey',
+                         'dataType': 'string',
+                         'value': 'foo'}]
+            res = client.set_network_properties(netid, network_properties=netprops)
+            self.assertTrue(str(res) == '' or str(res) == '1')
+
+            updated_net_attrs = client.get_network_aspect_as_cx_stream(netid,
+                                                                       'networkAttributes')
+            res_attrs = updated_net_attrs.json()
+            found_fookey = False
+            found_name = False
+            for attr in res_attrs:
+                if attr['n'] == 'fookey':
+                    self.assertEqual('foo', attr['v'])
+                    found_fookey = True
+                if attr['n'] == 'name':
+                    self.assertEqual(netname, attr['v'])
+                    found_name = True
+            self.assertTrue(found_fookey)
+            self.assertTrue(found_name)
+        finally:
+            # delete network
+            client.delete_network(netid)

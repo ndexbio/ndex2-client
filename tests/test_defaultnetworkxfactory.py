@@ -9,10 +9,21 @@ import networkx
 import ndex2
 from ndex2.exceptions import NDExError
 from ndex2.nice_cx_network import DefaultNetworkXFactory
+from ndex2.nice_cx_network import NetworkXFactory
 from ndex2.nice_cx_network import NiceCXNetwork
 
 SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
               'skipping for integration tests'
+
+
+NETWORKX_MAJOR_VERSION = 0
+netx_ver_str = str(networkx.__version__)
+period_pos = netx_ver_str.index('.')
+if period_pos != -1:
+    try:
+        NETWORKX_MAJOR_VERSION = int(netx_ver_str[0:period_pos])
+    except ValueError:
+        pass
 
 
 @unittest.skipIf(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
@@ -32,6 +43,40 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures, if any."""
         pass
+
+    def test_get_networkx_major_version(self):
+
+        # try with no arg
+        res = NetworkXFactory.get_networkx_major_version()
+        self.assertTrue(res > 0)
+
+        # try passing none
+        res = NetworkXFactory.get_networkx_major_version(networkx_version=None)
+        self.assertEqual(0, res)
+
+        # try passing empty string
+        res = NetworkXFactory.get_networkx_major_version(networkx_version='')
+        self.assertEqual(0, res)
+
+        # try passing string with no period
+        res = NetworkXFactory.get_networkx_major_version(networkx_version='12')
+        self.assertEqual(0, res)
+
+        # try passing with only period
+        res = NetworkXFactory.get_networkx_major_version(networkx_version='.')
+        self.assertEqual(0, res)
+
+        # try passing with non numeric value
+        res = NetworkXFactory.get_networkx_major_version(networkx_version='fo')
+        self.assertEqual(0, res)
+
+        # try passing 1.11
+        res = NetworkXFactory.get_networkx_major_version(networkx_version='1.11')
+        self.assertEqual(1, res)
+
+        # try passing 12.4.1b1
+        res = NetworkXFactory.get_networkx_major_version(networkx_version='12.4.1b1')
+        self.assertEqual(12, res)
 
     def test_none_passed_into_get_graph(self):
         fac = DefaultNetworkXFactory()
@@ -85,7 +130,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual(0, g.number_of_edges())
         self.assertTrue(0 in g)
         nodelist = g.nodes(data=True)
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             self.assertEqual('first', nodelist[0]['name'])
         else:
             self.assertEqual('first', nodelist[0][1]['name'])
@@ -107,7 +152,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual(0, g.number_of_edges())
         self.assertTrue(0 in g)
 
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             nodelist = list(g.nodes(data=True))
         else:
             nodelist = g.nodes(data=True)
@@ -127,7 +172,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual(1, g.number_of_edges())
         self.assertTrue(0 in g)
 
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
         else:
@@ -169,7 +214,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual(1, g.number_of_edges())
         self.assertTrue(0 in g)
         self.assertTrue(1 in g)
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
         else:
@@ -229,7 +274,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual(1, g.number_of_edges())
         self.assertTrue(0 in g)
         self.assertTrue(1 in g)
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
         else:
@@ -290,7 +335,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertTrue(0 in g)
         self.assertTrue(1 in g)
 
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
         else:
@@ -340,7 +385,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertTrue(1655 in g)
         self.assertTrue(1622 in g)
 
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
         else:
@@ -398,7 +443,7 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertTrue(1655 in g)
         self.assertTrue(1622 in g)
 
-        if float(networkx.__version__) >= 2:
+        if NETWORKX_MAJOR_VERSION >= 2:
             nodelist = list(g.nodes(data=True))
             edgelist = list(g.edges(data=True))
         else:

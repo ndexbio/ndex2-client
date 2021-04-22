@@ -14,6 +14,15 @@ from ndex2.nice_cx_network import NiceCXNetwork
 SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
               'skipping for integration tests'
 
+NETWORKX_MAJOR_VERSION = 0
+netx_ver_str = str(networkx.__version__)
+period_pos = netx_ver_str.index('.')
+if period_pos != -1:
+    try:
+        NETWORKX_MAJOR_VERSION = int(netx_ver_str[0:period_pos])
+    except ValueError:
+        pass
+
 
 @unittest.skipIf(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
 class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
@@ -41,7 +50,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         except NDExError as ne:
             self.assertEqual('Input network is None', str(ne))
 
-    @unittest.skipIf(float(networkx.__version__) < 2,
+    @unittest.skipIf(NETWORKX_MAJOR_VERSION < 2,
                      'test only works with networkx 2+ installed')
     def test_empty_network_passed_in_with_various_legacy_modes(self):
         net = NiceCXNetwork()
@@ -51,7 +60,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertEqual(0, len(g))
         self.assertEqual(0, g.number_of_edges())
 
-    @unittest.skipIf(float(networkx.__version__) < 2,
+    @unittest.skipIf(NETWORKX_MAJOR_VERSION < 2,
                      'test only works with networkx 2+ installed')
     def test_one_node_no_edge_network(self):
         net = NiceCXNetwork()
@@ -66,7 +75,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         nodelist = g.nodes(data=True)
         self.assertEqual('first', nodelist['first']['represents'])
 
-    @unittest.skipIf(float(networkx.__version__) < 2,
+    @unittest.skipIf(NETWORKX_MAJOR_VERSION < 2,
                      'test only works with networkx 2+ installed')
     def test_two_node_one_edge_network(self):
         net = NiceCXNetwork()
@@ -89,7 +98,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
                          and 'first' == edgelist[0][1]))
         self.assertEqual(None, edgelist[0][2]['interaction'])
 
-    @unittest.skipIf(float(networkx.__version__) < 2,
+    @unittest.skipIf(NETWORKX_MAJOR_VERSION < 2,
                      'test only works with networkx 2+ installed')
     def test_glypican_network_legacyfalse(self):
         net = ndex2\
@@ -160,7 +169,7 @@ class TestLegacyNetworkXVersionTwoPlusFactory(unittest.TestCase):
         self.assertTrue((g.pos[1][0] + 353.49) < 1.0)
         self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
 
-    @unittest.skipIf(float(networkx.__version__) < 2,
+    @unittest.skipIf(NETWORKX_MAJOR_VERSION < 2,
                      'test only works with networkx 2+ installed: ' +
                      networkx.__version__)
     def test_darktheme_network(self):

@@ -1626,7 +1626,8 @@ class NiceCXNetwork():
         if mode is None or mode == 'default':
             fac = DefaultNetworkXFactory()
         elif mode == 'legacy':
-            if float(nx.__version__) >= 2.0:
+            nx_major_version = NetworkXFactory.get_networkx_major_version()
+            if nx_major_version >= 2.0:
                 fac = LegacyNetworkXVersionTwoPlusFactory()
             else:
                 fac = DefaultNetworkXFactory(legacymode=True)
@@ -2314,6 +2315,31 @@ class NetworkXFactory(object):
 
     def __init__(self):
         self._logger = logging.getLogger(__name__)
+        self._nx_major_version = NetworkXFactory.get_networkx_major_version()
+
+
+    @staticmethod
+    def get_networkx_major_version(networkx_version=nx.__version__):
+        """
+        Gets major version of networkx library
+
+        :param networkx_version: raw version of networkx library
+        :type networkx_version: str
+        :return: major version of networkx assuming it will be in format of
+                 MAJOR.MINOR or MAJOR.MINOR.PATCH...
+                 or 0 if there was a problem
+        :rtype: int
+        """
+        if networkx_version is None:
+            return 0
+        netx_ver_str = str(networkx_version)
+        period_pos = netx_ver_str.find('.')
+        if period_pos == -1:
+            return 0
+        try:
+            return int(netx_ver_str[0:period_pos])
+        except ValueError:
+            return 0
 
     def get_graph(self, nice_cx_network, networkx_graph=None):
         """
@@ -2434,7 +2460,7 @@ class NetworkXFactory(object):
                            with key 'represents' on node
         :return: None
         """
-        if float(nx.__version__) >= 2:
+        if self._nx_major_version >= 2:
             self._add_node_networkx_two_plus(networkx_graph, nodeid, node_attributes,
                                              name=name,
                                              represents=represents)
@@ -2502,7 +2528,7 @@ class NetworkXFactory(object):
         :type attribute_dict: dict
         :return: None
         """
-        if float(nx.__version__) >= 2:
+        if self._nx_major_version >= 2:
             self._add_edge_networkx_two_plus(networkx_graph, source_node,
                                              target_node, attribute_dict)
             return

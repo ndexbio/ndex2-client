@@ -2,6 +2,13 @@
 History
 =======
 
+3.3.3 (2021-04-22)
+-------------------
+
+* Fixed bug where `NiceCXNetwork.to_networkx()` fails with `ValueError` when installed
+  networkx version of networkx has X.Y.Z version (example: 2.5.1)
+  `Issue #79 <https://github.com/ndexbio/ndex2-client/issues/79>`_
+
 3.3.2 (2021-04-13)
 -------------------
 

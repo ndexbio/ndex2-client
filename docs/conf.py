@@ -37,8 +37,12 @@ print('=====================')
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode'
 ]
+
+# intersphinx mapping
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

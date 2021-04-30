@@ -49,18 +49,18 @@ class Ndex2(object):
         Creates a connection to a particular `NDEx server <http://ndexbio.org>`_.
 
         :param host: The URL of the server.
-        :type host: string
+        :type host: str
         :param username: The username of the NDEx account to use. (Optional)
-        :type username: string
+        :type username: str
         :param password: The account password. (Optional)
-        :type password: string
+        :type password: str
         :param update_status: If set to True tells constructor to query
                               service for status
         :type update_status: bool
         :param user_agent: String to append to
                            `User-Agent <https://tools.ietf.org/html/rfc1945#page-46>`_
                            header sent with all requests to server
-        :type user_agent: string
+        :type user_agent: str
         :param timeout: The timeout in seconds value for requests to server. This value
                         is passed to Request calls `Click here for more information
                         <http://docs.python-requests.org/en/master/user/advanced/#timeouts>`_
@@ -170,6 +170,7 @@ class Ndex2(object):
     def _get_user_agent(self):
         """
         Creates string to use for User-Agent header
+
         :return: string containing User-Agent header value
         """
         return userAgent + self.user_agent
@@ -332,15 +333,15 @@ class Ndex2(object):
 
     def save_new_network(self, cx, visibility=None):
         """
-        Create a new network (cx) on the server
+        Create a new network (CX) on the server
 
-        :param cx: Network cx
-        :type cx: list of dicts
+        :param cx: Network CX which is a list of dict objects
+        :type cx: list
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
-        :type visibility: string
+        :type visibility: str
         :raises NDExInvalidCXError: For invalid CX data
         :return: Response data
-        :rtype: string or dict
+        :rtype: str or dict
         """
         if cx is None:
             raise NDExInvalidCXError('CX is None')
@@ -372,10 +373,10 @@ class Ndex2(object):
         :param cx_stream:  IO stream of cx
         :type cx_stream: BytesIO
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
-        :type visibility: string
+        :type visibility: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Response data
-        :rtype: string or dict
+        :rtype: str or dict
         """
         self._require_auth()
         query_string = None
@@ -471,7 +472,7 @@ class Ndex2(object):
         :param edge_limit: The maximum size of the neighborhood.
         :type edge_limit: int
         :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
-        :type error_when_limit: boolean
+        :type error_when_limit: bool
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
@@ -535,7 +536,7 @@ class Ndex2(object):
         :param edge_limit: The maximum size of the neighborhood.
         :type edge_limit: int
         :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
-        :type error_when_limit: boolean
+        :type error_when_limit: bool
         :return: The response.
         :rtype: `response object <http://docs.python-requests.org/en/master/user/quickstart/#response-content>`_
 
@@ -566,7 +567,7 @@ class Ndex2(object):
         :param edge_limit: The maximum size of the neighborhood.
         :type edge_limit: int
         :param error_when_limit: Default value is true. If this value is true the server will stop streaming the network when it hits the edgeLimit, add success: false and error: "EdgeLimitExceeded" in the status aspect and close the CX stream. If this value is set to false the server will return a subnetwork with edge count up to edgeLimit. The status aspect will be a success, and a network attribute {"EdgeLimitExceeded": "true"} will be added to the returned network only if the server hits the edgeLimit..
-        :type error_when_limit: boolean
+        :type error_when_limit: bool
         :return: The CX json object.
         :rtype: list
         """
@@ -736,7 +737,7 @@ class Ndex2(object):
         Retrieves a task by id
 
         :param task_id: Task id
-        :type task_id: string
+        :type task_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Task
         :rtype: dict
@@ -750,12 +751,12 @@ class Ndex2(object):
         Deletes the specified network from the server
 
         :param network_id: Network id
-        :type network_id: string
+        :type network_id: str
         :param retry: Number of times to retry if deleting fails
         :type retry: int
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :return: Error json if there is an error.  Blank
-        :rtype: string
+        :rtype: str
         """
         self._require_auth()
         route = "/network/%s" % network_id
@@ -782,7 +783,7 @@ class Ndex2(object):
             This method has been deprecated.
 
         :param network_id: Network id
-        :type network_id: string
+        :type network_id: str
         :return: Provenance
         :rtype: dict
         """
@@ -798,7 +799,7 @@ class Ndex2(object):
             This method has been deprecated.
 
         :param network_id: Network id
-        :type network_id: string
+        :type network_id: str
         :param provenance: Network provcenance
         :type provenance: dict
         :raises NDExUnauthorizedError: If credentials are invalid or not set
@@ -916,10 +917,10 @@ class Ndex2(object):
         Gets the sample network
 
         :param network_id: Network id
-        :type network_id: string
+        :type network_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
-        :return: Sample network
-        :rtype: list of dicts in cx format
+        :return: Sample network in CX format
+        :rtype: list
         """
         route = "/network/%s/sample" % network_id
         return self.get(route)
@@ -1097,7 +1098,7 @@ class Ndex2(object):
             }
 
         :param network_id: Network id
-        :type network_id: string
+        :type network_id: str
         :param network_profile: Network profile
         :type network_profile: dict
         :raises NDExUnauthorizedError: If credentials are invalid or not set
@@ -1132,11 +1133,11 @@ class Ndex2(object):
         Updated group permissions
 
         :param groupid: Group id
-        :type groupid: string
+        :type groupid: str
         :param networkid: Network id
-        :type networkid: string
+        :type networkid: str
         :param permission: Network permission
-        :type permission: string
+        :type permission: str
         :return: Result
         :rtype: dict
         """
@@ -1148,11 +1149,11 @@ class Ndex2(object):
         Updated network user permission
 
         :param userid: User id
-        :type userid: string
+        :type userid: str
         :param networkid: Network id
-        :type networkid: string
+        :type networkid: str
         :param permission: Network permission
-        :type permission: string
+        :type permission: str
         :return: Result
         :rtype: dict
         """
@@ -1164,11 +1165,11 @@ class Ndex2(object):
         Set group permission for a set of networks
 
         :param groupid: Group id
-        :type groupid: string
+        :type groupid: str
         :param networkids: List of network ids
         :type networkids: list
         :param permission: Network permission
-        :type permission: string
+        :type permission: str
         :return: Result
         :rtype: dict
         """
@@ -1197,7 +1198,7 @@ class Ndex2(object):
             }
 
         :param username: User name
-        :type username: string
+        :type username: str
         :return: user information as dict
         :rtype: dict
         """
@@ -1205,32 +1206,36 @@ class Ndex2(object):
         return self.get(route)
 
     def get_network_summaries_for_user(self, username):
-        network_summaries = self.get_user_network_summaries(username)
-        # self.search_networks("", username, size=1000)
+        """
+        .. deprecated:: 3.4.0
 
-        # if (network_summaries and network_summaries['networks']):
-        #    network_summaries_list = network_summaries['networks']
-        # else:
-        #    network_summaries_list = []
+            Use :func:`get_user_network_summaries`
 
-        return network_summaries
+        :param username: NDEx username
+        :return: List of dict objects containing network summaries
+        :rtype: list
+        """
+        return self.get_user_network_summaries(username)
 
     def get_user_network_summaries(self, username, offset=0, limit=1000):
         """
         Get a list of network summaries for networks owned by specified user.
-        It returns not only the networks that the user owns but also the networks that are
-        shared with them directly.
+        It returns not only the networks that the user owns but also the
+        networks that are shared with them directly.
+        As set via **limit** parameter only the first ``1,000`` ids are
+        returned. The **offset** parameter combined with **limit**
+        parameter provides pagination support.
 
-        :param username: the username of the network owner
+        :param username: Username of the network owner
         :type username: str
-        :param offset: the starting position of the network search
+        :param offset: Starting position of the network search
         :type offset: int
-        :param limit:
-        :type limit:
-        :return: list of uuids
+        :param limit: Number of summaries to return starting from `offset`
+        :type limit: int
+        :return: List of uuids
         :rtype: list
         """
-        user = self.get_user_by_username(username)#.json
+        user = self.get_user_by_username(username)
         if self.version.startswith('1.'):
             route = "/user/%s/networksummary/asCX?offset=%s&limit=%s" % (user['externalId'], offset, limit)
         else:
@@ -1238,36 +1243,43 @@ class Ndex2(object):
 
         network_summaries = self.get_stream(route)
 
-        # uuids = None
-        # if network_summaries:
-        #    uuids = [d.get('externalId') for d in network_summaries.json()]
         if network_summaries:
             return network_summaries.json()
         else:
             return None
 
-    def get_network_ids_for_user(self, username):
+    def get_network_ids_for_user(self, username, offset=0, limit=1000):
         """
-        Get the network uuids owned by the user
+        Get the network uuids owned by the user as well as any
+        networks shared with the user. As set via **limit** parameter
+        only the first ``1,000`` ids are returned. The **offset** parameter
+        combined with **limit** provides pagination support.
 
-        :param username: users NDEx username
+        :param username: NDEx username
         :type username: str
-        :return: list of uuids
+        :param offset: Starting position of the query
+        :type offset: int
+        :param limit: Number of summaries to return starting from **offset**
+        :type limit: int
+        :return: List of uuids as str
+        :rtype: list
         """
-        network_summaries_list = self.get_network_summaries_for_user(username)
+        network_summaries = self.get_user_network_summaries(username)
 
-        return self.network_summaries_to_ids(network_summaries_list)
+        return self.network_summaries_to_ids(network_summaries,
+                                             offset=offset,
+                                             limit=limit)
 
     def grant_network_to_user_by_username(self, username, network_id, permission):
         """
         Grants permission to network for the given user name
 
         :param username: User name
-        :type username: string
+        :type username: str
         :param network_id: Network id
-        :type network_id: string
+        :type network_id: str
         :param permission: Network permission
-        :type permission: string
+        :type permission: str
         :return: Result
         :rtype: dict
         """
@@ -1279,13 +1291,13 @@ class Ndex2(object):
         Gives read permission to specified networks for the provided user
 
         :param userid: User id
-        :type userid: string
-        :param networkids: Network ids
-        :type networkids: list of strings
+        :type userid: str
+        :param networkids: Network ids as str
+        :type networkids: list
         :param permission: Network permissions
-        :type permission: string (default is READ)
-        :return: none
-        :rtype: none
+        :type permission: str (default is READ)
+        :return: None
+        :rtype: None
         """
         for networkid in networkids:
             self.update_network_user_permission(userid, networkid, permission)
@@ -1305,11 +1317,11 @@ class Ndex2(object):
         Creates a new network set
 
         :param name: Network set name
-        :type name: string
+        :type name: str
         :param description: Network set description
-        :type description: string
+        :type description: str
         :return: URI of the newly created network set
-        :rtype: string
+        :rtype: str
         """
         route = '/networkset'
         return self.post(route, json.dumps({"name": name,
@@ -1324,7 +1336,7 @@ class Ndex2(object):
             Use :func:`get_networkset` instead.
 
         :param set_id: network set id
-        :type set_id: basestring
+        :type set_id: str
         :return: network set information
         :rtype: dict
         """
@@ -1335,7 +1347,7 @@ class Ndex2(object):
         Gets the network set information including the list of networks
 
         :param set_id: network set id
-        :type set_id: basestring
+        :type set_id: str
         :return: network set information
         :rtype: dict
         """
@@ -1389,9 +1401,9 @@ class Ndex2(object):
         Add networks to a network set.  User must have visibility of all networks being added
 
         :param set_id: network set id
-        :type set_id: basestring
-        :param networks: networks that will be added to the set
-        :type networks: list of strings
+        :type set_id: str
+        :param networks: networks (ids as str) that will be added to the set
+        :type networks: list
         :return: None
         :rtype: None
         """
@@ -1406,9 +1418,9 @@ class Ndex2(object):
         Removes network(s) from a network set.
 
         :param set_id: network set id
-        :type set_id: basestring
-        :param networks: networks that will be removed from the set
-        :type networks: list of strings
+        :type set_id: str
+        :param networks: networks (ids as str) that will be removed from the set
+        :type networks: list
         :param retry: Number of times to retry
         :type retry: int
         :return: None

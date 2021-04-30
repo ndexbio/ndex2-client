@@ -2,12 +2,28 @@
 History
 =======
 
+3.4.0 (TBD)
+-------------------
+
+* Added `offset` and `limit` parameters to `Ndex2.get_network_ids_for_user()` to enable
+  retreival of all networks for a user.
+  `Issue #78 <https://github.com/ndexbio/ndex2-client/issues/78>`__
+
+* Fixed documentation `NiceCXNetwork.update_to()` to correctly state method returns empty
+  string upon success.
+  `Issue #82 <https://github.com/ndexbio/ndex2-client/issues/82>`__
+
+* Improved documentation by adding intersphinx to provide links to python documentation for
+  python objects.
+
 3.3.3 (2021-04-22)
 -------------------
 
 * Fixed bug where `NiceCXNetwork.to_networkx()` fails with `ValueError` when installed
   networkx version has X.Y.Z format (example: 2.5.1)
   `Issue #79 <https://github.com/ndexbio/ndex2-client/issues/79>`_
+
+*
 
 3.3.2 (2021-04-13)
 -------------------

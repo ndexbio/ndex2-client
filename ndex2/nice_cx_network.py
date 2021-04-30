@@ -1477,23 +1477,26 @@ class NiceCXNetwork():
     def upload_to(self, server, username, password,
                   user_agent=''):
         """
-        Upload this network to the specified server to the account specified
-         by username and password.
+        Upload this network as a new network to the specified
+        NDEx `server` using account credentials set via `username`
+        and `password.` Note, networks with duplicate names are allowed.
 
         Example:
 
-            ``nice_cx.upload_to('http://public.ndexbio.org', username, password)``
+        .. code-block:: python
+
+            nice_cx.upload_to('public.ndexbio.org', username, password)
 
         :param server: The NDEx server to upload the network to.
-        :type server: string
+        :type server: str
         :param username: The username of the account to store the network.
-        :type username: string
+        :type username: str
         :param password: The password for the account.
-        :type password: string
+        :type password: str
         :param user_agent: String to append to User-Agent field sent to NDEx REST service
-        :type user_agent: string
+        :type user_agent: str
         :return: The UUID of the network on NDEx.
-        :rtype: string
+        :rtype: str
         """
         ndex = Ndex2(server, username, password, user_agent=user_agent)
         return ndex.save_new_network(self.to_cx())
@@ -1503,15 +1506,20 @@ class NiceCXNetwork():
 
     def update_to(self, uuid, server, username, password,
                   user_agent=''):
-        """ Upload this network to the specified server to the account specified
-         by username and password.
+        """
+        Replace the network on NDEx `server` with matching NDEx `uuid` with
+        this network using `username` and `password` account credentials
+        passed in.
 
         Example:
 
         .. code-block:: python
 
-            nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22', 'public.ndexbio.org', username, password)
+            nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22',
+                              'public.ndexbio.org', username, password)
 
+        :param uuid: UUID of the network on NDEx.
+        :type uuid: str
         :param server: The NDEx server to upload the network to.
         :type server: str
         :param username: The username of the account to store the network.
@@ -1519,23 +1527,24 @@ class NiceCXNetwork():
         :param password: The password for the account.
         :type password: str
         :param user_agent: String to append to User-Agent field sent to NDEx REST service
-        :type user_agent: string
-        :return: The UUID of the network on NDEx.
+        :type user_agent: str
+        :return: Empty string
         :rtype: str
 
         """
         cx = self.to_cx()
-        ndex = Ndex2(server,username,password, user_agent=user_agent)
+        ndex = Ndex2(server, username, password, user_agent=user_agent)
 
-        if(len(cx) > 0):
-            if(cx[len(cx) - 1] is not None):
-                if(cx[len(cx) - 1].get('status') is None):
+        if len(cx) > 0:
+            if cx[len(cx) - 1] is not None:
+                if cx[len(cx) - 1].get('status') is None:
                     # No STATUS element in the array.  Append a new status
-                    cx.append({"status" : [ {"error" : "","success" : True} ]})
+                    cx.append({"status": [{"error": "", "success": True}]})
                 else:
-                    if(len(cx[len(cx) - 1].get('status')) < 1):
+                    if len(cx[len(cx) - 1].get('status')) < 1:
                         # STATUS element found, but the status was empty
-                        cx[len(cx) - 1].get('status').append({"error" : "","success" : True})
+                        cx[len(cx) - 1].get('status').append({"error": "",
+                                                              "success": True})
 
             if sys.version_info.major == 3:
                 stream = io.BytesIO(json.dumps(cx).encode('utf-8'))
@@ -1544,7 +1553,8 @@ class NiceCXNetwork():
 
             return ndex.update_cx_network(stream, uuid)
         else:
-            raise IndexError("Cannot save empty CX.  Please provide a non-empty CX document.")
+            raise IndexError("Cannot save empty CX.  Please provide a "
+                             "non-empty CX document.")
 
     def _get_node_and_edge_items(self):
         """

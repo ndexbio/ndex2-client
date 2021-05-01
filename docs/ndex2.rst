@@ -45,12 +45,18 @@ Miscellaneous methods
 
 Supported data types
 =====================
-The following data types are supported in methods that accept **type**
+
+The following `CX Data Types <https://home.ndexbio.org/data-model/#data_types>`__
+are supported in methods that accept **type**
 
     Example:
 
-        ``set_edge_attribute(0, 'weight', 0.5, type='double')``
+    .. code-block:: python
 
+        import ndex2
+        net = ndex2.nice_cx_network.NiceCXNetwork()
+        node_id = net.create_node('hi')
+        net.set_node_attribute(node_id, 'somevalue', 0.5, type='double')
 
 * string
 * double

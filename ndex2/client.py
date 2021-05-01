@@ -26,6 +26,9 @@ from requests import exceptions as req_except
 import time
 
 userAgent = 'NDEx2-Python/' + __version__
+"""
+User agent value to prepend to all requests
+"""
 
 DEFAULT_SERVER = "http://public.ndexbio.org"
 
@@ -1254,6 +1257,10 @@ class Ndex2(object):
         networks shared with the user. As set via **limit** parameter
         only the first ``1,000`` ids are returned. The **offset** parameter
         combined with **limit** provides pagination support.
+
+        .. versionchanged:: 3.4.0
+
+            **offset** and **limit** parameters added.
 
         :param username: NDEx username
         :type username: str

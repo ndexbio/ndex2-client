@@ -120,6 +120,65 @@ class TestClient(unittest.TestCase):
             except HTTPError:
                 pass
 
+    def test_update_network_with_client(self):
+        client = self.get_ndex2_client()
+        # create network and add it
+        net = NiceCXNetwork()
+        oneid = net.create_node('node1')
+        twoid = net.create_node('node2')
+        net.create_edge(oneid, twoid, 'hello')
+        netname = 'NiceCXNetwork upload_to() test network' + str(datetime.now())
+        net.set_name(netname)
+        creds = self.get_ndex_credentials_as_tuple()
+        res = net.upload_to('badserver', user_agent=creds['user_agent'],
+                            client=client)
+        try:
+            self.assertTrue('http' in res)
+            netid = re.sub('^.*/', '', res)
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            self.assertEqual(netid, netsum['externalId'])
+            self.assertTrue('name' in netsum, msg=str(netsum))
+            self.assertEqual(netname, netsum['name'], str(netsum))
+            self.assertEqual('PRIVATE', netsum['visibility'])
+            self.assertEqual(False, netsum['isReadOnly'])
+            self.assertEqual(1, netsum['edgeCount'])
+            self.assertEqual(2, netsum['nodeCount'])
+            self.assertEqual(False, netsum['isShowcase'])
+            self.assertEqual('NONE', netsum['indexLevel'])
+
+            net.create_node(node_name='hello', node_represents='something')
+            net.create_node(node_name='hoho', node_represents='heheh')
+            newnetname = 'update via upload_to() ' + netname
+            self.assertEqual(4, len(net.get_nodes()))
+            net.set_name(newnetname)
+            newres = net.update_to(netid, None,
+                                   'baduser', 'baddpass',
+                                   user_agent=creds['user_agent'],
+                                   client=client)
+            self.assertEqual('', newres)
+            netsum = self.wait_for_network_to_be_ready(client, netid,
+                                                       num_retries=5,
+                                                       retry_weight=1)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            self.assertEqual(netid, netsum['externalId'])
+            self.assertEqual(newnetname, netsum['name'])
+            self.assertEqual('PRIVATE', netsum['visibility'])
+            self.assertEqual(False, netsum['isReadOnly'])
+            self.assertEqual(1, netsum['edgeCount'])
+            self.assertEqual(4, netsum['nodeCount'])
+            self.assertEqual(False, netsum['isShowcase'])
+            self.assertEqual('NONE', netsum['indexLevel'])
+        finally:
+            client.delete_network(netid)
+            try:
+                client.get_network_as_cx_stream(netid)
+                self.fail('Expected exception')
+            except HTTPError:
+                pass
+
     def test_update_network_with_empty_network(self):
         client = self.get_ndex2_client()
         # create network and add it

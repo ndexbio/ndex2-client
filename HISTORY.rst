@@ -9,6 +9,12 @@ History
   retreival of all networks for a user.
   `Issue #78 <https://github.com/ndexbio/ndex2-client/issues/78>`__
 
+* Switched `NiceCXNetwork.upload_to()` to named arguments and added `client` parameter.
+  `Issue #80 <https://github.com/ndexbio/ndex2-client/issues/80>`__
+
+* Switched `NiceCXNetwork.update_to()` to named arguments and added `client` parameter.
+  `Issue #81 <https://github.com/ndexbio/ndex2-client/issues/81>`__
+
 * Fixed documentation `NiceCXNetwork.update_to()` to correctly state method returns empty
   string upon success.
   `Issue #82 <https://github.com/ndexbio/ndex2-client/issues/82>`__

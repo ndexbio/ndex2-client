@@ -8,6 +8,7 @@ import unittest
 import sys
 import warnings
 
+from unittest.mock import MagicMock, ANY
 import requests_mock
 from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
@@ -444,6 +445,24 @@ class TestNiceCXNetwork(unittest.TestCase):
 
         net.create_edge(edge_source=0, edge_target=1)
         self.assertEqual('nodes: 3 \n edges: 1', str(net))
+
+    def test_upload_to_with_client_success(self):
+        mockclient = MagicMock()
+        fakeurl = 'http://foo/12345'
+        mockclient.save_new_network = MagicMock(return_value=fakeurl)
+        net = NiceCXNetwork()
+        res = net.upload_to(client=mockclient)
+        self.assertEqual(fakeurl, res)
+        mockclient.save_new_network.assert_called_with(net.to_cx())
+
+    def test_update_to_with_client_success(self):
+        mockclient = MagicMock()
+        mockclient.update_cx_network = MagicMock(return_value='')
+        net = NiceCXNetwork()
+        res = net.update_to('myuuid', client=mockclient)
+        self.assertEqual('', res)
+
+        mockclient.update_cx_network.assert_called_with(ANY, 'myuuid')
 
     def test_upload_to_success(self):
         with requests_mock.mock() as m:

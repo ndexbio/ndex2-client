@@ -1474,20 +1474,50 @@ class NiceCXNetwork():
 
             return return_bytes
 
-    def upload_to(self, server, username, password,
-                  user_agent=''):
+    def upload_to(self, server=None, username=None, password=None,
+                  user_agent='', client=None):
         """
-        Upload this network as a new network to the specified
-        NDEx `server` using account credentials set via `username`
-        and `password.` Note, networks with duplicate names are allowed.
+        Upload this network as a new network on NDEx server.
+
+        .. versionchanged:: 3.4.0
+
+            This method was switched to named arguments and the server and account
+            credentials can be passed in one of two ways.
+
+        Option 1) Set **username** and **password** parameters.
+
+        Option 2) Set **client** parameter with valid :py:class:`~ndex2.client.Ndex2` object
+
+        .. note::
+
+            If **client** parameter is set, **username**, **password**, and **server**
+            parameters are ignored
 
         Example:
 
         .. code-block:: python
 
-            nice_cx.upload_to('public.ndexbio.org', username, password)
+            import ndex2
+            nice_cx = ndex2.nice_cx_network.NiceCXNetwork()
+            nice_cx.create_node('foo')
 
-        :param server: The NDEx server to upload the network to.
+            # using production NDEx server
+            nice_cx.update_to(username=user_var,
+                              password=password_var)
+
+            # if one needs to use alternate NDEx server
+            nice_cx.update_to(server='public.ndexbio.org',
+                              username=username_var,
+                              password=password_var)
+
+            # Option 2, create Ndex2 client object
+            ndex_client = ndex2.client.Ndex2(username=username_var,
+                                             password=password_var)
+
+            # using NDEx client object for connection
+            nice_cx.update_to(client=ndex_client)
+
+        :param server: The NDEx server to upload the network to. Leaving unset or `None` will use production
         :type server: str
         :param username: The username of the account to store the network.
         :type username: str
@@ -1495,32 +1525,72 @@ class NiceCXNetwork():
         :type password: str
         :param user_agent: String to append to User-Agent field sent to NDEx REST service
         :type user_agent: str
+        :param client: NDEx2 object with valid credentials. If set **server**, **username**, and **password**
+                       parameters will be ignored.
+        :type client: :py:class:`~ndex2.client.Ndex2`
         :return: The UUID of the network on NDEx.
         :rtype: str
         """
-        ndex = Ndex2(server, username, password, user_agent=user_agent)
+        if client is not None:
+            ndex = client
+        else:
+            ndex = Ndex2(server, username, password, user_agent=user_agent)
         return ndex.save_new_network(self.to_cx())
 
     def upload_new_network_stream(self, server, username, password):
         raise Exception('upload_new_network_stream() is no longer supported.  Please use upload_to()')
 
-    def update_to(self, uuid, server, username, password,
-                  user_agent=''):
+    def update_to(self, uuid, server=None, username=None, password=None,
+                  user_agent='', client=None):
         """
-        Replace the network on NDEx `server` with matching NDEx `uuid` with
-        this network using `username` and `password` account credentials
-        passed in.
+        Replace the network on NDEx server with matching NDEx `uuid` with
+        this network.
+
+        .. versionchanged:: 3.4.0
+
+            This method was switched to named arguments and the server and account
+            credentials can be passed in one of two ways.
+
+
+        Option 1) Set **username** and **password** parameters.
+
+        Option 2) Set **client** parameter with valid :py:class:`~ndex2.client.Ndex2` object
+
+        .. note::
+
+            If **client** parameter is set, **username**, **password**, and **server**
+            parameters are ignored.
 
         Example:
 
         .. code-block:: python
 
+            import ndex2
+            nice_cx = ndex2.nice_cx_network.NiceCXNetwork()
+            nice_cx.create_node('foo')
+
+            # using production NDEx server
             nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22',
-                              'public.ndexbio.org', username, password)
+                              username=user_var,
+                              password=password_var)
+
+            # if one needs to use alternate NDEx server
+            nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22',
+                              server='public.ndexbio.org',
+                              username=username_var,
+                              password=password_var)
+
+            # Option 2, create Ndex2 client object
+            ndex_client = ndex2.client.Ndex2(username=username_var,
+                                             password=password_var)
+
+            # using NDEx client object for connection
+            nice_cx.update_to('2ec87c51-c349-11e8-90ac-525400c25d22',
+                              client=ndex_client)
 
         :param uuid: UUID of the network on NDEx.
         :type uuid: str
-        :param server: The NDEx server to upload the network to.
+        :param server: The NDEx server to upload the network to. Leaving unset or `None` will use production.
         :type server: str
         :param username: The username of the account to store the network.
         :type username: str
@@ -1528,12 +1598,18 @@ class NiceCXNetwork():
         :type password: str
         :param user_agent: String to append to User-Agent field sent to NDEx REST service
         :type user_agent: str
+        :param client: NDEx2 object with valid credentials. If set **server**, **username**, and **password**
+                       parameters will be ignored.
+        :type client: :py:class:`~ndex2.client.Ndex2`
         :return: Empty string
         :rtype: str
 
         """
         cx = self.to_cx()
-        ndex = Ndex2(server, username, password, user_agent=user_agent)
+        if client is not None:
+            ndex = client
+        else:
+            ndex = Ndex2(server, username, password, user_agent=user_agent)
 
         if len(cx) > 0:
             if cx[len(cx) - 1] is not None:

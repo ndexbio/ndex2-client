@@ -33,6 +33,7 @@ with open(os.path.join('ndex2', 'version.py')) as ver_file:
 test_requirements = [
     'unittest2',
     'requests-mock',
+    'mock; python_version < "3.3"',
     'nose'
 ]
 

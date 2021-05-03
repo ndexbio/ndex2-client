@@ -19,6 +19,8 @@ from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import Ndex2
 from ndex2.client import DecimalEncoder
 from ndex2.exceptions import NDExUnauthorizedError
+from ndex2.exceptions import NDExNotFoundError
+from ndex2.exceptions import NDExError
 
 SKIP_REASON = 'NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
               'environment variables not set, cannot run integration' \
@@ -26,28 +28,42 @@ SKIP_REASON = 'NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
 
 
 @unittest.skipUnless(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
-class TestClient(unittest.TestCase):
+class TestClientIntegration(unittest.TestCase):
 
     TEST_DIR = os.path.dirname(__file__)
     WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')
     GLYPICAN2_FILE = os.path.join(TEST_DIR, 'data', 'glypican2.cx')
 
+    def get_ndex_credentials_as_tuple(self):
+        """
+        Gets ndex user credentials as tuple
+
+        :return: {'server': SERVER, 'user': USER,
+                  'password': PASS, 'user_agent': USER_AGENT}
+        :rtype: dict
+        """
+        return {'server': os.getenv('NDEX2_TEST_SERVER'),
+                'user': os.getenv('NDEX2_TEST_USER'),
+                'password': os.getenv('NDEX2_TEST_PASS'),
+                'user_agent': 'ndex2-client integration test'}
+
     def get_ndex2_client(self):
-        return Ndex2(os.getenv('NDEX2_TEST_SERVER'),
-                     os.getenv('NDEX2_TEST_USER'),
-                     os.getenv('NDEX2_TEST_PASS'),
+        creds = self.get_ndex_credentials_as_tuple()
+        return Ndex2(creds['server'],
+                     creds['user'],
+                     creds['password'],
                      debug=True,
-                     user_agent='ndex2-client integration test')
+                     user_agent=creds['user_agent'])
 
     def wait_for_network_to_be_ready(self, client, netid,
-                                     num_retries=3, retry_weight=0.5):
+                                     num_retries=3, retry_wait=0.5):
         retrycount = 1
         while retrycount < num_retries:
             netsum = client.get_network_summary(network_id=netid)
             if netsum['completed'] is True:
                 return netsum
             retrycount += 1
-            time.sleep(retry_weight)
+            time.sleep(retry_wait)
         return None
 
     def test_update_network(self):
@@ -92,7 +108,7 @@ class TestClient(unittest.TestCase):
             self.assertEqual('', newres)
             netsum = self.wait_for_network_to_be_ready(client, netid,
                                                        num_retries=5,
-                                                       retry_weight=1)
+                                                       retry_wait=1)
             self.assertIsNotNone(netsum, 'Network is still not ready,'
                                          ' maybe server is busy?')
             self.assertEqual(netid, netsum['externalId'])
@@ -115,7 +131,7 @@ class TestClient(unittest.TestCase):
     def test_network_permissions(self):
         client = self.get_ndex2_client()
         # create network and add it
-        net = ndex2.create_nice_cx_from_file(TestClient.GLYPICAN2_FILE)
+        net = ndex2.create_nice_cx_from_file(TestClientIntegration.GLYPICAN2_FILE)
         netname = 'ndex2-client integration test network' + str(datetime.now())
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
@@ -194,7 +210,7 @@ class TestClient(unittest.TestCase):
         self.assertTrue('http' in res)
         netset_id = re.sub('^.*/', '', res)
 
-        net = ndex2.create_nice_cx_from_file(TestClient.GLYPICAN2_FILE)
+        net = ndex2.create_nice_cx_from_file(TestClientIntegration.GLYPICAN2_FILE)
         netname = 'ndex2-client integration test network' + str(datetime.now())
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
@@ -230,17 +246,243 @@ class TestClient(unittest.TestCase):
             except HTTPError:
                 pass
 
+    def test_get_networksets_for_user_invalid_user(self):
+        client = self.get_ndex2_client()
+        nonexistant_user = str(uuid.uuid4())
+        res = client.get_networksets_for_user_id(nonexistant_user)
+        self.assertEqual([], res)
+
+    def test_get_networksets_for_user_empty_networkset(self):
+        client = self.get_ndex2_client()
+
+        try:
+            user_id = client.get_id_for_user(None)
+            # get all the networksets for the user whose
+            # credentials were used to connect to NDEx
+            # with all default parameters
+            res = client.get_networksets_for_user_id(user_id)
+
+            num_networksets_existing = len(res)
+
+            # now lets add a networkset and run query several
+            # times to make sure we get it back correctly
+            netsetname = 'testnetworkset1: ' + str(datetime.now())
+            netset_desc = '1st networkset'
+            res = client.create_networkset(netsetname, netset_desc)
+            self.assertTrue('http' in res)
+            netset_id = re.sub('^.*/', '', res)
+
+            res = client.get_networksets_for_user_id(user_id)
+            self.assertEqual(num_networksets_existing+1, len(res))
+            found_netset = False
+            for netset in res:
+                if netset['name'] == netsetname:
+                    matching_netset = netset
+                    found_netset = True
+
+            self.assertTrue(found_netset)
+            self.assertEqual(netset_desc, matching_netset['description'])
+            self.assertEqual(user_id,
+                             matching_netset['ownerId'])
+            self.assertEqual(False, matching_netset['showcased'])
+            self.assertEqual(False, matching_netset['isDeleted'])
+            self.assertEqual({}, matching_netset['properties'])
+
+            # query again this time with summary_only set to False
+            # and set the username
+            res = client.get_networksets_for_user_id(user_id,
+                                                     summary_only=False,
+                                                     showcase=False)
+            self.assertEqual(num_networksets_existing + 1, len(res))
+            found_netset = False
+            counter = 0
+            for netset in res:
+                if netset['name'] == netsetname:
+                    matching_netset = netset
+                    found_netset = True
+                    break
+                counter += 1
+
+            self.assertTrue(found_netset)
+            self.assertEqual(netset_desc, matching_netset['description'])
+            self.assertEqual(user_id,
+                             matching_netset['ownerId'])
+            self.assertEqual(False, matching_netset['showcased'])
+            self.assertEqual(False, matching_netset['isDeleted'])
+            self.assertEqual({}, matching_netset['properties'])
+
+            # try limit and offset set to 0
+            res = client.get_networksets_for_user_id(user_id,
+                                                     summary_only=False,
+                                                     showcase=False,
+                                                     offset=0,
+                                                     limit=0)
+            self.assertEqual(num_networksets_existing+1, len(res))
+
+            # try limit=1 and offset set to 0
+            res = client.get_networksets_for_user_id(user_id,
+                                                     summary_only=False,
+                                                     showcase=False,
+                                                     offset=counter,
+                                                     limit=1)
+            self.assertEqual(1, len(res))
+            matching_netset = res[0]
+            self.assertEqual(netset_desc, matching_netset['description'])
+            self.assertEqual(user_id,
+                             matching_netset['ownerId'])
+            self.assertEqual(False, matching_netset['showcased'])
+            self.assertEqual(False, matching_netset['isDeleted'])
+            self.assertEqual({}, matching_netset['properties'])
+        finally:
+            # delete networkset
+            res = client.delete_networkset(netset_id)
+            self.assertEqual(None, res)
+
+            # verify networkset is not there
+            try:
+                client.get_network_set(netset_id)
+                self.fail('Expected Exception')
+            except HTTPError:
+                pass
+
+            # and verify it is not returned when looking for all
+            # networksets
+            res = client.get_networksets_for_user_id(user_id)
+            self.assertEqual(num_networksets_existing, len(res))
+
+    def test_get_networksets_for_user_full_networkset(self):
+        client = self.get_ndex2_client()
+        creds = self.get_ndex_credentials_as_tuple()
+        net_one_id = None
+        net_two_id = None
+        try:
+            user_id = client.get_id_for_user(None)
+
+            # now lets add a networkset
+            netsetname = 'testnetworkset1: ' + str(datetime.now())
+            netset_desc = '1st networkset'
+            res = client.create_networkset(netsetname, netset_desc)
+            self.assertTrue('http' in res)
+            netset_id = re.sub('^.*/', '', res)
+
+            # add a couple networks to networkset
+            net_one = ndex2.create_nice_cx_from_file(TestClientIntegration.GLYPICAN2_FILE)
+            net_one_name = 'ndex2-client integration test network' + str(datetime.now())
+            net_one.set_name(net_one_name)
+            res = client.save_new_network(net_one.to_cx(), visibility='PUBLIC')
+            self.assertTrue('http' in res)
+            net_one_id = re.sub('^.*/', '', res)
+
+            net_two = ndex2.create_nice_cx_from_file(TestClientIntegration.GLYPICAN2_FILE)
+            net_two_name = 'ndex2-client integration test network 2 ' + str(datetime.now())
+            net_two.set_name(net_two_name)
+            res = client.save_new_network(net_two.to_cx(), visibility='PUBLIC')
+            self.assertTrue('http' in res)
+            net_two_id = re.sub('^.*/', '', res)
+
+            client.add_networks_to_networkset(netset_id,
+                                              [net_one_id, net_two_id])
+
+            res = client.get_networksets_for_user_id(user_id)
+            found_netset = False
+            counter = 0
+            for netset in res:
+                if netset['name'] == netsetname:
+                    matching_netset = netset
+                    found_netset = True
+                    break
+                counter += 1
+
+            self.assertTrue(found_netset)
+            self.assertEqual(netset_desc, matching_netset['description'])
+            self.assertTrue('networks' not in matching_netset)
+            res = client.get_networksets_for_user_id(user_id,
+                                                     summary_only=False,
+                                                     offset=counter, limit=1)
+            matching_netset = res[0]
+            self.assertTrue(2, len(matching_netset['networks']))
+            self.assertTrue(net_one_id in matching_netset['networks'])
+            self.assertTrue(net_two_id in matching_netset['networks'])
+
+        finally:
+            # delete networks
+            if net_one_id is not None:
+                res = client.delete_network(net_one_id)
+                self.assertEqual('', res)
+            if net_two_id is not None:
+                res = client.delete_network(net_two_id)
+                self.assertEqual('', res)
+
+            # delete networkset
+            res = client.delete_networkset(netset_id)
+            self.assertEqual(None, res)
+
+            # verify networkset is not there
+            try:
+                client.get_network_set(netset_id)
+                self.fail('Expected Exception')
+            except HTTPError:
+                pass
+
     def test_get_user_by_username(self):
         client = self.get_ndex2_client()
-        theuser = os.getenv('NDEX2_TEST_USER')
+        creds = self.get_ndex_credentials_as_tuple()
+        theuser = creds['user']
         res = client.get_user_by_username(theuser)
         self.assertEqual(theuser, res['userName'])
         self.assertTrue('externalId' in res)
 
+    def test_get_id_for_user(self):
+        client = self.get_ndex2_client()
+        creds = self.get_ndex_credentials_as_tuple()
+
+        # try with user used in connection
+        user_id = client.get_id_for_user(None)
+        # compare with value from get_user_by_username
+        user_json = client.get_user_by_username(creds['user'])
+        self.assertEqual(user_json['externalId'], user_id)
+
+        bad_user_id = str(uuid.uuid4())
+        # try with user that does not exist
+        try:
+            client.get_id_for_user(bad_user_id)
+            self.fail('Expected NDExNotFoundError')
+        except NDExNotFoundError as e:
+            self.assertTrue('Caught 404 from server:' in str(e))
+
+    def test_get_user_by_id(self):
+        client = self.get_ndex2_client()
+
+        # try with current user
+        user_id = client.get_id_for_user(None)
+        self.assertTrue(user_id is not None)
+
+        user_json = client.get_user_by_id(user_id)
+        self.assertEqual(user_id, user_json['externalId'])
+
+        # compare with user json from get_user_by_name()
+        alt_user_json = client.get_user_by_username(user_json['userName'])
+        prop_list = ['isIndividual', 'userName', 'isVerified',
+                     'firstName', 'lastName', 'emailAddress', 'diskQuota',
+                     'externalId', 'isDeleted', 'creationTime']
+        # there is also modificationTime, and diskUsed, but those
+        # might change as test is running so will skip for now
+        for prop in prop_list:
+            self.assertEqual(user_json[prop],
+                             alt_user_json[prop])
+
+        bad_user_id = str(uuid.uuid4())
+        # try with user that does not exist
+        try:
+            client.get_user_by_id(bad_user_id)
+            self.fail('Expected NDExNotFoundError')
+        except NDExNotFoundError as e:
+            self.assertTrue('Caught 404 from server:' in str(e))
+
     def test_set_network_properties(self):
         client = self.get_ndex2_client()
         # create network and add it
-        net = ndex2.create_nice_cx_from_file(TestClient.GLYPICAN2_FILE)
+        net = ndex2.create_nice_cx_from_file(TestClientIntegration.GLYPICAN2_FILE)
         netname = 'ndex2-client integration test network2' + str(datetime.now())
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
@@ -285,3 +527,58 @@ class TestClient(unittest.TestCase):
         finally:
             # delete network
             client.delete_network(netid)
+
+    def test_get_network_ids_for_user(self):
+        client = self.get_ndex2_client()
+        creds = self.get_ndex_credentials_as_tuple()
+        netid_one = None
+        netid_two = None
+        try:
+            # query for networks for user in creds
+            network_ids = client.get_network_ids_for_user(creds['user'])
+            num_network_ids = len(network_ids)
+            self.assertTrue(num_network_ids >= 0)
+
+            # set offset to number of network ids and limit 1
+            network_ids = client.get_network_ids_for_user(creds['user'],
+                                                          offset=num_network_ids,
+                                                          limit=1)
+            self.assertTrue(len(network_ids) == 0)
+
+            # add two networks just in case there are none and verify
+            # they are returned
+            net = ndex2.create_nice_cx_from_file(TestClientIntegration.GLYPICAN2_FILE)
+            netname = 'ndex2-client integration test network1' + str(datetime.now())
+            net.set_name(netname)
+            res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
+            self.assertTrue('http' in res)
+            netid_one = re.sub('^.*/', '', res)
+            # verify network was uploaded
+            netsum = self.wait_for_network_to_be_ready(client, netid_one)
+            self.assertEqual(netid_one, netsum['externalId'])
+
+            net.set_name('ndex2-client integration test network2' + str(datetime.now()))
+            res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
+            self.assertTrue('http' in res)
+            netid_two = re.sub('^.*/', '', res)
+            # verify network was uploaded
+            netsum = self.wait_for_network_to_be_ready(client, netid_two)
+            self.assertEqual(netid_two, netsum['externalId'])
+
+            network_ids = client.get_network_ids_for_user(creds['user'],
+                                                          limit=num_network_ids+5)
+
+            self.assertTrue(netid_one in network_ids)
+            self.assertTrue(netid_two in network_ids)
+            self.assertEqual(num_network_ids+2, len(network_ids))
+
+            network_ids = client.get_network_ids_for_user(creds['user'],
+                                                          offset=num_network_ids+1,
+                                                          limit=5)
+            self.assertTrue(len(network_ids) == 1)
+        finally:
+            if netid_one is not None:
+                client.delete_network(netid_one)
+            if netid_two is not None:
+                client.delete_network(netid_two)
+

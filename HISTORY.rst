@@ -2,11 +2,11 @@
 History
 =======
 
-3.4.0 (TBD)
+3.4.0 (2021-05-03)
 -------------------
 
 * Added `offset` and `limit` parameters to `Ndex2.get_network_ids_for_user()` to enable
-  retreival of all networks for a user.
+  retrieval of all networks for a user.
   `Issue #78 <https://github.com/ndexbio/ndex2-client/issues/78>`__
 
 * Switched `NiceCXNetwork.upload_to()` to named arguments and added `client` parameter.
@@ -18,6 +18,13 @@ History
 * Fixed documentation `NiceCXNetwork.update_to()` to correctly state method returns empty
   string upon success.
   `Issue #82 <https://github.com/ndexbio/ndex2-client/issues/82>`__
+
+* Added `Ndex2.get_user_by_id()` method to get user information by NDEx user Id.
+
+* Added `Ndex2.get_id_for_user()` method to get NDEx user Id by username.
+
+* Added `Ndex2.get_networksets_for_user_id()` to get Network Sets for a given user Id.
+  `Issue #61 <https://github.com/ndexbio/ndex2-client/issues/61>`__
 
 * Improved documentation by adding intersphinx to provide links to python documentation for
   python objects.

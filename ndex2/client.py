@@ -185,7 +185,7 @@ class Ndex2(object):
         """
         Given a response from service request
         this method returns response.json() if the
-        headers content-type is application/json otherwise
+        headers Content-Type is application/json otherwise
         response.text is returned
         :param response: response object from requests.put or requests.post
                          call
@@ -209,10 +209,47 @@ class Ndex2(object):
             except ValueError:
                 result = response.text
             return result
-        if response.headers['content-type'] == 'application/json':
+
+        if ('content-type' in response.headers or
+            'Content-Type' in response.headers) and\
+                response.headers['content-type'] == 'application/json':
             return response.json()
         else:
             return response.text
+
+    def _convert_requests_http_error_to_ndex_error(self, http_error):
+        """
+        Raises :py:class:`~ndex2.exceptions.NDExError` using
+        information from :py:`requests.HTTPError`
+        passed in
+
+        :param http_error: Error from :py:mod:`requests` library
+        :type http_error: :py:class:`requests.HTTPError`
+        :raises NDExError: Raises this error unless
+        :raises NDExNotFoundError: Raises this error if status code
+                                   is 404
+        """
+        if http_error is None:
+            raise NDExError('Caught unknown server error')
+        errmsg = 'Caught ' + str(http_error.response.status_code) + \
+                 ' from server: ' + str(http_error.response.text)
+        if http_error.response.status_code == 404:
+            raise NDExNotFoundError(errmsg)
+        raise NDExError(errmsg)
+
+    def _convert_exception_to_ndex_error(self, error):
+        """
+        Raises :py:class:`~ndex2.exceptions.NDExError` using
+        information from :py:`python.Exception` passed in
+
+        :param error:
+        :type error: Exception
+        :raises NDExError: always raises error
+        """
+        if error is None:
+            raise NDExError('Caught unknown error')
+        raise NDExError('Caught ' + str(error.__class__.__name__) +
+                        ': ' + str(error))
 
     def put(self, route, put_json=None):
         url = self.host + route
@@ -632,7 +669,6 @@ class Ndex2(object):
     def find_networks(self, search_string="", account_name=None, skip_blocks=0, block_size=100):
         """
         .. deprecated:: 3.3.2
-
             Use :func:`search_networks` instead.
 
         :param search_string:
@@ -782,7 +818,6 @@ class Ndex2(object):
         Gets the network provenance
 
         .. deprecated:: 3.3.2
-
             This method has been deprecated.
 
         :param network_id: Network id
@@ -798,7 +833,6 @@ class Ndex2(object):
         Sets the network provenance
 
         .. deprecated:: 3.3.2
-
             This method has been deprecated.
 
         :param network_id: Network id
@@ -1012,12 +1046,13 @@ class Ndex2(object):
         The network properties should be a :py:func:`dict` or a json string of a :py:func:`dict`
         in this format:
 
-        .. code-block:: json-object
+        .. code-block:: python
 
             {'showcase': (boolean True or False),
              'visibility': (str 'PUBLIC' or 'PRIVATE'),
              'index_level': (str  'NONE', 'META', or 'ALL'),
-             'readOnly': (boolean True or False)}
+             'readOnly': (boolean True or False)
+            }
 
         .. note::
 
@@ -1179,11 +1214,56 @@ class Ndex2(object):
         for networkid in networkids:
             self.update_network_group_permission(groupid, networkid, permission)
 
+    def get_id_for_user(self, username):
+        """
+        Gets NDEx user Id for user
+
+        .. versionadded:: 3.4.0
+
+        .. code-block:: python
+
+            import ndex2.client
+            my_ndex = ndex2.client.Ndex2()
+            my_ndex.get_id_for_user('nci-pid')
+
+        :param username: Name of user on NDEx. If ``None`` user set in
+                         constructor of this client will be used.
+        :type username: str
+        :raises NDExError: If there was an error on the server.
+        :raises NDExInvalidParameterError: If username is empty string or is
+                                           of type other then str.
+        :return: Id of user on NDEx server.
+        :rtype: str
+        """
+        if username is None:
+            username = self.username
+            if username is None:
+                raise NDExInvalidParameterError('None passed in this method and '
+                                                'no user found via constructor '
+                                                'of this client')
+        if not isinstance(username, str):
+            raise NDExInvalidParameterError('Username must be of type str')
+
+        if username == '':
+            raise NDExInvalidParameterError('Username cannot be empty str')
+
+        try:
+            user_json = self.get_user_by_username(username)
+        except requests.HTTPError as he:
+            self._convert_requests_http_error_to_ndex_error(he)
+        except Exception as e:
+            self._convert_exception_to_ndex_error(e)
+        if 'externalId' not in user_json:
+            raise NDExError('Unable to get user id for user: ' + str(username))
+        return user_json['externalId']
+
     def get_user_by_username(self, username):
         """
-        Gets user information as a dict in format:
+        Gets user information from NDEx.
 
-        .. code-block:: json-object
+        Example user information:
+
+        .. code-block:: python
 
             {'properties': {},
              'isIndividual': True,
@@ -1202,17 +1282,63 @@ class Ndex2(object):
 
         :param username: User name
         :type username: str
-        :return: user information as dict
+        :return: User information as dict
         :rtype: dict
         """
         route = "/user?username=%s" % username
         return self.get(route)
 
+    def get_user_by_id(self, user_id):
+        """
+        Gets user matching id from NDEx server.
+
+        .. versionadded:: 3.4.0
+
+        Result is a dict in format:
+
+        .. code-block:: python
+
+            {'properties': {},
+             'isIndividual': True,
+             'userName': 'bsmith',
+             'isVerified': True,
+             'firstName': 'bob',
+             'lastName': 'smith',
+             'emailAddress': 'bob.smith@ndexbio.org',
+             'diskQuota': 10000000000,
+             'diskUsed': 3971183103,
+             'externalId': 'f2c3a7ef-b0d9-4c61-bf31-4c9fcabe4173',
+             'isDeleted': False,
+             'modificationTime': 1554410147104,
+             'creationTime': 1554410138498
+            }
+
+        :param user_id: Id of user on NDEx server
+        :type user_id: str
+        :raises NDExError: If there was an error on the server
+        :raises NDExInvalidParameterError: If user_id is not of
+                                           type str or if empty str
+        :return: user object. `externalId` is Id of user on NDEx server
+        :rtype: dict
+        """
+        if user_id is None or not isinstance(user_id, str):
+            raise NDExInvalidParameterError('user_id must be a str')
+
+        if user_id == '':
+            raise NDExInvalidParameterError('user_id cannot be an empty str')
+        try:
+            route = '/user/' + str(user_id)
+            return self.get(route)
+        except requests.HTTPError as he:
+            self._convert_requests_http_error_to_ndex_error(he)
+        except Exception as e:
+            self._convert_exception_to_ndex_error(e)
+
     def get_network_summaries_for_user(self, username):
         """
-        .. deprecated:: 3.4.0
+        Wrapper that calls :func:`get_user_network_summaries`
 
-            Use :func:`get_user_network_summaries`
+        See :func:`get_user_network_summaries` for usage
 
         :param username: NDEx username
         :return: List of dict objects containing network summaries
@@ -1253,29 +1379,53 @@ class Ndex2(object):
 
     def get_network_ids_for_user(self, username, offset=0, limit=1000):
         """
-        Get the network uuids owned by the user as well as any
+        Get the network UUIDs owned by the user as well as any
         networks shared with the user. As set via **limit** parameter
         only the first ``1,000`` ids are returned. The **offset** parameter
         combined with **limit** provides pagination support.
 
         .. versionchanged:: 3.4.0
-
             **offset** and **limit** parameters added.
 
         :param username: NDEx username
         :type username: str
-        :param offset: Starting position of the query
+        :param offset: Starting position of the query. If set, **limit** parameter
+                       must be set to a positive value.
         :type offset: int
         :param limit: Number of summaries to return starting from **offset**
+                      If set to ``None`` or ``0`` all summaries will be
+                      returned.
         :type limit: int
+        :raises NDExInvalidParameterError: If **offset**/**limit** parameters
+                                           are not of type int.
+                                           If **offset** parameter
+                                           is set to positive number and
+                                           **limit** is ``0`` or
+                                           negative.
         :return: List of uuids as str
         :rtype: list
         """
-        network_summaries = self.get_user_network_summaries(username)
+        if limit is None:
+            limit = 0
+        if offset is None:
+            offset = 0
 
-        return self.network_summaries_to_ids(network_summaries,
-                                             offset=offset,
-                                             limit=limit)
+        if not isinstance(limit, int):
+            raise NDExInvalidParameterError('Limit must be an int')
+
+        if not isinstance(offset, int):
+            raise NDExInvalidParameterError('Offset must be an int')
+
+        if limit <= 0:
+            if offset > 0:
+                raise NDExInvalidParameterError('Limit must be set to a '
+                                                'positive number '
+                                                'to use offset')
+        network_summaries = self.get_user_network_summaries(username,
+                                                            offset=offset,
+                                                            limit=limit)
+
+        return self.network_summaries_to_ids(network_summaries)
 
     def grant_network_to_user_by_username(self, username, network_id, permission):
         """
@@ -1339,7 +1489,6 @@ class Ndex2(object):
         Gets the network set information including the list of networks
 
         .. deprecated:: 3.2.0
-
             Use :func:`get_networkset` instead.
 
         :param set_id: network set id
@@ -1361,6 +1510,109 @@ class Ndex2(object):
         route = '/networkset/%s' % set_id
 
         return self.get(route)
+
+    def get_networksets_for_user_id(self, user_id, summary_only=True,
+                                    showcase=False, offset=0,
+                                    limit=0):
+        """
+        Gets a list of Network Set objects owned by the user
+        identified by **user_id**
+
+        .. versionadded:: 3.4.0
+
+        Example when **summary_only** is ``True`` or if Network Set
+        does not contain any networks:
+
+        .. code-block:: python
+
+            [
+             {'name': 'test networkset',
+              'description': ' ',
+              'ownerId': '4f0a6356-ed4a-49df-bd81-098fee90b448',
+              'showcased': False,
+              'properties': {},
+              'externalId': '956e31e8-f25c-471f-8596-2cae8348dcad',
+              'isDeleted': False,
+              'modificationTime': 1568844043868,
+              'creationTime': 1568844043868
+             }
+            ]
+
+        When **summary_only** is ``False`` and Network Set does
+        contain networks there will be an additional property named
+        ``networks``:
+
+        .. code-block:: python
+
+             'networks': ['face63b6-aba7-11eb-9e72-0ac135e8bacf',
+                          'fae4d1e8-aba7-11eb-9e72-0ac135e8bacf']
+
+
+        :param user_id: Id of user on NDEx. To get Id of user see
+                        :py:func:`get_id_for_user`
+        :type user_id: str
+        :param summary_only: When ``True``, the server will not return the
+                             list of network IDs in this Network Set
+        :type summary_only: bool
+        :param showcase: When ``True``, only showcased Network Sets are
+                         returned
+        :type showcase: bool
+        :param offset: Index to first object to return. If ``0``/``None``
+                       no offset will be applied. If this parameter is set
+                       to a positive value then **limit** parameter must be
+                       set to a positive value or this offset will be ignored.
+        :type offset: int
+        :param limit: Number of objects to retrieve. If ``0``, ``None``, or
+                      negative all results will be returned.
+        :type limit: int
+        :raises NDExInvalidParameterError: If **user_id** parameter is not of
+                                           type str.
+                                           If **offset**/**limit** parameters
+                                           are not ``None`` or of type int.
+                                           If **offset** parameter
+                                           is set to positive number and
+                                           **limit** is ``0``, ``None``, or
+                                           negative.
+        :raises NDExError: If there is an error from server
+        :return: list with dict objects containing Network Sets
+        :rtype: list
+        """
+        if user_id is None or not isinstance(user_id, str):
+            raise NDExInvalidParameterError('user_id must be of type str')
+
+        params = {}
+        if limit is not None:
+            if not isinstance(limit, int):
+                raise NDExInvalidParameterError('limit parameter must be of '
+                                                'type int ' +
+                                                str(type(limit)))
+            params['limit'] = limit
+        if offset is not None:
+            if not isinstance(offset, int):
+                raise NDExInvalidParameterError('offset parameter must be of '
+                                                'type int ' +
+                                                str(type(offset)))
+            if limit is None or limit <= 0:
+                if offset > 0:
+                    raise NDExInvalidParameterError('limit (' + str(limit) +
+                                                    ') parameter must be set '
+                                                    'to positive value when '
+                                                    'using offset parameter '
+                                                    'set to (' +
+                                                    str(offset) + ')')
+            params['offset'] = offset
+        if summary_only is not None:
+            params['summary'] = summary_only
+        if showcase is not None:
+            params['showcase'] = showcase
+
+        try:
+            return self.get('/user/' + str(user_id) + '/networksets',
+                            get_params=params)
+        except requests.HTTPError as he:
+            self._convert_requests_http_error_to_ndex_error(he)
+        except Exception as e:
+            self._convert_exception_to_ndex_error(e)
 
     def delete_networkset(self, networkset_id):
         """

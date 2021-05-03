@@ -12,6 +12,7 @@ import numpy as np
 import json
 
 import requests_mock
+from unittest.mock import MagicMock
 from requests.exceptions import HTTPError
 from ndex2 import client
 from ndex2.client import Ndex2
@@ -217,6 +218,48 @@ class TestClient(unittest.TestCase):
         res = ndex._get_user_agent()
         self.assertEqual(res, 'NDEx2-Python/' + __version__ + ' hi')
 
+    def test_convert_exception_to_ndex_error(self):
+        # try passing none
+        ndex = Ndex2(host='localhost')
+        try:
+            ndex._convert_exception_to_ndex_error(None)
+        except NDExError as ne:
+            self.assertEqual('Caught unknown error', str(ne))
+
+        # try passing in a ValueError
+        try:
+            ndex._convert_exception_to_ndex_error(ValueError('hi'))
+        except NDExError as ne:
+            self.assertEqual('Caught ValueError: hi', str(ne))
+
+    def test_convert_requests_http_error_to_ndex_error(self):
+        # try passing none
+        ndex = Ndex2(host='localhost')
+        try:
+            ndex._convert_requests_http_error_to_ndex_error(None)
+        except NDExError as ne:
+            self.assertEqual('Caught unknown server error', str(ne))
+
+        error = MagicMock()
+        error.response = MagicMock()
+        error.response.status_code = 404
+        error.response.text = 'hi'
+
+        # try passing in a mock HTTPError
+        try:
+            ndex._convert_requests_http_error_to_ndex_error(error)
+            self.fail('Expected NDExNotFoundError')
+        except NDExNotFoundError as ne:
+            self.assertEqual('Caught 404 from server: hi', str(ne))
+
+        # try passing in a 500 error
+        error.response.status_code = 500
+        try:
+            ndex._convert_requests_http_error_to_ndex_error(error)
+            self.fail('Expected NDExError')
+        except NDExError as ne:
+            self.assertEqual('Caught 500 from server: hi', str(ne))
+
     def test_ndex2_put_no_json_empty_resp_code_204(self):
         with requests_mock.mock() as m:
             m.get(self.get_rest_admin_status_url(),
@@ -414,6 +457,286 @@ class TestClient(unittest.TestCase):
             ndex.set_debug_mode(True)
             res = ndex.post_multipart('/hi', {"x": "y"}, query_string='yo=1')
             self.assertEqual(res, '')
+
+    def test_get_id_for_user_invalid_param(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                 json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            # try where None passed in and client was
+            # also constructed with anonymous connection so
+            # no username
+            try:
+                ndex.get_id_for_user(None)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertTrue('None passed in this method' in str(ne))
+
+            # try where username is not of type str
+            try:
+                ndex.get_id_for_user(44)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('Username must be of type str', str(ne))
+
+            # try where username is empty str
+            try:
+                ndex.get_id_for_user('')
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('Username cannot be empty str', str(ne))
+
+    def test_get_user_by_username(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user?username=bob'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl, json={'userName': 'bob'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            res = ndex.get_user_by_username('bob')
+            self.assertEqual('bob', res['userName'])
+
+    def test_get_id_for_user_success(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user?username=bob'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl, json={'externalId': '12345'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            self.assertEqual('12345', ndex.get_id_for_user('bob'))
+
+    def test_get_id_for_user_httperror(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user?username=bob'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  status_code=404,
+                  text='error',
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            try:
+                ndex.get_id_for_user('bob')
+                self.fail('Expected NDExNotFoundError')
+            except NDExNotFoundError as ne:
+                self.assertEqual('Caught 404 from server: error',
+                                 str(ne))
+
+    def test_get_id_for_user_exception(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user?username=bob'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            try:
+                ndex.get_id_for_user('bob')
+                self.fail('Expected NDExError')
+            except NDExError as ne:
+                self.assertTrue('Caught JSONDecodeError:' in str(ne))
+
+    def test_get_id_for_user_no_external_id(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user?username=bob'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  json={'uhoh': 'missing'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            try:
+                ndex.get_id_for_user('bob')
+                self.fail('Expected NDExError')
+            except NDExError as ne:
+                self.assertTrue('Unable to get user id for user: bob',
+                                str(ne))
+
+    def test_get_user_by_id_invalid_user_id(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+            # try passing None
+            try:
+                ndex.get_user_by_id(None)
+                self.fail('Expect NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('user_id must be a str', str(ne))
+
+            # try passing empty string
+            try:
+                ndex.get_user_by_id('')
+                self.fail('Expect NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('user_id cannot be an empty str', str(ne))
+
+    def test_get_user_by_id_success(self):
+        with requests_mock.mock() as m:
+
+            resurl = client.DEFAULT_SERVER + '/v2/user/foo'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  json={'userName': 'foo'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            res = ndex.get_user_by_id('foo')
+            self.assertEqual('foo', res['userName'])
+
+    def test_get_user_by_id_404_error(self):
+        with requests_mock.mock() as m:
+
+            resurl = client.DEFAULT_SERVER + '/v2/user/foo'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  text='some error', status_code=404)
+            ndex = Ndex2()
+            try:
+                res = ndex.get_user_by_id('foo')
+                self.fail('Expected NDExNotFoundError: ' + str(res))
+            except NDExNotFoundError as ne:
+                self.assertEqual('Caught 404 from server: some error',
+                                 str(ne))
+
+    def test_get_user_by_id_500_error(self):
+        with requests_mock.mock() as m:
+
+            resurl = client.DEFAULT_SERVER + '/v2/user/foo'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  text='error', status_code=500)
+            ndex = Ndex2()
+            try:
+                res = ndex.get_user_by_id('foo')
+                self.fail('Expected NDExNotFoundError: ' + str(res))
+            except NDExError as ne:
+                self.assertEqual('Caught 500 from server: error',
+                                 str(ne))
+
+    def test_get_user_by_id_random_exception(self):
+        with requests_mock.mock() as m:
+
+            resurl = client.DEFAULT_SERVER + '/v2/user/foo'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            try:
+                res = ndex.get_user_by_id('foo')
+                self.fail('Expected NDExError: ' + str(res))
+            except NDExError as ne:
+                self.assertTrue('Caught JSONDecodeError' in str(ne))
+
+    def test_get_networksets_for_user_invalid_userid(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+
+            # try where user id is None
+            try:
+                ndex.get_networksets_for_user_id(None)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('user_id must be of type str',
+                                 str(ne))
+
+            # try where user id is not of type str
+            try:
+                ndex.get_networksets_for_user_id(4)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('user_id must be of type str',
+                                 str(ne))
+
+    def test_get_networksets_for_user_invalid_limit(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+
+            # try where limit is not int or str
+            try:
+                ndex.get_networksets_for_user_id('foo', limit=3.5)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertTrue('limit parameter must be of type '
+                                'int ' in str(ne))
+
+    def test_get_networksets_for_user_invalid_offset_type(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+
+            # try where limit is not int or str
+            try:
+                ndex.get_networksets_for_user_id('foo', offset=3.5)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertTrue('offset parameter must be of type '
+                                'int ' in str(ne))
+
+    def test_get_networksets_for_user_invalid_offset(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            ndex = Ndex2()
+
+            # try where limit is not int or str
+            try:
+                ndex.get_networksets_for_user_id('foo', offset=5)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertTrue('limit (0) parameter must be set to '
+                                'positive ' in str(ne))
+
+    def test_get_networksets_for_user_success(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user/foo/networksets'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl, json={'hi': 'there'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+
+            res = ndex.get_networksets_for_user_id('foo',
+                                                   summary_only=False,
+                                                   showcase=True)
+            self.assertEqual('there', res['hi'])
+
+    def test_get_networksets_for_user_httperror(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user/foo/networksets'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl, status_code=404)
+            ndex = Ndex2()
+
+            try:
+                ndex.get_networksets_for_user_id('foo')
+            except NDExNotFoundError as ne:
+                self.assertEqual('Caught 404 from server: ', str(ne))
+
+    def test_get_networksets_for_user_exception(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v2/user/foo/networksets'
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            m.get(resurl,
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+
+            try:
+                ndex.get_networksets_for_user_id('foo')
+            except NDExError as ne:
+                self.assertTrue('Caught JSONDecodeError: ' in str(ne))
 
     def test_save_new_network_none_as_cx(self):
         with requests_mock.mock() as m:
@@ -1394,4 +1717,64 @@ class TestClient(unittest.TestCase):
             ndex = Ndex2(username='bob', password='warnerbrandis')
             res = ndex.add_networks_to_networkset('aid', ['someid'])
             self.assertEqual('', res)
+
+    def test_get_network_ids_for_user_invalid_offset_limit(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+
+            ndex = Ndex2()
+            try:
+                ndex.get_network_ids_for_user('bob', limit=None, offset=5)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('Limit must be set to a positive '
+                                 'number to use offset', str(ne))
+
+            # try where limit is str and offset is None
+            try:
+                ndex.get_network_ids_for_user('bob', limit='ha', offset=None)
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('Limit must be an int', str(ne))
+
+            # try where limit is str and offset is str
+            try:
+                ndex.get_network_ids_for_user('bob', offset='3')
+                self.fail('Expected NDExInvalidParameterError')
+            except NDExInvalidParameterError as ne:
+                self.assertEqual('Offset must be an int', str(ne))
+
+    def test_get_network_ids_for_user_success_no_ids(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            resurl = client.DEFAULT_SERVER + '/v2/user?username=bob'
+            m.get(resurl, json={'externalId': '12345'},
+                  headers={'Content-Type': 'application/json'})
+            resurl = client.DEFAULT_SERVER + '/v2/user/12345/networksummary?offset=0&limit=1000'
+            m.get(resurl,
+                  json=[],
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            res = ndex.get_network_ids_for_user('bob')
+            self.assertEqual([], res)
+
+    def test_get_network_ids_for_user_success_with_ids(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict())
+            resurl = client.DEFAULT_SERVER + '/v2/user?username=bob'
+            m.get(resurl, json={'externalId': '12345'},
+                  headers={'Content-Type': 'application/json'})
+            resurl = client.DEFAULT_SERVER + '/v2/user/12345/networksummary?offset=0&limit=1000'
+            m.get(resurl,
+                  json=[{'externalId': '1'}, {'externalId': '2'}],
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2()
+            res = ndex.get_network_ids_for_user('bob')
+            self.assertEqual(2, len(res))
+            self.assertTrue('1' in res)
+            self.assertTrue('2' in res)
+
 

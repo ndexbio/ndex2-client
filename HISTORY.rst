@@ -2,7 +2,7 @@
 History
 =======
 
-3.4.0 (2021-05-03)
+3.4.0 (2021-05-06)
 -------------------
 
 * Added `offset` and `limit` parameters to `Ndex2.get_network_ids_for_user()` to enable

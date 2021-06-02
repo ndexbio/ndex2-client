@@ -5,7 +5,7 @@
 .. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api
 
 .. image:: https://img.shields.io/travis/ndexbio/ndex2-client.svg
-        :target: https://travis-ci.org/ndexbio/ndex2-client.svg?branch=master
+        :target: https://travis-ci.com/ndexbio/ndex2-client.svg?branch=master
 
 .. image:: https://img.shields.io/pypi/v/ndex2.svg
         :target: https://pypi.python.org/pypi/ndex2

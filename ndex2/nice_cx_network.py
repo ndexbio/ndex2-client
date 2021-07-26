@@ -112,6 +112,12 @@ class NiceCXNetwork():
         """
         Create a new edge in the network by specifying source-interaction-target
 
+        .. warning::
+
+            Version `3.3.1` and prior of this library had a `bug <https://github.com/ndexbio/ndex2-client/issues/60>`__
+            that caused this method to behave incorrectly. Please upgrade to
+            `3.3.2 <https://pypi.org/project/ndex2/3.3.2/>`__ or greater.
+
         Example:
 
             ``my_edge = create_edge(edge_source=my_node, edge_target=my_node2, edge_interaction='up-regulates')``
@@ -173,6 +179,12 @@ class NiceCXNetwork():
     def create_node(self, node_name=None, node_represents=None):
         """
         Creates a new node with the corresponding name and represents (external id)
+
+        .. warning::
+
+            Version `3.3.1` and prior of this library had a `bug <https://github.com/ndexbio/ndex2-client/issues/60>`__
+            that caused this method to behave incorrectly. Please upgrade to
+            `3.3.2 <https://pypi.org/project/ndex2/3.3.2/>`__ or greater.
 
         Example:
 

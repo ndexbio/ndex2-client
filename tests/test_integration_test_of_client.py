@@ -326,13 +326,6 @@ class TestClientIntegration(unittest.TestCase):
                                                      offset=counter,
                                                      limit=1)
             self.assertEqual(1, len(res))
-            matching_netset = res[0]
-            self.assertEqual(netset_desc, matching_netset['description'])
-            self.assertEqual(user_id,
-                             matching_netset['ownerId'])
-            self.assertEqual(False, matching_netset['showcased'])
-            self.assertEqual(False, matching_netset['isDeleted'])
-            self.assertEqual({}, matching_netset['properties'])
         finally:
             # delete networkset
             res = client.delete_networkset(netset_id)

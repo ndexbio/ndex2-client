@@ -87,6 +87,40 @@ object
     print('Edge annotations: ' + str(g.edges.data()))
 
 
+How to build a lookup table for node names to node ids
+--------------------------------------------------------
+The code block below shows how to iterate through nodes in
+a `NiceCXNetwork <https://ndex2.readthedocs.io/en/latest/ndex2.html#nicecxnetwork>`__
+object and build a `dict <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`__
+of node names to node ids. The network downloaded below is
+`Multi-Scale Integrated Cell (MuSIC) v1 <https://www.ndexbio.org/viewer/networks/7fc70ab6-9fb1-11ea-aaef-0ac135e8bacf>`__
+
+.. code-block:: python
+
+    import ndex2
+    import json
+
+    # Create NDEx2 python client
+    client = ndex2.client.Ndex2()
+
+    # Download MuSIC network from NDEx
+    client_resp = client.get_network_as_cx_stream('7fc70ab6-9fb1-11ea-aaef-0ac135e8bacf')
+
+    # Convert downloaded network to NiceCXNetwork object
+    net_cx = ndex2.create_nice_cx_from_raw_cx(json.loads(client_resp.content))
+
+    node_name_dict = {}
+
+    # build dictionary and print out all the nodes
+    for node_id, node_obj in net_cx.get_nodes():
+        print('node_id: ' + str(node_id) + ' node_obj: ' + str(node_obj))
+        node_name_dict[node_obj['n']] = node_id
+
+
+    # print out dictionary
+    print(str(node_name_dict))
+
+
 
 
 

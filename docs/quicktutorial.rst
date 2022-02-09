@@ -71,7 +71,7 @@ object
     net_cx.set_node_attribute(node_one_id, 'altname', 'alternate name for foo', type='string')
 
     # add attribute to 'bar' node
-    net_cx.set_node_attribute(node_one_id, 'altname', 'alternate name for bar', type='string')
+    net_cx.set_node_attribute(node_two_id, 'altname', 'alternate name for bar', type='string')
 
     # add an edge attribute named 'weight' with value of 0.5. Set as string
     # value and then set type.

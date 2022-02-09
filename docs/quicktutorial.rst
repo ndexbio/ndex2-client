@@ -43,7 +43,7 @@ object.
     print('Network annotations: ' + str(g.graph))
 
 
-Add node attributes to network
+Add nodes, edges, and attributes to network
 -------------------------------------------------
 
 The code block below shows how to add nodes, edges and attributes to

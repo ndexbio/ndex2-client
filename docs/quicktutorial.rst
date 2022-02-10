@@ -89,7 +89,7 @@ The code block below shows how to upload a network that is a `NiceCXNetwork` obj
     `save_new_network() <https://ndex2.readthedocs.io/en/latest/ndex2client.html#ndex2.client.Ndex2.save_new_network>`__
     in code block above with
     `update_cx_network() <https://ndex2.readthedocs.io/en/latest/ndex2client.html#ndex2.client.Ndex2.update_cx_network>`__
-    and set the second argument to str UUID of network
+    and set first argument to ``net_cx.to_cx_stream()`` and the second argument to str UUID of network
 
 
 Add nodes, edges, and attributes to network

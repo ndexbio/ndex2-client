@@ -2,6 +2,12 @@
 History
 =======
 
+3.5.0 (TBD)
+-------------------
+
+* Added *skip_version_check* parameter to `Ndex2()` constructor to let caller
+  optionally bypass NDEx server call to see if **v2** endpoint is supported
+
 3.4.0 (2021-05-06)
 -------------------
 

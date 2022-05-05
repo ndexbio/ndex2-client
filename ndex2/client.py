@@ -47,9 +47,14 @@ class Ndex2(object):
 
     def __init__(self, host=None, username=None, password=None,
                  update_status=False, debug=False, user_agent='',
-                 timeout=30):
+                 timeout=30, skip_version_check=False):
         """
         Creates a connection to a particular `NDEx server <http://ndexbio.org>`_.
+
+
+        .. versionadded:: 3.5.0
+           *skip_version_check* parameter added, but set to ``False`` to maintain
+           current behavior. NOTE: At some point this will be set to ``True`` by default
 
         :param host: The URL of the server.
         :type host: str
@@ -68,6 +73,11 @@ class Ndex2(object):
                         is passed to Request calls `Click here for more information
                         <http://docs.python-requests.org/en/master/user/advanced/#timeouts>`_
         :type timeout: float or tuple(float, float)
+        :param skip_version_check: Dictates whether to skip NDEx server query to see if **v2**
+                                   endpoints are supported. If ``True`` then check is skipped
+                                   and it is assumed NDEx server supports **v2** endpoints.
+        :type skip_version_check: bool
+
         """
         self.debug = debug
         self.version = 1.3
@@ -92,46 +102,58 @@ class Ndex2(object):
         if "localhost" in host:
             self.host = "http://localhost:8080/ndexbio-rest"
         else:
-            status_url = "/rest/admin/status"
+            # Partial fix for https://github.com/ndexbio/ndex2-client/issues/85
+            # caller can now skip this check by setting skip_version_check to True
+            # in future this will be set to True by default
+            if skip_version_check is True:
+                self.version = '2.0'
+                self.host = host + "/v2"
+            else:
+                status_url = "/rest/admin/status"
 
-            try:
-                version_url = urljoin(host, status_url)
+                try:
+                    version_url = urljoin(host, status_url)
 
-                response = requests.get(version_url,
-                                        headers={Ndex2.USER_AGENT_KEY:
-                                                 userAgent + self.user_agent})
-                response.raise_for_status()
-                data = response.json()
+                    response = requests.get(version_url,
+                                            headers={Ndex2.USER_AGENT_KEY:
+                                                     userAgent +
+                                                     self.user_agent})
+                    response.raise_for_status()
+                    data = response.json()
 
-                prop = data.get('properties')
-                if prop is not None:
-                    pv = prop.get('ServerVersion')
-                    if pv is not None:
-                        if not pv.startswith('2.'):
-                            raise Exception("This release only supports NDEx 2.x server.")
+                    prop = data.get('properties')
+                    if prop is not None:
+                        pv = prop.get('ServerVersion')
+                        if pv is not None:
+                            if not pv.startswith('2.'):
+                                raise Exception("This release only supports "
+                                                "NDEx 2.x server.")
+                            else:
+                                self.version = pv
+                                self.host = host + "/v2"
                         else:
-                            self.version = pv
-                            self.host = host + "/v2"
+                            self.logger.warning("Warning: This release "
+                                                "doesn't fully "
+                                                "support 1.3 version of NDEx")
+                            self.version = "1.3"
+                            self.host = host + "/rest"
                     else:
-                        self.logger.warning("Warning: This release doesn't fully "
+                        self.logger.warning("Warning: No properties found. "
+                                            "This release doesn't fully "
                                             "support 1.3 version of NDEx")
                         self.version = "1.3"
                         self.host = host + "/rest"
-                else:
-                    self.logger.warning("Warning: No properties found. "
-                                        "This release doesn't fully "
-                                        "support 1.3 version of NDEx")
+
+                except req_except.HTTPError as he:
+                    self.logger.warning("Can't determine server version. " +
+                                        host + ' Server returned error -- ' +
+                                        str(he) +
+                                        ' will assume 1.3 version of NDEx '
+                                        'which is not fully supported by this '
+                                        'release')
                     self.version = "1.3"
                     self.host = host + "/rest"
-
-            except req_except.HTTPError as he:
-                self.logger.warning("Can't determine server version. " + host +
-                                    ' Server returned error -- ' + str(he) +
-                                    ' will assume 1.3 version of NDEx which' +
-                                    ' is not fully supported by this release')
-                self.version = "1.3"
-                self.host = host + "/rest"
-                # TODO - how to handle errors getting server version...
+                    # TODO - how to handle errors getting server version...
 
         # create a session for this Ndex
         self.s = requests.session()

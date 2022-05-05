@@ -198,6 +198,17 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/v2')
             self.assertTrue(ndex.s is not None)
 
+    def test_ndex2_constructor_with_skip_check_version_true(self):
+        ndex = Ndex2(skip_version_check=True)
+        self.assertEqual(ndex.debug, False)
+        self.assertEqual(ndex.version, '2.0')
+        self.assertEqual(ndex.status, {})
+        self.assertEqual(ndex.username, None)
+        self.assertEqual(ndex.password, None)
+        self.assertEqual(ndex.user_agent, '')
+        self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/v2')
+        self.assertTrue(ndex.s is not None)
+
     def test_ndex2_require_auth(self):
         ndex = Ndex2(host='localhost')
         try:

@@ -522,6 +522,8 @@ class Ndex2(object):
         Get the existing network with UUID network_id from the NDEx connection as CX2 stream
         contained within a :py:class:`requests.Response` object
 
+        .. versionadded:: 3.5.0
+
         Example usage:
 
         .. code-block:: python

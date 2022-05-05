@@ -44,6 +44,7 @@ class Ndex2(object):
     USER_AGENT_KEY = 'User-Agent'
     VALID_NETWORK_SYSTEM_PROPERTIES = ['showcase', 'visibility',
                                        'index_level', 'readOnly']
+    V3_ENDPOINT = '/v3'
 
     def __init__(self, host=None, username=None, password=None,
                  update_status=False, debug=False, user_agent='',
@@ -80,7 +81,8 @@ class Ndex2(object):
 
         """
         self.debug = debug
-        self.version = 1.3
+        self.version = '1.3'
+        self.version_endpoint = '/rest'
         self.status = {}
         self.username = username
         self.password = password
@@ -102,12 +104,13 @@ class Ndex2(object):
         if "localhost" in host:
             self.host = "http://localhost:8080/ndexbio-rest"
         else:
+            self.host = host
             # Partial fix for https://github.com/ndexbio/ndex2-client/issues/85
             # caller can now skip this check by setting skip_version_check to True
             # in future this will be set to True by default
             if skip_version_check is True:
                 self.version = '2.0'
-                self.host = host + "/v2"
+                self.version_endpoint = '/v2'
             else:
                 status_url = "/rest/admin/status"
 
@@ -130,19 +133,15 @@ class Ndex2(object):
                                                 "NDEx 2.x server.")
                             else:
                                 self.version = pv
-                                self.host = host + "/v2"
+                                self.version_endpoint = '/v2'
                         else:
                             self.logger.warning("Warning: This release "
                                                 "doesn't fully "
                                                 "support 1.3 version of NDEx")
-                            self.version = "1.3"
-                            self.host = host + "/rest"
                     else:
                         self.logger.warning("Warning: No properties found. "
                                             "This release doesn't fully "
                                             "support 1.3 version of NDEx")
-                        self.version = "1.3"
-                        self.host = host + "/rest"
 
                 except req_except.HTTPError as he:
                     self.logger.warning("Can't determine server version. " +
@@ -151,8 +150,6 @@ class Ndex2(object):
                                         ' will assume 1.3 version of NDEx '
                                         'which is not fully supported by this '
                                         'release')
-                    self.version = "1.3"
-                    self.host = host + "/rest"
                     # TODO - how to handle errors getting server version...
 
         # create a session for this Ndex
@@ -273,8 +270,15 @@ class Ndex2(object):
         raise NDExError('Caught ' + str(error.__class__.__name__) +
                         ': ' + str(error))
 
-    def put(self, route, put_json=None):
-        url = self.host + route
+    def _get_version_endpoint(self, alt_version_endpoint=None):
+        if alt_version_endpoint is None:
+            return self.version_endpoint
+        return alt_version_endpoint
+
+    def put(self, route, put_json=None, alt_version_endpoint=None):
+        url = self.host +\
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         self.logger.debug("PUT route: " + url)
         self.logger.debug("PUT json: " + str(put_json))
 
@@ -291,8 +295,10 @@ class Ndex2(object):
                                   timeout=self.timeout)
         return self._return_response(response)
 
-    def post(self, route, post_json):
-        url = self.host + route
+    def post(self, route, post_json, alt_version_endpoint=None):
+        url = self.host + \
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         self.logger.debug("POST route: " + url)
         self.logger.debug("POST json: " + post_json)
         headers = {'Content-Type': 'application/json',
@@ -307,8 +313,11 @@ class Ndex2(object):
     def delete(self, route, data=None,
                raiseforstatus=True,
                returnfullresponse=False,
-               returnjsonundertry=False):
-        url = self.host + route
+               returnjsonundertry=False,
+               alt_version_endpoint=None):
+        url = self.host + \
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         self.logger.debug("DELETE route: " + url)
         headers = self.s.headers
         headers[Ndex2.USER_AGENT_KEY] = userAgent + self.user_agent
@@ -324,8 +333,10 @@ class Ndex2(object):
                                      returnfullresponse=returnfullresponse,
                                      returnjsonundertry=returnjsonundertry)
 
-    def get(self, route, get_params=None):
-        url = self.host + route
+    def get(self, route, get_params=None, alt_version_endpoint=None):
+        url = self.host + \
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         self.logger.debug("GET route: " + url)
         headers = self.s.headers
         headers[Ndex2.USER_AGENT_KEY] = self._get_user_agent()
@@ -335,8 +346,10 @@ class Ndex2(object):
         return self._return_response(response)
 
     # The stream refers to the Response, not the Request
-    def get_stream(self, route, get_params=None):
-        url = self.host + route
+    def get_stream(self, route, get_params=None, alt_version_endpoint=None):
+        url = self.host + \
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         self.logger.debug("GET stream route: " + url)
         headers = self.s.headers
         headers[Ndex2.USER_AGENT_KEY] = self._get_user_agent()
@@ -346,8 +359,10 @@ class Ndex2(object):
                                      returnfullresponse=True)
 
     # The stream refers to the Response, not the Request
-    def post_stream(self, route, post_json):
-        url = self.host + route
+    def post_stream(self, route, post_json, alt_version_endpoint=None):
+        url = self.host + \
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         self.logger.debug("POST stream route: " + url)
         headers = self.s.headers
 
@@ -361,8 +376,10 @@ class Ndex2(object):
                                      returnfullresponse=True)
 
     # The Request is streamed, not the Response
-    def put_multipart(self, route, fields):
-        url = self.host + route
+    def put_multipart(self, route, fields, alt_version_endpoint=None):
+        url = self.host + \
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         multipart_data = MultipartEncoder(fields=fields)
         self.logger.debug("PUT route: " + url)
 
@@ -376,11 +393,13 @@ class Ndex2(object):
                                      returnjsonundertry=True)
 
     # The Request is streamed, not the Response
-    def post_multipart(self, route, fields, query_string=None):
+    def post_multipart(self, route, fields, query_string=None, alt_version_endpoint=None):
+        url = self.host + \
+              self._get_version_endpoint(alt_version_endpoint=
+                                         alt_version_endpoint) + route
         if query_string:
-            url = self.host + route + '?' + query_string
-        else:
-            url = self.host + route
+            url = url + '?' + query_string
+
         multipart_data = MultipartEncoder(fields=fields)
         self.logger.debug("POST route: " + url)
         headers = {'Content-Type': multipart_data.content_type,
@@ -497,6 +516,55 @@ class Ndex2(object):
             route = "/network/%s" % network_id
 
         return self.get_stream(route)
+
+    def get_network_as_cx2_stream(self, network_id, access_key=None):
+        """
+        Get the existing network with UUID network_id from the NDEx connection as CX2 stream
+        contained within a :py:class:`requests.Response` object
+
+        Example usage:
+
+        .. code-block:: python
+
+            from ndex2.client import Ndex2
+            client = Ndex2(skip_version_check=True)
+
+            # 7fc.. is UUID MuSIC v1 network: http://doi.org/10.1038/s41586-021-04115-9
+            client_resp = client.get_network_as_cx2_stream('7fc70ab6-9fb1-11ea-aaef-0ac135e8bacf')
+
+            # for HTTP status code, 200 means success
+            print(client_resp.status_code)
+
+            # for smaller networks one can get the CX2 by calling:
+            print(client_resp.json())
+
+
+        .. note::
+
+            For retrieving larger networks see :py:meth:`requests.Response.iter_content`
+
+            This method sets `stream=True` in the request to
+            avoid loading response into memory.
+
+
+        :param network_id: The UUID of the network
+        :param access_key: Optional access key UUID
+        :raises NDExError: If there was an error
+        :return: Requests library response with CX2 in content and status
+                 code of 200 upon success
+        :rtype: :py:class:`requests.Response`
+        """
+        get_params = None
+        if access_key is not None:
+            get_params = {'accesskey': str(access_key)}
+        try:
+            return self.get_stream('/networks/' + str(network_id),
+                                   get_params=get_params,
+                                   alt_version_endpoint=Ndex2.V3_ENDPOINT)
+        except requests.HTTPError as he:
+            self._convert_requests_http_error_to_ndex_error(he)
+        except Exception as e:
+            self._convert_exception_to_ndex_error(e)
 
     def get_network_aspect_as_cx_stream(self, network_id, aspect_name):
         """

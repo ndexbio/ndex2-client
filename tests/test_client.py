@@ -84,7 +84,7 @@ class TestClient(unittest.TestCase):
         # try with nothing set
         ndex = Ndex2(host='localhost')
         self.assertEqual(ndex.debug, False)
-        self.assertEqual(ndex.version, 1.3)
+        self.assertEqual(ndex.version, '1.3')
         self.assertEqual(ndex.status, {})
         self.assertEqual(ndex.username, None)
         self.assertEqual(ndex.password, None)
@@ -101,11 +101,12 @@ class TestClient(unittest.TestCase):
                      password='smith', user_agent='yo', debug=True,
                      timeout=1)
         self.assertEqual(ndex.debug, True)
-        self.assertEqual(ndex.version, 1.3)
+        self.assertEqual(ndex.version, '1.3')
         self.assertEqual(ndex.status, {})
         self.assertEqual(ndex.username, 'bob')
         self.assertEqual(ndex.password, 'smith')
         self.assertEqual(ndex.user_agent, ' yo')
+        self.assertEqual(ndex.version_endpoint, '/rest')
         self.assertEqual(ndex.host, 'http://localhost:8080/ndexbio-rest')
         self.assertTrue(ndex.s is not None)
         self.assertTrue(ndex.timeout, 1)
@@ -130,7 +131,8 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.username, None)
             self.assertEqual(ndex.password, None)
             self.assertEqual(ndex.user_agent, '')
-            self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/rest')
+            self.assertEqual(ndex.version_endpoint, '/rest')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER)
             self.assertTrue(ndex.s is not None)
 
     def test_ndex2_constructor_with_defaulthost_serverversionnone(self):
@@ -148,7 +150,8 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.username, None)
             self.assertEqual(ndex.password, None)
             self.assertEqual(ndex.user_agent, '')
-            self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/rest')
+            self.assertEqual(ndex.version_endpoint, '/rest')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER)
             self.assertTrue(ndex.s is not None)
 
     def test_ndex2_constructor_with_defaulthost_properties_is_none(self):
@@ -165,7 +168,8 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.username, None)
             self.assertEqual(ndex.password, None)
             self.assertEqual(ndex.user_agent, '')
-            self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/rest')
+            self.assertEqual(ndex.version_endpoint, '/rest')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER)
             self.assertTrue(ndex.s is not None)
 
     def test_ndex2_constructor_with_defaulthost_thatisversionone(self):
@@ -195,7 +199,8 @@ class TestClient(unittest.TestCase):
             self.assertEqual(ndex.username, None)
             self.assertEqual(ndex.password, None)
             self.assertEqual(ndex.user_agent, '')
-            self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/v2')
+            self.assertEqual(ndex.version_endpoint, '/v2')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER)
             self.assertTrue(ndex.s is not None)
 
     def test_ndex2_constructor_with_skip_check_version_true(self):
@@ -206,7 +211,8 @@ class TestClient(unittest.TestCase):
         self.assertEqual(ndex.username, None)
         self.assertEqual(ndex.password, None)
         self.assertEqual(ndex.user_agent, '')
-        self.assertEqual(ndex.host, client.DEFAULT_SERVER + '/v2')
+        self.assertEqual(ndex.version_endpoint, '/v2')
+        self.assertEqual(ndex.host, client.DEFAULT_SERVER)
         self.assertTrue(ndex.s is not None)
 
     def test_ndex2_require_auth(self):
@@ -1346,6 +1352,9 @@ class TestClient(unittest.TestCase):
             res = ndex.get_network_aspect_as_cx_stream('someid', 'sa')
             self.assertEqual(res.json(), {'hi': 'bye'})
             self.assertEqual(res.status_code, 200)
+
+    def test_get_network_as_cx2_stream(self):
+        self.assertEqual(1, 2, 'NEED TO IMPLEMENT TESTS FOR THIS!!!!')
 
     def test_get_neighborhood_as_cx_stream(self):
         with requests_mock.mock() as m:

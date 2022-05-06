@@ -11,6 +11,7 @@ import unittest
 import json
 import uuid
 from datetime import datetime
+import math
 import requests
 
 from requests.exceptions import HTTPError
@@ -575,3 +576,75 @@ class TestClientIntegration(unittest.TestCase):
             if netid_two is not None:
                 client.delete_network(netid_two)
 
+    def test_get_network_as_cx2_stream_not_found(self):
+        client = self.get_ndex2_client()
+        try:
+            # UUID that was just created so it should not exist in NDEx
+            client.get_network_as_cx2_stream('0EE12A3D-6594-4D4D-'
+                                             '9FF0-AF33D1982E94')
+            self.fail('Expected exception')
+        except NDExNotFoundError as not_found:
+            self.assertTrue('Caught 404 from server: ' in str(not_found))
+
+    def test_get_network_as_cx2_stream_from_cx_uploaded_net(self):
+        client = self.get_ndex2_client()
+
+        # create network and add it
+        net = ndex2.create_nice_cx_from_file(TestClientIntegration.GLYPICAN2_FILE)
+        netname = 'ndex2-client integration test network2' + str(datetime.now())
+        net.set_name(netname)
+        res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
+        self.assertTrue('http' in res)
+        netid = re.sub('^.*/', '', res)
+        try:
+            res = client.get_network_as_cx2_stream(netid)
+            self.assertEqual(200, res.status_code)
+            cx = res.json()
+            self.assertEqual({'CXVersion': '2.0',
+                              'hasFragments': False}, cx[0])
+            found_aspects = set()
+            for frag in cx[1:-1]:
+                self.assertEqual(1, len(frag.keys()), 'expected 1 key per fragment')
+                cur_aspect = list(frag.keys())[0]
+                found_aspects.add(cur_aspect)
+
+                if cur_aspect == 'metaData':
+                    self.assertEqual(6, len(frag[cur_aspect]))
+                elif cur_aspect == 'attributeDeclarations':
+                    self.assertEqual(1, len(frag[cur_aspect]))
+                    self.assertEqual(3, len(frag[cur_aspect][0].keys()))
+                    self.assertTrue('nodes' in frag[cur_aspect][0])
+                    self.assertTrue('edges' in frag[cur_aspect][0])
+                    self.assertTrue('networkAttributes' in frag[cur_aspect][0])
+                elif cur_aspect == 'nodes':
+                    self.assertEqual(2, len(frag[cur_aspect]))
+                    node_dict = {}
+                    for n in frag[cur_aspect]:
+                        node_dict[n['id']] = n
+                    # check node with id 0
+                    self.assertTrue(math.fabs(node_dict[0]['x'] + 398) < 1.0)
+                    self.assertTrue(math.fabs(node_dict[0]['y'] - 70) < 1.0)
+                    self.assertEqual('MDK', node_dict[0]['v']['n'])
+                    self.assertEqual('uniprot knowledgebase:P21741',
+                                     node_dict[0]['v']['r'])
+                    self.assertEqual('Protein', node_dict[0]['v']['type'])
+                    self.assertEqual(2, len(node_dict[0]['v']['alias']))
+                    self.assertTrue('uniprot knowledgebase:Q2LEK4' in node_dict[0]['v']['alias'])
+                    self.assertTrue('uniprot knowledgebase:Q9UCC7' in node_dict[0]['v']['alias'])
+
+                    # check node with id 1
+                    self.assertTrue(math.fabs(node_dict[1]['x'] + 353) < 1.0)
+                    self.assertTrue(math.fabs(node_dict[1]['y'] - 70) < 1.0)
+                    self.assertEqual('GPC2', node_dict[1]['v']['n'])
+                    self.assertEqual('uniprot knowledgebase:A4D2A7',
+                                     node_dict[1]['v']['r'])
+                    self.assertEqual('Protein', node_dict[1]['v']['type'])
+                    self.assertEqual(1, len(node_dict[1]['v']['alias']))
+                    self.assertTrue('uniprot knowledgebase:Q8N158' in node_dict[1]['v']['alias'])
+
+                else:
+                    print(frag[cur_aspect])
+                    print('\n\n\n')
+            self.assertEqual({'status': [{'success': True}]}, cx[-1])
+        finally:
+            client.delete_network(network_id=netid)

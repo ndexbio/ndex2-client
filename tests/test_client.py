@@ -1353,8 +1353,63 @@ class TestClient(unittest.TestCase):
             self.assertEqual(res.json(), {'hi': 'bye'})
             self.assertEqual(res.status_code, 200)
 
-    def test_get_network_as_cx2_stream(self):
-        self.assertEqual(1, 2, 'NEED TO IMPLEMENT TESTS FOR THIS!!!!')
+    def test_get_network_as_cx2_stream_error(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid',
+                  status_code=500,
+                  json={'error': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            try:
+                ndex.get_network_as_cx2_stream('someid')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertEqual(str(ne),
+                                 'Caught 500 from server: {"error": "bye"}')
+
+    def test_get_network_as_cx2_stream_low_level_error(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid',
+                  status_code=200,
+                  json={'error': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            ndex.host = None
+            try:
+                ndex.get_network_as_cx2_stream('someid')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertEqual(str(ne),
+                                 'Caught TypeError: unsupported operand type(s) '
+                                 'for +: \'NoneType\' and \'str\'')
+
+    def test_get_network_as_cx2_stream_success(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_as_cx2_stream('someid')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_network_as_cx2_stream_w_access_key_success(self):
+        with requests_mock.mock() as m:
+            a_key = 'b4487036-84cb-4764-b058-a2abeb034b76'
+            m.get(client.DEFAULT_SERVER +
+                  '/v3/networks/someid?accesskey=' + a_key,
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_as_cx2_stream('someid', access_key=a_key)
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
 
     def test_get_neighborhood_as_cx_stream(self):
         with requests_mock.mock() as m:

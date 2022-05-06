@@ -8,6 +8,10 @@ History
 * Added *skip_version_check* parameter to `Ndex2()` constructor to let caller
   optionally bypass NDEx server call to see if **v2** endpoint is supported
 
+* In `Ndex2()` client, methods that raise ``NDExError`` exceptions from calls
+  to NDEx server will now raise the more specific ``NDExUnauthorizedError``
+  subclass when the response from NDEx server is a 401 aka unauthorized.
+
 3.4.0 (2021-05-06)
 -------------------
 

@@ -247,6 +247,7 @@ class Ndex2(object):
         :raises NDExError: Raises this error unless
         :raises NDExNotFoundError: Raises this error if status code
                                    is 404
+        :raises NDExUnauthorizedError: Raises this error if status code is 401
         """
         if http_error is None:
             raise NDExError('Caught unknown server error')
@@ -254,6 +255,8 @@ class Ndex2(object):
                  ' from server: ' + str(http_error.response.text)
         if http_error.response.status_code == 404:
             raise NDExNotFoundError(errmsg)
+        if http_error.response.status_code == 401:
+            raise NDExUnauthorizedError(errmsg)
         raise NDExError(errmsg)
 
     def _convert_exception_to_ndex_error(self, error):

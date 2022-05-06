@@ -396,7 +396,8 @@ class Ndex2(object):
                                      returnjsonundertry=True)
 
     # The Request is streamed, not the Response
-    def post_multipart(self, route, fields, query_string=None, alt_version_endpoint=None):
+    def post_multipart(self, route, fields, query_string=None, alt_version_endpoint=None,
+                       returnjsonundertry=True, returnfullresponse=False):
         url = self.host + \
               self._get_version_endpoint(alt_version_endpoint=
                                          alt_version_endpoint) + route
@@ -411,7 +412,8 @@ class Ndex2(object):
                    }
         response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         return self._return_response(response,
-                                     returnjsonundertry=True)
+                                     returnjsonundertry=returnjsonundertry,
+                                     returnfullresponse=returnfullresponse)
 
 # Network methods
 
@@ -477,6 +479,76 @@ class Ndex2(object):
         }
 
         return self.post_multipart(route, fields, query_string=query_string)
+
+    def save_new_cx2_network(self, cx, visibility=None):
+        """
+        Create a new network (CX2) on the server
+
+        .. versionadded:: 3.5.0
+
+        :param cx: Network CX2 which is a list of dict objects
+        :type cx: list
+        :param visibility: Sets the visibility (PUBLIC or PRIVATE)
+        :type visibility: str
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
+        :raises NDExInvalidCXError: if **cx** is ``None``, not a list,
+                                    or is an empty list
+        :raises NDExError: if there is an error saving the network
+        :return: Full URL to newly created network
+                 (ie http://ndexbio.org/v3/networks/XXXX)
+        :rtype: str
+        """
+        if cx is None:
+            raise NDExInvalidCXError('CX is None')
+        if not isinstance(cx, list):
+            raise NDExInvalidCXError('CX is not a list')
+        if len(cx) is 0:
+            raise NDExInvalidCXError('CX appears to be empty')
+
+        if sys.version_info.major == 3:
+            stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder).encode('utf-8'))
+        else:
+            stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
+
+        return self.save_cx2_stream_as_new_network(stream, visibility=visibility)
+
+    def save_cx2_stream_as_new_network(self, cx_stream, visibility=None):
+        """
+        Create a new network from a CX2 stream
+
+        .. versionadded:: 3.5.0
+
+        :param cx_stream:  IO stream of cx2
+        :type cx_stream: BytesIO
+        :param visibility: Sets the visibility (PUBLIC or PRIVATE)
+        :type visibility: str
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
+        :raises NDExError: if there is an error saving the network
+        :return: Full URL to newly created network
+                 (ie http://ndexbio.org/v3/networks/XXXX)
+        :rtype: str
+        """
+        self._require_auth()
+        query_string = None
+        if visibility:
+            query_string = 'visibility=' + str(visibility)
+
+        fields = {
+            'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
+        }
+
+        res = self.post_multipart('/networks', fields, query_string=query_string,
+                                  alt_version_endpoint=Ndex2.V3_ENDPOINT,
+                                  returnfullresponse=True)
+        # this extra check is necessary cause NDEx 2.5.2 CX2 POST endpoint
+        # only returns URL of new network in Location header
+        # See https://ndexbio.atlassian.net/browse/UD-2163
+        if res.text is not None and res.text.startswith('http'):
+            return res.text
+        if 'Location' not in res.headers:
+            raise NDExError('Unable to get URL for newly created network: ' +
+                            str(res.text))
+        return res.headers['Location']
 
     def update_cx_network(self, cx_stream, network_id):
         """
@@ -592,6 +664,71 @@ class Ndex2(object):
             route = "/network/%s/aspect/%s" % (network_id, aspect_name)
 
         return self.get_stream(route)
+
+    def get_network_aspect_as_cx2_stream(self, network_id, aspect_name=None,
+                                         access_key=None, size=None):
+        """
+        Gets JSON array of CX2 elements from the aspect specified by **aspect_name** from the
+        network specified by **network_id**
+
+        .. versionadded:: 3.5.0
+
+        Example usage:
+
+        .. code-block:: python
+
+            from ndex2.client import Ndex2
+            client = Ndex2(skip_version_check=True)
+
+            # 7fc.. is UUID MuSIC v1 network: http://doi.org/10.1038/s41586-021-04115-9
+            client_resp = client.get_network_aspect_as_cx2_stream('7fc70ab6-9fb1-11ea-aaef-0ac135e8bacf', 'nodes')
+
+            # for HTTP status code, 200 means success
+            print(client_resp.status_code)
+
+            # for smaller networks one can get the CX2 by calling:
+            print(client_resp.json())
+
+
+        .. note::
+
+            For retrieving larger networks see :py:meth:`requests.Response.iter_content`
+
+            This method sets `stream=True` in the request to
+            avoid loading response into memory.
+
+
+        :param network_id: The UUID of the network
+        :type network_id: str
+        :param aspect_name: Name of CX2 aspect.
+                            Example aspects: ``nodes``, ``edges``,
+                                             ``networkAttributes`` etc.
+        :type aspect_name: str
+        :param access_key: Optional access key UUID
+        :param size: Denotes number of elements of given aspect to return. If < 0 or
+                     ``None`` all elements will be returned
+        :type size: int
+        :raises NDExError: If there was an error
+        :return: Requests library response with CX2 in content and status
+                 code of 200 upon success
+        :rtype: :py:class:`requests.Response`
+        """
+        get_params = None
+        if access_key is not None:
+            get_params = {'accesskey': str(access_key)}
+        if size is not None:
+            if get_params is None:
+                get_params = {}
+            get_params['size'] = size
+        try:
+            return self.get_stream('/networks/' + str(network_id) +
+                                   '/aspects/' + str(aspect_name),
+                                   get_params=get_params,
+                                   alt_version_endpoint=Ndex2.V3_ENDPOINT)
+        except requests.HTTPError as he:
+            self._convert_requests_http_error_to_ndex_error(he)
+        except Exception as e:
+            self._convert_exception_to_ndex_error(e)
 
     def get_neighborhood_as_cx_stream(self, network_id, search_string, search_depth=1, edge_limit=2500, error_when_limit=True):
         """

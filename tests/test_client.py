@@ -884,6 +884,83 @@ class TestClient(unittest.TestCase):
             self.assertTrue('"error": ""' in decode_txt)
             self.assertTrue('"success": true' in decode_txt)
 
+    def test_save_new_cx2_network_none_as_cx(self):
+        ndex = Ndex2(skip_version_check=True)
+        try:
+            ndex.save_new_cx2_network(None)
+            self.fail('expected NDExInvalidCXError')
+        except NDExInvalidCXError as ice:
+            self.assertEqual(str(ice), 'CX is None')
+
+    def test_save_new_cx2_network_invalid_as_cx(self):
+        ndex = Ndex2(skip_version_check=True)
+        try:
+            ndex.save_new_cx2_network('hi')
+            self.fail('expected NDExInvalidCXError')
+        except NDExInvalidCXError as ice:
+            self.assertEqual(str(ice), 'CX is not a list')
+
+    def test_save_new_cx2_network_empty_cx(self):
+        ndex = Ndex2(skip_version_check=True)
+        try:
+            ndex.save_new_cx2_network([])
+            self.fail('expected NDExInvalidCXError')
+        except NDExInvalidCXError as ice:
+            self.assertEqual(str(ice), 'CX appears to be empty')
+
+    def test_save_new_cx2_network_with_no_status(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   status_code=1,
+                   text=resurl)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            res = ndex.save_new_cx2_network([{'foo': '123'}])
+            self.assertEqual(res, resurl)
+            decode_txt = m.last_request.text.read().decode('UTF-8')
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
+            self.assertTrue('{"foo": "123"}' in decode_txt)
+
+    def test_save_new_cx2_network_with_visibility(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks?visibility=PUBLIC',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            res = ndex.save_new_cx2_network([{'foo': '123'}],
+                                            visibility='PUBLIC')
+            self.assertEqual(res, resurl)
+            decode_txt = m.last_request.text.read().decode('UTF-8')
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
+            self.assertTrue('{"foo": "123"}' in decode_txt)
+
+    def test_save_new_cx2_network_with_nourl(self):
+        with requests_mock.mock() as m:
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            try:
+                ndex.save_new_cx2_network([{'foo': '123'}])
+                self.fail('Expected Exception')
+            except NDExError as ne:
+                self.assertTrue('Unable to get URL for newly '
+                                'created network' in str(ne))
+
     def test_update_cx_network_success(self):
         with requests_mock.mock() as m:
             resurl = client.DEFAULT_SERVER + '/v2/network/asdf'
@@ -1353,6 +1430,82 @@ class TestClient(unittest.TestCase):
             self.assertEqual(res.json(), {'hi': 'bye'})
             self.assertEqual(res.status_code, 200)
 
+    def test_get_network_aspect_as_cx2_stream_success(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid/aspects/sa',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_aspect_as_cx2_stream('someid',
+                                                        aspect_name='sa')
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_network_aspect_as_cx2_stream_success_with_size(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid/'
+                                          'aspects/sa?size=4',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_aspect_as_cx2_stream('someid',
+                                                        aspect_name='sa',
+                                                        size=4)
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_network_aspect_as_cx2_stream_success_with_size_access(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid/'
+                                          'aspects/sa?accesskey=key&size=4',
+                  status_code=200,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            res = ndex.get_network_aspect_as_cx2_stream('someid',
+                                                        aspect_name='sa',
+                                                        access_key='key',
+                                                        size=4)
+            self.assertEqual(res.json(), {'hi': 'bye'})
+            self.assertEqual(res.status_code, 200)
+
+    def test_get_network_aspect_as_cx2_stream_error(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid/aspects/sa',
+                  status_code=500,
+                  json={'hi': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            try:
+                ndex.get_network_aspect_as_cx2_stream('someid',
+                                                      aspect_name='sa')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertEqual('Caught 500 from server: {"hi": "bye"}',
+                                 str(ne))
+
+    def test_get_network_aspect_as_cx2_stream_low_level_error(self):
+        with requests_mock.mock() as m:
+            m.get(client.DEFAULT_SERVER + '/v3/networks/someid/aspects/sa',
+                  status_code=200,
+                  json={'error': 'bye'},
+                  headers={'Content-Type': 'application/json'})
+            ndex = Ndex2(skip_version_check=True)
+            ndex.set_debug_mode(True)
+            ndex.host = None
+            try:
+                ndex.get_network_aspect_as_cx2_stream('someid',
+                                                      aspect_name='sa')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertTrue('Caught TypeError:' in str(ne))
+
     def test_get_network_as_cx2_stream_error(self):
         with requests_mock.mock() as m:
             m.get(client.DEFAULT_SERVER + '/v3/networks/someid',
@@ -1376,6 +1529,9 @@ class TestClient(unittest.TestCase):
                   headers={'Content-Type': 'application/json'})
             ndex = Ndex2(skip_version_check=True)
             ndex.set_debug_mode(True)
+
+            # here we do a hack break by setting host to
+            # None which will cause a TypeError
             ndex.host = None
             try:
                 ndex.get_network_as_cx2_stream('someid')

@@ -67,6 +67,86 @@ class TestClientIntegration(unittest.TestCase):
             time.sleep(retry_wait)
         return None
 
+    def check_glypican_cx2_is_correct(self, cx):
+        """
+
+        :param cx:
+        :return:
+        """
+        self.assertEqual({'CXVersion': '2.0',
+                          'hasFragments': False}, cx[0])
+        found_aspects = set()
+        for frag in cx[1:-1]:
+            self.assertEqual(1, len(frag.keys()), 'expected 1 key per fragment')
+            cur_aspect = list(frag.keys())[0]
+            found_aspects.add(cur_aspect)
+
+            if cur_aspect == 'metaData':
+                self.assertEqual(6, len(frag[cur_aspect]))
+            elif cur_aspect == 'attributeDeclarations':
+                self.assertEqual(1, len(frag[cur_aspect]))
+                self.assertEqual(3, len(frag[cur_aspect][0].keys()))
+                self.assertTrue('nodes' in frag[cur_aspect][0])
+                self.assertTrue('edges' in frag[cur_aspect][0])
+                self.assertTrue('networkAttributes' in frag[cur_aspect][0])
+            elif cur_aspect == 'nodes':
+                self.assertEqual(2, len(frag[cur_aspect]))
+                node_dict = {}
+                for n in frag[cur_aspect]:
+                    node_dict[n['id']] = n
+                # check node with id 0
+                self.assertTrue(math.fabs(node_dict[0]['x'] + 398) < 1.0)
+                self.assertTrue(math.fabs(node_dict[0]['y'] - 70) < 1.0)
+                self.assertEqual('MDK', node_dict[0]['v']['n'])
+                self.assertEqual('uniprot knowledgebase:P21741',
+                                 node_dict[0]['v']['r'])
+                self.assertEqual('Protein', node_dict[0]['v']['type'])
+                self.assertEqual(2, len(node_dict[0]['v']['alias']))
+                self.assertTrue('uniprot knowledgebase:Q2LEK4' in node_dict[0]['v']['alias'])
+                self.assertTrue('uniprot knowledgebase:Q9UCC7' in node_dict[0]['v']['alias'])
+
+                # check node with id 1
+                self.assertTrue(math.fabs(node_dict[1]['x'] + 353) < 1.0)
+                self.assertTrue(math.fabs(node_dict[1]['y'] - 70) < 1.0)
+                self.assertEqual('GPC2', node_dict[1]['v']['n'])
+                self.assertEqual('uniprot knowledgebase:A4D2A7',
+                                 node_dict[1]['v']['r'])
+                self.assertEqual('Protein', node_dict[1]['v']['type'])
+                self.assertEqual(1, len(node_dict[1]['v']['alias']))
+                self.assertTrue('uniprot knowledgebase:Q8N158' in node_dict[1]['v']['alias'])
+            elif cur_aspect == 'networkAttributes':
+                self.assertEqual(1, len(frag[cur_aspect]))
+                self.assertEqual(8, len(frag[cur_aspect][0].keys()))
+                print(frag[cur_aspect])
+            elif cur_aspect == 'edges':
+                self.assertEqual(1, len(frag[cur_aspect]))
+                self.assertEqual(0, frag[cur_aspect][0]['id'])
+                self.assertEqual(1, frag[cur_aspect][0]['s'])
+                self.assertEqual(0, frag[cur_aspect][0]['t'])
+                self.assertEqual({'directed': False,
+                                  'i': 'in-complex-with'},
+                                 frag[cur_aspect][0]['v'])
+            elif cur_aspect == 'visualEditorProperties':
+                self.assertEqual(1, len(frag[cur_aspect]))
+                self.assertEqual(True, frag[cur_aspect][0]['properties']['nodeSizeLocked'])
+                self.assertEqual(True, frag[cur_aspect][0]['properties']['arrowColorMatchesEdge'])
+                self.assertEqual(True, frag[cur_aspect][0]['properties']['nodeCustomGraphicsSizeSync'])
+                self.assertEqual(0.0, frag[cur_aspect][0]['properties']['NETWORK_CENTER_Y_LOCATION'])
+                self.assertEqual(0.0, frag[cur_aspect][0]['properties']['NETWORK_CENTER_X_LOCATION'])
+                self.assertEqual(1.0, frag[cur_aspect][0]['properties']['NETWORK_SCALE_FACTOR'])
+            elif cur_aspect == 'visualProperties':
+                self.assertEqual(1, len(frag[cur_aspect]))
+                self.assertEqual(3, len(frag[cur_aspect][0]['default']))
+                self.assertTrue('edge' in frag[cur_aspect][0]['default'])
+                self.assertTrue('network' in frag[cur_aspect][0]['default'])
+                self.assertTrue('node' in frag[cur_aspect][0]['default'])
+            else:
+                print(cur_aspect + ' ----------')
+                print(frag[cur_aspect])
+                print('\n\n\n')
+
+        self.assertEqual({'status': [{'success': True}]}, cx[-1])
+
     def test_update_network(self):
         client = self.get_ndex2_client()
         # create network and add it
@@ -599,52 +679,6 @@ class TestClientIntegration(unittest.TestCase):
         try:
             res = client.get_network_as_cx2_stream(netid)
             self.assertEqual(200, res.status_code)
-            cx = res.json()
-            self.assertEqual({'CXVersion': '2.0',
-                              'hasFragments': False}, cx[0])
-            found_aspects = set()
-            for frag in cx[1:-1]:
-                self.assertEqual(1, len(frag.keys()), 'expected 1 key per fragment')
-                cur_aspect = list(frag.keys())[0]
-                found_aspects.add(cur_aspect)
-
-                if cur_aspect == 'metaData':
-                    self.assertEqual(6, len(frag[cur_aspect]))
-                elif cur_aspect == 'attributeDeclarations':
-                    self.assertEqual(1, len(frag[cur_aspect]))
-                    self.assertEqual(3, len(frag[cur_aspect][0].keys()))
-                    self.assertTrue('nodes' in frag[cur_aspect][0])
-                    self.assertTrue('edges' in frag[cur_aspect][0])
-                    self.assertTrue('networkAttributes' in frag[cur_aspect][0])
-                elif cur_aspect == 'nodes':
-                    self.assertEqual(2, len(frag[cur_aspect]))
-                    node_dict = {}
-                    for n in frag[cur_aspect]:
-                        node_dict[n['id']] = n
-                    # check node with id 0
-                    self.assertTrue(math.fabs(node_dict[0]['x'] + 398) < 1.0)
-                    self.assertTrue(math.fabs(node_dict[0]['y'] - 70) < 1.0)
-                    self.assertEqual('MDK', node_dict[0]['v']['n'])
-                    self.assertEqual('uniprot knowledgebase:P21741',
-                                     node_dict[0]['v']['r'])
-                    self.assertEqual('Protein', node_dict[0]['v']['type'])
-                    self.assertEqual(2, len(node_dict[0]['v']['alias']))
-                    self.assertTrue('uniprot knowledgebase:Q2LEK4' in node_dict[0]['v']['alias'])
-                    self.assertTrue('uniprot knowledgebase:Q9UCC7' in node_dict[0]['v']['alias'])
-
-                    # check node with id 1
-                    self.assertTrue(math.fabs(node_dict[1]['x'] + 353) < 1.0)
-                    self.assertTrue(math.fabs(node_dict[1]['y'] - 70) < 1.0)
-                    self.assertEqual('GPC2', node_dict[1]['v']['n'])
-                    self.assertEqual('uniprot knowledgebase:A4D2A7',
-                                     node_dict[1]['v']['r'])
-                    self.assertEqual('Protein', node_dict[1]['v']['type'])
-                    self.assertEqual(1, len(node_dict[1]['v']['alias']))
-                    self.assertTrue('uniprot knowledgebase:Q8N158' in node_dict[1]['v']['alias'])
-
-                else:
-                    print(frag[cur_aspect])
-                    print('\n\n\n')
-            self.assertEqual({'status': [{'success': True}]}, cx[-1])
+            self.check_glypican_cx2_is_correct(res.json())
         finally:
             client.delete_network(network_id=netid)

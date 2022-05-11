@@ -54,8 +54,7 @@ class Ndex2(object):
 
 
         .. versionadded:: 3.5.0
-           *skip_version_check* parameter added, but set to ``False`` to maintain
-           current behavior. NOTE: At some point this will be set to ``True`` by default
+           *skip_version_check* parameter added
 
         :param host: The URL of the server.
         :type host: str
@@ -74,9 +73,10 @@ class Ndex2(object):
                         is passed to Request calls `Click here for more information
                         <http://docs.python-requests.org/en/master/user/advanced/#timeouts>`_
         :type timeout: float or tuple(float, float)
-        :param skip_version_check: Dictates whether to skip NDEx server query to see if **v2**
-                                   endpoints are supported. If ``True`` then check is skipped
-                                   and it is assumed NDEx server supports **v2** endpoints.
+        :param skip_version_check: If ``True``, it is assumed
+                                   NDEx server supports **v2** endpoints,
+                                   otherwise NDEx server is queried to see
+                                   if **v2** endpoints are supported
         :type skip_version_check: bool
 
         """
@@ -379,7 +379,8 @@ class Ndex2(object):
                                      returnfullresponse=True)
 
     # The Request is streamed, not the Response
-    def put_multipart(self, route, fields, alt_version_endpoint=None):
+    def put_multipart(self, route, fields, alt_version_endpoint=None,
+                      returnjsonundertry=True, returnfullresponse=False):
         url = self.host + \
               self._get_version_endpoint(alt_version_endpoint=
                                          alt_version_endpoint) + route
@@ -393,7 +394,8 @@ class Ndex2(object):
                    }
         response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
         return self._return_response(response,
-                                     returnjsonundertry=True)
+                                     returnjsonundertry=returnjsonundertry,
+                                     returnfullresponse=returnfullresponse)
 
     # The Request is streamed, not the Response
     def post_multipart(self, route, fields, query_string=None, alt_version_endpoint=None,
@@ -486,9 +488,29 @@ class Ndex2(object):
 
         .. versionadded:: 3.5.0
 
+        .. code-block:: python
+
+            from ndex2.client import Ndex2
+            from ndex2.exceptions import NDExError
+
+            client = Ndex2(username=<NDEx USER NAME>,
+                           password=<NDEx PASSWORD>,
+                           skip_version_check=True)
+
+            # cx is set to an empty CX2 network
+            cx = [{"CXVersion":"2.0","hasFragments":false},
+                  {"status":[{"success":true}]}]
+
+            try:
+                net_url = client.save_new_cx2_network(cx, visibility='PRIVATE')
+                print('URL of new network: ' + str(net_url))
+            except NDExError as ne:
+                print('Caught error: ' + str(ne))
+
         :param cx: Network CX2 which is a list of dict objects
         :type cx: list
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
+                           If ``None`` sets visibility to PRIVATE
         :type visibility: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :raises NDExInvalidCXError: if **cx** is ``None``, not a list,
@@ -518,8 +540,32 @@ class Ndex2(object):
 
         .. versionadded:: 3.5.0
 
+        .. code-block:: python
+
+            import io
+            import json
+            from ndex2.client import Ndex2
+            from ndex2.exceptions import NDExError
+
+            client = Ndex2(username=<NDEx USER NAME>,
+                           password=<NDEx PASSWORD>,
+                           skip_version_check=True)
+
+            # cx is set to an empty CX2 network
+            cx = [{"CXVersion":"2.0","hasFragments":false},
+                  {"status":[{"success":true}]}]
+
+            try:
+                cx_stream = io.BytesIO(json.dumps(cx,
+                                                  cls=DecimalEncoder).encode('utf-8'))
+                net_url = client.save_cx2_stream_as_new_network(cx_stream,
+                                                                visibility='PUBLIC')
+                print('Network URL: ' + str(net_url))
+            except NDExError as ne:
+                print('Caught error: ' + str(ne))
+
         :param cx_stream:  IO stream of cx2
-        :type cx_stream: BytesIO
+        :type cx_stream: BytesIO like object
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
@@ -536,23 +582,23 @@ class Ndex2(object):
         fields = {
             'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
         }
-
-        res = self.post_multipart('/networks', fields, query_string=query_string,
-                                  alt_version_endpoint=Ndex2.V3_ENDPOINT,
-                                  returnfullresponse=True)
-        # this extra check is necessary cause NDEx 2.5.2 CX2 POST endpoint
-        # only returns URL of new network in Location header
-        # See https://ndexbio.atlassian.net/browse/UD-2163
-        if res.text is not None and res.text.startswith('http'):
-            return res.text
-        if 'Location' not in res.headers:
-            raise NDExError('Unable to get URL for newly created network: ' +
-                            str(res.text))
-        return res.headers['Location']
+        try:
+            res = self.post_multipart('/networks', fields, query_string=query_string,
+                                      alt_version_endpoint=Ndex2.V3_ENDPOINT,
+                                      returnfullresponse=True)
+            if 'Location' not in res.headers:
+                raise NDExError('Unable to get URL for newly created network: ' +
+                                str(res.text))
+            return res.headers['Location']
+        except requests.HTTPError as he:
+            self._convert_requests_http_error_to_ndex_error(he)
+        except Exception as e:
+            self._convert_exception_to_ndex_error(e)
 
     def update_cx_network(self, cx_stream, network_id):
         """
-        Update the network specified by UUID network_id using the CX stream cx_stream.
+        Update the network specified by UUID network_id using the CX stream
+        **cx_stream** passed in
 
         :param cx_stream: The network stream.
         :param network_id: The UUID of the network.
@@ -573,6 +619,57 @@ class Ndex2(object):
             route = "/network/%s" % network_id
 
         return self.put_multipart(route, fields)
+
+    def update_cx2_network(self, cx_stream, network_id):
+        """
+        Update the network specified by UUID network_id using the CX2
+        stream **cx_stream** passed in
+
+        .. versionadded:: 3.5.0
+
+        .. code-block:: python
+
+            import io
+            import json
+            from ndex2.client import Ndex2
+            from ndex2.exceptions import NDExError
+
+            client = Ndex2(username=<NDEx USER NAME>,
+                           password=<NDEx PASSWORD>,
+                           skip_version_check=True)
+
+            # cx is set to an empty CX2 network
+            cx = [{"CXVersion":"2.0","hasFragments":false},
+                  {"status":[{"success":true}]}]
+
+            try:
+                cx_stream = io.BytesIO(json.dumps(cx,
+                                                  cls=DecimalEncoder).encode('utf-8'))
+                client.update_cx2_network(cx_stream, <UUID OF NETWORK TO UPDATE>)
+                print('Success')
+            except NDExError as ne:
+                print('Caught error: ' + str(ne))
+
+
+        :param cx_stream: The network stream.
+        :param network_id: The UUID of the network.
+        :type network_id: str
+        :raises NDExUnauthorizedError: If credentials are invalid or not set
+        :raises NDExError: If there is an error updating the network
+        """
+        self._require_auth()
+        fields = {
+            'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
+        }
+
+        try:
+            # update endpoint has no output so do not return anything
+            self.put_multipart('/networks/' + str(network_id), fields,
+                               alt_version_endpoint=Ndex2.V3_ENDPOINT)
+        except requests.HTTPError as he:
+            self._convert_requests_http_error_to_ndex_error(he)
+        except Exception as e:
+            self._convert_exception_to_ndex_error(e)
 
     def get_network_as_cx_stream(self, network_id):
         """

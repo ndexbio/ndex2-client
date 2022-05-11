@@ -908,7 +908,7 @@ class TestClient(unittest.TestCase):
         except NDExInvalidCXError as ice:
             self.assertEqual(str(ice), 'CX appears to be empty')
 
-    def test_save_new_cx2_network_with_no_status(self):
+    def test_save_new_cx2_network_with_no_location_in_header(self):
         with requests_mock.mock() as m:
             resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
             m.post(client.DEFAULT_SERVER + '/v3/networks',
@@ -917,15 +917,28 @@ class TestClient(unittest.TestCase):
                    text=resurl)
             ndex = Ndex2(username='bob', password='warnerbrandis',
                          skip_version_check=True)
-            res = ndex.save_new_cx2_network([{'foo': '123'}])
-            self.assertEqual(res, resurl)
-            decode_txt = m.last_request.text.read().decode('UTF-8')
-            self.assertTrue('Content-Disposition: form-data; '
-                            'name="CXNetworkStream"; '
-                            'filename="filename"' in decode_txt)
-            self.assertTrue('Content-Type: application/'
-                            'octet-stream' in decode_txt)
-            self.assertTrue('{"foo": "123"}' in decode_txt)
+            try:
+                ndex.save_new_cx2_network([{'foo': '123'}])
+                self.fail('Expected Exception')
+            except NDExError as ne:
+                self.assertTrue('Unable to get URL for newly' in str(ne))
+
+    def test_save_new_cx2_network_with_server_error(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   json={'error': 'bad'},
+                   status_code=500)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            try:
+                ndex.save_new_cx2_network([{'foo': '123'}],
+                                          visibility='PUBLIC')
+                self.fail('Expected Exception')
+            except NDExError as ne:
+                self.assertEqual('Caught 500 from server: '
+                                 '{"error": "bad"}', str(ne))
 
     def test_save_new_cx2_network_with_visibility(self):
         with requests_mock.mock() as m:
@@ -1024,6 +1037,89 @@ class TestClient(unittest.TestCase):
             self.assertTrue('{"status": [{"' in decode_txt)
             self.assertTrue('"error": ""' in decode_txt)
             self.assertTrue('"success": true' in decode_txt)
+
+    def test_update_cx2_network_success(self):
+        with requests_mock.mock() as m:
+
+            m.put(client.DEFAULT_SERVER + '/v3/networks/someid',
+                  request_headers={'Connection': 'close'},
+                  status_code=200)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            cx = [{'foo': '123'},
+                  {"status": [{"error": "", "success": True}]}]
+
+            if sys.version_info.major == 3:
+                stream = io.BytesIO(json.dumps(cx,
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
+            else:
+                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
+
+            ndex.update_cx2_network(stream, 'someid')
+
+            decode_txt = m.last_request.text.read().decode('UTF-8')
+            self.assertTrue('Content-Disposition: form-data; '
+                            'name="CXNetworkStream"; '
+                            'filename="filename"' in decode_txt)
+            self.assertTrue('Content-Type: application/'
+                            'octet-stream' in decode_txt)
+            self.assertTrue('{"foo": "123"}' in decode_txt)
+            self.assertTrue('{"status": [{"' in decode_txt)
+            self.assertTrue('"error": ""' in decode_txt)
+            self.assertTrue('"success": true' in decode_txt)
+
+    def test_update_cx2_network_server_error(self):
+        with requests_mock.mock() as m:
+
+            m.put(client.DEFAULT_SERVER + '/v3/networks/someid',
+                  request_headers={'Connection': 'close'},
+                  json={'error': 'bad'},
+                  status_code=500)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            cx = [{'foo': '123'},
+                  {"status": [{"error": "", "success": True}]}]
+
+            if sys.version_info.major == 3:
+                stream = io.BytesIO(json.dumps(cx,
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
+            else:
+                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
+
+            try:
+                ndex.update_cx2_network(stream, 'someid')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertEqual('Caught 500 from server: '
+                                 '{"error": "bad"}', str(ne))
+
+    def test_update_cx2_network_other_error(self):
+        with requests_mock.mock() as m:
+
+            m.put(client.DEFAULT_SERVER + '/v3/networks/someid',
+                  request_headers={'Connection': 'close'},
+                  json={'error': 'bad'},
+                  status_code=500)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            ndex.host = None
+            cx = [{'foo': '123'},
+                  {"status": [{"error": "", "success": True}]}]
+
+            if sys.version_info.major == 3:
+                stream = io.BytesIO(json.dumps(cx,
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
+            else:
+                stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
+
+            try:
+                ndex.update_cx2_network(stream, 'someid')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertTrue('Caught TypeError' in str(ne))
 
     def test_validate_network_system_properties(self):
         with requests_mock.mock() as m:

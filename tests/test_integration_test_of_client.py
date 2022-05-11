@@ -34,6 +34,7 @@ class TestClientIntegration(unittest.TestCase):
     TEST_DIR = os.path.dirname(__file__)
     WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')
     GLYPICAN2_FILE = os.path.join(TEST_DIR, 'data', 'glypican2.cx')
+    CX2_GLYPICAN2_FILE = os.path.join(TEST_DIR, 'data', 'glypican2.cx2')
 
     def get_ndex_credentials_as_tuple(self):
         """
@@ -69,6 +70,7 @@ class TestClientIntegration(unittest.TestCase):
 
     def check_glypican_cx2_is_correct(self, cx):
         """
+        Bunch of checks to verify CX2 passed in **cx** is valid
 
         :param cx:
         :return:
@@ -116,8 +118,11 @@ class TestClientIntegration(unittest.TestCase):
                 self.assertTrue('uniprot knowledgebase:Q8N158' in node_dict[1]['v']['alias'])
             elif cur_aspect == 'networkAttributes':
                 self.assertEqual(1, len(frag[cur_aspect]))
-                self.assertEqual(8, len(frag[cur_aspect][0].keys()))
-                print(frag[cur_aspect])
+                # so @context opaque aspect is ignored in v3.4.0 and earlier
+                # hence the check for 8 or 9
+                # https://github.com/ndexbio/ndex2-client/issues/88
+                self.assertTrue(len(frag[cur_aspect][0].keys()) == 8 or
+                                len(frag[cur_aspect][0].keys()) == 9)
             elif cur_aspect == 'edges':
                 self.assertEqual(1, len(frag[cur_aspect]))
                 self.assertEqual(0, frag[cur_aspect][0]['id'])
@@ -141,9 +146,7 @@ class TestClientIntegration(unittest.TestCase):
                 self.assertTrue('network' in frag[cur_aspect][0]['default'])
                 self.assertTrue('node' in frag[cur_aspect][0]['default'])
             else:
-                print(cur_aspect + ' ----------')
-                print(frag[cur_aspect])
-                print('\n\n\n')
+                self.fail('Unknown aspect: ' + str(cur_aspect) + ' : ' + str(frag[cur_aspect]))
 
         self.assertEqual({'status': [{'success': True}]}, cx[-1])
 
@@ -674,6 +677,32 @@ class TestClientIntegration(unittest.TestCase):
         netname = 'ndex2-client integration test network2' + str(datetime.now())
         net.set_name(netname)
         res = client.save_new_network(net.to_cx(), visibility='PUBLIC')
+        self.assertTrue('http' in res)
+        netid = re.sub('^.*/', '', res)
+        try:
+            res = client.get_network_as_cx2_stream(netid)
+            self.assertEqual(200, res.status_code)
+            self.check_glypican_cx2_is_correct(res.json())
+        finally:
+            client.delete_network(network_id=netid)
+
+    def test_save_new_cx2_network(self):
+        client = self.get_ndex2_client()
+
+        # load network
+        with open(TestClientIntegration.CX2_GLYPICAN2_FILE, 'r') as f:
+            cx = json.load(f)
+
+        # set the name
+        for frag in cx[1:-1]:
+            cur_aspect = list(frag.keys())[0]
+            if cur_aspect == 'networkAttributes':
+                frag[cur_aspect][0]['name'] = 'ndex2-client integration ' \
+                                              'test network2 ' +\
+                                              str(datetime.now())
+                break
+
+        res = client.save_new_cx2_network(cx, visibility='PUBLIC')
         self.assertTrue('http' in res)
         netid = re.sub('^.*/', '', res)
         try:

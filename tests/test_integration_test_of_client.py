@@ -711,3 +711,130 @@ class TestClientIntegration(unittest.TestCase):
             self.check_glypican_cx2_is_correct(res.json())
         finally:
             client.delete_network(network_id=netid)
+
+    def test_update_cx2_network_that_was_uploaded_as_cx1(self):
+        client = self.get_ndex2_client()
+        # create network and add it
+        net = NiceCXNetwork()
+        oneid = net.create_node('node1')
+        twoid = net.create_node('node2')
+        net.create_edge(oneid, twoid, 'hello')
+        netname = 'ndex2-client integration test network' + str(datetime.now())
+        net.set_name(netname)
+        res = client.save_new_network(net.to_cx(), visibility='PRIVATE')
+        try:
+            self.assertTrue('http' in res)
+            netid = re.sub('^.*/', '', res)
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            self.assertEqual(netid, netsum['externalId'])
+            self.assertTrue('name' in netsum, msg=str(netsum))
+            self.assertEqual(netname, netsum['name'], str(netsum))
+            self.assertEqual('PRIVATE', netsum['visibility'])
+            self.assertEqual(False, netsum['isReadOnly'])
+            self.assertEqual(1, netsum['edgeCount'])
+            self.assertEqual(2, netsum['nodeCount'])
+            self.assertEqual(False, netsum['isShowcase'])
+            self.assertEqual('NONE', netsum['indexLevel'])
+
+            # load network
+            with open(TestClientIntegration.CX2_GLYPICAN2_FILE, 'r') as f:
+                cx = json.load(f)
+
+            # set the name
+            for frag in cx[1:-1]:
+                cur_aspect = list(frag.keys())[0]
+                if cur_aspect == 'networkAttributes':
+                    frag[cur_aspect][0]['name'] = 'ndex2-client integration ' \
+                                                  'test network2 ' + \
+                                                  str(datetime.now())
+                    break
+
+            if sys.version_info.major == 3:
+                stream = io.BytesIO(json.dumps(cx,
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
+            else:
+                stream = io.BytesIO(json.dumps(cx,
+                                               cls=DecimalEncoder))
+            client.update_cx2_network(stream, netid)
+
+            res = client.get_network_as_cx2_stream(netid)
+            self.assertEqual(200, res.status_code)
+            self.check_glypican_cx2_is_correct(res.json())
+        finally:
+            client.delete_network(netid)
+            try:
+                client.get_network_as_cx_stream(netid)
+                self.fail('Expected exception')
+            except HTTPError:
+                pass
+
+    def test_update_cx2_network_with_invalid_network(self):
+        client = self.get_ndex2_client()
+        try:
+            # load network
+            with open(TestClientIntegration.CX2_GLYPICAN2_FILE, 'r') as f:
+                cx = json.load(f)
+
+                # set the name
+                for frag in cx[1:-1]:
+                    cur_aspect = list(frag.keys())[0]
+                    if cur_aspect == 'networkAttributes':
+                        frag[cur_aspect][0]['name'] = 'ndex2-client integration update ' \
+                                                      'test network2 ' + \
+                                                      str(datetime.now())
+                        break
+            resurl = client.save_new_cx2_network(cx, visibility='PUBLIC')
+            self.assertTrue('http' in resurl)
+            netid = resurl[resurl.rindex('/')+1:]
+
+            if sys.version_info.major == 3:
+                stream = io.BytesIO(json.dumps([],
+                                               cls=DecimalEncoder)
+                                    .encode('utf-8'))
+            else:
+                stream = io.BytesIO(json.dumps([],
+                                               cls=DecimalEncoder))
+
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertEqual('PUBLIC', netsum['visibility'])
+            self.assertTrue('ndex2-client' in netsum['name'])
+            self.assertEqual(False, netsum['isReadOnly'])
+            self.assertEqual(1, netsum['edgeCount'])
+            self.assertEqual(2, netsum['nodeCount'])
+            self.assertEqual(False, netsum['isShowcase'])
+            self.assertEqual('NONE', netsum['indexLevel'])
+            self.assertEqual('cx2', netsum['cxFormat'])
+            self.assertTrue('errorMessage' not in netsum)
+            self.assertEqual(True, netsum['isValid'])
+
+            # updating with invalid network works silently
+            client.update_cx2_network(stream, network_id=netid)
+
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            self.assertEqual(netid, netsum['externalId'])
+            # there wont be a name in the summary
+            self.assertTrue('name' not in netsum, msg=str(netsum))
+            
+            # visibility is reset to private
+            self.assertEqual('PRIVATE', netsum['visibility'])
+            self.assertEqual(False, netsum['isReadOnly'])
+            self.assertEqual(0, netsum['edgeCount'])
+            self.assertEqual(0, netsum['nodeCount'])
+            self.assertEqual(False, netsum['isShowcase'])
+            self.assertEqual('NONE', netsum['indexLevel'])
+            self.assertEqual('cx2', netsum['cxFormat'])
+            self.assertTrue('Expect \'{\' at line' in netsum['errorMessage'])
+            self.assertEqual(True, netsum['isValid'])
+            
+            # trying to get the CX2 of the network will just fail
+            client.get_network_as_cx2_stream(netid)
+
+        except NDExNotFoundError as nfe:
+            self.assertTrue('Caught 404 from server' in str(nfe))
+        finally:
+            client.delete_network(network_id=netid)

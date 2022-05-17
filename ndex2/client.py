@@ -656,6 +656,8 @@ class Ndex2(object):
         :type network_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :raises NDExError: If there is an error updating the network
+        :return: Nothing is returned. To check status
+                 call :py:func:`get_network_summary`
         """
         self._require_auth()
         fields = {
@@ -1020,11 +1022,92 @@ class Ndex2(object):
 
     def get_network_summary(self, network_id):
         """
-        Gets information about a network.
+        Gets information and status of a network
 
-        :param network_id: The UUID of the network.
+        Example usage:
+
+        .. code-block:: python
+
+            from ndex2.client import Ndex2
+            client = Ndex2(skip_version_check=True)
+
+            # 7fc.. is UUID MuSIC v1 network: http://doi.org/10.1038/s41586-021-04115-9
+            net_sum = client.get_network_summary('7fc70ab6-9fb1-11ea-aaef-0ac135e8bacf')
+
+            print(net_sum)
+
+
+        Example result:
+
+        .. code-block:: text
+
+            {
+              "ownerUUID": "daa09f36-8cdd-11e7-a10d-0ac135e8bacf",
+              "isReadOnly": true,
+              "subnetworkIds": [],
+              "isValid": true,
+              "warnings": [],
+              "isShowcase": true,
+              "doi": "10.18119/N9188W",
+              "isCertified": true,
+              "indexLevel": "ALL",
+              "hasLayout": true,
+              "hasSample": false,
+              "cxFileSize": 82656,
+              "cx2FileSize": 68979,
+              "visibility": "PUBLIC",
+              "nodeCount": 70,
+              "edgeCount": 87,
+              "completed": true,
+              "version": "1.0",
+              "owner": "yue",
+              "description": "<div><br/></div><div>Two central approaches for mapping cellular structure \u2013 protein fluorescent imaging and protein biophysical association \u2013 each generate extensive datasets but of distinct qualities and resolutions that are typically treated separately. The MuSIC map is designed to address this challenge, by integrating immunofluorescent images in the Human Protein Atlas with ongoing affinity purification experiments from the BioPlex resource. The result is a unified hierarchical map of eukaryotic cell architecture. In the MuSIC hierarchy, nodes represent systems and arrows indicate containment of the lower system by the upper. Node color indicates known (gold) or putative novel (purple) systems. The size of each circle is based on the number of proteins in the system. The relative height of each system in the layout is determined based on the predicted diameter of the system in MuSIC.<br/></div>",
+              "name": "Multi-Scale Integrated Cell (MuSIC) v1",
+              "properties": [
+                {
+                  "subNetworkId": null,
+                  "predicateString": "author",
+                  "dataType": "string",
+                  "value": "Yue Qin"
+                },
+                {
+                  "subNetworkId": null,
+                  "predicateString": "rights",
+                  "dataType": "string",
+                  "value": "MIT license (MIT)"
+                },
+                {
+                  "subNetworkId": null,
+                  "predicateString": "rightsHolder",
+                  "dataType": "string",
+                  "value": "Yue Qin"
+                },
+                {
+                  "subNetworkId": null,
+                  "predicateString": "reference",
+                  "dataType": "string",
+                  "value": "Yue Qin, Edward L. Huttlin, Casper F. Winsnes, Maya L. Gosztyla, Ludivine Wacheul, Marcus R. Kelly, Steven M. Blue, Fan Zheng, Michael Chen, Leah V. Schaffer, Katherine Licon, Anna B\u00e4ckstr\u00f6m, Laura Pontano Vaites, John J. Lee, Wei Ouyang, Sophie N. Liu, Tian Zhang, Erica Silva, Jisoo Park, Adriana Pitea, Jason F. Kreisberg, Steven P. Gygi, Jianzhu Ma, J. Wade Harper, Gene W. Yeo, Denis L. J. Lafontaine, Emma Lundberg, Trey Ideker<br><strong>A multi-scale map of cell structure fusing protein images and interactions</strong><br><i>Nature 600, 536\u2013542 (2021).</i>, (2021)<br><a href=\"http://doi.org/10.1038/s41586-021-04115-9\"  target=\"_blank\">10.1038/s41586-021-04115-9</a>"
+                }
+              ],
+              "externalId": "7fc70ab6-9fb1-11ea-aaef-0ac135e8bacf",
+              "isDeleted": false,
+              "modificationTime": 1630270298717,
+              "creationTime": 1590539529001
+            }
+
+        .. note::
+
+            **isvalid** is a boolean to denote that the network was inspected, not
+            that it is actually valid.
+
+            **errorMessage** Will be in result if there was an error parsing network
+
+            **completed** is set to ``True`` after all server tasks have completed and
+            network is ready to be used
+
+        :param network_id: The UUID of the network
         :type network_id: str
-        :return: Summary
+        :return: Summary information about network
         :rtype: dict
 
         """

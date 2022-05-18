@@ -480,6 +480,23 @@ class NiceCXBuilder(object):
         return ijson.parse(urlopen('http://dev2.ndexbio.org/v2/network/' + uuid + '/aspect/' + aspect_name))
 
     def _infer_data_type(self, val, split_string=False):
+        """
+        Gets data type of **val** and returns an updated **val** value
+        that conforms to the data type inferred
+
+        Okay this is kinda complicated, but this code leverages :python:`isinstance`
+        to determine data types
+
+
+        :param val: Value to infer data type from
+        :param split_string: If ``True`` split **val** if it is type :py:func:`str`
+                             and it contains ``,`` or ``;``. Order matters if both
+                             ``,`` and ``;`` are found **val** is split by ``,``
+        :type split_string: bool
+        :return: (processed value, CX data type), if **val** is ``None`` then ``(None, None)`` is
+                 returned
+        :rtype tuple
+        """
         if val is None:
             return None, None
 
@@ -493,26 +510,33 @@ class NiceCXBuilder(object):
                 elif ';' in val:
                     val = val.split(';')
 
-        processed_value = val
-
         if isinstance(val, float) or isinstance(val, np.float) or isinstance(val, np.double):
             if math.isnan(val):
                 # do something (skip?)
-                processed_value = None
+                val = None
             elif math.isinf(val):
-                processed_value = 'INFINITY'
-            attr_type = 'double'  # CX spec dropped support for float and instead uses double precision
-        elif isinstance(val, int) or isinstance(val, np.int):
-            attr_type = 'integer'
-        elif isinstance(val, list):
+                val = 'INFINITY'
+            return val, 'double'
+        if isinstance(val, bool):
+            # fix for https://github.com/ndexbio/ndex2-client/issues/83
+            # a boolean is a sub type of int so bool must be tested first
+            return val, 'boolean'
+        if isinstance(val, int) or isinstance(val, np.int):
+            return val, 'integer'
+        if isinstance(val, list):
+            # if the list is empty just set data type to list_of_string
+            # fix for https://github.com/ndexbio/ndex2-client/issues/90
+            attr_type = 'list_of_string'
             if len(val) > 0:
                 if isinstance(val[0], float) or isinstance(val[0], np.float) or isinstance(val[0], np.double):
                     attr_type = 'list_of_double'
+                elif isinstance(val[0], bool):
+                    # fix for https://github.com/ndexbio/ndex2-client/issues/83
+                    # a boolean is a sub type of int so bool must be tested first
+                    attr_type = 'list_of_boolean'
                 elif isinstance(val[0], int) or isinstance(val[0], np.int):
                     attr_type = 'list_of_integer'
-                else:
-                    attr_type = 'list_of_string'
 
-        return processed_value, attr_type
+        return val, attr_type
 
 

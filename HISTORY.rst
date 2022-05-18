@@ -11,11 +11,17 @@ History
 * Added the following *CX2* methods to `NDex2()` client:
   `get_network_as_cx2_stream()`, `get_network_aspect_as_cx2_stream()`, `save_cx2_stream_as_new_network()`,
   `save_new_cx2_network()`, and `update_cx2_network()`
-  `Issue #87 <https://github.com/ndexbio/ndex2-client/issues/78>`__
+  `Issue #87 <https://github.com/ndexbio/ndex2-client/issues/87>`__
 
 * In `Ndex2()` client, methods that raise ``NDExError`` exceptions from calls
   to NDEx server will now raise the more specific ``NDExUnauthorizedError``
   subclass when the response from NDEx server is a 401 aka unauthorized.
+
+* Fixed bug where creation of NiceCXNetwork from networkx via `ndex2.create_nice_cx_from_networkx()`
+  incorrectly set the data type for boolean values to integer.
+  Issues `#83 <https://github.com/ndexbio/ndex2-client/issues/83>`__,
+  `#90 <https://github.com/ndexbio/ndex2-client/issues/90>`__
+
 
 3.4.0 (2021-05-06)
 -------------------

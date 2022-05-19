@@ -9,6 +9,8 @@ import json
 import base64
 import numpy as np
 from ndex2cx.nice_cx_builder import NiceCXBuilder
+from ndex2.nice_cx_network import NetworkXFactory
+from ndex2 import constants
 
 
 def get_logger(name, level=logging.DEBUG):
@@ -152,85 +154,130 @@ def create_empty_nice_cx():
 
 
 def _create_cartesian_coordinates_aspect_from_networkx(G):
+    """
+    Converts networkx graph position coordinates to cartesianLayout
+
+    .. note::
+
+        The ``-`` on `y` is because `cartesianLayout` isn't actually
+        cartesian. The `y` is inverted so lower values go higher on graph
+        instead of lower
+
+    :param G:
+    :return:
+    """
     return [
-        {'node': n, 'x': float(G.pos[n][0]), 'y': float(G.pos[n][1])} for n in G.pos
+        {'node': n, 'x': float(G.pos[n][0]),
+         'y': -float(G.pos[n][1])} for n in G.pos
     ]
 
 
 def create_nice_cx_from_networkx(G):
     """
     Creates a :py:class:`~ndex2.nice_cx_network.NiceCXNetwork` based on a
-    networkx graph.
+    :class:`networkx.Graph` graph.
+
+    .. versionchanged:: 3.5.0
+       Major refactor to fix multiple bugs #83, #84, #90
+
+    .. code-block:: python
+
+        import ndex2
+        import networkx as nx
+
+        G = nx.Graph()
+        G.add_node(1, someval=1.5, name='node 1')
+        G.add_node(2, someval=2.5, name='node 2')
+        G.add_edge(1, 2, weight=5)
+
+        print(ndex2.create_nice_cx_from_networkx(G).to_cx())
 
     The resulting :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
-    contains the nodes, edges and their attributes from the networkx graph and also
-    preserves the graph 'pos' attribute as a CX cartesian coordinates aspect.
+    contains the nodes, edges and their attributes from the
+    :class:`networkx.Graph`
+    graph and also preserves the graph 'pos' attribute as a CX
+    cartesian coordinates aspect
+    :py:const:`~ndex2.constants.CARTESIAN_LAYOUT_ASPECT`
+    with the values of `Y` inverted
 
-    The node name is taken from the networkx node id. Node 'represents' is
-    taken from the networkx node attribute 'represents'
+    Description of how conversion is performed:
 
-    :param G: networkx graph
-    :type G: networkx graph
-    :return: NiceCXNetwork
+    **Network:**
+
+    * Network name is set value of ``G.graph.get('name')`` or to
+      ``created from networkx by ndex2.create_nice_cx_networkx()`` if
+      `name` is ``None`` or not present
+
+    **Nodes:**
+
+    * Node id is value of ``n`` from this for loop:
+      ``for n, d G.nodes(data=True):`` if ``n`` is **NOT** an
+      :py:class:`int`, new ids starting from ``0`` are used
+
+    * Node name is value of `name` attribute on the node or is
+      set to id of node if `name` is not present.
+
+    * Node `represents` is value of `represents` attribute on the
+      node or set is to node `name` if ``None`` or not present
+
+    **Edges:**
+
+    * Interaction is value of `interaction` attribute on the edge
+      or is set to ``neighbor-of`` if ``None`` or not present
+
+    .. note::
+
+        Data types are inferred by using :py:func:`isinstance` and
+        converted to corresponding CX data types. For list items,
+        only the 1st item is examined to determine type
+
+    :param G: Graph to convert
+    :type G: :class:`networkx.Graph`
+    :raises Exception: if **G** parameter is ``None`` or there is another error
+                       in conversion
+    :return: Converted network
     :rtype: :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
-
-    niceCxBuilder = NiceCXBuilder()
+    cx_builder = NiceCXBuilder()
     if G is None:
         raise Exception('Networkx input is empty')
 
-    my_nicecx = NiceCXNetwork()
-
-    if G.graph.get('name'):
-        my_nicecx.set_name(G.graph.get('name'))
+    network_name = G.graph.get('name')
+    if network_name is not None:
+        cx_builder.set_name(network_name)
     else:
-        my_nicecx.set_name('created from networkx')
-
-    my_nicecx.add_metadata_stub('networkAttributes')
-
-
-    #=========================================
-    # Check to see if the node label is same
-    # (case insensitive) as 'name' attribute
-    #=========================================
-    #use_node_label = False
-    #for n, d in G.nodes_iter(data=True):
-    #    if not isinstance(n, int) and d and d.get('name'):
-    #        if n.lower() == d.get('name').lower():
-    #            use_node_label = True
-
-    #    break
+        cx_builder.set_name('created from networkx by '
+                            'ndex2.create_nice_cx_networkx()')
 
     for n, d in G.nodes(data=True):
-        # =============
-        # ADD NODES
-        # =============
-        #if d and d.get('name'):
-        #    if isinstance(n, int):
-        #        node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), id=n, map_node_ids=True)
-        #    else:
-        #        # If networkx node is of type string then maybe the 'name' atribute is no longer accurate
-        #        if use_node_label:
-        #            node_id = niceCxBuilder.add_node(name=n,represents=n, map_node_ids=True)
-        #        else:
-        #            node_id = niceCxBuilder.add_node(name=d.get('name'),represents=d.get('name'), map_node_ids=True)
-        #else:
         if isinstance(n, int):
-            node_id = niceCxBuilder.add_node(name=n,represents=d.get('represents'), id=n, map_node_ids=True)
+            n_name = d.get('name')
+            if n_name is None:
+                n_name = str(n)
+            node_id = cx_builder.add_node(name=n_name, represents=d.get('represents'), id=n, map_node_ids=True)
         else:
-            node_id = niceCxBuilder.add_node(name=n, represents=d.get('represents'), map_node_ids=True)
+            node_id = cx_builder.add_node(name=n, represents=d.get('represents'), map_node_ids=True)
 
         # ======================
         # ADD NODE ATTRIBUTES
         # ======================
         for k, v in d.items():
-            use_this_value, attr_type = niceCxBuilder._infer_data_type(v, split_string=True)
 
+            # if node attribute is 'name' skip it cause that will be used
+            # for name of node, also skip 'represents'
+            # fix for https://github.com/ndexbio/ndex2-client/issues/84
+            if k == 'name' or k == 'represents':
+                continue
+
+            use_this_value, attr_type = cx_builder._infer_data_type(v, split_string=True)
+
+            # This might go away, waiting on response to
+            # https://ndexbio.atlassian.net/browse/UD-2181
             if k == 'citation' and not isinstance(use_this_value, list):
-                use_this_value = [use_this_value]
-                attr_type = 'list_of_string'
+                use_this_value = [str(use_this_value)]
+                attr_type = constants.LIST_OF_STRING
             if use_this_value is not None:
-                niceCxBuilder.add_node_attribute(node_id, k, use_this_value, type=attr_type)
+                cx_builder.add_node_attribute(node_id, k, use_this_value, type=attr_type)
 
     index = 0
     for u, v, d in G.edges(data=True):
@@ -243,32 +290,36 @@ def create_nice_cx_from_networkx(G):
             interaction = d.get('interaction')
 
         if isinstance(u, int):
-            niceCxBuilder.add_edge(source=u, target=v, interaction=interaction, id=index)
+            cx_builder.add_edge(source=u, target=v, interaction=interaction, id=index)
         else:
-            niceCxBuilder.add_edge(source=niceCxBuilder.node_id_lookup.get(u), target=niceCxBuilder.node_id_lookup.get(v),
-                               interaction=interaction, id=index)
+            cx_builder.add_edge(source=cx_builder.node_id_lookup.get(u), target=cx_builder.node_id_lookup.get(v),
+                                interaction=interaction, id=index)
 
         # ==============================
         # ADD EDGE ATTRIBUTES
         # ==============================
         for k, val in d.items():
-            if k != 'interaction':
-                use_this_value, attr_type = niceCxBuilder._infer_data_type(val, split_string=True)
+            if k == 'interaction':
+                continue
+            use_this_value, attr_type = cx_builder._infer_data_type(val, split_string=True)
 
-                if k == 'citation' and not isinstance(use_this_value, list):
-                    use_this_value = [use_this_value]
-                    attr_type = 'list_of_string'
+            # This might go away, waiting on response to
+            # https://ndexbio.atlassian.net/browse/UD-2181
+            if k == 'citation' and not isinstance(use_this_value, list):
+                use_this_value = [str(use_this_value)]
+                attr_type = constants.LIST_OF_STRING
 
-                if use_this_value is not None:
-                    niceCxBuilder.add_edge_attribute(property_of=index, name=k, values=use_this_value, type=attr_type)
+            if use_this_value is not None:
+                cx_builder.add_edge_attribute(property_of=index, name=k, values=use_this_value, type=attr_type)
 
         index += 1
 
     if hasattr(G, 'pos'):
         aspect = _create_cartesian_coordinates_aspect_from_networkx(G)
-        niceCxBuilder.add_opaque_aspect('cartesianLayout', aspect)
+        cx_builder.add_opaque_aspect(constants.CARTESIAN_LAYOUT_ASPECT,
+                                     aspect)
 
-    return niceCxBuilder.get_nice_cx()
+    return cx_builder.get_nice_cx()
 
 
 def create_nice_cx_from_raw_cx(cx):

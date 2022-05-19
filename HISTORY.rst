@@ -22,6 +22,17 @@ History
   Issues `#83 <https://github.com/ndexbio/ndex2-client/issues/83>`__,
   `#90 <https://github.com/ndexbio/ndex2-client/issues/90>`__
 
+* Fixed bug where Y coordinates of nodes would be inverted when converting to/from
+  networkx from `NiceCXNetwork`. This was due to differences in coordinate systems
+  between networkx and `NiceCXNetwork`
+
+* **mode** parameter in `NiceCXNetwork.to_networkx()` is now set to ``default`` which
+  is using the updated `DefaultNetworkXFactory` networkx converter
+
+* `DefaultNetworkXFactory` networkx converter (used by `NiceCXNetwork.to_networkx()`)
+  no longer converts edge attributes that are of type list into strings delimited by
+  commas
+
 
 3.4.0 (2021-05-06)
 -------------------

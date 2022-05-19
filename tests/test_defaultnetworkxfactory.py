@@ -159,12 +159,85 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
 
         self.assertEqual('first', nodelist[0][1]['name'])
 
+    def test_one_node_network(self):
+        net = NiceCXNetwork()
+        node_one = net.create_node('first')
+
+        net.set_node_attribute(node_one, 'booleanattrib', 'false',
+                               type='boolean')
+        net.set_node_attribute(node_one, 'integerattrib', '1',
+                               type='integer')
+        net.set_node_attribute(node_one, 'doubleattrib', '2.0',
+                               type='double')
+        net.set_node_attribute(node_one, 'longattrib', '3',
+                               type='long')
+        net.set_node_attribute(node_one, 'stringattrib', 'false',
+                               type='string')
+
+        net.set_node_attribute(node_one, 'list_of_booleanattrib',
+                               ['True'], type='list_of_boolean')
+        net.set_node_attribute(node_one, 'list_of_doubleattrib',
+                               ['4.0'], type='list_of_double')
+        net.set_node_attribute(node_one, 'list_of_integerattrib',
+                               ['5'], type='list_of_integer')
+        net.set_node_attribute(node_one, 'list_of_longattrib',
+                               ['6'], type='list_of_long')
+        net.set_node_attribute(node_one, 'list_of_stringattrib',
+                               ['false'], type='list_of_string')
+
+        net.set_name('bob')
+        fac = DefaultNetworkXFactory()
+        g = fac.get_graph(net)
+        self.assertEqual('bob', g.graph['name'])
+        self.assertEqual(1, len(g))
+        self.assertEqual(0, g.number_of_edges())
+        self.assertTrue(0 in g)
+
+        if NETWORKX_MAJOR_VERSION >= 2:
+            nodelist = list(g.nodes(data=True))
+        else:
+            nodelist = g.nodes(data=True)
+
+        self.assertEqual('false', nodelist[0][1]['booleanattrib'])
+        self.assertEqual('1', nodelist[0][1]['integerattrib'])
+        self.assertEqual('2.0', nodelist[0][1]['doubleattrib'])
+        self.assertEqual('3', nodelist[0][1]['longattrib'])
+        self.assertEqual('false', nodelist[0][1]['stringattrib'])
+
+        self.assertEqual(['True'], nodelist[0][1]['list_of_booleanattrib'])
+        self.assertEqual(['4.0'], nodelist[0][1]['list_of_doubleattrib'])
+        self.assertEqual(['5'], nodelist[0][1]['list_of_integerattrib'])
+        self.assertEqual(['6'], nodelist[0][1]['list_of_longattrib'])
+        self.assertEqual(['false'], nodelist[0][1]['list_of_stringattrib'])
+
     def test_two_node_one_edge_network(self):
         net = NiceCXNetwork()
         net.create_node('first')
         net.create_node('second')
-        net.create_edge(edge_source=0, edge_target=1)
+        edge_one = net.create_edge(edge_source=0, edge_target=1)
         net.set_name('bob')
+
+        net.set_edge_attribute(edge_one, 'booleanattrib', 'false',
+                               type='boolean')
+        net.set_edge_attribute(edge_one, 'integerattrib', '1',
+                               type='integer')
+        net.set_edge_attribute(edge_one, 'doubleattrib', '2.0',
+                               type='double')
+        net.set_edge_attribute(edge_one, 'longattrib', '3',
+                               type='long')
+        net.set_edge_attribute(edge_one, 'stringattrib', 'false',
+                               type='string')
+        net.set_edge_attribute(edge_one, 'list_of_booleanattrib',
+                               ['True'], type='list_of_boolean')
+        net.set_edge_attribute(edge_one, 'list_of_doubleattrib',
+                               ['4.0'], type='list_of_double')
+        net.set_edge_attribute(edge_one, 'list_of_integerattrib',
+                               ['5'], type='list_of_integer')
+        net.set_edge_attribute(edge_one, 'list_of_longattrib',
+                               ['6'], type='list_of_long')
+        net.set_edge_attribute(edge_one, 'list_of_stringattrib',
+                               ['false'], type='list_of_string')
+
         fac = DefaultNetworkXFactory()
         g = fac.get_graph(net)
         self.assertEqual('bob', g.graph['name'])
@@ -184,6 +257,18 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual(0, edgelist[0][0])
         self.assertEqual(1, edgelist[0][1])
         self.assertEqual(None, edgelist[0][2]['interaction'])
+
+        self.assertEqual('false', edgelist[0][2]['booleanattrib'])
+        self.assertEqual('1', edgelist[0][2]['integerattrib'])
+        self.assertEqual('2.0', edgelist[0][2]['doubleattrib'])
+        self.assertEqual('3', edgelist[0][2]['longattrib'])
+        self.assertEqual('false', edgelist[0][2]['stringattrib'])
+
+        self.assertEqual(['True'], edgelist[0][2]['list_of_booleanattrib'])
+        self.assertEqual(['4.0'], edgelist[0][2]['list_of_doubleattrib'])
+        self.assertEqual(['5'], edgelist[0][2]['list_of_integerattrib'])
+        self.assertEqual(['6'], edgelist[0][2]['list_of_longattrib'])
+        self.assertEqual(['false'], edgelist[0][2]['list_of_stringattrib'])
 
     def test_glypican_network_legacyfalse_and_multigraph_passed_in(self):
         net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory
@@ -241,9 +326,9 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
 
         # check coordinates
         self.assertTrue((g.pos[0][0] + 398.3) < 1.0)
-        self.assertTrue((g.pos[0][1] - 70.71) < 1.0)
+        self.assertTrue((g.pos[0][1] + 70.71) < 1.0)
         self.assertTrue((g.pos[1][0] + 353.49) < 1.0)
-        self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
+        self.assertTrue((g.pos[1][1] + 70.71) < 1.0)
 
     def test_glypican_network_legacyfalse(self):
         net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory
@@ -361,10 +446,10 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual('false', edgelist[0][2]['directed'])
 
         # check coordinates
-        self.assertTrue((g.pos[0][0] + 398.3) < 1.0)
-        self.assertTrue((g.pos[0][1] - 70.71) < 1.0)
-        self.assertTrue((g.pos[1][0] + 353.49) < 1.0)
-        self.assertTrue((g.pos[1][1] - 70.71) < 1.0)
+        self.assertAlmostEqual(g.pos[0][0], -398.3, delta=0.1)
+        self.assertAlmostEqual(g.pos[0][1], -70.71, delta=0.1)
+        self.assertAlmostEqual(g.pos[1][0], -353.49, delta=0.1)
+        self.assertAlmostEqual(g.pos[1][1], -70.71, delta=0.1)
 
     def test_darktheme_network_legacyfalse(self):
         net = ndex2.create_nice_cx_from_file(TestDefaultNetworkXFactory
@@ -416,12 +501,12 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual('form complex',
                          edgelist[sixteenfiftyfiveedge][2]['interaction'])
         self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
-        self.assertEqual('"pubmed:15284024"',
+        self.assertEqual(['pubmed:15284024'],
                          edgelist[sixteenfiftyfiveedge][2]['citation'])
 
         # check coordinates
-        self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)
-        self.assertTrue((g.pos[1655][1] - 145.72) < 1.0)
+        self.assertAlmostEqual(g.pos[1655][0], -90.96, delta=0.1)
+        self.assertAlmostEqual(g.pos[1655][1], -145.72, delta=0.1)
 
     def test_darktheme_network_legacytrue(self):
         net = ndex2\
@@ -473,9 +558,8 @@ class TestDefaultNetworkXFactory(unittest.TestCase):
         self.assertEqual('form complex',
                          edgelist[sixteenfiftyfiveedge][2]['interaction'])
         self.assertEqual('true', edgelist[sixteenfiftyfiveedge][2]['directed'])
-        self.assertEqual('"pubmed:15284024"',
+        self.assertEqual(['pubmed:15284024'],
                          edgelist[sixteenfiftyfiveedge][2]['citation'])
-
         # check coordinates
-        self.assertTrue((g.pos[1655][0] + 90.96) < 1.0)
-        self.assertTrue((g.pos[1655][1] - 145.72) < 1.0)
+        self.assertAlmostEqual(g.pos[1655][0], -90.96, delta=0.1)
+        self.assertAlmostEqual(g.pos[1655][1], -145.72, delta=0.1)

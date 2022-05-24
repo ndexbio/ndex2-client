@@ -698,6 +698,41 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual({'foo': 'https://www/foo.com'},
                          net.get_namespaces())
 
+    def test_set_context(self):
+        net = NiceCXNetwork()
+        net.set_context([{'foo': 'https://www/foo.com'}, {}])
+        self.assertEqual({'foo': 'https://www/foo.com'},
+                         net.get_context())
+        try:
+            net.set_context('bad value')
+            self.fail('Expected NDExError')
+        except NDExError as ne:
+            self.assertEqual('Context provided is not '
+                             'of type list or dict', str(ne))
+
+    def test_set_metadata(self):
+        net = NiceCXNetwork()
+        net.set_metadata({'meta': 1})
+        self.assertEqual(('meta', 1),
+                         list(net.get_metadata())[0])
+
+    def test_get_opaque_aspect(self):
+        net = NiceCXNetwork()
+        self.assertEqual({},
+                         net.get_opaque_aspect_table())
+
+    def test_set_opaque_aspect(self):
+        net = NiceCXNetwork()
+        net.set_opaque_aspect('foo', {'hi': 1})
+        self.assertEqual({'foo': [{'hi': 1}]},
+                         net.get_opaque_aspect_table())
+
+        # see if setting None removes the aspect
+        net.set_opaque_aspect('foo', None)
+        self.assertEqual({},
+                         net.get_opaque_aspect_table())
+
+
     def test_add_name_space(self):
         net = NiceCXNetwork()
         net.add_name_space('blah', 'https://blah.com')

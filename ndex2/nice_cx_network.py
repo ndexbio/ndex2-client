@@ -947,36 +947,54 @@ class NiceCXNetwork:
 
     def set_opaque_aspect(self, aspect_name, aspect_elements):
         """
-        Set the aspect specified by aspect_name to the list of aspect elements. If aspect_elements is None, the
+        Set the aspect specified by aspect_name to the list of
+        aspect elements. If aspect_elements is `None`, the
         aspect is removed.
 
+        .. code-block:: python
+
+            from ndex2.nice_cx_network import NiceCXNetwork
+            net = NiceCXNetwork()
+
+            # to set an opaque aspect
+            net.set_opaque_aspect('foo', [{'data': 'val'}])
+
+            # to remove an opaque aspect named 'foo'
+            net.set_opaque_aspect('foo', None)
+
         :param aspect_name: Name of the aspect
-        :type aspect_name: string
+        :type aspect_name: str
         :param aspect_elements: Aspect element
-        :type aspect_elements: list of dict
+        :type aspect_elements: list of dict or dict
+        :raises NDExError: If `aspect_elements` is not `None`,
+                           :py:class:`dict`, or :py:class:`list`
         :return: None
         :rtype: none
         """
-
+        if aspect_elements is None:
+            self.remove_opaque_aspect(aspect_name)
+            return
         if isinstance(aspect_elements, list):
             self.opaqueAspects[aspect_name] = aspect_elements
-        elif isinstance(aspect_elements, dict):
+            return
+        if isinstance(aspect_elements, dict):
             self.opaqueAspects[aspect_name] = [aspect_elements]
-        else:
-            #if aspect_name is None:
-            #    aspect_name = 'unknown'
-            raise Exception('Provided aspect for ' + aspect_name + ' is not of type <list>')
+            return
 
-    # TODO move removal code to remove_opaque_aspect() - Done
+        raise NDExError('Provided aspect for ' +
+                        aspect_name +
+                        ' is not of type <list or dict>')
+
     def remove_opaque_aspect(self, aspect_name):
-        '''
-        Removes the given aspect from the opaque aspects collection
+        """
+        Removes the given aspect from the opaque aspects
+        collection
 
         :param aspect_name: The opaque aspect name
         :type aspect_name: str
         :return: None
         :rtype: None
-        '''
+        """
         self.opaqueAspects.pop(aspect_name, None)
 
     def get_opaque_aspect_names(self):

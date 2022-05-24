@@ -43,6 +43,14 @@ History
 * Removed unused test methods from internal class `NiceCXBuilder`:
   `load_aspect(), stream_aspect(), stream_aspect_raw()`
 
+* Removed the following deprecated methods from `NiceCXNetwork`:
+  `add_node()`, `add_edge()`, `get_edge_attribute_object()`,
+  `get_node_attribute_objects()`, `get_edge_attribute_objects()`,
+  `add_metadata()`, `get_provenance()`, `set_provenance()`,
+  `__merge_node_attributes()`, `create_from_pandas()`,
+  `create_from_networkx()`, `create_from_server()`, &
+  `create_from_cx()`
+
 
 
 3.4.0 (2021-05-06)

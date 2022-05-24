@@ -58,22 +58,6 @@ class TestNiceCXNetwork(unittest.TestCase):
 
         self.assertEqual(isThree, NiceCXNetwork._is_python_three_or_greater())
 
-    def test_add_edge(self):
-        net_cx = NiceCXNetwork()
-        try:
-            net_cx.add_edge()
-            self.fail('Expected Warning')
-        except Warning as we:
-            self.assertTrue('add_edge() is deprecated' in str(we))
-
-    def test_add_node(self):
-        net_cx = NiceCXNetwork()
-        try:
-            net_cx.add_node()
-            self.fail('Expected Warning')
-        except Warning as we:
-            self.assertTrue('add_node() is deprecated' in str(we))
-
     def test_add_opaque_aspect_invalid_type(self):
         net_cx = NiceCXNetwork()
         try:
@@ -377,13 +361,28 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(1, len(res))
         self.assertTrue('foo' in res)
 
-    def test_get_nex_node_id(self):
+    def test_get_next_node_id(self):
         net = NiceCXNetwork()
         self.assertEqual(0, net.get_next_node_id())
         self.assertEqual(1, net.get_next_node_id())
         self.assertEqual(2, net.get_next_node_id())
         self.assertEqual(3, net.get_next_node_id())
 
+    def test_add_citation(self):
+        net = NiceCXNetwork()
+        cite = net.add_citation(1, title='title',
+                                contributor='contributor',
+                                identifier='identifier',
+                                type='type',
+                                description='description',
+                                attributes='attributes')
+        self.assertEqual({'@id': 1,
+                          'attributes': 'attributes',
+                          'dc:contributor': 'contributor',
+                          'dc:description': 'description',
+                          'dc:identifier': 'identifier',
+                          'dc:title': 'title',
+                          'dc:type': 'type'}, cite)
 
     def test_get_nodes(self):
         net = NiceCXNetwork()
@@ -399,11 +398,11 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0], (0, {'@id': 0, 'n': 'foo', 'r': 'foo'}))
 
         # add another node
-        net.create_node('bar')
+        net.create_node('bar', node_represents='bar_rep')
         res = list(net.get_nodes())
         self.assertEqual(2, len(res))
         self.assertEqual(res[0], (0, {'@id': 0, 'n': 'foo', 'r': 'foo'}))
-        self.assertEqual(res[1], (1, {'@id': 1, 'n': 'bar', 'r': 'bar'}))
+        self.assertEqual(res[1], (1, {'@id': 1, 'n': 'bar', 'r': 'bar_rep'}))
 
     def test_get_edges(self):
         net = NiceCXNetwork()

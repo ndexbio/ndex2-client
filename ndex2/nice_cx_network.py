@@ -33,7 +33,6 @@ class NiceCXNetwork():
     def __init__(self, **attr):
 
         self.metadata = {}
-        self.context = []
         self.nodes = {}
         self.node_int_id_generator = 0
         self.edge_int_id_generator = 0
@@ -402,26 +401,10 @@ class NiceCXNetwork():
     def set_namespaces(self, ns):
         self.set_context(ns)
 
-        # TODO - uncomment the following when the web app supports context located in the network attributes
-        #if isinstance(ns, list):
-        #    add_this_context = {}
-        #    for c in ns:
-        #        for k, v in c.items():
-        #            add_this_context[k] = v
-        #    self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
-        #elif isinstance(ns, dict):
-        #    self.add_network_attribute(name='@context', values=json.dumps(ns), type='string')
-        #else:
-        #    raise Exception('Namespace must be of type dict or list')
-
     def get_namespaces(self,):
-        for n_a in self.networkAttributes:
-            if n_a.get('n') == '@context':
-                return json.loads(n_a['v'])
+        return self.get_context()
 
-        return None
-
-    def get_edges (self):
+    def get_edges(self):
         """
         Returns an iterator over edge ids as keys and edge objects as values.
 
@@ -952,7 +935,8 @@ class NiceCXNetwork():
 
     def get_context(self):
         """
-        Get the @context information of the network.  This information maps namespace prefixes to their defining URIs
+        Get the @context information of the network.  This information
+        maps namespace prefixes to their defining URIs
 
         Example:
 
@@ -961,45 +945,45 @@ class NiceCXNetwork():
         :return: context object
         :rtype: dict
         """
+        for n_a in self.networkAttributes:
+            if n_a.get('n') == '@context':
+                return json.loads(n_a['v'])
 
-        return self.context
-
-        # TODO uncomment when context is fixed on web app ---
-        #for n_a in self.networkAttributes:
-        #    if n_a.get('n') == '@context':
-        #        return json.loads(n_a['v'])
-
-        #return None
+        return None
 
     def set_context(self, context):
         """
-        Set the @context information of the network.  This information maps namespace prefixes to their defining URIs
+        Set the @context information of the network.  This information
+        maps namespace prefixes to their defining URIs
 
         Example:
 
-            ``set_context({'pmid': 'https://www.ncbi.nlm.nih.gov/pubmed/'})``
+        .. code-block:: python
+            from ndex2.nice_cx_network import NiceCXNetwork
+
+            net = NiceCXNetwork()
+            net.set_context({'pmid': 'https://www.ncbi.nlm.nih.gov/pubmed/'})
 
 
-        :param context: dict of name, URI pairs
-        :type context: dict
+        :param context: dict where key is name and value is URI or list of those
+                        dict objects
+        :type context: dict or list
+        :raises NDExError: If **context** is not of type :py:`list` or :py:`dict`
         :return: None
         :rtype: none
         """
         if isinstance(context, list):
-            self.context = context
-
             add_this_context = {}
             for c in context:
                 for k, v in c.items():
                     add_this_context[k] = v
-            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(add_this_context), type='string')
+            self.add_network_attribute(name='@context',
+                                       values=json.dumps(add_this_context))
         elif isinstance(context, dict):
-            self.context = [context]
-
-            # TODO uncomment when context is fixed on web app --- self.add_network_attribute(name='@context', values=json.dumps(context), type='string')
+            self.add_network_attribute(name='@context',
+                                       values=json.dumps(context))
         else:
-            raise Exception('Context provided is not of type list or dict')
-
+            raise NDExError('Context provided is not of type list or dict')
 
     def get_metadata(self):
         """
@@ -1659,18 +1643,22 @@ class NiceCXNetwork():
 
         return self.nodes.iteritems(), self.edges.iteritems()
 
-    def to_networkx(self, mode='legacy'):
+    def to_networkx(self, mode='default'):
         """
         Returns a NetworkX ``Graph()`` object or one of its subclasses
         based on the network.
         The `mode` parameter dictates how the translation occurs.
 
+        .. versionchanged:: 3.5.0
+           Default value for **mode** parameter switched from
+           ``legacy`` to ``default``
+
+
         This method currently supports the following mode values:
 
         .. warning::
 
-            For backwards compatibility `mode` is set to **legacy**
-            but there are known bugs in this implementation when
+            **legacy** mode has known bugs when
             networkx 2.0+ or greater is installed.
 
             See the description on **legacy** mode below for more information.
@@ -1709,10 +1697,8 @@ class NiceCXNetwork():
             graph = nice_cx.to_networkx(mode='default')
 
             # returns networkx graph using legacy implementation
-            graph = nice_cx.to_networkx()
+            graph = nice_cx.to_networkx(mode='legacy)
 
-            # returns networkx graph using legacy implementation
-            graph = nice_cx.to_networkx()
 
         :param mode: Since translation to networkx can be done in many ways this mode lets
                      the caller dictate the method.
@@ -1798,25 +1784,29 @@ class NiceCXNetwork():
     def __str__(self):
         return 'nodes: %d \n edges: %d' % (len(self.nodes), len(self.edges)) #f'nodes: {len(self.nodes)} edges: {len(self.edges)}'
 
-    def to_cx(self):
+    def to_cx(self, log_to_stdout=True):
         """
         Return the CX corresponding to the network.
 
+        .. versionchanged:: 3.5.0
+           Added **log_to_stdout** param which lets caller silence
+           print statement *Generating CX*
+
+        :param log_to_stdout: If ``True`` then code will output to
+                              standard out *Generating CX*
+        :type log_to_stdout: bool
         :return: CX representation of the network
         :rtype: CX (list of dict aspects)
         """
-
-        #TODO - when server is compatible remove numberVerification and alter metadata insert() to position 0
         output_cx = [{"numberVerification": [{"longNumber": 281474976710655}]}]
 
-        print('Generating CX')
+        if log_to_stdout is not None and log_to_stdout is True:
+            print('Generating CX')
 
         #=====================================================
         # IF THE @ID IS NOT NUMERIC WE NEED TO CONVERT IT TO
         # INT BY USING THE INDEX OF THE NON-NUMERIC VALUE
         #=====================================================
-        if self.context:
-            output_cx.append(self.generate_aspect('@context'))
         if self.nodes:
             output_cx.append(self.generate_aspect('nodes'))
         if self.edges:
@@ -1871,7 +1861,8 @@ class NiceCXNetwork():
         return output_cx
 
     def generate_aspect(self, aspect_name):
-        core_aspect = ['nodes', 'edges','networkAttributes', 'nodeAttributes', 'edgeAttributes', 'metaData', '@context', 'citations', 'supports']
+        core_aspect = ['nodes', 'edges', 'networkAttributes', 'nodeAttributes',
+                       'edgeAttributes', 'metaData', 'citations', 'supports']
         aspect_element_array = []
         element_count = 0
         element_id_max = 0
@@ -1884,9 +1875,6 @@ class NiceCXNetwork():
             use_this_aspect = self.string_to_aspect_object(aspect_name)
 
         if use_this_aspect is not None:
-
-
-
             if isinstance(use_this_aspect, dict):
                 if aspect_name in ['nodes', 'edges']:
                     for k, asp in use_this_aspect.items():
@@ -1990,60 +1978,39 @@ class NiceCXNetwork():
                 if cg > consistency_group:
                     consistency_group = cg
 
-            consistency_group += 1 # bump the consistency group up by one
+            consistency_group += 1  # bump the consistency group up by one
 
             for mi_k, mi_v in self.metadata.items():
-                #print mi_k
-                #print mi_v
                 mi_v.set_consistency_group(consistency_group)
 
     def generate_metadata(self, G, unclassified_cx):
-        #if self.metadata:
-        #    for k, v in self.metadata.iteritems():
-
 
         return_metadata = []
         consistency_group = 1
-        if(self.metadata_original is not None):
+        if self.metadata_original is not None:
             for mi in self.metadata_original:
-                if(mi.get("consistencyGroup") is not None):
-                    if(mi.get("consistencyGroup") > consistency_group):
+                if mi.get("consistencyGroup" is not None):
+                    if mi.get("consistencyGroup") > consistency_group:
                         consistency_group = mi.get("consistencyGroup")
                 else:
                     mi['consistencyGroup'] = 0
+            consistency_group += 1  # bump the consistency group up by one
 
-            consistency_group += 1 # bump the consistency group up by one
-
-            #print("consistency group max: " + str(consistency_group))
-
-        # ========================
-        # @context metadata
-        # ========================
-        #if self.context: # REPLACED BY NETWORK ATTRIBUTE: @context
-        #    return_metadata.append(
-        #        {
-        #            "consistencyGroup": consistency_group,
-        #            "elementCount": 1,
-        #            "name": "@context",
-        #            "properties": [],
-        #            "version": "1.0"
-        #        }
-        #    )
 
         #========================
         # Nodes metadata
         #========================
         node_ids = [n[0] for n in G.nodes_iter(data=True)]
-        if(len(node_ids) < 1):
+        if len(node_ids) < 1:
             node_ids = [0]
         return_metadata.append(
             {
-                "consistencyGroup" : consistency_group,
-                "elementCount" : len(node_ids),
+                "consistencyGroup": consistency_group,
+                "elementCount": len(node_ids),
                 "idCounter": max(node_ids),
-                "name" : "nodes",
-                "properties" : [ ],
-                "version" : "1.0"
+                "name": "nodes",
+                "properties": [],
+                "version": "1.0"
             }
         )
 
@@ -2051,30 +2018,30 @@ class NiceCXNetwork():
         # Edges metadata
         #========================
         edge_ids = [e[2]for e in G.edges_iter(data=True, keys=True)]
-        if(len(edge_ids) < 1):
+        if len(edge_ids) < 1:
             edge_ids = [0]
         return_metadata.append(
             {
-                "consistencyGroup" : consistency_group,
-                "elementCount" : len(edge_ids),
+                "consistencyGroup": consistency_group,
+                "elementCount": len(edge_ids),
                 "idCounter": max(edge_ids),
-                "name" : "edges",
-                "properties" : [ ],
-                "version" : "1.0"
+                "name": "edges",
+                "properties": [],
+                "version": "1.0"
             }
         )
 
         #=============================
         # Network Attributes metadata
         #=============================
-        if(len(G.graph) > 0):
+        if len(G.graph) > 0:
             return_metadata.append(
                 {
-                    "consistencyGroup" : consistency_group,
-                    "elementCount" : len(G.graph),
-                    "name" : "networkAttributes",
-                    "properties" : [ ],
-                    "version" : "1.0"
+                    "consistencyGroup": consistency_group,
+                    "elementCount": len(G.graph),
+                    "name": "networkAttributes",
+                    "properties": [],
+                    "version": "1.0"
                 }
             )
 
@@ -2083,20 +2050,20 @@ class NiceCXNetwork():
         #===========================
         #id_max = 0
         attr_count = 0
-        for node_id , attributes in G.nodes_iter(data=True):
+        for node_id, attributes in G.nodes_iter(data=True):
             for attribute_name in attributes:
                 if attribute_name != "name" and attribute_name != "represents":
                     attr_count += 1
 
-        if(attr_count > 0):
+        if attr_count > 0:
             return_metadata.append(
                 {
-                    "consistencyGroup" : consistency_group,
-                    "elementCount" : attr_count,
+                    "consistencyGroup": consistency_group,
+                    "elementCount": attr_count,
                     #"idCounter": id_max,
-                    "name" : "nodeAttributes",
-                    "properties" : [ ],
-                    "version" : "1.0"
+                    "name": "nodeAttributes",
+                    "properties": [],
+                    "version": "1.0"
                 }
             )
 
@@ -2284,10 +2251,10 @@ class NiceCXNetwork():
                    or aspect_type == "@context"):
                     return_metadata.append(
                         {
-                            "consistencyGroup" : consistency_group,
-                            "elementCount":len(asp[aspect_type]),
-                            "name":aspect_type,
-                            "properties":[]
+                            "consistencyGroup": consistency_group,
+                            "elementCount": len(asp[aspect_type]),
+                            "name": aspect_type,
+                            "properties": []
                          }
                     )
             except Exception as e:
@@ -2296,10 +2263,20 @@ class NiceCXNetwork():
         return [{'metaData': return_metadata}]
 
     def string_to_aspect_object(self, aspect_name):
+        """
+        Given an aspect name via **aspect_name**
+        this method returns the corresponding aspect
+        object
+
+        .. versionchanged:: 3.5.0
+           ``@context`` aspect removed
+
+        :param aspect_name: name of aspect
+        :type aspect_name: str
+        :return: Aspect object or None
+        """
         if aspect_name == 'metaData':
             return self.metadata
-        elif aspect_name == '@context':
-            return self.context
         elif aspect_name == 'nodes':
             return self.nodes
         elif aspect_name == 'edges':
@@ -2460,6 +2437,10 @@ class NetworkXFactory(object):
         Examines the `nice_cx_network` extracting the content of
         the opaque aspect :py:const:`~ndex2.constants.CARTESIAN_LAYOUT_ASPECT`
 
+        .. versionchanged:: 3.5.0
+           code now inverts value of y coordinate
+           so position is correct in networkx
+
         If data is found in above aspect, then this method iterates through the
         list of values which is assumed to be a dictionary of node ids
         with coordinates as seen here::
@@ -2499,7 +2480,7 @@ class NetworkXFactory(object):
         networkx_graph.pos = {}
         for coord in cl:
             ctuple = (coord.get(constants.LAYOUT_X),
-                      coord.get(constants.LAYOUT_Y))
+                      -coord.get(constants.LAYOUT_Y))
             networkx_graph.pos[coord.get(constants.LAYOUT_NODE)] = ctuple
 
     def add_network_attributes_from_nice_cx_network(self, nice_cx_network,
@@ -2738,7 +2719,6 @@ class DefaultNetworkXFactory(NetworkXFactory):
         name as found in the input network. The value is directly set
         as it was found in input network (could be single object or list)
 
-
         For edges:
 
         Each edge is added setting the source to the value of
@@ -2749,9 +2729,10 @@ class DefaultNetworkXFactory(NetworkXFactory):
         Any edge attributes named :py:const:`~ndex2.constants.EDGE_INTERACTION`
         are renamed 'interaction' and stored as an attribute for the edge
 
-        If the value of an edge attribute is a list then the list values
-        are turned into a string separated by a comma and then enclosed
-        by double quotes.
+        .. versionchanged:: 3.5.0
+            If the value of an edge attribute is a list then the value
+            is set directly in the graph as is as opposed to being converted
+            into a comma delimited string
 
         Coordinates are copied in manner described here:
         :py:func:`~NetworkXFactory.copy_cartesian_coords_into_graph`
@@ -2832,11 +2813,7 @@ class DefaultNetworkXFactory(NetworkXFactory):
             add_this_dict['interaction'] = v.get(constants.EDGE_INTERACTION)
             if e_a is not None:
                 for e_a_item in e_a:
-                    if isinstance(e_a_item.get('v'), list):
-                        add_this_dict[e_a_item.get('n')] = ','.join(str(e) for e in e_a_item.get('v'))
-                        add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
-                    else:
-                        add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
+                    add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
 
             self.add_edge(graph, v[constants.EDGE_SOURCE],
                           v[constants.EDGE_TARGET],

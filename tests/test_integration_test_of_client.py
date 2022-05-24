@@ -118,11 +118,9 @@ class TestClientIntegration(unittest.TestCase):
                 self.assertTrue('uniprot knowledgebase:Q8N158' in node_dict[1]['v']['alias'])
             elif cur_aspect == 'networkAttributes':
                 self.assertEqual(1, len(frag[cur_aspect]))
-                # so @context opaque aspect is ignored in v3.4.0 and earlier
-                # hence the check for 8 or 9
-                # https://github.com/ndexbio/ndex2-client/issues/88
-                self.assertTrue(len(frag[cur_aspect][0].keys()) == 8 or
-                                len(frag[cur_aspect][0].keys()) == 9)
+                # @context aspect if found is converted to network attribute hence
+                # the 9 count. This occurs in version 3.5.0 and newer
+                self.assertTrue(len(frag[cur_aspect][0].keys()) == 9, frag[cur_aspect][0].keys())
             elif cur_aspect == 'edges':
                 self.assertEqual(1, len(frag[cur_aspect]))
                 self.assertEqual(0, frag[cur_aspect][0]['id'])

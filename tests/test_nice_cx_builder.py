@@ -260,6 +260,23 @@ class TestNiceCXBuilder(unittest.TestCase):
                          builder._infer_data_type([1],
                                                   split_string=True))
 
+    def test_set_context(self):
+        # set context as list
+        builder = NiceCXBuilder()
+        builder.set_context([{'a': 'a_url', 'b': 'b_url'}])
+
+        res = builder.get_nice_cx()
+        self.assertEqual({'a': 'a_url',
+                          'b': 'b_url'}, res.get_context())
+
+        # set context as dict
+        builder = NiceCXBuilder()
+        builder.set_context({'a': 'a_url', 'b': 'b_url'})
+
+        res = builder.get_nice_cx()
+        self.assertEqual({'a': 'a_url',
+                          'b': 'b_url'}, res.get_context())
+
 
 
 

@@ -24,7 +24,6 @@ known_aspects = [
     'nodeSupports',
     'edgeSupports',
     'cartesianLayout',
-    '@context',
     'cyVisualProperties',
     'visualProperties'
     ]
@@ -32,7 +31,6 @@ known_aspects = [
 known_aspects_min = [
     'nodes',
     'edges',
-    '@context',
     'nodeAttributes',
     'edgeAttributes',
     'networkAttributes',

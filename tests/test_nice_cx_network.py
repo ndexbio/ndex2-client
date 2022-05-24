@@ -125,7 +125,6 @@ class TestNiceCXNetwork(unittest.TestCase):
         net_cx.set_name(None)
         self.assertEqual(None, net_cx.get_name())
 
-
     def test_create_edge_with_int_for_edge_ids(self):
         net = NiceCXNetwork()
         net.create_edge(edge_source=0, edge_target=1)
@@ -329,6 +328,16 @@ class TestNiceCXNetwork(unittest.TestCase):
         res = net.get_network_attribute('foo')
         self.assertEqual('integer', res['d'])
 
+    def test_get_network_attribute(self):
+        net = NiceCXNetwork()
+        self.assertEqual(None, net.get_network_attribute('foo'))
+
+        net.add_network_attribute('foo', 'blah')
+
+        self.assertEqual({'n': 'foo',
+                          'v': 'blah'},
+                         net.get_network_attribute('foo'))
+
     def test_get_network_attribute_names(self):
         net = NiceCXNetwork()
 
@@ -359,6 +368,22 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertTrue('bah' in res)
         for x in range(50):
             self.assertTrue('attr' + str(x) in res)
+
+        # try with attribute lacking constants.NET_ATTR_NAME
+        net = NiceCXNetwork()
+        net.networkAttributes = [{'bad': 'blah'}]
+        net.add_network_attribute('foo')
+        res = list(net.get_network_attribute_names())
+        self.assertEqual(1, len(res))
+        self.assertTrue('foo' in res)
+
+    def test_get_nex_node_id(self):
+        net = NiceCXNetwork()
+        self.assertEqual(0, net.get_next_node_id())
+        self.assertEqual(1, net.get_next_node_id())
+        self.assertEqual(2, net.get_next_node_id())
+        self.assertEqual(3, net.get_next_node_id())
+
 
     def test_get_nodes(self):
         net = NiceCXNetwork()
@@ -645,11 +670,52 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(2, len(g))
 
     def test_to_networkx_simple_graph_default_mode(self):
-        net = NiceCXNetwork(mode='default')
+        net = NiceCXNetwork()
         net.set_name('mynetwork')
         net.create_node('node0')
         net.create_node('node1')
         net.create_edge(edge_source=0, edge_target=1)
-        g = net.to_networkx()
+        g = net.to_networkx(mode='default')
         self.assertEqual(g.graph['name'], 'mynetwork')
         self.assertEqual(2, len(g))
+
+    def test_get_context_empty_network(self):
+        net = NiceCXNetwork()
+        self.assertEqual(None, net.get_context())
+
+    def test_get_namespaces(self):
+        net = NiceCXNetwork()
+        net.set_namespaces({'foo': 'https://www/foo.com'})
+        self.assertEqual({'foo': 'https://www/foo.com'},
+                         net.get_namespaces())
+        self.assertEqual({'foo': 'https://www/foo.com'},
+                         net.get_context())
+
+    def test_get_context_(self):
+        net = NiceCXNetwork()
+        net.set_context({'foo': 'https://www/foo.com'})
+        self.assertEqual({'foo': 'https://www/foo.com'},
+                         net.get_context())
+        self.assertEqual({'foo': 'https://www/foo.com'},
+                         net.get_namespaces())
+
+    def test_add_name_space(self):
+        net = NiceCXNetwork()
+        net.add_name_space('blah', 'https://blah.com')
+        self.assertEqual({'blah': 'https://blah.com'},
+                         net.get_context())
+        self.assertEqual({'blah': 'https://blah.com'},
+                         net.get_namespaces())
+
+        net.add_name_space('foo', 'https://foo')
+
+        self.assertEqual({'blah': 'https://blah.com',
+                          'foo': 'https://foo'},
+                         net.get_context())
+        self.assertEqual({'blah': 'https://blah.com',
+                          'foo': 'https://foo'},
+                         net.get_namespaces())
+
+
+
+

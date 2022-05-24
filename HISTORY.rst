@@ -22,6 +22,9 @@ History
   Issues `#83 <https://github.com/ndexbio/ndex2-client/issues/83>`__,
   `#90 <https://github.com/ndexbio/ndex2-client/issues/90>`__
 
+* Fixed bug where converting NiceCXNetwork to networkx and back does not handle
+  name attribute correctly. `Issue #84 <https://github.com/ndexbio/ndex2-client/issues/84>`__
+
 * Fixed bug where Y coordinates of nodes would be inverted when converting to/from
   networkx from `NiceCXNetwork`. This was due to differences in coordinate systems
   between networkx and `NiceCXNetwork`
@@ -32,6 +35,10 @@ History
 * `DefaultNetworkXFactory` networkx converter (used by `NiceCXNetwork.to_networkx()`)
   no longer converts edge attributes that are of type list into strings delimited by
   commas
+
+* Removed unused test methods from internal class `NiceCXBuilder`:
+  `load_aspect(), stream_aspect(), stream_aspect_raw()`
+
 
 
 3.4.0 (2021-05-06)

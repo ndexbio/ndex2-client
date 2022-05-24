@@ -29,6 +29,10 @@ History
   networkx from `NiceCXNetwork`. This was due to differences in coordinate systems
   between networkx and `NiceCXNetwork`
 
+* Fixed bug where `@context` was lost if it was set as aspect in CX format and loaded
+  into NiceCXNetwork object.
+  `Issue #88 <https://github.com/ndexbio/ndex2-client/issues/88>`__
+
 * **mode** parameter in `NiceCXNetwork.to_networkx()` is now set to ``default`` which
   is using the updated `DefaultNetworkXFactory` networkx converter
 

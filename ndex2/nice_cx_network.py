@@ -951,6 +951,12 @@ class NiceCXNetwork:
         aspect elements. If aspect_elements is `None`, the
         aspect is removed.
 
+        .. versionchanged:: 3.5.0
+           Fixed bug where passing `None` in `aspect_elements` did
+           **NOT** remove aspect. Code also now raises
+           :py:class:`~ndex2.exceptions.NDExError` if input values are
+           invalid
+
         .. code-block:: python
 
             from ndex2.nice_cx_network import NiceCXNetwork
@@ -966,11 +972,14 @@ class NiceCXNetwork:
         :type aspect_name: str
         :param aspect_elements: Aspect element
         :type aspect_elements: list of dict or dict
-        :raises NDExError: If `aspect_elements` is not `None`,
+        :raises NDExError: If `aspect_name` is `None`, or if
+                           `aspect_elements` is not `None`,
                            :py:class:`dict`, or :py:class:`list`
         :return: None
         :rtype: none
         """
+        if aspect_name is None:
+            raise NDExError('aspect_name is None')
         if aspect_elements is None:
             self.remove_opaque_aspect(aspect_name)
             return

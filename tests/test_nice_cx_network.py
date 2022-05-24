@@ -732,6 +732,12 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual({},
                          net.get_opaque_aspect_table())
 
+        # see if setting None, None does anything
+        try:
+            net.set_opaque_aspect(None, None)
+            self.fail('Expected NDExError')
+        except NDExError as ne:
+            self.assertEqual('aspect_name is None', str(ne))
 
     def test_add_name_space(self):
         net = NiceCXNetwork()

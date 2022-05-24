@@ -70,6 +70,9 @@ History
   string upon success.
   `Issue #82 <https://github.com/ndexbio/ndex2-client/issues/82>`__
 
+* Fixed bug in `NiceCXNetwork.set_opaque_aspect()` where passing `None` in the **aspect_elements**
+  parameter raised an error instead of removing the aspect
+
 * Added `Ndex2.get_user_by_id()` method to get user information by NDEx user Id.
 
 * Added `Ndex2.get_id_for_user()` method to get NDEx user Id by username.

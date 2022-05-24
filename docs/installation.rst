@@ -22,7 +22,7 @@ If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
 
 .. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
+.. _Python installation guide: https://docs.python-guide.org/en/latest/starting/installation/
 
 
 From sources

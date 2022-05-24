@@ -355,10 +355,8 @@ def create_nice_cx_from_raw_cx(cx):
     for ae in (o for o in niceCxBuilder.get_frag_from_list_by_key(cx, 'metaData')):
         available_aspects.append(ae.get('name'))
 
-
     opaque_aspects = set(available_aspects).difference(known_aspects_min)
-    print('\t\t\t\t\t available ' + str(available_aspects))
-    print('\t\t\t\t\t opaque ' + str(opaque_aspects))
+
     # ====================
     # NETWORK ATTRIBUTES
     # ====================

@@ -22,7 +22,7 @@ else:
     from urllib2 import urlopen, Request, HTTPError, URLError
 
 
-class NiceCXNetwork():
+class NiceCXNetwork:
 
     VISUAL_PROPERTIES = 'visualProperties'
     CY_VISUAL_PROPERTIES = 'cyVisualProperties'
@@ -874,6 +874,7 @@ class NiceCXNetwork():
         Example:
 
         .. code-block:: python
+
             from ndex2.nice_cx_network import NiceCXNetwork
 
             net = NiceCXNetwork()
@@ -883,7 +884,7 @@ class NiceCXNetwork():
         :param context: dict where key is name and value is URI or list of those
                         dict objects
         :type context: dict or list
-        :raises NDExError: If **context** is not of type :py:`list` or :py:`dict`
+        :raises NDExError: If **context** is not of type :py:class:`list` or :py:class:`dict`
         :return: None
         :rtype: none
         """

@@ -14,6 +14,9 @@ import logging
 
 from ndex2.client import Ndex2
 from ndex2.exceptions import NDExError
+from ndex2.exceptions import NDExNotFoundError
+from ndex2.exceptions import NDExUnauthorizedError
+
 from ndex2 import constants
 
 if sys.version_info.major == 3:
@@ -29,6 +32,7 @@ class NiceCXNetwork:
     PROPERTIES_OF = 'properties_of'
     PROPS_OF_NODES = 'nodes'
     PROPS_OF_EDGES = 'edges'
+    META_DATA = 'metaData'
 
     def __init__(self, **attr):
 
@@ -656,58 +660,24 @@ class NiceCXNetwork:
         """
         Set an attribute of the network
 
-        Example:
+        .. code-block:: python
 
-            ``set_network_attribute(name='networkType', values='Genetic interactions')``
+            from ndex2.nice_cx_network import NiceCXNetwork
+
+            net = NiceCXNetwork()
+            net.set_network_attribute(name='networkType', values='Genetic interactions')
 
         :param name: Attribute name
-        :type name: string
+        :type name: str
         :param values: The values of the attribute
-        :type values: list, string, double or int
+        :type values: list, str, float, or int
         :param type: The datatype of the attribute values.  See `Supported data types`_
         :type type: str
         :return: None
         :rtype: none
         """
-        subnetwork = None
-        #TODO add support for subnetworks
-        found_attr = False
-        for n_a in self.networkAttributes:
-            if n_a.get('n') == name:
-                n_a['v'] = values
-                if type is not None:
-                    if type == 'float':
-                        type = 'double'
-                    elif type == 'list_of_float':
-                        type = 'list_of_double'
-                    n_a['d'] = type
-
-                if subnetwork:
-                    n_a['s'] = subnetwork
-
-                found_attr = True
-
-                break
-
-        if not found_attr:
-            if type is not None:
-                if type == 'float':
-                    type = 'double'
-                elif type == 'list_of_float':
-                    type = 'list_of_double'
-
-                net_attr = {
-                    'n': name,
-                    'v': values,
-                    'd': type
-                }
-            else:
-                net_attr = {
-                    'n': name,
-                    'v': values
-                }
-
-            self.networkAttributes.append(net_attr)
+        return self.add_network_attribute(name, values=values,
+                                          type=type)
 
     def set_edge_attribute(self, edge, attribute_name, values, type=None):
         """
@@ -1069,7 +1039,9 @@ class NiceCXNetwork:
     def _remove_node_and_edge_specific_visual_properties(self, vis_aspect):
         """
         Removes node and edge specific visual properties
-        :return:
+
+        :return: **vis_aspect* with node and edge
+        :rtype: list
         """
         if vis_aspect is None:
             return vis_aspect
@@ -1134,17 +1106,20 @@ class NiceCXNetwork:
         setting the new data to :py:const:`~.NiceCXNetwork.CY_VISUAL_PROPERTIES`
         aspect
 
-        :param visual_props_aspect:
-        :return:
+        :param visual_props_aspect: visual properties aspect
+        :type visual_props_aspect: list
+        :raises TypeError: If **visual_props_aspect** is `None`
+        :return: None
         """
         if visual_props_aspect is None:
             raise TypeError('Visual Properties aspect is None')
 
         self._delete_deprecated_visual_properties_aspect()
 
-        self.set_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES, visual_props_aspect)
+        self.set_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES,
+                               visual_props_aspect)
         mde = {
-            'name': 'cyVisualProperties',
+            'name': NiceCXNetwork.CY_VISUAL_PROPERTIES,
             'elementCount': len(visual_props_aspect),
             'version': "1.0",
             'consistencyGroup': 1,
@@ -1154,22 +1129,38 @@ class NiceCXNetwork:
 
     def apply_template(self, server, uuid, username=None, password=None):
         """
-        Applies the Cytoscape visual properties of a network from the provideduuid to this network.
+        Applies the Cytoscape visual properties of a network from the provided
+        uuid to this network.
 
-        This allows the use of networks formatted in Cytoscape as templates to apply visual styles to other networks.
+        This allows the use of networks formatted in Cytoscape as templates to apply
+        visual styles to other networks.
 
-        Example:
+        .. versionchanged:: 3.5.0
+           Fixed bug where style from template were appended to style
+           on this network instead of performing a replacement. In most cases, method
+           now raises NDExError and subclasses instead of more generic Exception
 
-            ``nice_cx.apply_template('public.ndexbio.org', '51247435-1e5f-11e8-b939-0ac135e8bacf')``
+        .. code-block:: python
+
+            from ndex2.nice_cx_network import NiceCXNetwork
+
+            nice_cx = NiceCXNetwork()
+            nice_cx.apply_template('public.ndexbio.org',
+                                   '51247435-1e5f-11e8-b939-0ac135e8bacf')
 
         :param server: server host name (i.e. public.ndexbio.org)
-        :type server: string
+        :type server: str
         :param username: username (optional - used when accessing private networks)
-        :type username: string
+        :type username: str
         :param password: password (optional - used when accessing private networks)
-        :type password:  string
+        :type password:  str
         :param uuid: uuid of the styled network
-        :type uuid: string
+        :type uuid: str
+        :raises NDExError: Raised if *server* or *uuid* not set or if metaData is not found
+                           in the network specified by *uuid* or some other server error
+        :raises NDExUnauthorizedError: If credentials not authorized to access network
+                                       specified by *uuid*
+        :raises NDExNotFoundError: If network with *uuid* not found
         :return: None
         :rtype: None
         """
@@ -1179,64 +1170,39 @@ class NiceCXNetwork:
         if not uuid:
             error_message.append('uuid')
 
-        if server and uuid:
-            #===================
-            # METADATA
-            #===================
-            available_aspects = []
-            metadata_return = self.get_aspect(uuid, 'metaData', server, username, password)
-            if metadata_return is None:
-                raise Exception('Template not found %s.' % uuid)
+        if len(error_message) > 0:
+            raise NDExError(', '.join(error_message) +
+                            ' not specified in apply_template')
 
-            for ae in (o for o in self.get_aspect(uuid, 'metaData', server, username, password)):
-                available_aspects.append(ae.get('name'))
+        # ===================
+        # METADATA
+        # ===================
+        available_aspects = []
+        metadata_return = self.get_aspect(uuid, NiceCXNetwork.META_DATA,
+                                          server, username, password)
 
-            #=======================
-            # ADD VISUAL PROPERTIES
-            #=======================
-            for oa in available_aspects:
-                if 'visualProperties' in oa:
-                    objects = self.get_aspect(uuid, 'visualProperties', server, username, password)
-                    obj_items = (o for o in objects)
-                    for oa_item in obj_items:
-                        aspectElmts = self.opaqueAspects.get(oa)
-                        if aspectElmts is None:
-                            aspectElmts = []
-                            self.opaqueAspects['cyVisualProperties'] = aspectElmts # ALWAYS USE cyVisualProperties
+        if metadata_return is None:
+            raise NDExError('Template not found %s.' % uuid)
 
-                        aspectElmts.append(oa_item)
+        for ae in (o for o in metadata_return):
+            available_aspects.append(ae.get('name'))
 
-                    mde = {
-                        'name': 'cyVisualProperties',
-                        'elementCount': len(aspectElmts),
-                        'version': "1.0",
-                        'consistencyGroup': 1,
-                        'properties': []
-                    }
-                    self.metadata['visualProperties'] = mde
-
-                if 'cyVisualProperties' in oa:
-                    objects = self.get_aspect(uuid, 'cyVisualProperties', server, username, password)
-                    obj_items = (o for o in objects)
-                    for oa_item in obj_items:
-                        aspectElmts = self.opaqueAspects.get(oa)
-                        if aspectElmts is None:
-                            aspectElmts = []
-                            self.opaqueAspects[oa] = aspectElmts
-
-                        aspectElmts.append(oa_item)
-
-                    mde = {
-                              'name': 'cyVisualProperties',
-                              'elementCount': len(aspectElmts),
-                              'version': "1.0",
-                              'consistencyGroup': 1,
-                              'properties': []
-                          }
-                    self.metadata['cyVisualProperties'] = mde
-
-        else:
-            raise Exception(', '.join(error_message) + 'not specified in apply_template')
+        # =======================
+        # ADD VISUAL PROPERTIES
+        # =======================
+        for oa in available_aspects:
+            if NiceCXNetwork.VISUAL_PROPERTIES in oa or NiceCXNetwork.\
+                    CY_VISUAL_PROPERTIES in oa:
+                objects = self.get_aspect(uuid, oa, server,
+                                          username, password)
+                obj_items = (o for o in objects)
+                for oa_item in obj_items:
+                    aspect_elmts = self.opaqueAspects.get(oa)
+                    if aspect_elmts is None:
+                        aspect_elmts = []
+                        self.opaqueAspects[NiceCXNetwork.CY_VISUAL_PROPERTIES] = aspect_elmts
+                    aspect_elmts.append(oa_item)
+                self._set_visual_properties_aspect(oa_item)
 
     def get_frag_from_list_by_key(self, cx, key):
         for aspect in cx:
@@ -1247,25 +1213,75 @@ class NiceCXNetwork:
 
     def to_pandas_dataframe(self):
         """
-        Export the network as a Pandas DataFrame.
+        Network edges exported as a :py:class:`pandas.DataFrame`
 
-         Example:
+        .. versionchanged:: 3.5.0
+            Fixed bug where node and edge attributes were NOT being added to
+            the :py:class:`pandas.DataFrame`
 
-            ``df = nice_cx.to_pandas_dataframe() # df is now a pandas dataframe``
+        The following columns will be added to the :py:class:`pandas.DataFrame`:
 
-        Note: This method only processes nodes, edges, node attributes and edge attributes, but not network attributes
-        or other aspects
+        * **source** - Name of edge source node
 
-        :return: Pandas dataframe
-        :rtype: Pandas dataframe
+        * **interaction** - Interaction between source and target node
+
+        * **target** - Name of edge target node
+
+        All edge attributes will be also added as separate columns with
+        same name.
+
+        .. note::
+
+            Attributes on **source** node will be added as a columns with ``source_``
+            prefixed to name.
+
+            Attributes on **target** node will be added as columns with ``target_``
+            prefixed to name.
+
+
+
+        .. code-block:: python
+
+            from ndex2.nice_cx_network import NiceCXNetwork
+
+            net = NiceCXNetwork()
+            node_one = net.create_node('node1')
+            node_two = net.create_node('node2')
+
+            net.set_node_attribute(node_one, 'weight', 0.5, type='double')
+            net.set_node_attribute(node_two, 'weight', 0.2, type='double')
+
+            edge_one = net.create_edge(edge_source=node_one, edge_target=node_two,
+                                       edge_interaction='binds')
+
+            net.set_edge_attribute(edge_one, 'edgelabel', 'an edge')
+            df = net.to_pandas_dataframe() # df is now a pandas dataframe
+
+            print(df.head())
+
+        Output from above code block:
+
+        .. code-block:: python
+
+               source interaction target edgelabel  target_weight  source_weight
+            0  node1       binds  node2   an edge            0.2            0.5
+
+        .. note::
+
+            This method only processes nodes, edges, node attributes and
+            edge attributes, but not network attributes or other aspects
+
+        :return: Edge table with attributes
+        :rtype: :py:class:`pandas.DataFrame`
         """
-        #TODO expand documentation
         rows = []
-        edge_items = None
         if sys.version_info.major == 3:
             edge_items = self.edges.items()
         else:
             edge_items = self.edges.iteritems()
+
+        edge_attr_name_set = set()
+        node_attr_name_set = set()
 
         for k, v in edge_items:
             e_a = self.edgeAttributes.get(k)
@@ -1280,6 +1296,7 @@ class NiceCXNetwork:
                         add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
                     else:
                         add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
+                    edge_attr_name_set.add(e_a_item.get('n'))
             #================================
             # PROCESS SOURCE NODE ATTRIBUTES
             #================================
@@ -1291,6 +1308,7 @@ class NiceCXNetwork:
                         add_this_dict['source_' + s_a_item.get('n')] = '"' + add_this_dict['source_' + s_a_item.get('n')] + '"'
                     else:
                         add_this_dict['source_' + s_a_item.get('n')] = s_a_item.get('v')
+                    node_attr_name_set.add('source_' + s_a_item.get('n'))
 
             #================================
             # PROCESS TARGET NODE ATTRIBUTES
@@ -1300,25 +1318,25 @@ class NiceCXNetwork:
                 for t_a_item in t_a:
                     if isinstance(t_a_item.get('v'), list):
                         add_this_dict['target_' + t_a_item.get('n')] = ','.join(str(e) for e in t_a_item.get('v'))
-                        add_this_dict['target_' + t_a_item.get('n')] = '"' + add_this_dict['target_' + t_a_item.get('n')] + '"'
+                        add_this_dict['target_' + t_a_item.get('n')] = '"' + add_this_dict['target_' +
+                                                                                           t_a_item.get('n')] + '"'
                     else:
                         add_this_dict['target_' + t_a_item.get('n')] = t_a_item.get('v')
+                    node_attr_name_set.add('target_' + s_a_item.get('n'))
 
             if add_this_dict:
-                rows.append(dict(add_this_dict, source=self.nodes.get(v.get('s')).get('n'), target=self.nodes.get(v.get('t')).get('n'), interaction=v.get('i')))
+                rows.append(dict(add_this_dict,
+                                 source=self.nodes.get(v.get('s')).get('n'),
+                                 target=self.nodes.get(v.get('t')).get('n'),
+                                 interaction=v.get('i')))
             else:
-                rows.append(dict(source=self.nodes.get(v.get('s')).get('n'), target=self.nodes.get(v.get('t')).get('n'), interaction=v.get('i')))
+                rows.append(dict(source=self.nodes.get(v.get('s')).get('n'),
+                                 target=self.nodes.get(v.get('t')).get('n'),
+                                 interaction=v.get('i')))
 
-        nodeAttributeSourceTarget = []
-        for n_a in self.nodeAttributeHeader:
-            nodeAttributeSourceTarget.append('source_' + n_a)
-            nodeAttributeSourceTarget.append('target_' + n_a)
+        df_columns = ['source', 'interaction', 'target'] + list(edge_attr_name_set) + list(node_attr_name_set)
 
-        df_columns = ['source', 'interaction', 'target'] + list(self.edgeAttributeHeader) + nodeAttributeSourceTarget
-
-        return_df = pd.DataFrame(rows, columns=df_columns)
-
-        return return_df
+        return pd.DataFrame(rows, columns=df_columns)
 
     def add_metadata_stub(self, aspect_name):
         md = self.metadata.get(aspect_name)
@@ -1413,9 +1431,6 @@ class NiceCXNetwork:
         else:
             ndex = Ndex2(server, username, password, user_agent=user_agent)
         return ndex.save_new_network(self.to_cx())
-
-    def upload_new_network_stream(self, server, username, password):
-        raise Exception('upload_new_network_stream() is no longer supported.  Please use upload_to()')
 
     def update_to(self, uuid, server=None, username=None, password=None,
                   user_agent='', client=None):
@@ -2180,37 +2195,81 @@ class NiceCXNetwork:
             return self.supports
 
     def get_aspect(self, uuid, aspect_name, server, username, password, stream=False):
+        """
+
+        :param uuid:
+        :param aspect_name:
+        :param server:
+        :param username:
+        :param password:
+        :param stream: refers to the response not the request
+        :type stream: bool
+        :return:
+        """
         if stream:
             return self.stream_aspect(uuid, aspect_name, server, username, password)
         else:
             return self.get_stream(uuid, aspect_name, server, username, password)
 
-    # The stream refers to the Response, not the Request
     def get_stream(self, uuid, aspect_name, server, username, password):
-        if 'http' not in server:
+        """
+
+        :param uuid: Unique id of network in NDEx
+        :type uuid: str
+        :param aspect_name: aspect to stream. If `metaData` then
+                            the meta data of the network will be
+                            returned
+        :type aspect_name: str
+        :param server: Server to connect to. If value does not
+                       start with http, then http:// is prepended
+        :type server: str
+        :param username: NDEx username or None to not authenticate
+        :type username: str
+        :param password: NDEx password or None to not authenticate
+        :type password: str
+        :return:
+        :rtype:
+        """
+        if not server.lower().startswith('http'):
             server = 'http://' + server
 
         s = requests.session()
         if username and password:
-            # add credentials to the session, if available
+            #  add credentials to the session, if available
             s.auth = (username, password)
 
+        url_suffix = '/' + aspect_name
+
+        # if the metaData aspect is the aspect name
+        # it means caller just wants the meta data aspect
+        # which is obtained by omitting the aspect name
+        # from the end of the URL
         if aspect_name == 'metaData':
-            md_response = s.get(server + '/v2/network/' + uuid + '/aspect')
-            json_response = md_response.json()
-            s.close()
-            return json_response.get('metaData')
-        else:
-            aspect_response = s.get(server + '/v2/network/' + uuid + '/aspect/' + aspect_name)
+            url_suffix = ''
+
+        aspect_response = s.get(server + '/v2/network/' + uuid +
+                                '/aspect' + url_suffix)
+        if aspect_response.status_code == 401:
+            raise NDExUnauthorizedError(str(aspect_response.text))
+        if aspect_response.status_code == 404:
+            raise NDExNotFoundError(str(aspect_response.text))
+        if aspect_response.status_code > 200:
+            raise NDExError(str(aspect_response.text))
+        try:
             json_response = aspect_response.json()
-            s.close()
+            if aspect_name == 'metaData':
+                return json_response[aspect_name]
             return json_response
+        except requests.exceptions.RequestException as e:
+            raise NDExError('Error parsing JSON from server: ' +
+                            str(e))
+        finally:
+            s.close()
 
     def stream_aspect(self, uuid, aspect_name, server, username, password):
         if 'http' not in server:
             server = 'http://' + server
         if aspect_name == 'metaData':
-            print(server + '/v2/network/' + uuid + '/aspect')
 
             s = requests.session()
             if username and password:

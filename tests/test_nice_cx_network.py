@@ -818,6 +818,23 @@ class TestNiceCXNetwork(unittest.TestCase):
                           'foo': 'https://foo'},
                          net.get_namespaces())
 
+    def test_get_node_attribute_value(self):
+        net = NiceCXNetwork()
+        # non existant node
+        self.assertEqual(None, net.get_node_attribute_value(0, 'foo'))
+
+        node_one = net.create_node('foo')
+        # non existant attribute
+        self.assertEqual(None, net.get_node_attribute_value(node_one, 'foo'))
+
+        # non existant  attribute
+        net.set_node_attribute(node_one, 'blah', values='hi')
+        self.assertEqual(None, net.get_node_attribute_value(node_one, 'foo'))
+
+        # valid attribute
+        net.set_node_attribute(node_one, 'foo', values='bye')
+        self.assertEqual('bye', net.get_node_attribute_value(node_one, 'foo'))
+
     def test_apply_template_server_and_or_uuid_none(self):
         net = NiceCXNetwork()
         try:

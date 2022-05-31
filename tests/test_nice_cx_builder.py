@@ -18,7 +18,7 @@ from ndex2cx.nice_cx_builder import NiceCXBuilder
 import ndex2
 
 
-SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
+SKIP_REASON = 'NDEX2_TEST_SERVER environment variable detected, ' \
               'skipping for integration tests'
 
 

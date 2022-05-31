@@ -2260,6 +2260,9 @@ class NiceCXNetwork:
             if aspect_name == 'metaData':
                 return json_response[aspect_name]
             return json_response
+        except json.decoder.JSONDecodeError as de:
+            raise NDExError('Error parsing JSON from server: ' +
+                            str(de))
         except requests.exceptions.RequestException as e:
             raise NDExError('Error parsing JSON from server: ' +
                             str(e))

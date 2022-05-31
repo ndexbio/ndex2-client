@@ -5,24 +5,25 @@ History
 3.5.0 (TBD)
 -------------------
 
-* Added *skip_version_check* parameter to `Ndex2()` constructor to let caller
+* Added *skip_version_check* parameter to ``Ndex2()`` constructor to let caller
   optionally bypass NDEx server call to see if **v2** endpoint is supported
 
-* Added the following *CX2* methods to `NDex2()` client:
-  `get_network_as_cx2_stream()`, `get_network_aspect_as_cx2_stream()`, `save_cx2_stream_as_new_network()`,
-  `save_new_cx2_network()`, and `update_cx2_network()`
+* Added the following *CX2* methods to ``Ndex2()`` client:
+  ``get_network_as_cx2_stream()``, ``get_network_aspect_as_cx2_stream()``,
+  ``save_cx2_stream_as_new_network()``,
+  ``save_new_cx2_network()``, and ``update_cx2_network()``
   `Issue #87 <https://github.com/ndexbio/ndex2-client/issues/87>`__
 
-* In `Ndex2()` client, methods that raise ``NDExError`` exceptions from calls
+* In ``Ndex2()`` client, methods that raise ``NDExError`` exceptions from calls
   to NDEx server will now raise the more specific ``NDExUnauthorizedError``
   subclass when the response from NDEx server is a 401 aka unauthorized.
 
-* Fixed bug where creation of NiceCXNetwork from networkx via `ndex2.create_nice_cx_from_networkx()`
+* Fixed bug where creation of `NiceCXNetwork` from networkx via ``ndex2.create_nice_cx_from_networkx()``
   incorrectly set the data type for boolean values to integer.
   Issues `#83 <https://github.com/ndexbio/ndex2-client/issues/83>`__,
   `#90 <https://github.com/ndexbio/ndex2-client/issues/90>`__
 
-* Fixed bug where converting NiceCXNetwork to networkx and back does not handle
+* Fixed bug where converting `NiceCXNetwork` to networkx and back does not handle
   name attribute correctly. `Issue #84 <https://github.com/ndexbio/ndex2-client/issues/84>`__
 
 * Fixed bug where Y coordinates of nodes would be inverted when converting to/from
@@ -33,10 +34,10 @@ History
   into NiceCXNetwork object.
   `Issue #88 <https://github.com/ndexbio/ndex2-client/issues/88>`__
 
-* **mode** parameter in `NiceCXNetwork.to_networkx()` is now set to ``default`` which
+* The **mode** parameter in ``NiceCXNetwork.to_networkx()`` is now set to ``default`` which
   is using the updated `DefaultNetworkXFactory` networkx converter
 
-* `DefaultNetworkXFactory` networkx converter (used by `NiceCXNetwork.to_networkx()`)
+* `DefaultNetworkXFactory` networkx converter (used by ``NiceCXNetwork.to_networkx()``)
   no longer converts edge attributes that are of type list into strings delimited by
   commas
 
@@ -44,12 +45,15 @@ History
   `load_aspect(), stream_aspect(), stream_aspect_raw()`
 
 * Removed the following deprecated methods from `NiceCXNetwork`:
-  `add_node()`, `add_edge()`, `get_edge_attribute_object()`,
-  `get_node_attribute_objects()`, `get_edge_attribute_objects()`,
-  `add_metadata()`, `get_provenance()`, `set_provenance()`,
-  `__merge_node_attributes()`, `create_from_pandas()`,
-  `create_from_networkx()`, `create_from_server()`, `upload_new_network_stream()`, &
-  `create_from_cx()`
+  ``add_node()``, ``add_edge()``, ``get_edge_attribute_object()``,
+  ``get_node_attribute_objects()``, ``get_edge_attribute_objects()``,
+  ``add_metadata()``, ``get_provenance()``, ``set_provenance()``,
+  ``__merge_node_attributes()``, ``create_from_pandas()``,
+  ``create_from_networkx()``, ``create_from_server()``, ``upload_new_network_stream()``, &
+  ``create_from_cx()``
+
+* Fixed bug where ``NiceCXNetwork.to_pandas_dataframe()`` was not converting
+  node and edge attributes
 
 
 

@@ -885,8 +885,8 @@ class TestNiceCXNetwork(unittest.TestCase):
                                    password='badpass')
                 self.fail('Expected exception')
             except NDExError as ne:
-                self.assertEqual('Error parsing JSON from '
-                                 'server: [Errno Expecting value] : 0',
+                self.assertTrue('Error parsing JSON from '
+                                 'server' in
                                  str(ne))
 
     def test_apply_template_not_authorized(self):

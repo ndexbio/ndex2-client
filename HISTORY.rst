@@ -48,7 +48,7 @@ History
   `get_node_attribute_objects()`, `get_edge_attribute_objects()`,
   `add_metadata()`, `get_provenance()`, `set_provenance()`,
   `__merge_node_attributes()`, `create_from_pandas()`,
-  `create_from_networkx()`, `create_from_server()`, &
+  `create_from_networkx()`, `create_from_server()`, `upload_new_network_stream()`, &
   `create_from_cx()`
 
 

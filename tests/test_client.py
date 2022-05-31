@@ -25,7 +25,7 @@ from ndex2.exceptions import NDExInvalidParameterError
 from ndex2.exceptions import NDExUnsupportedCallError
 from ndex2.exceptions import NDExError
 
-SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
+SKIP_REASON = 'NDEX2_TEST_SERVER environment variable detected, ' \
               'skipping for integration tests'
 
 

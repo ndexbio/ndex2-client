@@ -13,11 +13,13 @@ import requests_mock
 from ndex2 import client
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
+from ndex2.exceptions import NDExUnauthorizedError
+from ndex2.exceptions import NDExNotFoundError
 from ndex2 import constants
 import ndex2
 
 
-SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
+SKIP_REASON = 'NDEX2_TEST_SERVER environment variable detected, ' \
               'skipping for integration tests'
 
 
@@ -292,6 +294,39 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual(res[0][constants.NODE_ATTR_NAME], 'attrname')
         self.assertEqual(res[0][constants.NODE_ATTR_VALUE], 'value2')
 
+    def test_add_edge_attribute(self):
+        net = NiceCXNetwork()
+        node_one = net.create_node('node1')
+        node_two = net.create_node('node2')
+        edge_one = net.create_edge(edge_source=node_one,
+                                   edge_target=node_two)
+
+        net.add_edge_attribute({'@id': edge_one}, 'foo',
+                               'someval')
+        res = net.get_edge_attribute(edge_one, 'foo')
+        self.assertEqual({'po': 0, 'n': 'foo',
+                          'v': 'someval'}, res)
+
+    def test_get_edge_attribute_value(self):
+        net = NiceCXNetwork()
+        node_one = net.create_node('node1')
+        node_two = net.create_node('node2')
+        edge_one = net.create_edge(edge_source=node_one,
+                                   edge_target=node_two)
+
+        net.add_edge_attribute(edge_one, 'foo',
+                               'someval')
+        res = net.get_edge_attribute_value(edge_one, 'foo')
+        self.assertEqual('someval', res)
+
+        res = net.get_edge_attribute_value(edge_one,
+                                           'doesnotexist')
+        self.assertEqual((None, None), res)
+
+    def test_get_edge_attribute_none_found(self):
+        net = NiceCXNetwork()
+        self.assertEqual((None, None), net.get_edge_attribute(0, 'foo'))
+
     def test_add_network_attribute_duplicate_add(self):
         net = NiceCXNetwork()
         net.add_network_attribute(name='foo',
@@ -307,6 +342,26 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertTrue('d' not in res)
 
         net.add_network_attribute(name='foo',
+                                  values=4,
+                                  type='integer')
+        res = net.get_network_attribute('foo')
+        self.assertEqual('integer', res['d'])
+
+    def test_set_network_attribute_duplicate_add(self):
+        net = NiceCXNetwork()
+        net.set_network_attribute(name='foo',
+                                  values=['a', 'b'],
+                                  type='list_of_string')
+        res = net.get_network_attribute('foo')
+        self.assertEqual('list_of_string', res['d'])
+
+        # add duplicate with no type
+        net.set_network_attribute(name='foo',
+                                  values=['a', 'b'])
+        res = net.get_network_attribute('foo')
+        self.assertTrue('d' not in res)
+
+        net.set_network_attribute(name='foo',
                                   values=4,
                                   type='integer')
         res = net.get_network_attribute('foo')
@@ -723,6 +778,13 @@ class TestNiceCXNetwork(unittest.TestCase):
 
     def test_set_opaque_aspect(self):
         net = NiceCXNetwork()
+        try:
+            net.set_opaque_aspect('foo', 'invalid')
+            self.fail('Expected Exception')
+        except NDExError as ne:
+            self.assertEqual('Provided aspect for foo is not of '
+                             'type <list or dict>', str(ne))
+
         net.set_opaque_aspect('foo', {'hi': 1})
         self.assertEqual({'foo': [{'hi': 1}]},
                          net.get_opaque_aspect_table())
@@ -756,6 +818,134 @@ class TestNiceCXNetwork(unittest.TestCase):
                           'foo': 'https://foo'},
                          net.get_namespaces())
 
+    def test_apply_template_server_and_or_uuid_none(self):
+        net = NiceCXNetwork()
+        try:
+            net.apply_template(None, None)
+            self.fail('Expected exeption')
+        except NDExError as ne:
+            self.assertEqual('server, uuid not '
+                             'specified in apply_template',
+                             str(ne))
 
+        try:
+            net.apply_template('foo', None)
+            self.fail('Expected exeption')
+        except NDExError as ne:
+            self.assertEqual('uuid not '
+                             'specified in apply_template',
+                             str(ne))
+
+        try:
+            net.apply_template(None, 'foo')
+            self.fail('Expected exeption')
+        except NDExError as ne:
+            self.assertEqual('server not '
+                             'specified in apply_template',
+                             str(ne))
+
+    def test_apply_template_server_error(self):
+        with requests_mock.mock() as m:
+            m.get('http://foo/v2/network/12345/aspect',
+                  status_code=500,
+                  text='error')
+            net = NiceCXNetwork()
+            try:
+                net.apply_template('foo', '12345', username='bob',
+                                   password='badpass')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertEqual('error', str(ne))
+
+    def test_apply_template_metadata_none(self):
+        with requests_mock.mock() as m:
+            m.get('http://foo/v2/network/12345/aspect',
+                  status_code=200,
+                  json=None)
+            net = NiceCXNetwork()
+            try:
+                net.apply_template('foo', '12345', username='bob',
+                                   password='badpass')
+                self.fail('Expected exception')
+            except NDExError as ne:
+                self.assertEqual('Error parsing JSON from '
+                                 'server: [Errno Expecting value] : 0',
+                                 str(ne))
+
+    def test_apply_template_not_authorized(self):
+        with requests_mock.mock() as m:
+            m.get('http://foo/v2/network/12345/aspect',
+                  status_code=401,
+                  text='error')
+            net = NiceCXNetwork()
+            try:
+                net.apply_template('foo', '12345')
+                self.fail('Expected exception')
+            except NDExUnauthorizedError as ne:
+                self.assertEqual('error', str(ne))
+
+    def test_apply_template_not_found(self):
+        with requests_mock.mock() as m:
+            m.get('http://foo/v2/network/12345/aspect',
+                  status_code=404,
+                  text='error')
+            net = NiceCXNetwork()
+            try:
+                net.apply_template('foo', '12345')
+                self.fail('Expected exception')
+            except NDExNotFoundError as ne:
+                self.assertEqual('error', str(ne))
+
+    def test_apply_template_valid(self):
+        with requests_mock.mock() as m:
+            m.get('http://foo/v2/network/12345/aspect',
+                  status_code=200,
+                  json={'metaData': [{'name': 'cyVisualProperties'}]})
+            m.get('http://foo/v2/network/12345/aspect/cyVisualProperties',
+                  status_code=200,
+                  json=[{'hi': 1}])
+            net = NiceCXNetwork()
+
+            net.apply_template('foo', '12345')
+            self.assertEqual([{'hi': 1}],
+                             net.get_opaque_aspect('cyVisualProperties'))
+
+    def test_apply_template_verify_it_overwrites_existing(self):
+        with requests_mock.mock() as m:
+            m.get('http://foo/v2/network/12345/aspect',
+                  status_code=200,
+                  json={'metaData': [{'name': 'cyVisualProperties'}]})
+            m.get('http://foo/v2/network/12345/aspect/cyVisualProperties',
+                  status_code=200,
+                  json=[{'hi': 1}])
+            net = NiceCXNetwork()
+            net.set_opaque_aspect('cyVisualProperties', [{'data': 1}])
+            net.apply_template('foo', '12345')
+            self.assertEqual([{'hi': 1}],
+                             net.get_opaque_aspect('cyVisualProperties'))
+
+    def test_to_pandas_dataframe_glypican2(self):
+        glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
+        df = glypy.to_pandas_dataframe()
+        self.assertEqual(1, len(df))
+        self.assertEqual(7, df.shape[1])
+        self.assertEqual('GPC2', df.iloc[0]['source'])
+        self.assertEqual('in-complex-with',
+                         df.iloc[0]['interaction'])
+        self.assertEqual('MDK', df.iloc[0]['target'])
+
+    def test_to_pandas_dataframe_wnt_signaling(self):
+        wnt = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
+        df = wnt.to_pandas_dataframe()
+        self.assertEqual(74, len(df))
+        self.assertEqual(15, df.shape[1])
+        self.assertEqual('LRP6', df.iloc[0]['source'], str(df.head(n=75)))
+        self.assertEqual('down-regulates activity',
+                         df.iloc[0]['interaction'])
+        self.assertEqual('GSK3B/Axin/APC', df.iloc[0]['target'])
+        self.assertEqual('MYC', df.iloc[73]['source'], str(df.head(n=75)))
+        self.assertEqual('down-regulates quantity by repression',
+                         df.iloc[73]['interaction'])
+        self.assertEqual('SFRP1', df.iloc[73]['target'])
 
 

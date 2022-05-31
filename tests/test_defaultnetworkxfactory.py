@@ -12,7 +12,7 @@ from ndex2.nice_cx_network import DefaultNetworkXFactory
 from ndex2.nice_cx_network import NetworkXFactory
 from ndex2.nice_cx_network import NiceCXNetwork
 
-SKIP_REASON = 'NDEX2_TEST_USER environment variable detected, ' \
+SKIP_REASON = 'NDEX2_TEST_SERVER environment variable detected, ' \
               'skipping for integration tests'
 
 

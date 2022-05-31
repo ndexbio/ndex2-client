@@ -13,9 +13,13 @@ import uuid
 from datetime import datetime
 
 from requests.exceptions import HTTPError
+from ndex2.exceptions import NDExError
+from ndex2.exceptions import NDExNotFoundError
+from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.client import Ndex2
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import DecimalEncoder
+import ndex2
 
 SKIP_REASON = 'NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
               'environment variables not set, cannot run integration' \
@@ -28,7 +32,6 @@ class TestNiceCXNetworkIntegration(unittest.TestCase):
     TEST_DIR = os.path.dirname(__file__)
     WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')
     GLYPICAN2_FILE = os.path.join(TEST_DIR, 'data', 'glypican2.cx')
-
 
     def get_ndex_credentials_as_tuple(self):
         """
@@ -232,3 +235,51 @@ class TestNiceCXNetworkIntegration(unittest.TestCase):
             except HTTPError:
                 pass
 
+    def test_apply_template_network_not_found(self):
+        net = NiceCXNetwork()
+        net.set_name('foo')
+        creds = self.get_ndex_credentials_as_tuple()
+        try:
+            net.apply_template(creds['server'], str(uuid.uuid4()),
+                               username=creds['user'],
+                               password=creds['password'])
+            self.fail('Expected NDExNotFoundError')
+        except NDExNotFoundError as ne:
+            self.assertTrue('NDEx_Object_Not_Found_Exception',
+                            str(ne))
+
+    def test_apply_template_network(self):
+        net = NiceCXNetwork()
+        net.set_name('foo')
+        creds = self.get_ndex_credentials_as_tuple()
+        client = self.get_ndex2_client()
+        template_net = ndex2.create_nice_cx_from_file(TestNiceCXNetworkIntegration.GLYPICAN2_FILE)
+        netname = 'ndex2-client integration test network' + str(datetime.now())
+        template_net.set_name(netname)
+        res = client.save_new_network(template_net.to_cx(), visibility='PRIVATE')
+        try:
+            self.assertTrue('http' in res)
+            netid = re.sub('^.*/', '', res)
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+
+            # verify we get the right exception for unauthorized
+            # call
+            try:
+                net.apply_template(creds['server'], netid)
+                self.fail('Expected NDExUnauthorizedError')
+            except NDExUnauthorizedError as ne:
+                self.assertTrue('NDEx_Unauthorized_Operation_Exception' in
+                                str(ne))
+
+            # okay try to apply template on valid network
+            net.apply_template(creds['server'], netid,
+                               username=creds['user'],
+                               password=creds['password'])
+            cyvis = net.get_opaque_aspect(NiceCXNetwork.VISUAL_PROPERTIES)
+            self.assertEqual(template_net.get_opaque_aspect(NiceCXNetwork.CY_VISUAL_PROPERTIES),
+                             cyvis)
+        finally:
+            # delete network
+            client.delete_network(netid)

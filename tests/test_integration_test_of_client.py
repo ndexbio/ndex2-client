@@ -58,7 +58,7 @@ class TestClientIntegration(unittest.TestCase):
                      user_agent=creds['user_agent'])
 
     def wait_for_network_to_be_ready(self, client, netid,
-                                     num_retries=3, retry_wait=0.5):
+                                     num_retries=5, retry_wait=0.5):
         retrycount = 1
         while retrycount < num_retries:
             netsum = client.get_network_summary(network_id=netid)
@@ -678,6 +678,9 @@ class TestClientIntegration(unittest.TestCase):
         self.assertTrue('http' in res)
         netid = re.sub('^.*/', '', res)
         try:
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
             res = client.get_network_as_cx2_stream(netid)
             self.assertEqual(200, res.status_code)
             self.check_glypican_cx2_is_correct(res.json())
@@ -704,6 +707,9 @@ class TestClientIntegration(unittest.TestCase):
         self.assertTrue('http' in res)
         netid = re.sub('^.*/', '', res)
         try:
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
             res = client.get_network_as_cx2_stream(netid)
             self.assertEqual(200, res.status_code)
             self.check_glypican_cx2_is_correct(res.json())
@@ -757,6 +763,10 @@ class TestClientIntegration(unittest.TestCase):
                 stream = io.BytesIO(json.dumps(cx,
                                                cls=DecimalEncoder))
             client.update_cx2_network(stream, netid)
+
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
 
             res = client.get_network_as_cx2_stream(netid)
             self.assertEqual(200, res.status_code)
@@ -836,3 +846,57 @@ class TestClientIntegration(unittest.TestCase):
             self.assertTrue('Caught 404 from server' in str(nfe))
         finally:
             client.delete_network(network_id=netid)
+
+    def test_upload_network_with_no_network_attributes(self):
+        """
+        So if one uploads a network with NO network attributes
+        to NDEx and then edits the network (setting name visibility, description)
+        via [updateNetworkSummary]	[/v2/network/6b89b286-e142-11ec-b397-0ac135e8bacf/summary
+        the CX2 endpoint shows the changed network attributes, but the CX1
+        is missing the network attributes
+        :return:
+        """
+        client = self.get_ndex2_client()
+        # create network and add it
+        net = NiceCXNetwork()
+        oneid = net.create_node('node1')
+        twoid = net.create_node('node2')
+        net.create_edge(oneid, twoid, 'hello')
+
+        res = client.save_new_network(net.to_cx(), visibility='PRIVATE')
+        try:
+            self.assertTrue('http' in res)
+            netid = re.sub('^.*/', '', res)
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            self.assertEqual(netid, netsum['externalId'])
+            self.assertTrue('name' not in netsum, msg=str(netsum))
+
+            # okay now we have the network, lets update the name
+            # and description and then get the network back again
+            # via cx1 and cx2 endpoints
+            netname = 'ndex2-client integration test network' + str(datetime.now())
+            client.update_network_profile(netid,
+                                          {'name': netname})
+            netsum = self.wait_for_network_to_be_ready(client, netid)
+            self.assertIsNotNone(netsum, 'Network is still not ready,'
+                                         ' maybe server is busy?')
+            cx2_resp = client.get_network_as_cx2_stream(network_id=netid)
+            cx2_json = json.loads(cx2_resp.content)
+            net_attrs = None
+            for aspect in cx2_json:
+                print(aspect)
+                if 'networkAttributes' in aspect:
+                    net_attrs = aspect['networkAttributes']
+                    break
+            self.assertEqual([{'name': netname}],
+                             net_attrs)
+
+            client_resp = client.get_network_as_cx_stream(network_id=netid)
+            cx1_net = ndex2.create_nice_cx_from_raw_cx(json.loads(client_resp.content))
+            self.assertEqual(netname, cx1_net.get_name(), 'Special test to expose '
+                                                          'bug in NDEx server')
+        finally:
+            client.delete_network(netid)
+

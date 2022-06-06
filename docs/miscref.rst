@@ -4,6 +4,14 @@ Constants
 .. automodule:: ndex2.constants
     :members:
 
+Miscellaneous
+---------------
+.. autoclass:: ndex2.util.DataConverter
+    :members: convert_value
+
+.. autoclass:: ndex2.util.PandasDataConverter
+    :members: convert_value
+
 Exceptions
 ----------
 

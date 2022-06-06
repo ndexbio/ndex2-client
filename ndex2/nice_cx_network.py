@@ -18,6 +18,7 @@ from ndex2.exceptions import NDExNotFoundError
 from ndex2.exceptions import NDExUnauthorizedError
 
 from ndex2 import constants
+from ndex2.util import PandasDataConverter
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPError, URLError
@@ -1211,7 +1212,7 @@ class NiceCXNetwork:
 
         return []
 
-    def to_pandas_dataframe(self):
+    def to_pandas_dataframe(self, dataconverter=PandasDataConverter()):
         """
         Network edges exported as a :py:class:`pandas.DataFrame`
 
@@ -1230,15 +1231,23 @@ class NiceCXNetwork:
         All edge attributes will be also added as separate columns with
         same name.
 
+        Attributes on **source** node will be added as a columns with ``source_``
+        prefixed to name.
+
+        Attributes on **target** node will be added as columns with ``target_``
+        prefixed to name.
+
         .. note::
 
-            Attributes on **source** node will be added as a columns with ``source_``
-            prefixed to name.
-
-            Attributes on **target** node will be added as columns with ``target_``
-            prefixed to name.
-
-
+            Values will converted based on CX data types. For list
+            data types (:py:const:`~ndex2.constants.LIST_OF_STRING`,
+            :py:const:`~ndex2.constants.LIST_OF_DOUBLE`,
+            :py:const:`~ndex2.constants.LIST_OF_BOOL`,
+            :py:const:`~ndex2.constants.LIST_OF_INTEGER`)they are
+            converted to comma delimited :py:class:`str`
+            objects. For other datatypes
+            :py:class:`~ndex2.util.PandasDataConverter` is
+            used to perform the conversion
 
         .. code-block:: python
 
@@ -1271,6 +1280,10 @@ class NiceCXNetwork:
             This method only processes nodes, edges, node attributes and
             edge attributes, but not network attributes or other aspects
 
+        :param dataconverter: Object that converts CX data values to native
+                              data types. Default is
+                              :py:class:`~ndex2.util.PandasDataConverter`
+        :type dataconverter: :py:class:`~ndex2.util.DataConverter`
         :return: Edge table with attributes
         :rtype: :py:class:`pandas.DataFrame`
         """
@@ -1285,43 +1298,33 @@ class NiceCXNetwork:
 
         for k, v in edge_items:
             e_a = self.edgeAttributes.get(k)
-            #==========================
+            # ==========================
             # PROCESS EDGE ATTRIBUTES
-            #==========================
+            # ==========================
             add_this_dict = {}
             if e_a is not None:
                 for e_a_item in e_a:
-                    if isinstance(e_a_item.get('v'), list):
-                        add_this_dict[e_a_item.get('n')] = ','.join(str(e) for e in e_a_item.get('v'))
-                        add_this_dict[e_a_item.get('n')] = '"' + add_this_dict[e_a_item.get('n')] + '"'
-                    else:
-                        add_this_dict[e_a_item.get('n')] = e_a_item.get('v')
+                    add_this_dict[e_a_item.get('n')] = dataconverter.convert_value(e_a_item.get('v'),
+                                                                                   e_a_item.get('d'))
                     edge_attr_name_set.add(e_a_item.get('n'))
-            #================================
+            # ================================
             # PROCESS SOURCE NODE ATTRIBUTES
-            #================================
+            # ================================
             s_a = self.nodeAttributes.get(v.get('s'))
             if s_a is not None:
                 for s_a_item in s_a:
-                    if isinstance(s_a_item.get('v'), list):
-                        add_this_dict['source_' + s_a_item.get('n')] = ','.join(str(e) for e in s_a_item.get('v'))
-                        add_this_dict['source_' + s_a_item.get('n')] = '"' + add_this_dict['source_' + s_a_item.get('n')] + '"'
-                    else:
-                        add_this_dict['source_' + s_a_item.get('n')] = s_a_item.get('v')
+                    add_this_dict['source_' + s_a_item.get('n')] = dataconverter.convert_value(s_a_item.get('v'),
+                                                                                                   s_a_item.get('d'))
                     node_attr_name_set.add('source_' + s_a_item.get('n'))
 
-            #================================
+            # ================================
             # PROCESS TARGET NODE ATTRIBUTES
-            #================================
+            # ================================
             t_a = self.nodeAttributes.get(v.get('t'))
             if t_a is not None:
                 for t_a_item in t_a:
-                    if isinstance(t_a_item.get('v'), list):
-                        add_this_dict['target_' + t_a_item.get('n')] = ','.join(str(e) for e in t_a_item.get('v'))
-                        add_this_dict['target_' + t_a_item.get('n')] = '"' + add_this_dict['target_' +
-                                                                                           t_a_item.get('n')] + '"'
-                    else:
-                        add_this_dict['target_' + t_a_item.get('n')] = t_a_item.get('v')
+                    add_this_dict['target_' + t_a_item.get('n')] = dataconverter.convert_value(t_a_item.get('v'),
+                                                                                                   t_a_item.get('d'))
                     node_attr_name_set.add('target_' + s_a_item.get('n'))
 
             if add_this_dict:

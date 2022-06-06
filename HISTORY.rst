@@ -42,7 +42,7 @@ History
   commas
 
 * Removed unused test methods from internal class `NiceCXBuilder`:
-  `load_aspect(), stream_aspect(), stream_aspect_raw()`
+  ``load_aspect()``, ``stream_aspect()``, ``stream_aspect_raw()``
 
 * Removed the following deprecated methods from `NiceCXNetwork`:
   ``add_node()``, ``add_edge()``, ``get_edge_attribute_object()``,
@@ -52,8 +52,8 @@ History
   ``create_from_networkx()``, ``create_from_server()``, ``upload_new_network_stream()``, &
   ``create_from_cx()``
 
-* Fixed bug where ``NiceCXNetwork.to_pandas_dataframe()`` was not converting
-  node and edge attributes
+* Fixed bug where ``NiceCXNetwork.to_pandas_dataframe()`` was not adding
+  node and edge attributes to the resulting data frame
 
 
 

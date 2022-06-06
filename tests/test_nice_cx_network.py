@@ -955,6 +955,12 @@ class TestNiceCXNetwork(unittest.TestCase):
         wnt = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
         df = wnt.to_pandas_dataframe()
         self.assertEqual(74, len(df))
+
+        # ['source', 'interaction', 'target', 'MECHANISM',
+        # 'ANNOTATOR', 'DIRECT', 'citation', 'RESIDUE', 'SEQUENCE',
+        # 'CELL_DATA', 'SENTENCE', 'NOTES', 'TISSUE_DATA', 'source_TYPE',
+        # 'target_TYPE']
+
         self.assertEqual(15, df.shape[1])
         self.assertEqual('LRP6', df.iloc[0]['source'], str(df.head(n=75)))
         self.assertEqual('down-regulates activity',
@@ -964,5 +970,7 @@ class TestNiceCXNetwork(unittest.TestCase):
         self.assertEqual('down-regulates quantity by repression',
                          df.iloc[73]['interaction'])
         self.assertEqual('SFRP1', df.iloc[73]['target'])
+
+        self.assertEqual('BTO:0004896,BTO:0004300', df.iloc[73]['CELL_DATA'])
 
 

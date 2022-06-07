@@ -1137,9 +1137,10 @@ class NiceCXNetwork:
         visual styles to other networks.
 
         .. versionchanged:: 3.5.0
-           Fixed bug where style from template were appended to style
-           on this network instead of performing a replacement. In most cases, method
-           now raises NDExError and subclasses instead of more generic Exception
+           Fixed bug where style from template was appended
+           instead of replacing the existing style. In most cases, method
+           now raises :py:class:`~ndex2.exceptions.NDExError` and
+           subclasses instead of more generic :py:class:`Exception`
 
         .. code-block:: python
 

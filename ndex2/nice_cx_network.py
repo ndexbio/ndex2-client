@@ -1197,14 +1197,7 @@ class NiceCXNetwork:
                     CY_VISUAL_PROPERTIES in oa:
                 objects = self.get_aspect(uuid, oa, server,
                                           username, password)
-                obj_items = (o for o in objects)
-                for oa_item in obj_items:
-                    aspect_elmts = self.opaqueAspects.get(oa)
-                    if aspect_elmts is None:
-                        aspect_elmts = []
-                        self.opaqueAspects[NiceCXNetwork.CY_VISUAL_PROPERTIES] = aspect_elmts
-                    aspect_elmts.append(oa_item)
-                self._set_visual_properties_aspect(oa_item)
+                self._set_visual_properties_aspect(objects)
 
     def get_frag_from_list_by_key(self, cx, key):
         for aspect in cx:

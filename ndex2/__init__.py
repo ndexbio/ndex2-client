@@ -267,7 +267,7 @@ def create_nice_cx_from_networkx(G):
             if k == 'name' or k == 'represents':
                 continue
 
-            use_this_value, attr_type = cx_builder._infer_data_type(v, split_string=True)
+            use_this_value, attr_type = cx_builder._infer_data_type(v, split_string=False)
 
             # This might go away, waiting on response to
             # https://ndexbio.atlassian.net/browse/UD-2181
@@ -299,7 +299,7 @@ def create_nice_cx_from_networkx(G):
         for k, val in d.items():
             if k == 'interaction':
                 continue
-            use_this_value, attr_type = cx_builder._infer_data_type(val, split_string=True)
+            use_this_value, attr_type = cx_builder._infer_data_type(val, split_string=False)
 
             # This might go away, waiting on response to
             # https://ndexbio.atlassian.net/browse/UD-2181

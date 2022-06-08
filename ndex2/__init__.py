@@ -10,6 +10,10 @@ import base64
 import numpy as np
 from ndex2cx.nice_cx_builder import NiceCXBuilder
 from ndex2.nice_cx_network import NetworkXFactory
+from ndex2.exceptions import NDExNotFoundError
+from ndex2.exceptions import NDExError
+from ndex2.nice_cx_network import NiceCXNetwork
+from ndex2.client import Ndex2
 from ndex2 import constants
 
 
@@ -655,173 +659,58 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     return niceCxBuilder.get_nice_cx()  # my_nicecx
 
 
-def create_nice_cx_from_server(server, username=None, password=None, uuid=None):
+def create_nice_cx_from_server(server, username=None, password=None, uuid=None,
+                               ndex_client=None):
     """
     Create a :py:func:`~ndex2.nice_cx_network.NiceCXNetwork` based on a network
     retrieved from NDEx, specified by its UUID.
-    If the network is not public, then username and password arguments for an account on
+
+    .. versionchanged:: 3.5.0
+        Code refactor and **ndex_client** parameter has been added
+
+
+    If the network is not public, then **username** and **password** arguments
+    (or **ndex_client** with username and password set) for an account on
     the server with permission to access the network must be supplied.
 
-    :param server: the URL of the NDEx server hosting the network.
-    :param username: the user name of an account with permission to access the network.
-    :param password: the password of an account with permission to access the network.
-    :param uuid: the UUID of the network.
+    Example usage:
+
+    .. code-block:: python
+
+        import ndex2
+
+        # Download BioGRID: Protein-Protein Interactions (SARS-CoV) from NDEx
+        # https://www.ndexbio.org/viewer/networks/669f30a3-cee6-11ea-aaef-0ac135e8bacf
+        net_cx = ndex2.create_nice_cx_from_server(None, uuid='669f30a3-cee6-11ea-aaef-0ac135e8bacf')
+
+    .. note::
+
+        If **ndex_client** is not passed in, this function internally creates
+        :py:class:`~ndex2.client.Ndex2` using values from parameters passed into
+        this function.
+
+    :param server: the URL of the NDEx server hosting the network
+    :type server: str
+    :param username: the user name of an account with permission to access the network
+    :type username: str
+    :param password: the password of an account with permission to access the network
+    :type password: str
+    :param uuid: the UUID of the network
+    :type uuid: str
+    :param ndex_client: Used as NDEx REST client overriding **server**, **username** and
+                        **password** parameters if set
+    :type ndex_client: :py:class:`~ndex2.client.Ndex2`
+    :raises NDExError: If uuid is not specified
     :return: NiceCXNetwork
     :rtype: :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
-
-    niceCxBuilder = NiceCXBuilder()
-
-    if server and uuid:
-        my_nicecx = NiceCXNetwork()
-
-        # ===================
-        # METADATA
-        # ===================
-        available_aspects = []
-        md_aspect_iter = my_nicecx.get_aspect(uuid, 'metaData', server, username, password)
-        if md_aspect_iter:
-            for ae in (o for o in md_aspect_iter):
-                available_aspects.append(ae.get('name'))
-        else:
-            if not username or not password:
-                raise Exception('Network is not available.  Username and/or password not supplied')
-            else:
-                raise Exception('Network not available')
-
-        opaque_aspects = set(available_aspects).difference(known_aspects_min)
-
-        # ====================
-        # NETWORK ATTRIBUTES
-        # ====================
-        if 'networkAttributes' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'networkAttributes', server, username, password)
-            for network_item in objects:
-                niceCxBuilder._add_network_attributes_from_fragment(network_item)
-                #niceCxBuilder.add_network_attribute(network_item.get('n'), network_item.get('v'), network_item.get('d'))
-
-        # ===================
-        # @CONTEXT
-        # ===================
-        if '@context' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, '@context', server, username, password)
-
-            niceCxBuilder.set_context(objects) #nice_cx.set_namespaces(objects)
-            #niceCxBuilder.set_context(objects)
-
-        # ===================
-        # NODES
-        # ===================
-        if 'nodes' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'nodes', server, username, password)
-            for node_item in objects:
-                niceCxBuilder._add_node_from_fragment(node_item)
-                #niceCxBuilder.add_node(node_item.get('n'), node_item.get('r'), id=node_item.get('@id'))
-
-        # ===================
-        # EDGES
-        # ===================
-        if 'edges' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'edges', server, username, password)
-            for edge_item in objects:
-                niceCxBuilder._add_edge_from_fragment(edge_item)
-
-                #niceCxBuilder.add_edge(source=edge_item.get('s'), target=edge_item.get('t'),
-                #                       interaction=edge_item.get('i'), id=edge_item.get('@id'))
-
-        # ===================
-        # NODE ATTRIBUTES
-        # ===================
-        if 'nodeAttributes' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'nodeAttributes', server, username, password)
-            for att in objects:
-                niceCxBuilder._add_node_attribute_from_fragment(att)
-
-                #niceCxBuilder.add_node_attribute(att.get('po'), att.get('n'), att.get('v'), type=att.get('d'))
-
-        # ===================
-        # EDGE ATTRIBUTES
-        # ===================
-        if 'edgeAttributes' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'edgeAttributes', server, username, password)
-            for att in objects:
-                niceCxBuilder._add_edge_attribute_from_fragment(att)
-
-                #niceCxBuilder.add_edge_attribute(property_of=att.get('po'), name=att.get('n'),
-                #                                 values=att.get('v'), type=att.get('d'))
-
-        # ===================
-        # CITATIONS
-        # ===================
-        if 'citations' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'citations', server, username, password)
-            for cit in objects:
-                niceCxBuilder._add_citation_from_fragment(cit)
-                #my_nicecx.citations[cit.get('@id')] = cit
-
-            #my_nicecx.add_metadata_stub('citations')
-
-        # ===================
-        # SUPPORTS
-        # ===================
-        if 'supports' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'supports', server, username, password)
-            for sup in objects:
-                niceCxBuilder._add_supports_from_fragment(sup)
-
-                #my_nicecx.supports[sup.get('@id')] = sup
-
-            #my_nicecx.add_metadata_stub('supports')
-
-        # ===================
-        # EDGE SUPPORTS
-        # ===================
-        if 'edgeSupports' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'edgeSupports', server, username, password)
-            for add_this_edge_sup in objects:
-                niceCxBuilder._add_edge_supports_from_fragment(add_this_edge_sup)
-
-                #for po_id in add_this_edge_sup.get('po'):
-                #    my_nicecx.edgeSupports[po_id] = add_this_edge_sup.get('supports')
-
-            #my_nicecx.add_metadata_stub('edgeSupports')
-
-        # ===================
-        # NODE CITATIONS
-        # ===================
-        if 'nodeCitations' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'nodeCitations', server, username, password)
-            for node_cit in objects:
-                niceCxBuilder._add_node_citations_from_fragment(node_cit)
-
-                #for po_id in node_cit.get('po'):
-                #    my_nicecx.nodeCitations[po_id] = node_cit.get('citations')
-
-            #my_nicecx.add_metadata_stub('nodeCitations')
-
-        # ===================
-        # EDGE CITATIONS
-        # ===================
-        if 'edgeCitations' in available_aspects:
-            objects = my_nicecx.get_aspect(uuid, 'edgeCitations', server, username, password)
-            for edge_cit in objects:
-                niceCxBuilder._add_edge_citations_from_fragment(edge_cit)
-                #for po_id in edge_cit.get('po'):
-                #    my_nicecx.nodeCitations[po_id] = edge_cit.get('citations')
-
-            #my_nicecx.add_metadata_stub('edgeCitations')
-
-        # ===================
-        # OPAQUE ASPECTS
-        # ===================
-        for oa in opaque_aspects:
-            objects = my_nicecx.get_aspect(uuid, oa, server, username, password)
-            niceCxBuilder.add_opaque_aspect(oa, objects)
-
-    else:
-        raise Exception('Server and uuid not specified')
-
-    return niceCxBuilder.get_nice_cx()
+    if uuid is None:
+        raise NDExError('uuid not specified')
+    if ndex_client is None:
+        ndex_client = Ndex2(server, username=username,
+                            password=password, skip_version_check=True)
+    client_resp = ndex_client.get_network_as_cx_stream(uuid)
+    return create_nice_cx_from_raw_cx(json.loads(client_resp.content))
 
 
 def create_nice_cx_from_file(path):
@@ -849,6 +738,3 @@ def create_nice_cx_from_file(path):
     else:
         raise Exception('The file ' + path + '  does not exist.')
 
-
-from ndex2.nice_cx_network import NiceCXNetwork
-from ndex2.client import Ndex2

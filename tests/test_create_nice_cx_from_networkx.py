@@ -186,7 +186,33 @@ class TestCreateNiceCXNetworkFromNetworkX(unittest.TestCase):
         self.assertEqual(-353.49370090105185, cart[1]['x'])
         self.assertEqual(70.71067822788493, cart[1]['y'])
 
+    def test_nice_cx_from_networkx_using_graph_from_jupyternotebook(self):
+        g = nx.Graph()
+        g.add_node('ABC')
+        g.add_node('DEF')
+        g.add_node('GHI')
+        g.add_node('JKL')
+        g.add_node('MNO')
+        g.add_node('PQR')
+        g.add_node('XYZ')
+        g.add_edges_from([('ABC', 'DEF'), ('DEF', 'GHI'), ('GHI', 'JKL'),
+                          ('DEF', 'JKL'), ('JKL', 'MNO'), ('DEF', 'MNO'),
+                          ('MNO', 'XYZ'), ('DEF', 'PQR')])
 
+        short_path = nx.shortest_path(g, source='ABC', target="MNO")
+
+        path_subgraph = g.subgraph(short_path)
+
+        g.name = 'Created from NetworkX (full)'
+        nice_cx_full = ndex2.create_nice_cx_from_networkx(g)
+        self.assertEqual(7, len(nice_cx_full.get_nodes()))
+        self.assertEqual(8, len(nice_cx_full.get_edges()))
+        self.assertEqual(g.name, nice_cx_full.get_name())
+        g.name = 'Created from NetworkX (shortest path)'
+        nice_cx_short = ndex2.create_nice_cx_from_networkx(path_subgraph)
+        self.assertEqual(3, len(nice_cx_short.get_nodes()))
+        self.assertEqual(2, len(nice_cx_short.get_edges()))
+        self.assertEqual(g.name, nice_cx_short.get_name())
 
 
 

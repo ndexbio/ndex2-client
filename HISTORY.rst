@@ -55,6 +55,14 @@ History
 * Fixed bug where ``NiceCXNetwork.to_pandas_dataframe()`` was not adding
   node and edge attributes to the resulting data frame
 
+* Fixed bug where ``ndex2.create_nice_cx_from_server()`` failed on networks
+  with `provenanceHistory`
+
+* Added new parameter to ``ndex2.create_nice_cx_from_server()`` **ndex_client**
+  that lets caller specify ``NDex2()`` client object to use. In addition,
+  ``None`` can be specified for **server** parameter to get current production
+  NDEx server
+
 
 
 3.4.0 (2021-05-06)

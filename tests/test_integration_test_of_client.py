@@ -900,3 +900,11 @@ class TestClientIntegration(unittest.TestCase):
         finally:
             client.delete_network(netid)
 
+    def test_update_status_part_of_find_subgraph_jupyter_notebook(self):
+        creds = self.get_ndex_credentials_as_tuple()
+        anon_ndex = ndex2.client.Ndex2(creds['server'])
+        anon_ndex.update_status()
+        self.assertTrue(anon_ndex.status.get("networkCount") > 0)
+        self.assertTrue(anon_ndex.status.get("userCount") > 0)
+        self.assertTrue(anon_ndex.status.get("groupCount") > 0)
+

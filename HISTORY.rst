@@ -58,9 +58,11 @@ History
 * Fixed bug where ``ndex2.create_nice_cx_from_server()`` failed on networks
   with `provenanceHistory`
 
-* Added new parameter to ``ndex2.create_nice_cx_from_server()`` **ndex_client**
-  that lets caller specify ``NDex2()`` client object to use. In addition,
-  ``None`` can be specified for **server** parameter to get current production
+* Added new parameter to ``ndex2.create_nice_cx_from_server()`` named **ndex_client**
+  that lets caller specify ``NDex2()`` client object to use.
+
+* Passing ``None`` as the **server** positional parameter into
+  ``ndex2.create_nice_cx_from_server()`` will use the default production
   NDEx server
 
 

@@ -1233,15 +1233,9 @@ class NiceCXNetwork:
 
         .. note::
 
-            Values will converted based on CX data types. For list
-            data types (:py:const:`~ndex2.constants.LIST_OF_STRING`,
-            :py:const:`~ndex2.constants.LIST_OF_DOUBLE`,
-            :py:const:`~ndex2.constants.LIST_OF_BOOL`,
-            :py:const:`~ndex2.constants.LIST_OF_INTEGER`)they are
-            converted to comma delimited :py:class:`str`
-            objects. For other datatypes
-            :py:class:`~ndex2.util.PandasDataConverter` is
-            used to perform the conversion
+            Values will converted based on CX data types. See
+            :py:class:`~ndex2.util.PandasDataConverter` for information
+            on how conversion is performed
 
         .. code-block:: python
 

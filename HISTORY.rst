@@ -61,8 +61,7 @@ History
 * Added new parameter to ``ndex2.create_nice_cx_from_server()`` named **ndex_client**
   that lets caller specify ``NDex2()`` client object to use.
 
-* Passing ``None`` as the **server** positional parameter into
-  ``ndex2.create_nice_cx_from_server()`` will use the default production
+* Passing ``None`` for the **server** positional parameter into ``ndex2.create_nice_cx_from_server(None, uuid='XXXX')`` will default to the production
   NDEx server
 
 

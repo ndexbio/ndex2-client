@@ -56,7 +56,7 @@ History
   node and edge attributes to the resulting data frame
 
 * Fixed bug where ``ndex2.create_nice_cx_from_server()`` failed on networks
-  with `provenanceHistory`
+  with `provenanceHistory` aspect
 
 * Added new parameter to ``ndex2.create_nice_cx_from_server()`` named **ndex_client**
   that lets caller specify ``NDex2()`` client object to use.

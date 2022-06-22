@@ -15,6 +15,7 @@ from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.exceptions import NDExError
 from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExNotFoundError
+from ndex2.exceptions import NDExInvalidParameterError
 from ndex2 import constants
 import ndex2
 
@@ -943,7 +944,7 @@ class TestNiceCXNetwork(unittest.TestCase):
 
     def test_to_pandas_dataframe_glypican2(self):
         glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
-        df = glypy.to_pandas_dataframe()
+        df = glypy.to_pandas_dataframe(include_attributes=True)
         self.assertEqual(1, len(df))
         self.assertEqual(7, df.shape[1])
         self.assertEqual('GPC2', df.iloc[0]['source'])
@@ -951,9 +952,39 @@ class TestNiceCXNetwork(unittest.TestCase):
                          df.iloc[0]['interaction'])
         self.assertEqual('MDK', df.iloc[0]['target'])
 
+    def test_to_pandas_dataframe_glypican2_omit_attrs(self):
+        glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
+        df = glypy.to_pandas_dataframe(include_attributes=False)
+        self.assertEqual(1, len(df))
+        self.assertEqual(3, df.shape[1])
+        self.assertEqual('GPC2', df.iloc[0]['source'])
+        self.assertEqual('in-complex-with',
+                         df.iloc[0]['interaction'])
+        self.assertEqual('MDK', df.iloc[0]['target'])
+
+    def test_to_pandas_dataframe_glypican2_omit_attrs_none(self):
+        glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
+        df = glypy.to_pandas_dataframe(include_attributes=None)
+        self.assertEqual(1, len(df))
+        self.assertEqual(3, df.shape[1])
+        self.assertEqual('GPC2', df.iloc[0]['source'])
+        self.assertEqual('in-complex-with',
+                         df.iloc[0]['interaction'])
+        self.assertEqual('MDK', df.iloc[0]['target'])
+
+    def test_to_pandas_dataframe_glypican2_omit_attrs_astr(self):
+        glypy = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.GLYPICAN_FILE)
+        try:
+            glypy.to_pandas_dataframe(include_attributes='foo')
+            self.fail('Expected NDExInvalidParameterError')
+        except NDExInvalidParameterError as ne:
+            self.assertEqual('include_attributes must be None or a bool',
+                             str(ne))
+
+
     def test_to_pandas_dataframe_wnt_signaling(self):
         wnt = ndex2.create_nice_cx_from_file(TestNiceCXNetwork.WNT_SIGNAL_FILE)
-        df = wnt.to_pandas_dataframe()
+        df = wnt.to_pandas_dataframe(include_attributes=True)
         self.assertEqual(74, len(df))
 
         # ['source', 'interaction', 'target', 'MECHANISM',

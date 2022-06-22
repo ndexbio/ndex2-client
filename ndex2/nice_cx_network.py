@@ -16,6 +16,7 @@ from ndex2.client import Ndex2
 from ndex2.exceptions import NDExError
 from ndex2.exceptions import NDExNotFoundError
 from ndex2.exceptions import NDExUnauthorizedError
+from ndex2.exceptions import NDExInvalidParameterError
 
 from ndex2 import constants
 from ndex2.util import PandasDataConverter
@@ -1206,13 +1207,13 @@ class NiceCXNetwork:
 
         return []
 
-    def to_pandas_dataframe(self, dataconverter=PandasDataConverter()):
+    def to_pandas_dataframe(self, dataconverter=PandasDataConverter(),
+                            include_attributes=False):
         """
         Network edges exported as a :py:class:`pandas.DataFrame`
 
         .. versionchanged:: 3.5.0
-            Fixed bug where node and edge attributes were NOT being added to
-            the :py:class:`pandas.DataFrame`
+            Added **include_attributes** and  **dataconverter** parameters
 
         The following columns will be added to the :py:class:`pandas.DataFrame`:
 
@@ -1222,14 +1223,17 @@ class NiceCXNetwork:
 
         * **target** - Name of edge target node
 
-        All edge attributes will be also added as separate columns with
-        same name.
 
-        Attributes on **source** node will be added as a columns with ``source_``
-        prefixed to name.
+        If **include_attributes** parameter is set to ``True`` then:
 
-        Attributes on **target** node will be added as columns with ``target_``
-        prefixed to name.
+            All edge attributes will be also added as separate columns with
+            same name.
+
+            Attributes on **source** node will be added as a columns with ``source_``
+            prefixed to name.
+
+            Attributes on **target** node will be added as columns with ``target_``
+            prefixed to name.
 
         .. note::
 
@@ -1252,7 +1256,7 @@ class NiceCXNetwork:
                                        edge_interaction='binds')
 
             net.set_edge_attribute(edge_one, 'edgelabel', 'an edge')
-            df = net.to_pandas_dataframe() # df is now a pandas dataframe
+            df = net.to_pandas_dataframe(include_attributes=True) # df is now a pandas dataframe
 
             print(df.head())
 
@@ -1272,9 +1276,18 @@ class NiceCXNetwork:
                               data types. Default is
                               :py:class:`~ndex2.util.PandasDataConverter`
         :type dataconverter: :py:class:`~ndex2.util.DataConverter`
+        :param include_attributes: If `True` then edge attributes are added to
+                                   :py:class:`pandas.DataFrame`, otherwise only
+                                   **source**, **target**, and **interaction** are
+                                   added
+        :type include_attributes: bool
+        :raises NDExInvalidParameterError: If **include_attributes** is not ``None`` or a :py:class:`bool`
         :return: Edge table with attributes
         :rtype: :py:class:`pandas.DataFrame`
         """
+        if include_attributes is not None and isinstance(include_attributes, bool) is False:
+            raise NDExInvalidParameterError('include_attributes must be None or a bool')
+
         rows = []
         if sys.version_info.major == 3:
             edge_items = self.edges.items()
@@ -1284,38 +1297,43 @@ class NiceCXNetwork:
         edge_attr_name_set = set()
         node_attr_name_set = set()
 
+        omit_attrs = True
+        if include_attributes is not None and include_attributes is True:
+            omit_attrs = False
+
         for k, v in edge_items:
-            e_a = self.edgeAttributes.get(k)
-            # ==========================
-            # PROCESS EDGE ATTRIBUTES
-            # ==========================
-            add_this_dict = {}
-            if e_a is not None:
-                for e_a_item in e_a:
-                    add_this_dict[e_a_item.get('n')] = dataconverter.convert_value(e_a_item.get('v'),
-                                                                                   e_a_item.get('d'))
-                    edge_attr_name_set.add(e_a_item.get('n'))
-            # ================================
-            # PROCESS SOURCE NODE ATTRIBUTES
-            # ================================
-            s_a = self.nodeAttributes.get(v.get('s'))
-            if s_a is not None:
-                for s_a_item in s_a:
-                    add_this_dict['source_' + s_a_item.get('n')] = dataconverter.convert_value(s_a_item.get('v'),
-                                                                                                   s_a_item.get('d'))
-                    node_attr_name_set.add('source_' + s_a_item.get('n'))
+            if omit_attrs is False:
+                e_a = self.edgeAttributes.get(k)
+                # ==========================
+                # PROCESS EDGE ATTRIBUTES
+                # ==========================
+                add_this_dict = {}
+                if e_a is not None:
+                    for e_a_item in e_a:
+                        add_this_dict[e_a_item.get('n')] = dataconverter.convert_value(e_a_item.get('v'),
+                                                                                       e_a_item.get('d'))
+                        edge_attr_name_set.add(e_a_item.get('n'))
+                # ================================
+                # PROCESS SOURCE NODE ATTRIBUTES
+                # ================================
+                s_a = self.nodeAttributes.get(v.get('s'))
+                if s_a is not None:
+                    for s_a_item in s_a:
+                        add_this_dict['source_' + s_a_item.get('n')] = dataconverter.convert_value(s_a_item.get('v'),
+                                                                                                       s_a_item.get('d'))
+                        node_attr_name_set.add('source_' + s_a_item.get('n'))
 
-            # ================================
-            # PROCESS TARGET NODE ATTRIBUTES
-            # ================================
-            t_a = self.nodeAttributes.get(v.get('t'))
-            if t_a is not None:
-                for t_a_item in t_a:
-                    add_this_dict['target_' + t_a_item.get('n')] = dataconverter.convert_value(t_a_item.get('v'),
-                                                                                                   t_a_item.get('d'))
-                    node_attr_name_set.add('target_' + s_a_item.get('n'))
+                # ================================
+                # PROCESS TARGET NODE ATTRIBUTES
+                # ================================
+                t_a = self.nodeAttributes.get(v.get('t'))
+                if t_a is not None:
+                    for t_a_item in t_a:
+                        add_this_dict['target_' + t_a_item.get('n')] = dataconverter.convert_value(t_a_item.get('v'),
+                                                                                                       t_a_item.get('d'))
+                        node_attr_name_set.add('target_' + s_a_item.get('n'))
 
-            if add_this_dict:
+            if omit_attrs is False and add_this_dict:
                 rows.append(dict(add_this_dict,
                                  source=self.nodes.get(v.get('s')).get('n'),
                                  target=self.nodes.get(v.get('t')).get('n'),
@@ -1324,8 +1342,10 @@ class NiceCXNetwork:
                 rows.append(dict(source=self.nodes.get(v.get('s')).get('n'),
                                  target=self.nodes.get(v.get('t')).get('n'),
                                  interaction=v.get('i')))
-
-        df_columns = ['source', 'interaction', 'target'] + list(edge_attr_name_set) + list(node_attr_name_set)
+        if omit_attrs is False:
+            df_columns = ['source', 'interaction', 'target'] + list(edge_attr_name_set) + list(node_attr_name_set)
+        else:
+            df_columns = ['source', 'interaction', 'target']
 
         return pd.DataFrame(rows, columns=df_columns)
 
@@ -1530,16 +1550,11 @@ class NiceCXNetwork:
 
         return self.nodes.iteritems(), self.edges.iteritems()
 
-    def to_networkx(self, mode='default'):
+    def to_networkx(self, mode='legacy'):
         """
         Returns a NetworkX ``Graph()`` object or one of its subclasses
         based on the network.
         The `mode` parameter dictates how the translation occurs.
-
-        .. versionchanged:: 3.5.0
-           Default value for **mode** parameter switched from
-           ``legacy`` to ``default``
-
 
         This method currently supports the following mode values:
 

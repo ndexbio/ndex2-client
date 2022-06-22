@@ -34,10 +34,7 @@ History
   into NiceCXNetwork object.
   `Issue #88 <https://github.com/ndexbio/ndex2-client/issues/88>`__
 
-* The **mode** parameter in ``NiceCXNetwork.to_networkx()`` is now set to ``default`` which
-  is using the updated `DefaultNetworkXFactory` networkx converter
-
-* `DefaultNetworkXFactory` networkx converter (used by ``NiceCXNetwork.to_networkx()``)
+* `DefaultNetworkXFactory` networkx converter (used by ``NiceCXNetwork.to_networkx(mode='default')``)
   no longer converts edge attributes that are of type list into strings delimited by
   commas
 
@@ -52,8 +49,9 @@ History
   ``create_from_networkx()``, ``create_from_server()``, ``upload_new_network_stream()``, &
   ``create_from_cx()``
 
-* Fixed bug where ``NiceCXNetwork.to_pandas_dataframe()`` was not adding
-  node and edge attributes to the resulting data frame
+* Added new parameters `dataconverter` and `include_attributes` to ``NiceCXNetwork.to_pandas_dataframe()``
+  `dataconverter` specifies data type conversion and if `include_attributes` lets
+  caller specify whether all node/edge attributes are added to the resulting DataFrame
 
 * Fixed bug where ``ndex2.create_nice_cx_from_server()`` failed on networks
   with `provenanceHistory` aspect

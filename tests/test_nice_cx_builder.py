@@ -40,6 +40,93 @@ class TestNiceCXBuilder(unittest.TestCase):
         """Tear down test fixtures, if any."""
         pass
 
+    def test_add_network_attribute_no_type(self):
+        builder = NiceCXBuilder()
+        builder.add_network_attribute(name='foo', values='somevalue')
+        net = builder.get_nice_cx()
+        self.assertEqual(['foo'], list(net.get_network_attribute_names()))
+        self.assertEqual({'n': 'foo', 'v': 'somevalue'}, net.get_network_attribute('foo'))
+
+    def test_add_network_attribute_no_with_type(self):
+        builder = NiceCXBuilder()
+        builder.add_network_attribute(name='foo', values='1.0', type='double')
+        net = builder.get_nice_cx()
+        self.assertEqual(['foo'], list(net.get_network_attribute_names()))
+        self.assertEqual({'d': 'double', 'n': 'foo', 'v': '1.0'}, net.get_network_attribute('foo'))
+
+    def test_add_node_with_type(self):
+        builder = NiceCXBuilder()
+        builder.add_node(name='xname', represents='xrepresents', data_type='string')
+        net = builder.get_nice_cx()
+        self.assertEqual({'@id': 0, 'd': 'string',
+                          'n': 'xname', 'r': 'xrepresents'}, net.get_node(0))
+
+    def test_add_edge_no_interaction_no_id(self):
+        builder = NiceCXBuilder()
+        builder.add_edge(source=0, target=1)
+        net = builder.get_nice_cx()
+        self.assertEqual({'@id': 0,
+                          'i': 'interacts-with',
+                          's': 0, 't': 1}, net.get_edge(0))
+
+    def test_add_node_attribute(self):
+        builder = NiceCXBuilder()
+
+        # property_of is None
+        try:
+            builder.add_node_attribute(None, 'xname', 'xvalue')
+            self.fail('Expected TypeError')
+        except TypeError as te:
+            self.assertEqual('Node value is None', str(te))
+
+        # name is None
+        try:
+            builder.add_node_attribute(0, None, 'xvalue')
+            self.fail('Expected TypeError')
+        except TypeError as te:
+            self.assertEqual('Property name is None', str(te))
+
+        # values is None
+        try:
+            builder.add_node_attribute(0, 'xname', None)
+            self.fail('Expected TypeError')
+        except TypeError as te:
+            self.assertEqual('Attribute value is None', str(te))
+
+        # duplicate check
+        builder.add_node('node 0')
+        builder.add_node_attribute(0, 'xname', 'xvalue')
+        net = builder.get_nice_cx()
+        self.assertEqual({'d': 'string',
+                          'n': 'xname',
+                          'po': 0,
+                          'v': 'xvalue'}, net.get_node_attribute(0, 'xname'))
+        builder.add_node_attribute(0, 'xname', 'NEW_VALUE')
+        net = builder.get_nice_cx()
+        self.assertEqual({'d': 'string',
+                          'n': 'xname',
+                          'po': 0,
+                          'v': 'xvalue'}, net.get_node_attribute(0, 'xname'))
+
+        # test type is double
+        builder.add_node_attribute(0, 'dcheck', '2.0', type='double')
+        net = builder.get_nice_cx()
+        self.assertEqual({'d': 'double',
+                          'n': 'dcheck',
+                          'po': 0,
+                          'v': 2.0}, net.get_node_attribute(0, 'dcheck'))
+
+        # test type is list_of_double
+        builder.add_node_attribute(0, 'dchecklist', [2.0], type='list_of_double')
+        net = builder.get_nice_cx()
+        self.assertEqual({'d': 'list_of_double',
+                          'n': 'dchecklist',
+                          'po': 0,
+                          'v': [2.0]}, net.get_node_attribute(0, 'dchecklist'))
+
+
+
+
     def test_infer_data_type_none_val(self):
         builder = NiceCXBuilder()
         self.assertEqual((None, None),

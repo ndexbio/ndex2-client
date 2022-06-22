@@ -465,19 +465,44 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     Create a :py:func:`~ndex2.nice_cx_network.NiceCXNetwork` from a :py:class:`pandas.DataFrame`
     in which each row specifies one edge in the network.
 
-    If only the df argument is provided the dataframe is treated as 'SIF' format,
-    where the first two columns specify the source and target node ids of the edge
-    and all other columns are ignored. The edge interaction is defaulted to "interacts-with"
-
-    If both the source_field and target_field arguments are provided, the those and any other
-    arguments refer to headers in the dataframe, controlling the mapping of columns to
-    the attributes of nodes, and edges in the resulting
-    :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`. If a header is not
-    mapped the corresponding column is ignored. If the edge_interaction is not specified it
-    defaults to "interacts-with"
-
     .. versionchanged:: 3.5.0
-        Removed print statements showing progress
+        Removed print statements showing progress and network name is
+        now being set
+
+    If only the **df** argument is provided the :py:class:`pandas.DataFrame` is treated
+    as 'SIF' format, where the first two columns specify the source and target node ids
+    of the edge and all other columns are ignored. The edge interaction is
+    defaulted to "interacts-with"
+
+    If both the source_field and target_field arguments are provided, then those and any other
+    arguments refer to headers in the :py:class:`pandas.DataFrame`, controlling the
+    mapping of columns to the attributes of nodes, and edges in the resulting
+    :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`.
+
+    If a header is not mapped, the corresponding column is ignored.
+
+    If the edge_interaction is not specified, interaction is set to "interacts-with"
+
+    .. code-block:: python
+
+        import ndex2
+        import pandas as pd
+
+        data = {'source': ['Node 1','Node 2'],
+                'target': ['Node 2','Node 3'],
+                'interaction': ['helps', 'hurts']}
+        df = pd.DataFrame.from_dict(data)
+
+        net = ndex2.create_nice_cx_from_pandas(df, source_field='source',
+                                               target_field='target',
+                                               edge_interaction='interaction')
+
+        print(net.get_nodes())
+        print(net.get_edges())
+
+    .. note::
+        The datatype for everything added to the network is the CX string type
+
 
     :param df: Pandas dataframe to process
     :type df: :py:class:`pandas.DataFrame`
@@ -501,18 +526,16 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     :return: NiceCXNetwork
     :rtype: :py:func:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
-
-    my_nicecx = NiceCXNetwork()
-
     # ====================================================
     # IF NODE FIELD NAME (SOURCE AND TARGET) IS PROVIDED
     # THEN USE THOSE FIELDS OTHERWISE USE INDEX 0 & 1
     # ====================================================
-    my_nicecx.set_name('Pandas Upload')
     source_predicate = ''
     target_predicate = ''
 
-    niceCxBuilder = NiceCXBuilder()
+    cx_builder = NiceCXBuilder()
+    cx_builder.set_name('created from pandas by '
+                        'ndex2.create_nice_cx_from_pandas()')
 
     if source_field and target_field:
         for index, row in df.iterrows():
@@ -522,21 +545,21 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # =============
 
             if source_represents is not None:
-                source_node_id = niceCxBuilder.add_node(name=source_predicate + str(row[source_field]),
-                                                        represents=source_predicate +
+                source_node_id = cx_builder.add_node(name=source_predicate + str(row[source_field]),
+                                                     represents=source_predicate +
                                                                    str(row[source_represents]))
             else:
-                source_node_id = niceCxBuilder.add_node(name=source_predicate + str(row[source_field]),
-                                                        represents=source_predicate +
+                source_node_id = cx_builder.add_node(name=source_predicate + str(row[source_field]),
+                                                     represents=source_predicate +
                                                                    str(row[source_field]))
 
             if target_represents is not None:
-                target_node_id = niceCxBuilder.add_node(name=target_predicate + str(row[target_field]),
-                                                        represents=target_predicate +
+                target_node_id = cx_builder.add_node(name=target_predicate + str(row[target_field]),
+                                                     represents=target_predicate +
                                                                    str(row[target_represents]))
             else:
-                target_node_id = niceCxBuilder.add_node(name=target_predicate + str(row[target_field]),
-                                                        represents=target_predicate +
+                target_node_id = cx_builder.add_node(name=target_predicate + str(row[target_field]),
+                                                     represents=target_predicate +
                                                                    str(row[target_field]))
 
             # =============
@@ -550,9 +573,9 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             else:
                 use_this_interaction = 'interacts-with'
 
-            niceCxBuilder.add_edge(id=index, source=source_node_id,
-                                   target=target_node_id,
-                                   interaction=use_this_interaction)
+            cx_builder.add_edge(id=index, source=source_node_id,
+                                target=target_node_id,
+                                interaction=use_this_interaction)
 
             # ==============================
             # ADD SOURCE NODE ATTRIBUTES
@@ -578,7 +601,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                 if sp == 'citation' and not isinstance(row[sp], list):
                     row[sp] = [row[sp]]
                     attr_type = 'list_of_string'
-                niceCxBuilder.add_node_attribute(source_node_id, sp, str(row[sp]), type=attr_type)
+                cx_builder.add_node_attribute(source_node_id, sp, str(row[sp]), type=attr_type)
 
             # ==============================
             # ADD TARGET NODE ATTRIBUTES
@@ -604,7 +627,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                 if tp == 'citation' and not isinstance(row[tp], list):
                     row[tp] = [row[tp]]
                     attr_type = 'list_of_string'
-                niceCxBuilder.add_node_attribute(target_node_id, tp, str(row[tp]), type=attr_type)
+                cx_builder.add_node_attribute(target_node_id, tp, str(row[tp]), type=attr_type)
 
             # ==============================
             # ADD EDGE ATTRIBUTES
@@ -627,36 +650,36 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                     row[ep] = [row[ep]]
                     attr_type = 'list_of_string'
 
-                niceCxBuilder.add_edge_attribute(property_of=index,
-                                                 name=ep, values=row[ep],
-                                                 type=attr_type)
+                cx_builder.add_edge_attribute(property_of=index,
+                                              name=ep, values=row[ep],
+                                              type=attr_type)
 
     else:
         for index, row in df.iterrows():
             # =============
             # ADD NODES
             # =============
-            source_node_id = niceCxBuilder.add_node(name=str(row[0]),
-                                                    represents=str(row[0]))
+            source_node_id = cx_builder.add_node(name=str(row[0]),
+                                                 represents=str(row[0]))
 
-            target_node_id = niceCxBuilder.add_node(name=str(row[1]),
-                                                    represents=str(row[1]))
+            target_node_id = cx_builder.add_node(name=str(row[1]),
+                                                 represents=str(row[1]))
 
             # =============
             # ADD EDGES
             # =============
             if len(row) > 2:
-                niceCxBuilder.add_edge(id=index,
-                                       source=source_node_id,
-                                       target=target_node_id,
-                                       interaction=row[2])
+                cx_builder.add_edge(id=index,
+                                    source=source_node_id,
+                                    target=target_node_id,
+                                    interaction=row[2])
             else:
-                niceCxBuilder.add_edge(id=index,
-                                       source=source_node_id,
-                                       target=target_node_id,
-                                       interaction='interacts-with')
+                cx_builder.add_edge(id=index,
+                                    source=source_node_id,
+                                    target=target_node_id,
+                                    interaction='interacts-with')
 
-    return niceCxBuilder.get_nice_cx()  # my_nicecx
+    return cx_builder.get_nice_cx()  # my_nicecx
 
 
 def create_nice_cx_from_server(server, username=None, password=None, uuid=None,

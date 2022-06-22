@@ -31,16 +31,19 @@ Edge methods
 ****************************
 .. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: create_edge, get_edges, get_edge_attributes, get_edge_attribute, get_edge_attribute_value, set_edge_attribute
+    :noindex:
 
 Network methods
 ****************************
 .. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: get_context, get_name, get_network_attribute, get_network_attribute_names, get_opaque_aspect, set_context, set_name, set_network_attribute, set_opaque_aspect
+    :noindex:
 
 Miscellaneous methods
 ****************************
 .. autoclass:: ndex2.nice_cx_network.NiceCXNetwork
     :members: apply_template, apply_style_from_network, print_summary, to_cx, to_cx_stream, to_networkx, to_pandas_dataframe, update_to, upload_to
+    :noindex:
 
 
 Supported data types

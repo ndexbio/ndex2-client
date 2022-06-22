@@ -134,6 +134,59 @@ class TestCreateNiceCXNetworkFromNetworkX(unittest.TestCase):
                           'n': 'somestrfield',
                           'v': 'bye', 'd': 'string'}, n_a)
 
+    def test_create_nice_cx_from_networkx_roundtrip_from_legacy_with_attrs(self):
+        net = ndex2.nice_cx_network.NiceCXNetwork()
+        node_one = net.create_node('Node 1')
+        node_two = net.create_node('Node 2')
+        net.set_node_attribute(node_one, 'somestrfield', 'hi')
+
+        edge_one = net.create_edge(edge_source=node_one, edge_target=node_two,
+                                   edge_interaction='breaks')
+        net.set_edge_attribute(edge_one, 'somestrfield', 'bye')
+        net.set_opaque_aspect(ndex2.constants.CARTESIAN_LAYOUT_ASPECT,
+                              [{'node': node_one, 'x': 1.0, 'y': 2.0},
+                               {'node': node_two, 'x': 3.0, 'y': 4.0}])
+
+        net.set_name('mynetwork')
+        netx_net = net.to_networkx(mode='legacy')
+        net_roundtrip = ndex2.create_nice_cx_from_networkx(netx_net)
+
+        self.assertEqual(netx_net.pos[0], (1.0, -2.0))
+        self.assertEqual(netx_net.pos[1], (3.0, -4.0))
+
+        self.assertEqual('mynetwork', net_roundtrip.get_name())
+        self.assertEqual(1, len(net_roundtrip.get_edges()))
+        self.assertEqual(2, len(net_roundtrip.get_nodes()))
+
+        self.assertEqual((0, {'@id': 0,
+                              's': 0, 't': 1,
+                              'i': 'breaks'}),
+                         list(net_roundtrip.get_edges())[0])
+
+        for node_id, node_obj in net_roundtrip.get_nodes():
+            if node_id == 0:
+                self.assertEqual({'@id': 0,
+                                  'n': 'Node 1',
+                                  'r': 'Node 1'}, node_obj)
+            elif node_id == 1:
+                self.assertEqual({'@id': 1,
+                                  'n': 'Node 2',
+                                  'r': 'Node 2'}, node_obj)
+            else:
+                self.fail('Invalid node: ' + str(node_obj))
+
+        n_a = net_roundtrip.get_node_attribute(node_one,
+                                               'somestrfield')
+        self.assertEqual({'po': 0,
+                          'n': 'somestrfield',
+                          'v': 'hi', 'd': 'string'}, n_a)
+
+        n_a = net_roundtrip.get_edge_attribute(node_one,
+                                               'somestrfield')
+        self.assertEqual({'po': 0,
+                          'n': 'somestrfield',
+                          'v': 'bye', 'd': 'string'}, n_a)
+
     def test_create_nice_cx_from_networkx_roundtrip_glypican(self):
 
         net = ndex2.create_nice_cx_from_file(TestCreateNiceCXNetworkFromNetworkX.GLYPICAN_FILE)

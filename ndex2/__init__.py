@@ -17,7 +17,19 @@ from ndex2.client import Ndex2
 from ndex2 import constants
 
 
-def get_logger(name, level=logging.DEBUG):
+def get_logger(name, level=logging.DEBUG):  # pragma: no cover
+    """
+    Do **NOT** use. This function writes log messages to a `logs`
+    directory under the ndex2 installed package which is very
+    bad form
+
+    .. deprecated:: 3.5.0
+        This will eventually go away
+
+    :param name:
+    :param level:
+    :return:
+    """
     # TODO Creating a logs directory within the package installation of Python is bad
     root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     log_path = os.path.join(root, 'logs')
@@ -43,7 +55,7 @@ def get_logger(name, level=logging.DEBUG):
     return logger
 
 
-def load_matrix_to_ndex(x, x_cols, x_rows, server, username, password, name):
+def load_matrix_to_ndex(x, x_cols, x_rows, server, username, password, name):  # pragma: no cover
     """
     Testing 1
     :param X: param 1
@@ -91,7 +103,7 @@ def load_matrix_to_ndex(x, x_cols, x_rows, server, username, password, name):
     return ont_url
 
 
-def get_matrix_from_ndex(server, username, password, uuid):
+def get_matrix_from_ndex(server, username, password, uuid):  # pragma: no cover
     nice_cx = create_nice_cx_from_server(server=server, uuid=uuid, username=username, password=password)
 
     matrix = __get_v_from_aspect(nice_cx, 'matrix')
@@ -111,7 +123,7 @@ def get_matrix_from_ndex(server, username, password, uuid):
     return x, matrix_cols, matrix_rows
 
 
-def __get_v_from_aspect(niceCx, aspect):
+def __get_v_from_aspect(niceCx, aspect):  # pragma: no cover
     aspect_tmp = niceCx.get_opaque_aspect(aspect)
     if len(aspect_tmp) > 0:
         return aspect_tmp[0].get('v')

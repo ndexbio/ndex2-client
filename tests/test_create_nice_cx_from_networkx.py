@@ -7,6 +7,7 @@ import unittest
 import json
 import networkx as nx
 import ndex2
+from ndex2.nice_cx_network import NetworkXFactory
 
 
 SKIP_REASON = 'NDEX2_TEST_SERVER environment variable detected, ' \
@@ -25,7 +26,7 @@ class TestCreateNiceCXNetworkFromNetworkX(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures, if any."""
-        pass
+        self._nx_major_version = NetworkXFactory.get_networkx_major_version()
 
     def tearDown(self):
         """Tear down test fixtures, if any."""
@@ -165,13 +166,23 @@ class TestCreateNiceCXNetworkFromNetworkX(unittest.TestCase):
 
         for node_id, node_obj in net_roundtrip.get_nodes():
             if node_id == 0:
-                self.assertEqual({'@id': 0,
-                                  'n': 'Node 1',
-                                  'r': 'Node 1'}, node_obj)
+                if self._nx_major_version >= 2:
+                    self.assertEqual({'@id': 0,
+                                      'n': 'Node 1',
+                                      'r': 'Node 1'}, node_obj)
+                else:
+                    self.assertEqual({'@id': 0,
+                                      'n': 'Node 1'}, node_obj)
+
             elif node_id == 1:
-                self.assertEqual({'@id': 1,
-                                  'n': 'Node 2',
-                                  'r': 'Node 2'}, node_obj)
+                if self._nx_major_version >= 2:
+                    self.assertEqual({'@id': 1,
+                                      'n': 'Node 2',
+                                      'r': 'Node 2'}, node_obj)
+                else:
+                    self.assertEqual({'@id': 1,
+                                      'n': 'Node 2'}, node_obj)
+
             else:
                 self.fail('Invalid node: ' + str(node_obj))
 

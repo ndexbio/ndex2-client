@@ -6,7 +6,7 @@ History
 -------------------
 
 * Enhancements
-    * Added *skip_version_check* parameter to ``Ndex2()`` constructor to let caller
+    * Added **skip_version_check** parameter to ``Ndex2()`` constructor to let caller
       optionally bypass NDEx server call to see if **v2** endpoint is supported
 
     * Added the following *CX2* methods to ``Ndex2()`` client:
@@ -19,8 +19,8 @@ History
       to NDEx server will now raise the more specific ``NDExUnauthorizedError``
       subclass when the response from NDEx server is a 401 aka unauthorized.
 
-    * Added new parameters `dataconverter` and `include_attributes` to ``NiceCXNetwork.to_pandas_dataframe()``
-      `dataconverter` specifies data type conversion and if `include_attributes` lets
+    * Added new parameters **dataconverter** and **include_attributes** to ``NiceCXNetwork.to_pandas_dataframe()``.
+      **dataconverter** parameter specifies data type conversion and **include_attributes** parameter lets
       caller specify whether all node/edge attributes are added to the resulting DataFrame
 
     * Added new parameter to ``ndex2.create_nice_cx_from_server()`` named **ndex_client**
@@ -72,14 +72,14 @@ History
 3.4.0 (2021-05-06)
 -------------------
 
-* Added `offset` and `limit` parameters to `Ndex2.get_network_ids_for_user()` to enable
+* Added **offset** and **limit** parameters to `Ndex2.get_network_ids_for_user()` to enable
   retrieval of all networks for a user.
   `Issue #78 <https://github.com/ndexbio/ndex2-client/issues/78>`__
 
-* Switched `NiceCXNetwork.upload_to()` to named arguments and added `client` parameter.
+* Switched `NiceCXNetwork.upload_to()` to named arguments and added **client** parameter.
   `Issue #80 <https://github.com/ndexbio/ndex2-client/issues/80>`__
 
-* Switched `NiceCXNetwork.update_to()` to named arguments and added `client` parameter.
+* Switched `NiceCXNetwork.update_to()` to named arguments and added **client** parameter.
   `Issue #81 <https://github.com/ndexbio/ndex2-client/issues/81>`__
 
 * Fixed documentation `NiceCXNetwork.update_to()` to correctly state method returns empty
@@ -128,28 +128,28 @@ History
 3.3.0 (2019-09-11)
 ------------------
 
-* Fixed bug where if server version is not 2.0 exactly then Ndex2() object incorrectly falls back to version of 1.3 of REST calls
+* Fixed bug where if server version is not 2.0 exactly then `Ndex2()` object incorrectly falls back to version of 1.3 of REST calls
   `Issue #40 <https://github.com/ndexbio/ndex2-client/issues/40>`_
 
-* Fixed bug in NiceCXNetwork.add_network_attribute() method where type not properly reset when adding duplicate attribute
+* Fixed bug in `NiceCXNetwork.add_network_attribute()` method where type not properly reset when adding duplicate attribute
   `Issue #50 <https://github.com/ndexbio/ndex2-client/issues/50>`_
 
-* Added delete_networksets() method to Ndex2 client to allow deletion of networksets `Issue #59 <https://github.com/ndexbio/ndex2-client/issues/59>`_
+* Added `delete_networksets()` method to Ndex2 client to allow deletion of networksets `Issue #59 <https://github.com/ndexbio/ndex2-client/issues/59>`_
 
 
 3.2.0 (2019-04-23)
 ------------------
 
-* Verify consistent conversion of cx for networkx 1.11 and 2.0+
+* Verify consistent conversion of CX for networkx 1.11 and 2.0+
   `Issue #30 <https://github.com/ndexbio/ndex2-client/issues/30>`_
 
-* NiceCXNetwork.get_nodes(), NiceCXNetwork.get_edges(), NiceCXNetwork.get_metadata() needs to make correct iterator call in Python 2
+* `NiceCXNetwork.get_nodes()`, `NiceCXNetwork.get_edges()`, `NiceCXNetwork.get_metadata()` needs to make correct iterator call in Python 2
   `Issue #44 <https://github.com/ndexbio/ndex2-client/issues/44>`_
 
-* Add NiceCXNetwork.get_network_attribute_names() function enhancement
+* Add `NiceCXNetwork.get_network_attribute_names()` function enhancement
   `Issue #45 <https://github.com/ndexbio/ndex2-client/issues/45>`_
 
-* NiceCXNetwork.create_edge fails to correctly create edge when node dict passed in
+* `NiceCXNetwork.create_edge()` fails to correctly create edge when node dict passed in
   `Issue #46 <https://github.com/ndexbio/ndex2-client/issues/46>`_
 
 3.1.0a1 (2019-03-20)

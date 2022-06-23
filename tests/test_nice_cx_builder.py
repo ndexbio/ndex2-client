@@ -124,9 +124,6 @@ class TestNiceCXBuilder(unittest.TestCase):
                           'po': 0,
                           'v': [2.0]}, net.get_node_attribute(0, 'dchecklist'))
 
-
-
-
     def test_infer_data_type_none_val(self):
         builder = NiceCXBuilder()
         self.assertEqual((None, None),

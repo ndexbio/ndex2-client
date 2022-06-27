@@ -42,11 +42,11 @@ networks via the NiceCXNetwork class.
 **Compatibility**
 -----------------------
 
-Python 2.7+
+Python 3.6+
 
 .. note::
 
-    Python 2.7 may have some issues, Python 3.6+ is preferred
+    Python < 3.6 may have some issues
 
 **Installation**
 --------------------------------------

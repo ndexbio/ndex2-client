@@ -1,9 +1,24 @@
 language: python
 python:
   - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
+  - "3.10"
 env:
   - NETX=1.11
   - NETX=true
+jobs:
+  exclude:
+    - python: "3.7"
+      env: NETX=1.11
+    - python: "3.8"
+      env: NETX=1.11
+    - python: "3.9"
+      env: NETX=1.11
+    - python: "3.10"
+      env: NETX=1.11
+
 install:
   - if [ $NETX = 1.11 ] ; then echo 'installing networkx 1.11' ; pip install networkx==1.11 ; fi
   - pip install -r requirements.txt

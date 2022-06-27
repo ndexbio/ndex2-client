@@ -145,6 +145,10 @@ class TestCreateNiceCXNetworkFromNetworkX(unittest.TestCase):
                 'target': ['Node 2', 'Node 3'],
                 'interaction': ['helps', 'hurts']}
         df = pd.DataFrame.from_dict(data)
+        # on older versions of pandas this order is not consistent
+        # so setting it explicitly
+        df = df[['source', 'target', 'interaction']]
+
         net = ndex2.create_nice_cx_from_pandas(df)
         self.assertEqual(2, len(net.get_edges()))
         self.assertEqual(3, len(net.get_nodes()))

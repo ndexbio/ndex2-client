@@ -610,7 +610,7 @@ class TestClientIntegration(unittest.TestCase):
         netid_two = None
         try:
             # query for networks for user in creds
-            network_ids = client.get_network_ids_for_user(creds['user'])
+            network_ids = client.get_network_ids_for_user(creds['user'], limit=100000)
             num_network_ids = len(network_ids)
             self.assertTrue(num_network_ids >= 0)
 
@@ -618,7 +618,10 @@ class TestClientIntegration(unittest.TestCase):
             network_ids = client.get_network_ids_for_user(creds['user'],
                                                           offset=num_network_ids,
                                                           limit=1)
-            self.assertTrue(len(network_ids) == 0)
+            self.assertTrue(len(network_ids) == 0, 'this will fail if user has '
+                                                   'more then 100000 networks in'
+                                                   'there account')
+
 
             # add two networks just in case there are none and verify
             # they are returned

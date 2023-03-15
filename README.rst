@@ -66,6 +66,13 @@ can use this command instead:
     pip install --upgrade ndex2
 
 
+**Resources**
+--------------------------------------
+
+* The NDEx2 Python Client `documentation <https://ndex2.readthedocs.io/en/latest/>`_ is available on Read the Docs.
+* Please refer to our `Jupyter Notebook Tutorials <https://github.com/ndexbio/ndex-jupyter-notebooks>`_ GitHub repository for code examples to work with networks using the NDEx2 Python Client and NiceCX object class. 
+
+
 **License**
 --------------------------------------
 

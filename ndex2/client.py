@@ -278,6 +278,19 @@ class Ndex2(object):
             return self.version_endpoint
         return alt_version_endpoint
 
+    def _get_auth_tuple(self):
+        """
+        Gets a tuple with username and password set via constructor
+        if they are both NOT ``None``
+
+        :return: (username, password) or ``None`` if values of both are
+                 ``None``
+        :rtype: tuple
+        """
+        if self.username is None and self.password is None:
+            return None
+        return self.username, self.password
+
     def put(self, route, put_json=None, alt_version_endpoint=None):
         url = self.host +\
               self._get_version_endpoint(alt_version_endpoint=
@@ -392,7 +405,7 @@ class Ndex2(object):
                    Ndex2.USER_AGENT_KEY: self._get_user_agent(),
                    'Connection': 'close'
                    }
-        response = requests.put(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
+        response = requests.put(url, data=multipart_data, headers=headers, auth=self._get_auth_tuple())
         return self._return_response(response,
                                      returnjsonundertry=returnjsonundertry,
                                      returnfullresponse=returnfullresponse)
@@ -412,7 +425,8 @@ class Ndex2(object):
                    Ndex2.USER_AGENT_KEY: self._get_user_agent(),
                    'Connection': 'close'
                    }
-        response = requests.post(url, data=multipart_data, headers=headers, auth=(self.username, self.password))
+
+        response = requests.post(url, data=multipart_data, headers=headers, auth=self._get_auth_tuple())
         return self._return_response(response,
                                      returnjsonundertry=returnjsonundertry,
                                      returnfullresponse=returnfullresponse)
@@ -435,7 +449,7 @@ class Ndex2(object):
             raise NDExInvalidCXError('CX is None')
         if not isinstance(cx, list):
             raise NDExInvalidCXError('CX is not a list')
-        if len(cx) is 0:
+        if len(cx) == 0:
             raise NDExInvalidCXError('CX appears to be empty')
 
         indexed_fields = None
@@ -524,7 +538,7 @@ class Ndex2(object):
             raise NDExInvalidCXError('CX is None')
         if not isinstance(cx, list):
             raise NDExInvalidCXError('CX is not a list')
-        if len(cx) is 0:
+        if len(cx) == 0:
             raise NDExInvalidCXError('CX appears to be empty')
 
         if sys.version_info.major == 3:

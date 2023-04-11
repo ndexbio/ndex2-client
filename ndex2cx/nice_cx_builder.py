@@ -4,7 +4,6 @@ import logging
 import base64
 import sys
 import math
-import numpy as np
 
 if sys.version_info.major == 3:
     from urllib.request import urlopen, Request, HTTPError, URLError
@@ -468,7 +467,7 @@ class NiceCXBuilder(object):
                 elif ';' in val:
                     val = val.split(';')
 
-        if isinstance(val, float) or isinstance(val, np.float) or isinstance(val, np.double):
+        if isinstance(val, float):
             if math.isnan(val):
                 # do something (skip?)
                 val = None
@@ -479,20 +478,20 @@ class NiceCXBuilder(object):
             # fix for https://github.com/ndexbio/ndex2-client/issues/83
             # a boolean is a sub type of int so bool must be tested first
             return val, 'boolean'
-        if isinstance(val, int) or isinstance(val, np.int):
+        if isinstance(val, int):
             return val, 'integer'
         if isinstance(val, list):
             # if the list is empty just set data type to list_of_string
             # fix for https://github.com/ndexbio/ndex2-client/issues/90
             attr_type = 'list_of_string'
             if len(val) > 0:
-                if isinstance(val[0], float) or isinstance(val[0], np.float) or isinstance(val[0], np.double):
+                if isinstance(val[0], float):
                     attr_type = 'list_of_double'
                 elif isinstance(val[0], bool):
                     # fix for https://github.com/ndexbio/ndex2-client/issues/83
                     # a boolean is a sub type of int so bool must be tested first
                     attr_type = 'list_of_boolean'
-                elif isinstance(val[0], int) or isinstance(val[0], np.int):
+                elif isinstance(val[0], int):
                     attr_type = 'list_of_integer'
 
         return val, attr_type

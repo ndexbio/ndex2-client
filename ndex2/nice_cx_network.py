@@ -1891,7 +1891,7 @@ class NiceCXNetwork:
         consistency_group = 1
         if self.metadata_original is not None:
             for mi in self.metadata_original:
-                if mi.get("consistencyGroup" is not None):
+                if mi.get("consistencyGroup") is not None:
                     if mi.get("consistencyGroup") > consistency_group:
                         consistency_group = mi.get("consistencyGroup")
                 else:

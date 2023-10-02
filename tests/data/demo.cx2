@@ -1,0 +1,1056 @@
+[
+    {
+        "CXVersion": "2.0",
+        "hasFragments": false
+    },
+    {
+        "metaData": [
+            {
+                "elementCount": 1,
+                "name": "networkAttributes"
+            },
+            {
+                "elementCount": 1,
+                "name": "visualProperties"
+            },
+            {
+                "elementCount": 1,
+                "name": "visualEditorProperties"
+            },
+            {
+                "elementCount": 3,
+                "name": "nodeBypasses"
+            },
+            {
+                "elementCount": 1,
+                "name": "edgeBypasses"
+            },
+            {
+                "elementCount": 1,
+                "name": "attributeDeclarations"
+            },
+            {
+                "elementCount": 2,
+                "name": "cyHiddenAttributes"
+            },
+            {
+                "elementCount": 6,
+                "name": "nodes"
+            },
+            {
+                "elementCount": 23,
+                "name": "cyTableColumn"
+            },
+            {
+                "elementCount": 6,
+                "name": "edges"
+            }
+        ]
+    },
+    {
+        "attributeDeclarations": [
+            {
+                "edges": {
+                    "Is_Tree_Edge": {
+                        "d": "string"
+                    },
+                    "interaction": {
+                        "a": "i",
+                        "d": "string"
+                    },
+                    "name": {
+                        "d": "string"
+                    }
+                },
+                "networkAttributes": {
+                    "name": {
+                        "d": "string"
+                    },
+                    "description": {
+                        "d": "string"
+                    }
+                },
+                "nodes": {
+                    "Size": {
+                        "d": "integer"
+                    },
+                    "align_fdr": {
+                        "d": "double"
+                    },
+                    "align_goID": {
+                        "d": "string"
+                    },
+                    "align_score": {
+                        "d": "double"
+                    },
+                    "annot": {
+                        "d": "string"
+                    },
+                    "annot_source": {
+                        "d": "string"
+                    },
+                    "cc_overlap": {
+                        "d": "string"
+                    },
+                    "genes": {
+                        "d": "string"
+                    },
+                    "jaccard": {
+                        "d": "double"
+                    },
+                    "name": {
+                        "a": "n",
+                        "d": "string"
+                    },
+                    "overlap": {
+                        "d": "string"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "networkAttributes": [
+            {
+                "name": "DLoc Hierarchy demo",
+                "description": "A small network that has attributes on network, nodes and edges. It also has visualstyles and bypasses on nodes and edges."
+            }
+        ]
+    },
+    {
+        "nodes": [
+            {
+                "id": 103,
+                "v": {
+                    "Size": 19,
+                    "align_fdr": -1.0,
+                    "align_score": -1.0,
+                    "annot": "COMP:764",
+                    "annot_source": "novel",
+                    "cc_overlap": "10/61;9/115;13/619;7/60;5/30;4/21;4/21;4/24;7/297;3/19;3/19;6/408;3/35;2/8;2/23;3/132;2/28;3/154",
+                    "genes": "SRRM2,DHX15,COIL,SNRPC,SNRPB2,CDC40,NAA38,RNPC3,SNRNP70,SRSF10,SRRM1,EXO1,CCDC12,DHX8,GEMIN4,CD2BP2,SNRPA1,GEMIN7,SF3A2,",
+                    "jaccard": -1.0,
+                    "n": "764",
+                    "overlap": "None"
+                },
+                "x": 123.14439668294953,
+                "y": -297.131767510978
+            },
+            {
+                "id": 115,
+                "v": {
+                    "Size": 11,
+                    "align_fdr": -1.0,
+                    "align_score": -1.0,
+                    "annot": "COMP:753",
+                    "annot_source": "novel",
+                    "cc_overlap": "6/61;6/115;5/60;8/619;3/21;5/297;3/30;2/8;2/19;2/21;2/24;3/408",
+                    "genes": "DHX15,SNRPC,SNRPB2,CDC40,SNRNP70,SRRM1,CCDC12,GEMIN4,CD2BP2,SNRPA1,GEMIN7,",
+                    "jaccard": -1.0,
+                    "n": "753",
+                    "overlap": "None"
+                },
+                "x": 193.35932771937667,
+                "y": -287.25515529706604
+            },
+            {
+                "id": 119,
+                "v": {
+                    "Size": 9,
+                    "align_fdr": -1.0,
+                    "align_score": -1.0,
+                    "annot": "COMP:751",
+                    "annot_source": "novel",
+                    "cc_overlap": "6/61;6/115;4/60;6/619;3/21;3/30;2/8;4/297;2/21;2/24",
+                    "genes": "DHX15,SNRPC,SNRPB2,CDC40,SNRNP70,SRRM1,CCDC12,SNRPA1,GEMIN7,",
+                    "jaccard": -1.0,
+                    "n": "751",
+                    "overlap": "None"
+                },
+                "x": 256.8421551008104,
+                "y": -292.45574205548394
+            },
+            {
+                "id": 123,
+                "v": {
+                    "Size": 4,
+                    "align_fdr": 0.0,
+                    "align_goID": "GO:0071007",
+                    "align_score": 0.459948,
+                    "annot": "U2-type catalytic step 2 spliceosome",
+                    "annot_source": "CC",
+                    "cc_overlap": "3/30;3/61;3/115;2/21;2/60",
+                    "genes": "SNRPB2,CDC40,CCDC12,SNRPA1,",
+                    "jaccard": 0.5,
+                    "n": "721",
+                    "overlap": "3/5"
+                },
+                "x": 299.8616030219418,
+                "y": -366.0878683881494
+            },
+            {
+                "id": 124,
+                "v": {
+                    "Size": 8,
+                    "align_fdr": 0.004,
+                    "align_goID": "GO:0071013",
+                    "align_score": 0.25474,
+                    "annot": "catalytic step 2 spliceosome",
+                    "annot_source": "CC",
+                    "cc_overlap": "5/61;4/30;5/115;3/21;3/60;2/21;4/619;3/408",
+                    "genes": "SNRPB2,CDC40,NAA38,RNPC3,EXO1,CCDC12,DHX8,SNRPA1,",
+                    "jaccard": 0.3076923077,
+                    "n": "747",
+                    "overlap": "4/9"
+                },
+                "x": 173.69852672302636,
+                "y": -347.7649365389975
+            },
+            {
+                "id": 137,
+                "v": {
+                    "Size": 6,
+                    "align_fdr": -1.0,
+                    "align_score": -1.0,
+                    "annot": "COMP:737",
+                    "annot_source": "novel",
+                    "cc_overlap": "4/61;4/115;3/21;3/60;2/8;4/619;2/24",
+                    "genes": "DHX15,SNRPC,SNRPB2,SNRNP70,CCDC12,GEMIN7,",
+                    "jaccard": -1.0,
+                    "n": "737",
+                    "overlap": "None"
+                },
+                "x": 326.15462133852697,
+                "y": -295.3667175710825
+            }
+        ]
+    },
+    {
+        "edges": [
+            {
+                "id": 239,
+                "s": 115,
+                "t": 119,
+                "v": {
+                    "Is_Tree_Edge": "Tree",
+                    "i": "interacts with",
+                    "name": "753 (interacts with) 751"
+                }
+            },
+            {
+                "id": 248,
+                "s": 124,
+                "t": 123,
+                "v": {
+                    "Is_Tree_Edge": "Tree",
+                    "i": "interacts with",
+                    "name": "747 (interacts with) 721"
+                }
+            },
+            {
+                "id": 245,
+                "s": 119,
+                "t": 123,
+                "v": {
+                    "Is_Tree_Edge": "Not_Tree",
+                    "i": "interacts with",
+                    "name": "751 (interacts with) 721"
+                }
+            },
+            {
+                "id": 244,
+                "s": 119,
+                "t": 137,
+                "v": {
+                    "Is_Tree_Edge": "Tree",
+                    "i": "interacts with",
+                    "name": "751 (interacts with) 737"
+                }
+            },
+            {
+                "id": 223,
+                "s": 103,
+                "t": 124,
+                "v": {
+                    "Is_Tree_Edge": "Tree",
+                    "i": "interacts with",
+                    "name": "764 (interacts with) 747"
+                }
+            },
+            {
+                "id": 222,
+                "s": 103,
+                "t": 115,
+                "v": {
+                    "Is_Tree_Edge": "Tree",
+                    "i": "interacts with",
+                    "name": "764 (interacts with) 753"
+                }
+            }
+        ]
+    },
+    {
+        "visualProperties": [
+            {
+                "default": {
+                    "edge": {
+                        "EDGE_CURVED": true,
+                        "EDGE_LABEL_COLOR": "#000000",
+                        "EDGE_LABEL_FONT_FACE": {
+                            "FONT_FAMILY": "sans-serif",
+                            "FONT_STYLE": "normal",
+                            "FONT_WEIGHT": "normal"
+                        },
+                        "EDGE_LABEL_FONT_SIZE": 10,
+                        "EDGE_LABEL_MAX_WIDTH": 200.0,
+                        "EDGE_LABEL_OPACITY": 1.0,
+                        "EDGE_LINE_COLOR": "#666666",
+                        "EDGE_LINE_STYLE": "solid",
+                        "EDGE_OPACITY": 1.0,
+                        "EDGE_SELECTED": "false",
+                        "EDGE_SELECTED_PAINT": "#FF0000",
+                        "EDGE_SOURCE_ARROW_COLOR": "#666666",
+                        "EDGE_SOURCE_ARROW_SHAPE": "triangle",
+                        "EDGE_SOURCE_ARROW_SIZE": 6.0,
+                        "EDGE_TARGET_ARROW_COLOR": "#000000",
+                        "EDGE_TARGET_ARROW_SHAPE": "none",
+                        "EDGE_TARGET_ARROW_SIZE": 6.0,
+                        "EDGE_VISIBILITY": "element",
+                        "EDGE_WIDTH": 2.0
+                    },
+                    "network": {
+                        "NETWORK_BACKGROUND_COLOR": "#FFFFFF"
+                    },
+                    "node": {
+                        "COMPOUND_NODE_PADDING": "10.0",
+                        "COMPOUND_NODE_SHAPE": "ROUND_RECTANGLE",
+                        "NODE_BACKGROUND_COLOR": "#89D0F5",
+                        "NODE_BACKGROUND_OPACITY": 1.0,
+                        "NODE_BORDER_COLOR": "#CCCCCC",
+                        "NODE_BORDER_OPACITY": 1.0,
+                        "NODE_BORDER_STYLE": "solid",
+                        "NODE_BORDER_WIDTH": 0.0,
+                        "NODE_HEIGHT": 35.0,
+                        "NODE_IMAGE_1_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_1_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_2_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_2_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_3_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_3_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_4_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_4_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_5_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_5_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_6_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_6_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_7_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_7_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_8_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_8_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_IMAGE_9_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_IMAGE_9_SIZE": {
+                            "HEIGHT": 50.0,
+                            "WIDTH": 50.0
+                        },
+                        "NODE_LABEL_COLOR": "#000000",
+                        "NODE_LABEL_FONT_FACE": {
+                            "FONT_FAMILY": "sans-serif",
+                            "FONT_STYLE": "normal",
+                            "FONT_WEIGHT": "normal"
+                        },
+                        "NODE_LABEL_FONT_SIZE": 12,
+                        "NODE_LABEL_MAX_WIDTH": 200.0,
+                        "NODE_LABEL_OPACITY": 1.0,
+                        "NODE_LABEL_POSITION": {
+                            "HORIZONTAL_ALIGN": "center",
+                            "HORIZONTAL_ANCHOR": "center",
+                            "JUSTIFICATION": "center",
+                            "MARGIN_X": 0.0,
+                            "MARGIN_Y": 0.0,
+                            "VERTICAL_ALIGN": "center",
+                            "VERTICAL_ANCHOR": "center"
+                        },
+                        "NODE_SELECTED": false,
+                        "NODE_SELECTED_PAINT": "#FFFF00",
+                        "NODE_SHAPE": "ellipse",
+                        "NODE_VISIBILITY": "element",
+                        "NODE_WIDTH": 35.0,
+                        "NODE_X_LOCATION": "0.0",
+                        "NODE_Y_LOCATION": "0.0",
+                        "NODE_Z_LOCATION": "0.0"
+                    }
+                },
+                "edgeMapping": {
+                    "EDGE_CURVED": {
+                        "definition": {
+                            "attribute": "Is_Tree_Edge",
+                            "map": [
+                                {
+                                    "v": "Tree",
+                                    "vp": false
+                                },
+                                {
+                                    "v": "Not_Tree",
+                                    "vp": true
+                                }
+                            ]
+                        },
+                        "type": "DISCRETE"
+                    },
+                    "EDGE_LINE_COLOR": {
+                        "definition": {
+                            "attribute": "Is_Tree_Edge",
+                            "map": [
+                                {
+                                    "v": "Tree",
+                                    "vp": "#666666"
+                                },
+                                {
+                                    "v": "Not_Tree",
+                                    "vp": "#CCCCCC"
+                                }
+                            ]
+                        },
+                        "type": "DISCRETE"
+                    },
+                    "EDGE_SOURCE_ARROW_COLOR": {
+                        "definition": {
+                            "attribute": "Is_Tree_Edge",
+                            "map": [
+                                {
+                                    "v": "Tree",
+                                    "vp": "#666666"
+                                },
+                                {
+                                    "v": "Not_Tree",
+                                    "vp": "#CCCCCC"
+                                }
+                            ]
+                        },
+                        "type": "DISCRETE"
+                    }
+                },
+                "nodeMapping": {
+                    "NODE_BACKGROUND_COLOR": {
+                        "definition": {
+                            "attribute": "annot_source",
+                            "map": [
+                                {
+                                    "v": "CC",
+                                    "vp": "#CCFFFF"
+                                },
+                                {
+                                    "v": "HPA",
+                                    "vp": "#CCFFCC"
+                                },
+                                {
+                                    "v": "novel",
+                                    "vp": "#FFCCCC"
+                                }
+                            ]
+                        },
+                        "type": "DISCRETE"
+                    },
+                    "NODE_HEIGHT": {
+                        "definition": {
+                            "attribute": "Size",
+                            "map": [
+                                {
+                                    "v": 3,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 4,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 5,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 6,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 7,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 8,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 9,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 11,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 75,
+                                    "vp": 80.0
+                                },
+                                {
+                                    "v": 12,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 13,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 14,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 15,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 16,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 18,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 19,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 20,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 661,
+                                    "vp": 100.0
+                                },
+                                {
+                                    "v": 21,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 22,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 23,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 88,
+                                    "vp": 80.0
+                                },
+                                {
+                                    "v": 25,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 28,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 29,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 33,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 37,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 39,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 40,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 43,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 53,
+                                    "vp": 80.0
+                                },
+                                {
+                                    "v": 63,
+                                    "vp": 80.0
+                                }
+                            ]
+                        },
+                        "type": "DISCRETE"
+                    },
+                    "NODE_LABEL": {
+                        "definition": {
+                            "attribute": "annot"
+                        },
+                        "type": "PASSTHROUGH"
+                    },
+                    "NODE_LABEL_FONT_SIZE": {
+                        "definition": {
+                            "attribute": "Size",
+                            "map": [
+                                {
+                                    "includeMax": false,
+                                    "includeMin": false,
+                                    "max": 3.0,
+                                    "maxVPValue": 1
+                                },
+                                {
+                                    "includeMax": true,
+                                    "includeMin": true,
+                                    "max": 195.0,
+                                    "maxVPValue": 45,
+                                    "min": 3.0,
+                                    "minVPValue": 7
+                                },
+                                {
+                                    "includeMax": true,
+                                    "includeMin": true,
+                                    "max": 661.0,
+                                    "maxVPValue": 47,
+                                    "min": 195.0,
+                                    "minVPValue": 45
+                                },
+                                {
+                                    "includeMax": false,
+                                    "includeMin": false,
+                                    "min": 661.0,
+                                    "minVPValue": 1
+                                }
+                            ]
+                        },
+                        "type": "CONTINUOUS"
+                    },
+                    "NODE_WIDTH": {
+                        "definition": {
+                            "attribute": "Size",
+                            "map": [
+                                {
+                                    "v": 3,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 4,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 5,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 6,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 7,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 8,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 9,
+                                    "vp": 20.0
+                                },
+                                {
+                                    "v": 11,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 75,
+                                    "vp": 80.0
+                                },
+                                {
+                                    "v": 12,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 13,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 14,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 15,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 16,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 18,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 19,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 20,
+                                    "vp": 35.0
+                                },
+                                {
+                                    "v": 661,
+                                    "vp": 100.0
+                                },
+                                {
+                                    "v": 21,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 22,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 23,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 88,
+                                    "vp": 80.0
+                                },
+                                {
+                                    "v": 25,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 28,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 29,
+                                    "vp": 50.0
+                                },
+                                {
+                                    "v": 33,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 37,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 39,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 40,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 43,
+                                    "vp": 65.0
+                                },
+                                {
+                                    "v": 53,
+                                    "vp": 80.0
+                                },
+                                {
+                                    "v": 63,
+                                    "vp": 80.0
+                                }
+                            ]
+                        },
+                        "type": "DISCRETE"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "nodeBypasses": [
+            {
+                "id": 137,
+                "v": {
+                    "NODE_LABEL_POSITION": {
+                        "HORIZONTAL_ALIGN": "center",
+                        "HORIZONTAL_ANCHOR": "center",
+                        "JUSTIFICATION": "center",
+                        "MARGIN_X": -4.44,
+                        "MARGIN_Y": 14.57,
+                        "VERTICAL_ALIGN": "center",
+                        "VERTICAL_ANCHOR": "center"
+                    }
+                }
+            },
+            {
+                "id": 115,
+                "v": {
+                    "NODE_LABEL_POSITION": {
+                        "HORIZONTAL_ALIGN": "center",
+                        "HORIZONTAL_ANCHOR": "center",
+                        "JUSTIFICATION": "center",
+                        "MARGIN_X": 0.25,
+                        "MARGIN_Y": 7.65,
+                        "VERTICAL_ALIGN": "center",
+                        "VERTICAL_ANCHOR": "center"
+                    }
+                }
+            },
+            {
+                "id": 119,
+                "v": {
+                    "NODE_LABEL_POSITION": {
+                        "HORIZONTAL_ALIGN": "center",
+                        "HORIZONTAL_ANCHOR": "center",
+                        "JUSTIFICATION": "center",
+                        "MARGIN_X": 0.25,
+                        "MARGIN_Y": 10.86,
+                        "VERTICAL_ALIGN": "center",
+                        "VERTICAL_ANCHOR": "center"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "edgeBypasses": [
+            {
+                "id": 245,
+                "v": {
+                    "EDGE_CONTROL_POINTS": [
+                        {
+                            "cos": 0.5211358239103628,
+                            "ratio": 0.6999978351246443,
+                            "sin": 0.8534737565017845
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "visualEditorProperties": [
+            {
+                "properties": {
+                    "NETWORK_CENTER_X_LOCATION": 277.9412,
+                    "NETWORK_CENTER_Y_LOCATION": -338.62628,
+                    "NETWORK_SCALE_FACTOR": 2.6440158,
+                    "arrowColorMatchesEdge": false,
+                    "nodeCustomGraphicsSizeSync": true,
+                    "nodeSizeLocked": true
+                }
+            }
+        ]
+    },
+    {
+        "cyHiddenAttributes": [
+            {
+                "n": "NDEx UUID",
+                "v": "ed43e087-493e-11ea-bfdc-0ac135e8bacf"
+            },
+            {
+                "d": "long",
+                "n": "__parentNetwork.SUID",
+                "v": "51"
+            }
+        ]
+    },
+    {
+        "cyTableColumn": [
+            {
+                "applies_to": "node_table",
+                "n": "shared name"
+            },
+            {
+                "applies_to": "node_table",
+                "d": "integer",
+                "n": "Size"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "genes"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "annot"
+            },
+            {
+                "applies_to": "node_table",
+                "d": "double",
+                "n": "align_score"
+            },
+            {
+                "applies_to": "node_table",
+                "d": "double",
+                "n": "align_fdr"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "annot_source"
+            },
+            {
+                "applies_to": "node_table",
+                "d": "double",
+                "n": "jaccard"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "overlap"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "align_goID"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "cc_overlap"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "Comment"
+            },
+            {
+                "applies_to": "node_table",
+                "n": "name"
+            },
+            {
+                "applies_to": "edge_table",
+                "n": "shared name"
+            },
+            {
+                "applies_to": "edge_table",
+                "n": "shared interaction"
+            },
+            {
+                "applies_to": "edge_table",
+                "n": "Is_Tree_Edge"
+            },
+            {
+                "applies_to": "edge_table",
+                "n": "name"
+            },
+            {
+                "applies_to": "edge_table",
+                "n": "interaction"
+            },
+            {
+                "applies_to": "network_table",
+                "n": "shared name"
+            },
+            {
+                "applies_to": "network_table",
+                "d": "list_of_string",
+                "n": "__Annotations"
+            },
+            {
+                "applies_to": "network_table",
+                "n": "description"
+            },
+            {
+                "applies_to": "network_table",
+                "n": "version"
+            },
+            {
+                "applies_to": "network_table",
+                "n": "name"
+            }
+        ]
+    },
+    {
+        "status": [
+            {
+                "success": true
+            }
+        ]
+    }
+]

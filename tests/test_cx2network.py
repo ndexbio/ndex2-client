@@ -28,6 +28,18 @@ class TestCX2Network(unittest.TestCase):
             data = json.load(f)
             self.assertIn("CXVersion", data[0])
 
+    def test_to_cx2(self):
+        self.cx2_obj.create_from_raw_cx2(self.sample_file)
+        cx2_data = self.cx2_obj.to_cx2()
+
+        self.assertIsInstance(cx2_data, list)
+        self.assertIn("CXVersion", cx2_data[0])
+
+        aspect_names = [list(item.keys())[0] for item in cx2_data]
+        self.assertIn("attributeDeclarations", aspect_names)
+        self.assertIn("nodes", aspect_names)
+        self.assertIn("edges", aspect_names)
+
     def test_convert_value(self):
         self.assertEqual(self.cx2_obj._convert_value("integer", "42"), 42)
         self.assertEqual(self.cx2_obj._convert_value("double", "42.42"), 42.42)

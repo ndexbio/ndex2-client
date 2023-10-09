@@ -3,7 +3,29 @@ import json
 
 class CX2Network(object):
     """
-    Represents the CX2 network format, allowing for reading, processing, and writing of CX2 data.
+    A representation of the CX2 (Cytoscape Exchange) network format.
+
+    This class provides functionality to read, process, and write data in the CX2 format.
+    It facilitates the structured access and manipulation of network data elements such as nodes, edges,
+    attributes, and visual properties.
+
+    The class maintains internal data structures that hold network data and provides methods to:
+    1. Load data from raw CX2 files.
+    2. Generate the CX2 representation of the current state.
+    3. Write the current state to a CX2 formatted file.
+
+    Attributes:
+        attribute_declarations: A dictionary representing the declarations of attributes for network elements.
+        network_attribute: A dictionary storing global attributes of the network.
+        nodes: A dictionary of nodes.
+        edges: A dictionary of edges.
+        aliases: A dictionary that maps aspect names (like "nodes" or "edges") to their alias declarations.
+        default_values: A dictionary that maps aspect names to their default attribute values.
+        visual_properties: A list storing visual properties of the network.
+        node_bypasses: A dictionary of node-specific visual properties that bypass default styles.
+        edge_bypasses: A dictionary of edge-specific visual properties that bypass default styles.
+        opaque_aspects: A list of other aspects in the CX2 format which don't have a defined structure in this class.
+        status: A dictionary representing the network's status.
     """
 
     def __init__(self):
@@ -94,6 +116,21 @@ class CX2Network(object):
         :param output_path: Destination file path for the CX2 formatted output.
         :type output_path: str
         """
+
+        with open(output_path, 'w') as output_file:
+            output_data = self.to_cx2()
+            json.dump(output_data, output_file, indent=4)
+
+    def to_cx2(self):
+        """
+        Generates the CX2 representation of the current state of the instance.
+
+        This method constructs a list structure representing the current state of the network
+        in the CX2 format.
+
+        :return: A list representing the CX2 formatted data of the current network state.
+        :rtype: list
+        """
         output_data = [{
             "CXVersion": "2.0",
             "hasFragments": False
@@ -154,8 +191,7 @@ class CX2Network(object):
         if self.status:
             output_data.append({"status": self.status})
 
-        with open(output_path, 'w') as output_file:
-            json.dump(output_data, output_file, indent=4)
+        return output_data
 
     def _process_attributes(self, aspect_name, attributes):
         """

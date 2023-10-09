@@ -6,10 +6,8 @@ History
 -------------------
 
 * Bug fixes
-
     * Fixed bug where ``ndex2.create_nice_cx_from_networkx()`` fails with numpy version 1.24
       `Issue #96 <https://github.com/ndexbio/ndex2-client/issues/96>`__
-
     * Updated post and put calls in ``client.py`` to only pass credentials if they are
       set. This change is to accommodate changes in upcoming version 3 of requests library
 

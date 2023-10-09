@@ -44,15 +44,20 @@ class CX2Network(object):
         self.opaque_aspects = []
         self.status = {}
 
-    def create_from_raw_cx2(self, cx2_file_path):
+    def create_from_raw_cx2(self, cx2_data):
         """
-        Loads and processes a raw CX2 file into structured data within the instance.
+        Loads and processes a raw CX2 data into structured data within the instance.
 
-        :param cx2_file_path: Path to the CX2 file to be processed.
-        :type cx2_file_path: str
+        :param cx2_data: Path to the CX2 file or a list representing CX2 data to be processed.
+        :type cx2_data: str or list
         """
-        with open(cx2_file_path, 'r') as cx2_file:
-            raw_data = json.load(cx2_file)
+        if isinstance(cx2_data, str):
+            with open(cx2_data, 'r') as cx2_file:
+                raw_data = json.load(cx2_file)
+        elif isinstance(cx2_data, list):
+            raw_data = cx2_data
+        else:
+            raise ValueError("Invalid input. cx2_data should be a file path (str) or a list.")
 
         for section in raw_data:
             if 'attributeDeclarations' in section:

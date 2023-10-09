@@ -14,10 +14,22 @@ class TestCX2Network(unittest.TestCase):
         if os.path.exists('test_output.cx2'):
             os.remove('test_output.cx2')
 
-    def test_create_from_raw_cx2(self):
+    def test_create_from_raw_cx2_from_file(self):
         self.cx2_obj.create_from_raw_cx2(self.sample_file)
         self.assertIsNotNone(self.cx2_obj.attribute_declarations)
         self.assertGreater(len(self.cx2_obj.nodes), 0)
+
+    def test_create_from_raw_cx2_from_list(self):
+        with open(self.sample_file, 'r') as f:
+            data_list = json.load(f)
+
+        self.cx2_obj.create_from_raw_cx2(data_list)
+        self.assertIsNotNone(self.cx2_obj.attribute_declarations)
+        self.assertGreater(len(self.cx2_obj.nodes), 0)
+
+    def test_invalid_input_create_from_raw_cx2(self):
+        with self.assertRaises(ValueError):
+            self.cx2_obj.create_from_raw_cx2(12345)
 
     def test_write_as_raw_cx2(self):
         self.cx2_obj.create_from_raw_cx2(self.sample_file)

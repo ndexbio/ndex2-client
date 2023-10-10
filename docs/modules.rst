@@ -12,7 +12,6 @@ The NDEx2 Python Client can be broken into two main parts:
    :maxdepth: 2
 
    cx2network
-   createcx2network
    ndex2
    createnicecx
    convertnicecx

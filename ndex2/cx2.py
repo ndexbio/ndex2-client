@@ -10,28 +10,39 @@ class CX2Network(object):
     attributes, and visual properties.
 
     The class maintains internal data structures that hold network data and provides methods to:
+
     1. Load data from raw CX2 files.
+
     2. Generate the CX2 representation of the current state.
+
     3. Write the current state to a CX2 formatted file.
 
     Attributes:
-        attribute_declarations: A dictionary representing the declarations of attributes for network elements.
-        network_attribute: A dictionary storing global attributes of the network.
-        nodes: A dictionary of nodes.
-        edges: A dictionary of edges.
-        aliases: A dictionary that maps aspect names (like "nodes" or "edges") to their alias declarations.
-        default_values: A dictionary that maps aspect names to their default attribute values.
-        visual_properties: A list storing visual properties of the network.
-        node_bypasses: A dictionary of node-specific visual properties that bypass default styles.
-        edge_bypasses: A dictionary of edge-specific visual properties that bypass default styles.
-        opaque_aspects: A list of other aspects in the CX2 format which don't have a defined structure in this class.
-        status: A dictionary representing the network's status.
+        - ``attribute_declarations``
+            A dictionary representing the declarations of attributes for network elements.
+        - ``network_attribute``
+            A dictionary storing global attributes of the network.
+        - ``nodes``
+            A dictionary of nodes.
+        - ``edges``
+            A dictionary of edges.
+        - ``aliases``
+            A dictionary that maps aspect names (like "nodes" or "edges") to their alias declarations.
+        - ``default_values``
+            A dictionary that maps aspect names to their default attribute values.
+        - ``visual_properties``
+            A list storing visual properties of the network.
+        - ``node_bypasses``
+            A dictionary of node-specific visual properties that bypass default styles.
+        - ``edge_bypasses``
+            A dictionary of edge-specific visual properties that bypass default styles.
+        - ``opaque_aspects``
+            A list of other aspects in the CX2 format which don't have a defined structure in this class.
+        - ``status``
+            A dictionary representing the network's status.
     """
 
     def __init__(self):
-        """
-        Initializes an empty CX2Network instance with default data structures.
-        """
         self.attribute_declarations = None
         self.network_attribute = {}
         self.nodes = {}

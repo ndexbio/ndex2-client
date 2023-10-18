@@ -26,63 +26,6 @@ def convert_value(dtype, value):
         return value
 
 
-class CX2Factory(object):
-    """
-    Base class for Factory classes that create
-    :py:class:`~ndex2.cx2.CX2Network` objects
-    """
-    def __init__(self):
-        """
-        Constructor
-        """
-        pass
-
-    def get_cx2_network(self, input_data=None):
-        """
-        Creates :py:class:`~ndex2.cx2.CX2Network`
-
-        .. warning::
-
-            Always raises NotImplementedError
-
-        :param input_data: Optional input data for used to generate
-                           network
-        :raises NotImplementedError: Always raised. Subclasses should implement
-        :return: Generated network
-        :rtype: :py:class:`~ndex2.cx2.CX2Network`
-        """
-        raise NotImplementedError('Should be implemented by subclasses')
-
-
-class NoStyleCXToCX2Factory(CX2Factory):
-    """
-    Creates :py:class:`~ndex2.cx2.CX2Network` network from
-    CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
-    """
-    def __init__(self):
-        """
-        Constructor
-        """
-        super().__init__()
-
-    def get_cx2_network(self, input_data=None):
-        """
-        Creates :py:class:`~ndex2.cx2.CX2Network` from
-        CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
-        but does **NOT** convert the style associated with input network
-
-        .. note::
-
-            Style is NOT converted by this call
-
-        :param input_data: Optional input data for used to generate
-                           network
-        :type input_data: list or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
-        :return: Generated network
-        :rtype: :py:class:`~ndex2.cx2.CX2Network`
-        """
-        raise NotImplementedError('TODO Need to implement this')
-
 class CX2Network(object):
     """
     A representation of the CX2 (Cytoscape Exchange) network format.
@@ -457,27 +400,42 @@ class CX2Network(object):
 
 class CX2NetworkFactory(object):
     """
-    Abstract factory class for CX2Network creation.
+    Base class for Factory classes that create
+    :py:class:`~ndex2.cx2.CX2Network` objects
     """
 
     def __init__(self):
-        pass
-
-    def get_cx2network(self, input_data) -> CX2Network:
         """
-        Abstract method that should be implemented by derived classes to provide a mechanism
-        for creating a CX2Network instance.
-
-        :param input_data: Input data to create CX2Network.
-        :type input_data:
-        :return: An instance of CX2Network.
+        Constructor
         """
         pass
+
+    def get_cx2_network(self, input_data=None) -> CX2Network:
+        """
+        Creates :py:class:`~ndex2.cx2.CX2Network`
+
+        .. warning::
+
+            Always raises NotImplementedError
+
+        :param input_data: Optional input data for used to generate
+                           network
+        :raises NotImplementedError: Always raised. Subclasses should implement
+        :return: Generated network
+        :rtype: :py:class:`~ndex2.cx2.CX2Network`
+        """
+        raise NotImplementedError('Should be implemented by subclasses')
 
 
 class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
-
+    """
+    Creates :py:class:`~ndex2.cx2.CX2Network` network from
+    CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+    """
     def __init__(self):
+        """
+        Constructor
+        """
         super(NoStyleCXToCX2NetworkFactory, self).__init__()
 
     def _translate_network_attributes_to_cx2(self, network_attributes):
@@ -530,6 +488,21 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         return cx2_edges
 
     def get_cx2network(self, input_data) -> CX2Network:
+        """
+        Creates :py:class:`~ndex2.cx2.CX2Network` from
+        CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+        but does **NOT** convert the style associated with input network
+
+        .. note::
+
+            Style is NOT converted by this call
+
+        :param input_data: Optional input data for used to generate
+                           network
+        :type input_data: list or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+        :return: Generated network
+        :rtype: :py:class:`~ndex2.cx2.CX2Network`
+        """
         if isinstance(input_data, NiceCXNetwork):
             network = input_data
         elif isinstance(input_data, str):
@@ -550,7 +523,6 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 class RawCX2NetworkFactory(CX2NetworkFactory):
     def get_cx2network(self, input_data) -> CX2Network:
         pass
-
 #
 # cl = NoStyleCXToCX2NetworkFactory()
 # cl.get_cx2network("/Users/jlenkiewicz/Documents/repos/ndex2-client/tests/data/glypican2.cx")

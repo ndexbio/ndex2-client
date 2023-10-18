@@ -1,7 +1,7 @@
 import unittest
 import os
 import json
-from ndex2.cx2 import CX2Network
+from ndex2.cx2 import CX2Network, convert_value
 
 
 class TestCX2Network(unittest.TestCase):
@@ -53,12 +53,12 @@ class TestCX2Network(unittest.TestCase):
         self.assertIn("edges", aspect_names)
 
     def test_convert_value(self):
-        self.assertEqual(self.cx2_obj._convert_value("integer", "42"), 42)
-        self.assertEqual(self.cx2_obj._convert_value("double", "42.42"), 42.42)
-        self.assertEqual(self.cx2_obj._convert_value("boolean", "true"), True)
+        self.assertEqual(convert_value("integer", "42"), 42)
+        self.assertEqual(convert_value("double", "42.42"), 42.42)
+        self.assertEqual(convert_value("boolean", "true"), True)
 
     def test_replace_with_alias(self):
-        self.cx2_obj.aliases['nodes'] = {'alias1': 'original1'}
+        self.cx2_obj._aliases['nodes'] = {'alias1': 'original1'}
         data = [{'id': 1, 'v': {'original1': 'value1'}}]
         transformed_data = self.cx2_obj._replace_with_alias(data, 'nodes')
         self.assertEqual(transformed_data[0]['v']['alias1'], 'value1')
@@ -72,14 +72,15 @@ class TestCX2Network(unittest.TestCase):
 
     def test_process_attributes_with_default_values_and_no_attribute_in_node(self):
         self.cx2_obj.attribute_declarations = {"nodes": {"annot": {"d": "string", "v": "example"}}}
-        self.cx2_obj.default_values = {"nodes": {"annot": "example"}}
+        self.cx2_obj._default_values = {"nodes": {"annot": "example"}}
         attributes = {"id": 1, "v": {}}
         processed = self.cx2_obj._process_attributes("nodes", attributes["v"])
+        print(processed)
         self.assertEqual(processed.get("annot"), "example")
 
     def test_process_attributes_with_default_values_and_attribute_none(self):
         self.cx2_obj.attribute_declarations = {"nodes": {"annot": {"d": "string", "v": "example"}}}
-        self.cx2_obj.default_values = {"nodes": {"annot": "example"}}
+        self.cx2_obj._default_values = {"nodes": {"annot": "example"}}
         attributes = {"id": 1, "v": {"annot": None}}
         processed = self.cx2_obj._process_attributes("nodes", attributes["v"])
         self.assertEqual(processed.get("annot"), "example")

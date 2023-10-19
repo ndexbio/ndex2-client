@@ -1,6 +1,6 @@
 import json
 
-from . import create_nice_cx_from_raw_cx, create_nice_cx_from_file
+from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file
 from ndex2.nice_cx_network import NiceCXNetwork
 
 
@@ -68,103 +68,109 @@ class CX2Network(object):
     """
 
     def __init__(self):
-        self.attribute_declarations = None
-        self.network_attributes = {}
-        self.nodes = {}
-        self.edges = {}
-        self.visual_properties = []
-        self.node_bypasses = {}
-        self.edge_bypasses = {}
-        self.opaque_aspects = []
-        self.status = {}
-        self._aliases = {"nodes": {}, "edges": {}}
-        self._default_values = {"nodes": {}, "edges": {}}
+        self._attribute_declarations = None
+        self._network_attributes = {}
+        self._nodes = {}
+        self._edges = {}
+        self._visual_properties = []
+        self._node_bypasses = {}
+        self._edge_bypasses = {}
+        self._opaque_aspects = []
+        self._status = {}
 
     def get_attribute_declarations(self):
-        return self.attribute_declarations
+        return self._attribute_declarations
 
     def set_attribute_declarations(self, value):
-        self.attribute_declarations = value
+        self._attribute_declarations = value
 
     def get_network_attributes(self):
-        return self.network_attributes
+        return self._network_attributes
 
     def set_network_attributes(self, value):
-        self.network_attributes = value
+        self._network_attributes = value
+
+    def get_nodes(self):
+        return self._nodes
 
     def add_node(self, node_id, attributes=None, x=None, y=None, z=None):
         """Adds a node to the network."""
+        processed_attributes = self._process_attributes('nodes', attributes)
         node = {
             "id": node_id,
-            "v": attributes or {},
+            "v": processed_attributes or {},
             "x": x,
             "y": y,
             "z": z
         }
-        self.nodes[node_id] = node
+        self._nodes[node_id] = node
 
     def get_node(self, node_id):
         """Retrieves a node based on its ID."""
-        return self.nodes.get(node_id, None)
+        return self._nodes.get(node_id, None)
 
     def remove_node(self, node_id):
         """Removes a node and checks for dangling edges."""
         # Remove the node
-        if node_id in self.nodes:
-            del self.nodes[node_id]
+        if node_id in self._nodes:
+            del self._nodes[node_id]
 
-        edges_to_remove = [edge_id for edge_id, edge in self.edges.items() if
+        edges_to_remove = [edge_id for edge_id, edge in self._edges.items() if
                            edge["s"] == node_id or edge["t"] == node_id]
         for edge_id in edges_to_remove:
             self.remove_edge(edge_id)
 
     def update_node(self, node_id, attributes=None, x=None, y=None, z=None):
         """Updates the attributes of a node."""
-        if node_id in self.nodes:
+        if node_id in self._nodes:
             if attributes:
-                self.nodes[node_id]["v"].update(attributes)
+                self._nodes[node_id]["v"].update(attributes)
             if x is not None:
-                self.nodes[node_id]["x"] = x
+                self._nodes[node_id]["x"] = x
             if y is not None:
-                self.nodes[node_id]["y"] = y
+                self._nodes[node_id]["y"] = y
             if z is not None:
-                self.nodes[node_id]["z"] = z
+                self._nodes[node_id]["z"] = z
+
+    def get_edges(self):
+        return self._edges
 
     def add_edge(self, edge_id, source, target, attributes=None):
         """Adds an edge to the network."""
+        processed_attributes = self._process_attributes('edges', attributes)
         edge = {
             "id": edge_id,
             "s": source,
             "t": target,
-            "v": attributes or {}
+            "v": processed_attributes or {}
         }
-        self.edges[edge_id] = edge
+        self._edges[edge_id] = edge
 
     def get_edge(self, edge_id):
         """Retrieves an edge based on its ID."""
-        return self.edges.get(edge_id, None)
+        return self._edges.get(edge_id, None)
 
     def remove_edge(self, edge_id):
         """Removes an edge from the network."""
-        if edge_id in self.edges:
-            del self.edges[edge_id]
+        if edge_id in self._edges:
+            del self._edges[edge_id]
 
     def update_edge(self, edge_id, attributes=None):
         """Updates the attributes of an edge."""
-        if edge_id in self.edges and attributes:
-            self.edges[edge_id]["v"].update(attributes)
+        if edge_id in self._edges and attributes:
+            self._edges[edge_id]["v"].update(attributes)
 
     def get_visual_properties(self):
-        return self.visual_properties
+        return self._visual_properties
 
     def set_visual_properties(self, value):
-        self.visual_properties = value
+        self._visual_properties = value
 
     def get_node_bypasses(self):
-        return self.node_bypasses
+        return self._node_bypasses
 
     def set_node_bypasses(self, value):
-        self.node_bypasses = value
+        self._node_bypasses = value
 
     def add_node_bypass(self, node_id, value):
         """
@@ -173,13 +179,13 @@ class CX2Network(object):
         :param node_id: ID of the node.
         :param value: Visual property bypass value.
         """
-        self.node_bypasses[node_id] = value
+        self._node_bypasses[node_id] = value
 
     def get_edge_bypasses(self):
-        return self.edge_bypasses
+        return self._edge_bypasses
 
     def set_edge_bypasses(self, value):
-        self.edge_bypasses = value
+        self._edge_bypasses = value
 
     def add_edge_bypass(self, edge_id, value):
         """
@@ -188,19 +194,45 @@ class CX2Network(object):
         :param edge_id: ID of the edge.
         :param value: Visual property bypass value.
         """
-        self.edge_bypasses[edge_id] = value
+        self._edge_bypasses[edge_id] = value
 
     def get_opaque_aspects(self):
-        return self.opaque_aspects
+        return self._opaque_aspects
 
     def set_opaque_aspects(self, value):
-        self.opaque_aspects = value
+        self._opaque_aspects = value
+
+    def add_opaque_aspect(self, aspect):
+        """
+        Adds an opaque aspect to the list of opaque aspects.
+
+        :param aspect: The opaque aspect to add.
+        """
+        self._opaque_aspects.append(aspect)
 
     def get_status(self):
-        return self.status
+        return self._status
 
     def set_status(self, value):
-        self.status = value
+        self._status = value
+
+    def get_aliases(self):
+        aliases = {"nodes": {}, "edges": {}}
+        for aspect, declarations in self.get_attribute_declarations().items():
+            for key, details in declarations.items():
+                alias = details.get("a", None)
+                if alias and aspect in ["nodes", "edges"]:
+                    aliases[aspect][alias] = key
+        return aliases
+
+    def get_default_values(self):
+        default_values = {"nodes": {}, "edges": {}}
+        for aspect, declarations in self.get_attribute_declarations().items():
+            for key, details in declarations.items():
+                default_value = details.get("v", None)
+                if default_value and aspect in ["nodes", "edges"]:
+                    default_values[aspect][key] = default_value
+        return default_values
 
     def create_from_raw_cx2(self, cx2_data):
         """
@@ -220,14 +252,6 @@ class CX2Network(object):
         for section in raw_data:
             if 'attributeDeclarations' in section:
                 self.set_attribute_declarations(section['attributeDeclarations'][0])
-                for aspect, declarations in self.attribute_declarations.items():
-                    for key, details in declarations.items():
-                        alias = details.get("a", None)
-                        if alias and aspect in ["nodes", "edges"]:
-                            self._aliases[aspect][alias] = key
-                        default_value = details.get("v", None)
-                        if default_value and aspect in ["nodes", "edges"]:
-                            self._default_values[aspect][key] = default_value
 
             elif 'networkAttributes' in section:
                 network_attrs = {}
@@ -240,16 +264,14 @@ class CX2Network(object):
 
             elif 'nodes' in section:
                 for node in section['nodes']:
-                    attributes = self._process_attributes('nodes', node["v"])
                     x = node.get("x", None)
                     y = node.get("y", None)
                     z = node.get("z", None)
-                    self.add_node(node["id"], attributes, x, y, z)
+                    self.add_node(node["id"], node["v"], x, y, z)
 
             elif 'edges' in section:
                 for edge in section['edges']:
-                    attributes = self._process_attributes('edges', edge["v"])
-                    self.add_edge(edge["id"], edge["s"], edge["t"], attributes)
+                    self.add_edge(edge["id"], edge["s"], edge["t"], edge["v"])
 
             elif "visualProperties" in section:
                 self.set_visual_properties(section["visualProperties"][0])
@@ -264,7 +286,7 @@ class CX2Network(object):
             elif "status" in section:
                 self.set_status(section["status"])
             else:
-                self.opaque_aspects.append(section)
+                self.add_opaque_aspect(section)
 
     def write_as_raw_cx2(self, output_path):
         """
@@ -292,26 +314,32 @@ class CX2Network(object):
             "CXVersion": "2.0",
             "hasFragments": False
         }]
-        meta_data = [
-            {"elementCount": 1, "name": "attributeDeclarations"},
-            {"elementCount": 1, "name": "networkAttributes"},
-            {"elementCount": len(self.nodes), "name": "nodes"},
-            {"elementCount": len(self.edges), "name": "edges"},
-            {"elementCount": 1, "name": "visualProperties"},
-            {"elementCount": len(self.node_bypasses), "name": "nodeBypasses"},
-            {"elementCount": len(self.edge_bypasses), "name": "edgeBypasses"}
-        ]
-        for opaque_aspect in self.opaque_aspects:
+        meta_data = []
+        if self.get_attribute_declarations():
+            meta_data.append({"elementCount": 1, "name": "attributeDeclarations"})
+        if self.get_network_attributes():
+            meta_data.append({"elementCount": 1, "name": "networkAttributes"})
+        if self.get_nodes():
+            meta_data.append({"elementCount": len(self._nodes), "name": "nodes"})
+        if self.get_edges():
+            meta_data.append({"elementCount": len(self._edges), "name": "edges"})
+        if self.get_visual_properties():
+            meta_data.append({"elementCount": 1, "name": "visualProperties"})
+        if self.get_node_bypasses():
+            meta_data.append({"elementCount": len(self._node_bypasses), "name": "nodeBypasses"})
+        if self.get_edge_bypasses():
+            meta_data.append({"elementCount": len(self._edge_bypasses), "name": "edgeBypasses"})
+        for opaque_aspect in self.get_opaque_aspects():
             aspect_name = list(opaque_aspect.keys())[0]
             aspect_count = len(opaque_aspect[aspect_name])
             meta_data.append({"elementCount": aspect_count, "name": aspect_name})
         output_data.append({"metaData": meta_data})
 
-        output_data.append({"attributeDeclarations": [self.attribute_declarations]})
-        output_data.append({"networkAttributes": [self.network_attributes]})
+        output_data.append({"attributeDeclarations": [self._attribute_declarations]})
+        output_data.append({"networkAttributes": [self._network_attributes]})
 
-        nodes_list = self._replace_with_alias(list(self.nodes.values()), 'nodes')
-        edges_list = self._replace_with_alias(list(self.edges.values()), 'edges')
+        nodes_list = self._replace_with_alias(list(self._nodes.values()), 'nodes')
+        edges_list = self._replace_with_alias(list(self._edges.values()), 'edges')
 
         output_nodes = []
         for node in nodes_list:
@@ -332,27 +360,28 @@ class CX2Network(object):
             "edges": edges_list
         })
 
-        if self.visual_properties:
-            output_data.append({"visualProperties": [self.visual_properties]})
+        if self._visual_properties:
+            output_data.append({"visualProperties": [self._visual_properties]})
 
-        if self.node_bypasses:
-            output_node_bypasses = [{"id": k, "v": v} for k, v in self.node_bypasses.items()]
+        if self._node_bypasses:
+            output_node_bypasses = [{"id": k, "v": v} for k, v in self._node_bypasses.items()]
             output_data.append({"nodeBypasses": output_node_bypasses})
 
-        if self.edge_bypasses:
-            output_edge_bypasses = [{"id": k, "v": v} for k, v in self.edge_bypasses.items()]
+        if self._edge_bypasses:
+            output_edge_bypasses = [{"id": k, "v": v} for k, v in self._edge_bypasses.items()]
             output_data.append({"edgeBypasses": output_edge_bypasses})
 
-        output_data.extend(self.opaque_aspects)
+        output_data.extend(self._opaque_aspects)
 
-        if self.status:
-            output_data.append({"status": self.status})
+        if self._status:
+            output_data.append({"status": self._status})
 
         return output_data
 
     def _process_attributes(self, aspect_name, attributes):
         """
-        Processes attributes based on declared types and aliases for the given aspect.
+        Process the attributes for the given aspect by assigning default or declared values,
+        converting them to declared types, and using full names instead of aliases.
 
         :param aspect_name: Name of the aspect (e.g., 'nodes', 'edges') for which attributes are being processed.
         :type aspect_name: str
@@ -360,15 +389,16 @@ class CX2Network(object):
         :type attributes: dict
         """
         processed_attrs = {}
+        aliases = self.get_aliases()
 
-        # Initially populate with default values
-        for key, default_value in self._default_values[aspect_name].items():
-            actual_key = self._aliases[aspect_name].get(key, key)
-            processed_attrs[actual_key] = default_value
+        for key, default_value in self.get_default_values()[aspect_name].items():
+            actual_key = aliases[aspect_name].get(key, key)
+            declared_type = self.get_attribute_declarations()[aspect_name].get(actual_key, {}).get('d', 'string')
+            processed_attrs[actual_key] = convert_value(declared_type, default_value)
 
         for key, value in attributes.items():
-            actual_key = self._aliases[aspect_name].get(key, key)
-            declared_type = self.attribute_declarations[aspect_name].get(actual_key, {}).get('d', 'string')
+            actual_key = aliases[aspect_name].get(key, key)
+            declared_type = self.get_attribute_declarations()[aspect_name].get(actual_key, {}).get('d', 'string')
             if value is not None:
                 processed_attrs[actual_key] = convert_value(declared_type, value)
 
@@ -384,8 +414,9 @@ class CX2Network(object):
         :type aspect: str
         """
         new_data = []
+        aliases = self.get_aliases()
 
-        reverse_aliases = {v: k for k, v in self._aliases[aspect].items()}
+        reverse_aliases = {v: k for k, v in aliases[aspect].items()}
 
         for item in data_list:
             new_item = item.copy()
@@ -432,6 +463,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
     Creates :py:class:`~ndex2.cx2.CX2Network` network from
     CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
     """
+
     def __init__(self):
         """
         Constructor
@@ -511,18 +543,14 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
             network = create_nice_cx_from_raw_cx(input_data)
 
         cx2network_obj = CX2Network()
-        cx2network_obj.network_attributes = self._translate_network_attributes_to_cx2(network.networkAttributes)
-        cx2network_obj.nodes = self._translate_nodes_to_cx2(network.nodes, network.opaqueAspects['cartesianLayout'],
-                                                            network.nodeAttributes)
-        cx2network_obj.edges = self._translate_edges_to_cx2(network.edges, network.edgeAttributes)
+        cx2network_obj._network_attributes = self._translate_network_attributes_to_cx2(network.networkAttributes)
+        cx2network_obj._nodes = self._translate_nodes_to_cx2(network.nodes, network.opaqueAspects['cartesianLayout'],
+                                                             network.nodeAttributes)
+        cx2network_obj._edges = self._translate_edges_to_cx2(network.edges, network.edgeAttributes)
 
-        cx2network_obj.write_as_raw_cx2("/Users/jlenkiewicz/Documents/repos/ndex2-client/tests/data/out.cx2")
         return cx2network_obj
 
 
 class RawCX2NetworkFactory(CX2NetworkFactory):
     def get_cx2network(self, input_data) -> CX2Network:
         pass
-#
-# cl = NoStyleCXToCX2NetworkFactory()
-# cl.get_cx2network("/Users/jlenkiewicz/Documents/repos/ndex2-client/tests/data/glypican2.cx")

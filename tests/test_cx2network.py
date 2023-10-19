@@ -16,16 +16,15 @@ class TestCX2Network(unittest.TestCase):
 
     def test_create_from_raw_cx2_from_file(self):
         self.cx2_obj.create_from_raw_cx2(self.sample_file)
-        self.assertIsNotNone(self.cx2_obj.attribute_declarations)
-        self.assertGreater(len(self.cx2_obj.nodes), 0)
+        self.assertIsNotNone(self.cx2_obj.get_attribute_declarations())
+        self.assertGreater(len(self.cx2_obj.get_nodes()), 0)
 
     def test_create_from_raw_cx2_from_list(self):
         with open(self.sample_file, 'r') as f:
             data_list = json.load(f)
-
         self.cx2_obj.create_from_raw_cx2(data_list)
-        self.assertIsNotNone(self.cx2_obj.attribute_declarations)
-        self.assertGreater(len(self.cx2_obj.nodes), 0)
+        self.assertIsNotNone(self.cx2_obj.get_attribute_declarations())
+        self.assertGreater(len(self.cx2_obj.get_nodes()), 0)
 
     def test_invalid_input_create_from_raw_cx2(self):
         with self.assertRaises(ValueError):
@@ -58,29 +57,29 @@ class TestCX2Network(unittest.TestCase):
         self.assertEqual(convert_value("boolean", "true"), True)
 
     def test_replace_with_alias(self):
-        self.cx2_obj._aliases['nodes'] = {'alias1': 'original1'}
+        self.cx2_obj._attribute_declarations = {
+            'nodes': {
+                'original1': {'a': 'alias1'}
+            }
+        }
         data = [{'id': 1, 'v': {'original1': 'value1'}}]
         transformed_data = self.cx2_obj._replace_with_alias(data, 'nodes')
         self.assertEqual(transformed_data[0]['v']['alias1'], 'value1')
 
     def test_process_attributes_with_default_values_not_used(self):
-        self.cx2_obj.attribute_declarations = {"nodes": {"annot": {"d": "string", "v": "example"}}}
-        self.cx2_obj.default_values = {"nodes": {"annot": "example"}}
+        self.cx2_obj.set_attribute_declarations({"nodes": {"annot": {"d": "string", "v": "example"}}})
         attributes = {"id": 1, "v": {"annot": "ex"}}
         processed = self.cx2_obj._process_attributes("nodes", attributes["v"])
         self.assertEqual(processed.get("annot"), "ex")
 
     def test_process_attributes_with_default_values_and_no_attribute_in_node(self):
-        self.cx2_obj.attribute_declarations = {"nodes": {"annot": {"d": "string", "v": "example"}}}
-        self.cx2_obj._default_values = {"nodes": {"annot": "example"}}
+        self.cx2_obj.set_attribute_declarations({"nodes": {"annot": {"d": "string", "v": "example"}}})
         attributes = {"id": 1, "v": {}}
         processed = self.cx2_obj._process_attributes("nodes", attributes["v"])
-        print(processed)
         self.assertEqual(processed.get("annot"), "example")
 
     def test_process_attributes_with_default_values_and_attribute_none(self):
-        self.cx2_obj.attribute_declarations = {"nodes": {"annot": {"d": "string", "v": "example"}}}
-        self.cx2_obj._default_values = {"nodes": {"annot": "example"}}
+        self.cx2_obj.set_attribute_declarations({"nodes": {"annot": {"d": "string", "v": "example"}}})
         attributes = {"id": 1, "v": {"annot": None}}
         processed = self.cx2_obj._process_attributes("nodes", attributes["v"])
         self.assertEqual(processed.get("annot"), "example")

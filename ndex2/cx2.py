@@ -445,8 +445,8 @@ class CX2Network(object):
 
         :param aspect_list: List of data items (e.g., nodes or edges) with attributes.
         :type aspect_list: list
-        :param aspect: Name of the aspect (e.g., 'nodes', 'edges') for which aliases are to be applied.
-        :type aspect: str
+        :param aspect_name: Name of the aspect (e.g., 'nodes', 'edges') for which aliases are to be applied.
+        :type aspect_name: str
         """
         new_data = []
         aliases = self.get_aliases(aspect_name)
@@ -505,72 +505,44 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         """
         super(NoStyleCXToCX2NetworkFactory, self).__init__()
 
-    def _translate_network_attributes_to_cx2(self, network_attributes):
-        cx2_data = {}
-        for item in network_attributes:
-            key = item['n']
-            value = item['v']
-            cx2_data[key] = value
-        return cx2_data
+    @staticmethod
+    def _translate_network_attributes_to_cx2(network_attributes):
+        return {item['n']: item['v'] for item in network_attributes}
 
-    def _generate_attribute_declarations(self, network_attributes, nodes, node_attributes, edges, edge_attributes):
+    @staticmethod
+    def _generate_attribute_declarations(network_attributes, nodes, node_attributes, edges, edge_attributes):
         attribute_declarations = {
-            "networkAttributes": {},
+            "networkAttributes": {item['n']: {'d': item.get('d', 'string')} for item in network_attributes},
             "nodes": {},
             "edges": {}
         }
-        for item in network_attributes:
-            attribute_declarations['networkAttributes'][item['n']] = {'d': item.get('d', 'string')}
 
-        node_internal_attributes = set()
-        for val in nodes.values():
-            node_internal_attributes.update(val.keys())
-        node_internal_attributes.remove('@id')
-        for item in node_internal_attributes:
-            if item == 'n':
-                attribute_declarations['nodes']['name'] = {'a': 'n', 'd': 'string'}
-            elif item == 'r':
-                attribute_declarations['nodes']['represents'] = {'a': 'r', 'd': 'string'}
+        node_internal_attributes = {key for val in nodes.values() for key in val}
+        if 'n' in node_internal_attributes:
+            attribute_declarations['nodes']['name'] = {'a': 'n', 'd': 'string'}
+        if 'r' in node_internal_attributes:
+            attribute_declarations['nodes']['represents'] = {'a': 'r', 'd': 'string'}
 
         for attr_list in node_attributes.values():
             for attr in attr_list:
-                if (attr['n'] not in attribute_declarations['nodes'].keys() or
-                        attribute_declarations['nodes'][attr['n']]['d'] == 'string'):
-                    attribute_declarations['nodes'][attr['n']] = {'d': attr.get('d', 'string')}
+                attribute_declarations['nodes'][attr['n']] = {'d': attr.get('d', 'string')}
 
-        edge_internal_attributes = set()
-        for val in edges.values():
-            edge_internal_attributes.update(val.keys())
-        edge_internal_attributes.remove('@id')
+        edge_internal_attributes = {key for val in edges.values() for key in val}
         if 'i' in edge_internal_attributes:
             attribute_declarations['edges']['interaction'] = {'a': 'i', 'd': 'string'}
 
         for attr_list in edge_attributes.values():
             for attr in attr_list:
-                if (attr['n'] not in attribute_declarations['edges'].keys() or
-                        attribute_declarations['edges'][attr['n']]['d'] == 'string'):
-                    attribute_declarations['edges'][attr['n']] = {'d': attr.get('d', 'string')}
+                attribute_declarations['edges'][attr['n']] = {'d': attr.get('d', 'string')}
 
         return attribute_declarations
 
-    def _process_node_attributes(self, node, node_attributes):
+    @staticmethod
+    def _process_attributes_for_cx2(entity, attributes, expected_keys=None):
         attr_vals = {}
-        if 'n' in node.keys():
-            attr_vals['n'] = node['n']
-        if 'r' in node.keys():
-            attr_vals['r'] = node['r']
-        for attr in node_attributes[node['@id']]:
-            value = attr['v']
-            attr_vals[attr['n']] = value
-        return attr_vals
-
-    def _process_edge_attributes(self, edge, edge_attributes):
-        attr_vals = {}
-        if 'i' in edge.keys():
-            attr_vals['i'] = edge['i']
-        for attr in edge_attributes[edge['@id']]:
-            value = attr['v']
-            attr_vals[attr['n']] = value
+        if expected_keys:
+            attr_vals = {key: entity[key] for key in expected_keys if key in entity}
+        attr_vals.update({attr['n']: attr['v'] for attr in attributes[entity['@id']]})
         return attr_vals
 
     def get_cx2network(self, input_data) -> CX2Network:
@@ -596,19 +568,20 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
             network = create_nice_cx_from_raw_cx(input_data)
 
         cx2network_obj = CX2Network()
-        cx2network_obj.set_attribute_declarations(self._generate_attribute_declarations(
-            network.networkAttributes, network.nodes, network.nodeAttributes, network.edges, network.edgeAttributes))
-        print(cx2network_obj.get_attribute_declarations())
+        cx2network_obj.set_attribute_declarations(
+            self._generate_attribute_declarations(
+                network.networkAttributes, network.nodes, network.nodeAttributes, network.edges, network.edgeAttributes
+            )
+        )
 
         cx2network_obj.set_network_attributes(self._translate_network_attributes_to_cx2(network.networkAttributes))
 
         for node, layout in zip(network.nodes.values(), network.opaqueAspects['cartesianLayout']):
-            attr_val = self._process_node_attributes(node, network.nodeAttributes)
-            cx2network_obj.add_node(node['@id'], attr_val, layout.get('x', None), layout.get('y', None),
-                                    layout.get('z', None))
+            attr_val = self._process_attributes_for_cx2(node, network.nodeAttributes, ['n', 'r'])
+            cx2network_obj.add_node(node['@id'], attr_val, layout.get('x'), layout.get('y'), layout.get('z'))
 
         for edge in network.edges.values():
-            attr_val = self._process_edge_attributes(edge, network.edgeAttributes)
+            attr_val = self._process_attributes_for_cx2(edge, network.edgeAttributes, ['i'])
             cx2network_obj.add_edge(edge['@id'], edge['s'], edge['t'], attr_val)
 
         cx2network_obj.set_status([{'error': '', 'success': True}])

@@ -18,7 +18,10 @@ def convert_value(dtype, value):
     elif dtype == "double" or dtype == "long":
         return float(value)
     elif dtype == "boolean":
-        return True if value.lower() == 'true' else False
+        if isinstance(value, bool):
+            return value
+        else:
+            return True if value.lower() == 'true' else False
     elif dtype.startswith("list_of_"):
         elem_type = dtype.split("_")[2]
         return [convert_value(elem_type, v) for v in value]
@@ -216,22 +219,35 @@ class CX2Network(object):
     def set_status(self, value):
         self._status = value
 
-    def get_aliases(self):
-        aliases = {"nodes": {}, "edges": {}}
-        for aspect, declarations in self.get_attribute_declarations().items():
-            for key, details in declarations.items():
-                alias = details.get("a", None)
-                if alias and aspect in ["nodes", "edges"]:
-                    aliases[aspect][alias] = key
+    def get_declared_type(self, aspect_name, attribute_name):
+        """
+        Retrieves the declared data type for a given aspect's attribute.
+
+        :param aspect_name: The name of the aspect (e.g., 'nodes', 'edges').
+        :type aspect_name: str
+        :param attribute_name: The attribute whose declared data type needs to be retrieved.
+        :type attribute_name: str
+        :return: The declared data type or 'string' if not found.
+        :rtype: str
+        """
+        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('d', 'string')
+
+    def get_aliases(self, aspect):
+        aliases = {}
+        declarations = self.get_attribute_declarations()[aspect]
+        for key, details in declarations.items():
+            alias = details.get("a", None)
+            if alias:
+                aliases[alias] = key
         return aliases
 
-    def get_default_values(self):
-        default_values = {"nodes": {}, "edges": {}}
-        for aspect, declarations in self.get_attribute_declarations().items():
-            for key, details in declarations.items():
-                default_value = details.get("v", None)
-                if default_value and aspect in ["nodes", "edges"]:
-                    default_values[aspect][key] = default_value
+    def get_default_values(self, aspect):
+        default_values = {}
+        declarations = self.get_attribute_declarations()[aspect]
+        for key, details in declarations.items():
+            default_value = details.get("v", None)
+            if default_value:
+                default_values[key] = default_value
         return default_values
 
     def create_from_raw_cx2(self, cx2_data):
@@ -389,36 +405,37 @@ class CX2Network(object):
         :type attributes: dict
         """
         processed_attrs = {}
-        aliases = self.get_aliases()
+        aliases = self.get_aliases(aspect_name)
+        default_values = self.get_default_values(aspect_name)
 
-        for key, default_value in self.get_default_values()[aspect_name].items():
-            actual_key = aliases[aspect_name].get(key, key)
-            declared_type = self.get_attribute_declarations()[aspect_name].get(actual_key, {}).get('d', 'string')
+        for key, default_value in default_values.items():
+            actual_key = aliases.get(key, key)
+            declared_type = self.get_declared_type(aspect_name, actual_key)
             processed_attrs[actual_key] = convert_value(declared_type, default_value)
 
         for key, value in attributes.items():
-            actual_key = aliases[aspect_name].get(key, key)
-            declared_type = self.get_attribute_declarations()[aspect_name].get(actual_key, {}).get('d', 'string')
+            actual_key = aliases.get(key, key)
+            declared_type = self.get_declared_type(aspect_name, actual_key)
             if value is not None:
                 processed_attrs[actual_key] = convert_value(declared_type, value)
 
         return processed_attrs
 
-    def _replace_with_alias(self, data_list, aspect):
+    def _replace_with_alias(self, aspect_list, aspect_name):
         """
         Replaces attribute names in a data list with their corresponding aliases, if available.
 
-        :param data_list: List of data items (e.g., nodes or edges) with attributes.
-        :type data_list: list
+        :param aspect_list: List of data items (e.g., nodes or edges) with attributes.
+        :type aspect_list: list
         :param aspect: Name of the aspect (e.g., 'nodes', 'edges') for which aliases are to be applied.
         :type aspect: str
         """
         new_data = []
-        aliases = self.get_aliases()
+        aliases = self.get_aliases(aspect_name)
 
-        reverse_aliases = {v: k for k, v in aliases[aspect].items()}
+        reverse_aliases = {v: k for k, v in aliases.items()}
 
-        for item in data_list:
+        for item in aspect_list:
             new_item = item.copy()
             if 'v' in new_item:
                 for attr in list(new_item['v'].keys()):

@@ -90,8 +90,12 @@ class CX2Network(object):
     def get_network_attributes(self):
         return self._network_attributes
 
-    def set_network_attributes(self, value):
-        self._network_attributes = value
+    def set_network_attributes(self, network_attrs):
+        processed_network_attrs = {}
+        for key, value in network_attrs.items():
+            declared_type = self.get_declared_type('networkAttributes', key)
+            processed_network_attrs[key] = convert_value(declared_type, value)
+        self._network_attributes = processed_network_attrs
 
     def get_nodes(self):
         return self._nodes
@@ -172,9 +176,6 @@ class CX2Network(object):
     def get_node_bypasses(self):
         return self._node_bypasses
 
-    def set_node_bypasses(self, value):
-        self._node_bypasses = value
-
     def add_node_bypass(self, node_id, value):
         """
         Adds a node-specific visual property bypass.
@@ -186,9 +187,6 @@ class CX2Network(object):
 
     def get_edge_bypasses(self):
         return self._edge_bypasses
-
-    def set_edge_bypasses(self, value):
-        self._edge_bypasses = value
 
     def add_edge_bypass(self, edge_id, value):
         """
@@ -296,12 +294,7 @@ class CX2Network(object):
                 self.set_attribute_declarations(section['attributeDeclarations'][0])
 
             elif 'networkAttributes' in section:
-                network_attrs = {}
-                for attr in section['networkAttributes']:
-                    for key, value in attr.items():
-                        declared_type = self.get_declared_type('networkAttributes', key)
-                        network_attrs[key] = convert_value(declared_type, value)
-                self.set_network_attributes(network_attrs)
+                self.set_network_attributes(section['networkAttributes'][0])
 
             elif 'nodes' in section:
                 for node in section['nodes']:
@@ -361,26 +354,26 @@ class CX2Network(object):
         if self.get_network_attributes():
             meta_data.append({"elementCount": 1, "name": "networkAttributes"})
         if self.get_nodes():
-            meta_data.append({"elementCount": len(self._nodes), "name": "nodes"})
+            meta_data.append({"elementCount": len(self.get_nodes()), "name": "nodes"})
         if self.get_edges():
-            meta_data.append({"elementCount": len(self._edges), "name": "edges"})
+            meta_data.append({"elementCount": len(self.get_edges()), "name": "edges"})
         if self.get_visual_properties():
             meta_data.append({"elementCount": 1, "name": "visualProperties"})
         if self.get_node_bypasses():
-            meta_data.append({"elementCount": len(self._node_bypasses), "name": "nodeBypasses"})
+            meta_data.append({"elementCount": len(self.get_node_bypasses()), "name": "nodeBypasses"})
         if self.get_edge_bypasses():
-            meta_data.append({"elementCount": len(self._edge_bypasses), "name": "edgeBypasses"})
+            meta_data.append({"elementCount": len(self.get_edge_bypasses()), "name": "edgeBypasses"})
         for opaque_aspect in self.get_opaque_aspects():
             aspect_name = list(opaque_aspect.keys())[0]
             aspect_count = len(opaque_aspect[aspect_name])
             meta_data.append({"elementCount": aspect_count, "name": aspect_name})
         output_data.append({"metaData": meta_data})
 
-        output_data.append({"attributeDeclarations": [self._attribute_declarations]})
-        output_data.append({"networkAttributes": [self._network_attributes]})
+        output_data.append({"attributeDeclarations": [self.get_attribute_declarations()]})
+        output_data.append({"networkAttributes": [self.get_network_attributes()]})
 
-        nodes_list = self._replace_with_alias(list(self._nodes.values()), 'nodes')
-        edges_list = self._replace_with_alias(list(self._edges.values()), 'edges')
+        nodes_list = self._replace_with_alias(list(self.get_nodes().values()), 'nodes')
+        edges_list = self._replace_with_alias(list(self.get_edges().values()), 'edges')
 
         output_nodes = []
         for node in nodes_list:
@@ -402,14 +395,14 @@ class CX2Network(object):
         })
 
         if self._visual_properties:
-            output_data.append({"visualProperties": [self._visual_properties]})
+            output_data.append({"visualProperties": [self.get_visual_properties()]})
 
         if self._node_bypasses:
-            output_node_bypasses = [{"id": k, "v": v} for k, v in self._node_bypasses.items()]
+            output_node_bypasses = [{"id": k, "v": v} for k, v in self.get_node_bypasses().items()]
             output_data.append({"nodeBypasses": output_node_bypasses})
 
         if self._edge_bypasses:
-            output_edge_bypasses = [{"id": k, "v": v} for k, v in self._edge_bypasses.items()]
+            output_edge_bypasses = [{"id": k, "v": v} for k, v in self.get_edge_bypasses().items()]
             output_data.append({"edgeBypasses": output_edge_bypasses})
 
         output_data.extend(self._opaque_aspects)
@@ -518,48 +511,67 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
             key = item['n']
             value = item['v']
             cx2_data[key] = value
-        return [cx2_data]
+        return cx2_data
 
-    def _translate_nodes_to_cx2(self, nodes, cartesian_layout, node_attributes):
-        cx2_nodes = {}
-        for node, layout in zip(nodes.values(), cartesian_layout):
-            cx2_node = {
-                "id": node['@id'],
-                "x": layout['x'],
-                "y": layout['y'],
-                "v": {
-                    "n": node['n'],
-                    "r": node['r']
-                }
-            }
-            for attr in node_attributes[node['@id']]:
-                value = attr['v']
-                if 'd' in attr:
-                    data_type = attr.get('d')
-                    value = convert_value(data_type, value)
-                cx2_node['v'][attr['n']] = value
-            cx2_nodes[cx2_node['id']] = cx2_node
-        return cx2_nodes
+    def _generate_attribute_declarations(self, network_attributes, nodes, node_attributes, edges, edge_attributes):
+        attribute_declarations = {
+            "networkAttributes": {},
+            "nodes": {},
+            "edges": {}
+        }
+        for item in network_attributes:
+            attribute_declarations['networkAttributes'][item['n']] = {'d': item.get('d', 'string')}
 
-    def _translate_edges_to_cx2(self, edges, edge_attributes):
-        cx2_edges = {}
-        for edge in edges.values():
-            cx2_edge = {
-                "id": edge['@id'],
-                "s": edge['s'],
-                "t": edge['t'],
-                "v": {
-                    "i": edge['i']
-                }
-            }
-            for attr in edge_attributes[edge['@id']]:
-                value = attr['v']
-                if 'd' in attr:
-                    data_type = attr.get('d')
-                    value = convert_value(data_type, value)
-                cx2_edge['v'][attr['n']] = value
-            cx2_edges[cx2_edge['id']] = cx2_edge
-        return cx2_edges
+        node_internal_attributes = set()
+        for val in nodes.values():
+            node_internal_attributes.update(val.keys())
+        node_internal_attributes.remove('@id')
+        for item in node_internal_attributes:
+            if item == 'n':
+                attribute_declarations['nodes']['name'] = {'a': 'n', 'd': 'string'}
+            elif item == 'r':
+                attribute_declarations['nodes']['represents'] = {'a': 'r', 'd': 'string'}
+
+        for attr_list in node_attributes.values():
+            for attr in attr_list:
+                if (attr['n'] not in attribute_declarations['nodes'].keys() or
+                        attribute_declarations['nodes'][attr['n']]['d'] == 'string'):
+                    attribute_declarations['nodes'][attr['n']] = {'d': attr.get('d', 'string')}
+
+        edge_internal_attributes = set()
+        for val in edges.values():
+            edge_internal_attributes.update(val.keys())
+        edge_internal_attributes.remove('@id')
+        if 'i' in edge_internal_attributes:
+            attribute_declarations['edges']['interaction'] = {'a': 'i', 'd': 'string'}
+
+        for attr_list in edge_attributes.values():
+            for attr in attr_list:
+                if (attr['n'] not in attribute_declarations['edges'].keys() or
+                        attribute_declarations['edges'][attr['n']]['d'] == 'string'):
+                    attribute_declarations['edges'][attr['n']] = {'d': attr.get('d', 'string')}
+
+        return attribute_declarations
+
+    def _process_node_attributes(self, node, node_attributes):
+        attr_vals = {}
+        if 'n' in node.keys():
+            attr_vals['n'] = node['n']
+        if 'r' in node.keys():
+            attr_vals['r'] = node['r']
+        for attr in node_attributes[node['@id']]:
+            value = attr['v']
+            attr_vals[attr['n']] = value
+        return attr_vals
+
+    def _process_edge_attributes(self, edge, edge_attributes):
+        attr_vals = {}
+        if 'i' in edge.keys():
+            attr_vals['i'] = edge['i']
+        for attr in edge_attributes[edge['@id']]:
+            value = attr['v']
+            attr_vals[attr['n']] = value
+        return attr_vals
 
     def get_cx2network(self, input_data) -> CX2Network:
         """
@@ -584,10 +596,22 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
             network = create_nice_cx_from_raw_cx(input_data)
 
         cx2network_obj = CX2Network()
-        cx2network_obj._network_attributes = self._translate_network_attributes_to_cx2(network.networkAttributes)
-        cx2network_obj._nodes = self._translate_nodes_to_cx2(network.nodes, network.opaqueAspects['cartesianLayout'],
-                                                             network.nodeAttributes)
-        cx2network_obj._edges = self._translate_edges_to_cx2(network.edges, network.edgeAttributes)
+        cx2network_obj.set_attribute_declarations(self._generate_attribute_declarations(
+            network.networkAttributes, network.nodes, network.nodeAttributes, network.edges, network.edgeAttributes))
+        print(cx2network_obj.get_attribute_declarations())
+
+        cx2network_obj.set_network_attributes(self._translate_network_attributes_to_cx2(network.networkAttributes))
+
+        for node, layout in zip(network.nodes.values(), network.opaqueAspects['cartesianLayout']):
+            attr_val = self._process_node_attributes(node, network.nodeAttributes)
+            cx2network_obj.add_node(node['@id'], attr_val, layout.get('x', None), layout.get('y', None),
+                                    layout.get('z', None))
+
+        for edge in network.edges.values():
+            attr_val = self._process_edge_attributes(edge, network.edgeAttributes)
+            cx2network_obj.add_edge(edge['@id'], edge['s'], edge['t'], attr_val)
+
+        cx2network_obj.set_status([{'error': '', 'success': True}])
 
         return cx2network_obj
 

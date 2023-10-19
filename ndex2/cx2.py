@@ -299,8 +299,7 @@ class CX2Network(object):
                 network_attrs = {}
                 for attr in section['networkAttributes']:
                     for key, value in attr.items():
-                        declared_type = (self.get_attribute_declarations()['networkAttributes'].get(key, {})
-                                         .get('d', 'string'))
+                        declared_type = self.get_declared_type('networkAttributes', key)
                         network_attrs[key] = convert_value(declared_type, value)
                 self.set_network_attributes(network_attrs)
 
@@ -572,8 +571,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 
             Style is NOT converted by this call
 
-        :param input_data: Optional input data for used to generate
-                           network
+        :param input_data: Optional input data used to generate network
         :type input_data: list or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
         :return: Generated network
         :rtype: :py:class:`~ndex2.cx2.CX2Network`
@@ -595,5 +593,17 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 
 
 class RawCX2NetworkFactory(CX2NetworkFactory):
+
+    def __init__(self):
+        """
+        Constructor
+        """
+        super(RawCX2NetworkFactory, self).__init__()
+
     def get_cx2network(self, input_data) -> CX2Network:
-        pass
+        """
+        Creates :py:class:`~ndex2.cx2.CX2Network` from raw CX2 data.
+        """
+        cx2network_obj = CX2Network()
+        cx2network_obj.create_from_raw_cx2(input_data)
+        return cx2network_obj

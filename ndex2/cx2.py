@@ -232,6 +232,19 @@ class CX2Network(object):
         """
         return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('d', 'string')
 
+    def get_alias(self, aspect_name, attribute_name):
+        """
+        Retrieves alias for a given aspect's attribute.
+
+        :param aspect_name: The name of the aspect (e.g., 'nodes', 'edges').
+        :type aspect_name: str
+        :param attribute_name: The attribute whose declared data type needs to be retrieved.
+        :type attribute_name: str
+        :return: The alias or None if not found.
+        :rtype: str
+        """
+        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('a', None)
+
     def get_aliases(self, aspect):
         aliases = {}
         declarations = self.get_attribute_declarations()[aspect]
@@ -240,6 +253,19 @@ class CX2Network(object):
             if alias:
                 aliases[alias] = key
         return aliases
+
+    def get_default_value(self, aspect_name, attribute_name):
+        """
+        Retrieves default value for a given aspect's attribute.
+
+        :param aspect_name: The name of the aspect (e.g., 'nodes', 'edges').
+        :type aspect_name: str
+        :param attribute_name: The attribute whose declared data type needs to be retrieved.
+        :type attribute_name: str
+        :return: The default value or None if not found.
+        :rtype: str
+        """
+        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('v', None)
 
     def get_default_values(self, aspect):
         default_values = {}

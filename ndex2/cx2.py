@@ -71,7 +71,7 @@ class CX2Network(object):
     """
 
     def __init__(self):
-        self._attribute_declarations = None
+        self._attribute_declarations = {}
         self._network_attributes = {}
         self._nodes = {}
         self._edges = {}
@@ -105,7 +105,7 @@ class CX2Network(object):
         processed_attributes = self._process_attributes('nodes', attributes)
         node = {
             "id": node_id,
-            "v": processed_attributes or {},
+            "v": processed_attributes,
             "x": x,
             "y": y,
             "z": z
@@ -131,7 +131,8 @@ class CX2Network(object):
         """Updates the attributes of a node."""
         if node_id in self._nodes:
             if attributes:
-                self._nodes[node_id]["v"].update(attributes)
+                processed_attributes = self._process_attributes('nodes', attributes)
+                self._nodes[node_id]["v"].update(processed_attributes)
             if x is not None:
                 self._nodes[node_id]["x"] = x
             if y is not None:
@@ -149,7 +150,7 @@ class CX2Network(object):
             "id": edge_id,
             "s": source,
             "t": target,
-            "v": processed_attributes or {}
+            "v": processed_attributes
         }
         self._edges[edge_id] = edge
 
@@ -164,8 +165,9 @@ class CX2Network(object):
 
     def update_edge(self, edge_id, attributes=None):
         """Updates the attributes of an edge."""
-        if edge_id in self._edges and attributes:
-            self._edges[edge_id]["v"].update(attributes)
+        processed_attributes = self._process_attributes('edges', attributes)
+        if edge_id in self._edges and processed_attributes:
+            self._edges[edge_id]["v"].update(processed_attributes)
 
     def get_visual_properties(self):
         return self._visual_properties
@@ -245,11 +247,12 @@ class CX2Network(object):
 
     def get_aliases(self, aspect):
         aliases = {}
-        declarations = self.get_attribute_declarations()[aspect]
-        for key, details in declarations.items():
-            alias = details.get("a", None)
-            if alias:
-                aliases[alias] = key
+        if self.get_attribute_declarations():
+            declarations = self.get_attribute_declarations().get(aspect, {})
+            for key, details in declarations.items():
+                alias = details.get("a", None)
+                if alias:
+                    aliases[alias] = key
         return aliases
 
     def get_default_value(self, aspect_name, attribute_name):
@@ -267,11 +270,12 @@ class CX2Network(object):
 
     def get_default_values(self, aspect):
         default_values = {}
-        declarations = self.get_attribute_declarations()[aspect]
-        for key, details in declarations.items():
-            default_value = details.get("v", None)
-            if default_value:
-                default_values[key] = default_value
+        if self.get_attribute_declarations():
+            declarations = self.get_attribute_declarations().get(aspect, {})
+            for key, details in declarations.items():
+                default_value = details.get("v", None)
+                if default_value:
+                    default_values[key] = default_value
         return default_values
 
     def create_from_raw_cx2(self, cx2_data):
@@ -556,7 +560,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
             Style is NOT converted by this call
 
         :param input_data: Optional input data used to generate network
-        :type input_data: list or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+        :type input_data: str, list or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
         :return: Generated network
         :rtype: :py:class:`~ndex2.cx2.CX2Network`
         """

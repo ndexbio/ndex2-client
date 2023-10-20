@@ -72,15 +72,12 @@ class TestNiceCXNetworkIntegration(unittest.TestCase):
         net = CX2Network()
         net.add_node(0, attributes={'name': 'node0'})
         net.add_node(1, attributes={'name': 'node1'})
-        net.add_edge(0, source=0, target=1)
+        net.add_edge(0, source=0, target=1, attributes={'foo': 1})
         netname = 'CX2Network test network' + str(datetime.now())
         net.set_network_attributes({'name': netname,
                                     'description': 'Created by test_update_network_with_client() in '
                                                    'test_integration_cx2network.py integration test in ndex2-client'})
-
-        netname = 'CX2Network test network' + str(datetime.now())
-        creds = self.get_ndex_credentials_as_tuple()
-
+        print(json.dumps(net.to_cx2(), indent=2))
         res = client.save_new_cx2_network(net.to_cx2())
         try:
             self.assertTrue('http' in res)
@@ -106,11 +103,8 @@ class TestNiceCXNetworkIntegration(unittest.TestCase):
 
             cx_stream = io.BytesIO(json.dumps(net.to_cx2(),
                                               cls=DecimalEncoder).encode('utf-8'))
-            newres = client.update_cx2_network()
-            newres = net.update_to(netid, None,
-                                   'baduser', 'baddpass',
-                                   user_agent=creds['user_agent'],
-                                   client=client)
+            newres = client.update_cx2_network(cx_stream)
+
             self.assertEqual('', newres)
             netsum = self.wait_for_network_to_be_ready(client, netid,
                                                        num_retries=5,

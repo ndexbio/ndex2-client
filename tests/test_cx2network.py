@@ -1,19 +1,18 @@
 import unittest
 import os
 import json
+import tempfile
+import shutil
 from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory
 
 
 class TestCX2Network(unittest.TestCase):
+
     def setUp(self):
         self.cx2_obj = CX2Network()
         current_dir = os.path.dirname(os.path.abspath(__file__))
         self.sample_file = os.path.join(current_dir, 'data', 'demo.cx2')
         self.cx_file = os.path.join(current_dir, 'data', 'glypican2.cx')
-
-    def tearDown(self):
-        if os.path.exists('test_output.cx2'):
-            os.remove('test_output.cx2')
 
     def test_create_from_raw_cx2_from_file(self):
         self.cx2_obj.create_from_raw_cx2(self.sample_file)
@@ -32,13 +31,20 @@ class TestCX2Network(unittest.TestCase):
             self.cx2_obj.create_from_raw_cx2(12345)
 
     def test_write_as_raw_cx2(self):
-        self.cx2_obj.create_from_raw_cx2(self.sample_file)
-        self.cx2_obj.write_as_raw_cx2('test_output.cx2')
-        self.assertTrue(os.path.exists('test_output.cx2'))
+        temp_dir = tempfile.mkdtemp()
 
-        with open('test_output.cx2', 'r') as f:
-            data = json.load(f)
-            self.assertIn("CXVersion", data[0])
+        try:
+            test_out = os.path.join(temp_dir, 'test_output.cx2')
+            self.cx2_obj.create_from_raw_cx2(self.sample_file)
+
+            self.cx2_obj.write_as_raw_cx2(test_out)
+            self.assertTrue(os.path.exists(test_out))
+
+            with open(test_out, 'r') as f:
+                data = json.load(f)
+                self.assertIn("CXVersion", data[0])
+        finally:
+            shutil.rmtree(temp_dir)
 
     def test_to_cx2(self):
         self.cx2_obj.create_from_raw_cx2(self.sample_file)

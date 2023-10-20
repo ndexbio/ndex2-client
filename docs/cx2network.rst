@@ -13,7 +13,7 @@ Class and methods
     :noindex:
 
 Supported data types for attributes
-=====================
+=====================================
 
 - string
 - double

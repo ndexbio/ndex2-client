@@ -151,6 +151,10 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.add_node(1, attributes={"name": "Node1"}, x=10, y=20, z=30)
         self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {"name": "Node1"}, "x": 10, "y": 20, "z": 30})
 
+    def test_add_node_without_attributes(self):
+        self.cx2_obj.add_node(1, x=10, y=20, z=30)
+        self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {}, "x": 10, "y": 20, "z": 30})
+
     def test_remove_node(self):
         self.cx2_obj.add_node(1, attributes={"name": "Node1"}, x=10, y=20, z=30)
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})
@@ -167,6 +171,10 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.set_attribute_declarations({"edges": {"interaction": {"a": "i", "d": "string"}}})
         self.cx2_obj.add_edge(1, 1, 2, attributes={"i": "link"})
         self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 1, "t": 2, "v": {"interaction": "link"}})
+
+    def test_add_edge_without_attributes(self):
+        self.cx2_obj.add_edge(1, 1, 2)
+        self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 1, "t": 2, "v": {}})
 
     def test_remove_edge(self):
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})

@@ -617,11 +617,12 @@ class CX2Network(object):
             declared_type = self.get_declared_type(aspect_name, actual_key)
             processed_attrs[actual_key] = convert_value(declared_type, default_value)
 
-        for key, value in attributes.items():
-            actual_key = aliases.get(key, key)
-            declared_type = self.get_declared_type(aspect_name, actual_key)
-            if value is not None:
-                processed_attrs[actual_key] = convert_value(declared_type, value)
+        if attributes is not None:
+            for key, value in attributes.items():
+                actual_key = aliases.get(key, key)
+                declared_type = self.get_declared_type(aspect_name, actual_key)
+                if value is not None:
+                    processed_attrs[actual_key] = convert_value(declared_type, value)
 
         return processed_attrs
 

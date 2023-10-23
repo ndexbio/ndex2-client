@@ -13,9 +13,9 @@ def convert_value(dtype, value):
     :param value: Value to be converted.
     :type value: any
     """
-    if dtype == "integer":
+    if dtype == "integer" or dtype == "long":
         return int(value)
-    elif dtype == "double" or dtype == "long":
+    elif dtype == "double":
         return float(value)
     elif dtype == "boolean":
         if isinstance(value, bool):
@@ -82,26 +82,78 @@ class CX2Network(object):
         self._status = {}
 
     def get_attribute_declarations(self):
+        """
+        Retrieves the attribute declarations.
+
+        :return: The attribute declarations.
+        :rtype: dict
+        """
         return self._attribute_declarations
 
     def set_attribute_declarations(self, value):
+        """
+        Sets the attribute declarations.
+
+        :param value: The attribute declarations to set.
+        :type value: dict
+        """
         self._attribute_declarations = value
 
     def get_network_attributes(self):
+        """
+        Retrieves the network attributes.
+
+        :return: The network attributes.
+        :rtype: dict
+        """
         return self._network_attributes
 
     def set_network_attributes(self, network_attrs):
+        """
+        Sets the network attributes after processing them using declared types in attribute declarations.
+
+        :param network_attrs: The network attributes to set.
+        :type network_attrs: dict
+        """
         processed_network_attrs = {}
         for key, value in network_attrs.items():
             declared_type = self.get_declared_type('networkAttributes', key)
             processed_network_attrs[key] = convert_value(declared_type, value)
         self._network_attributes = processed_network_attrs
 
+    def get_name(self):
+        """
+        Retrieves the network name.
+
+        :return: Network name
+        :rtype: str
+        """
+        return self.get_network_attributes().get('name', None)
+
     def get_nodes(self):
+        """
+        Retrieves the nodes in the network.
+
+        :return: Nodes in the network.
+        :rtype: dict
+        """
         return self._nodes
 
     def add_node(self, node_id, attributes=None, x=None, y=None, z=None):
-        """Adds a node to the network."""
+        """
+        Adds a node to the network.
+
+        :param node_id: ID of the node to add.
+        :type node_id: str
+        :param attributes: Attributes of the node.
+        :type attributes: dict, optional
+        :param x: X-coordinate of the node.
+        :type x: float, optional
+        :param y: Y-coordinate of the node.
+        :type y: float, optional
+        :param z: Z-coordinate of the node.
+        :type z: float, optional
+        """
         processed_attributes = self._process_attributes('nodes', attributes)
         node = {
             "id": node_id,
@@ -113,11 +165,23 @@ class CX2Network(object):
         self._nodes[node_id] = node
 
     def get_node(self, node_id):
-        """Retrieves a node based on its ID."""
+        """
+        Retrieves a node based on its ID.
+
+        :param node_id: ID of the node to retrieve.
+        :type node_id: str
+        :return: Node with the given ID or None if not found.
+        :rtype: dict or None
+        """
         return self._nodes.get(node_id, None)
 
     def remove_node(self, node_id):
-        """Removes a node and checks for dangling edges."""
+        """
+        Removes a node and checks for dangling edges (edges without both source and target).
+
+        :param node_id: ID of the node to remove.
+        :type node_id: str
+        """
         # Remove the node
         if node_id in self._nodes:
             del self._nodes[node_id]
@@ -128,7 +192,20 @@ class CX2Network(object):
             self.remove_edge(edge_id)
 
     def update_node(self, node_id, attributes=None, x=None, y=None, z=None):
-        """Updates the attributes of a node."""
+        """
+        Updates the attributes of a node.
+
+        :param node_id: ID of the node to update.
+        :type node_id: str
+        :param attributes: Attributes to update.
+        :type attributes: dict, optional
+        :param x: X-coordinate to update.
+        :type x: float, optional
+        :param y: Y-coordinate to update.
+        :type y: float, optional
+        :param z: Z-coordinate to update.
+        :type z: float, optional
+        """
         if node_id in self._nodes:
             if attributes:
                 processed_attributes = self._process_attributes('nodes', attributes)
@@ -141,10 +218,27 @@ class CX2Network(object):
                 self._nodes[node_id]["z"] = z
 
     def get_edges(self):
+        """
+        Retrieves the edges in the network.
+
+        :return: Edges in the network.
+        :rtype: dict
+        """
         return self._edges
 
     def add_edge(self, edge_id, source, target, attributes=None):
-        """Adds an edge to the network."""
+        """
+        Adds an edge to the network.
+
+        :param edge_id: ID of the edge to add.
+        :type edge_id: str
+        :param source: Source node of the edge.
+        :type source: str
+        :param target: Target node of the edge.
+        :type target: str
+        :param attributes: Attributes of the edge.
+        :type attributes: dict, optional
+        """
         processed_attributes = self._process_attributes('edges', attributes)
         edge = {
             "id": edge_id,
@@ -155,27 +249,64 @@ class CX2Network(object):
         self._edges[edge_id] = edge
 
     def get_edge(self, edge_id):
-        """Retrieves an edge based on its ID."""
+        """
+        Retrieves an edge based on its ID.
+
+        :param edge_id: ID of the edge to retrieve.
+        :type edge_id: str
+        :return: Edge with the given ID or None if not found.
+        :rtype: dict or None
+        """
         return self._edges.get(edge_id, None)
 
     def remove_edge(self, edge_id):
-        """Removes an edge from the network."""
+        """
+        Removes an edge from the network based on its ID.
+
+        :param edge_id: ID of the edge to remove.
+        :type edge_id: str
+        """
         if edge_id in self._edges:
             del self._edges[edge_id]
 
     def update_edge(self, edge_id, attributes=None):
-        """Updates the attributes of an edge."""
+        """
+        Updates the attributes of an edge.
+
+        :param edge_id: ID of the edge to update.
+        :type edge_id: str
+        :param attributes: New attributes for the edge.
+        :type attributes: dict, optional
+        """
         processed_attributes = self._process_attributes('edges', attributes)
         if edge_id in self._edges and processed_attributes:
             self._edges[edge_id]["v"].update(processed_attributes)
 
     def get_visual_properties(self):
+        """
+        Retrieves the visual properties of the network.
+
+        :return: The visual properties of the network.
+        :rtype: dict
+        """
         return self._visual_properties
 
     def set_visual_properties(self, value):
+        """
+        Sets the visual properties for the network.
+
+        :param value: New visual properties for the network.
+        :type value: dict
+        """
         self._visual_properties = value
 
     def get_node_bypasses(self):
+        """
+        Retrieves the node-specific visual property bypasses.
+
+        :return: The node-specific visual property bypasses.
+        :rtype: dict
+        """
         return self._node_bypasses
 
     def add_node_bypass(self, node_id, value):
@@ -183,11 +314,19 @@ class CX2Network(object):
         Adds a node-specific visual property bypass.
 
         :param node_id: ID of the node.
+        :type node_id: str
         :param value: Visual property bypass value.
+        :type value: Any
         """
         self._node_bypasses[node_id] = value
 
     def get_edge_bypasses(self):
+        """
+        Retrieves the edge-specific visual property bypasses.
+
+        :return: The edge-specific visual property bypasses.
+        :rtype: dict
+        """
         return self._edge_bypasses
 
     def add_edge_bypass(self, edge_id, value):
@@ -195,14 +334,28 @@ class CX2Network(object):
         Adds an edge-specific visual property bypass.
 
         :param edge_id: ID of the edge.
+        :type edge_id: str
         :param value: Visual property bypass value.
+        :type value: Any
         """
         self._edge_bypasses[edge_id] = value
 
     def get_opaque_aspects(self):
+        """
+        Retrieves the opaque aspects of the network.
+
+        :return: The opaque aspects of the network.
+        :rtype: list
+        """
         return self._opaque_aspects
 
     def set_opaque_aspects(self, value):
+        """
+        Sets the opaque aspects for the network.
+
+        :param value: New opaque aspects for the network.
+        :type value: list
+        """
         self._opaque_aspects = value
 
     def add_opaque_aspect(self, aspect):
@@ -210,13 +363,26 @@ class CX2Network(object):
         Adds an opaque aspect to the list of opaque aspects.
 
         :param aspect: The opaque aspect to add.
+        :type aspect: dict
         """
         self._opaque_aspects.append(aspect)
 
     def get_status(self):
-        return self._status
+        """
+        Retrieves the status of the network.
+
+        :return: The status of the network.
+        :rtype: list
+        """
+        return [self._status]
 
     def set_status(self, value):
+        """
+        Sets the status for the network.
+
+        :param value: New status for the network.
+        :type value: dict
+        """
         self._status = value
 
     def get_declared_type(self, aspect_name, attribute_name):
@@ -246,6 +412,14 @@ class CX2Network(object):
         return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('a', None)
 
     def get_aliases(self, aspect):
+        """
+        Retrieves aliases for a given aspect's attributes.
+
+        :param aspect: The name of the aspect (e.g., 'nodes', 'edges').
+        :type aspect: str
+        :return: Dictionary mapping aliases to attribute names.
+        :rtype: dict
+        """
         aliases = {}
         if self.get_attribute_declarations():
             declarations = self.get_attribute_declarations().get(aspect, {})
@@ -269,6 +443,14 @@ class CX2Network(object):
         return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('v', None)
 
     def get_default_values(self, aspect):
+        """
+        Retrieves default values for a given aspect's attributes.
+
+        :param aspect: The name of the aspect (e.g., 'nodes', 'edges').
+        :type aspect: str
+        :return: Dictionary mapping attribute names to their default values.
+        :rtype: dict
+        """
         default_values = {}
         if self.get_attribute_declarations():
             declarations = self.get_attribute_declarations().get(aspect, {})
@@ -475,9 +657,6 @@ class CX2NetworkFactory(object):
     """
 
     def __init__(self):
-        """
-        Constructor
-        """
         pass
 
     def get_cx2_network(self, input_data=None) -> CX2Network:
@@ -504,17 +683,38 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
     """
 
     def __init__(self):
-        """
-        Constructor
-        """
         super(NoStyleCXToCX2NetworkFactory, self).__init__()
 
     @staticmethod
     def _translate_network_attributes_to_cx2(network_attributes):
+        """
+        Translates network attributes into CX2 format.
+
+        :param network_attributes: Attributes to translate.
+        :type network_attributes: dict
+        :return: Translated network attributes.
+        :rtype: dict
+        """
         return {item['n']: item['v'] for item in network_attributes}
 
     @staticmethod
     def _generate_attribute_declarations(network_attributes, nodes, node_attributes, edges, edge_attributes):
+        """
+        Generates attribute declarations based on provided attributes, nodes, and edges.
+
+        :param network_attributes: Network attributes.
+        :type network_attributes: dict
+        :param nodes: Nodes in the network.
+        :type nodes: dict
+        :param node_attributes: Node attributes.
+        :type node_attributes: dict
+        :param edges: Edges in the network.
+        :type edges: dict
+        :param edge_attributes: Edge attributes.
+        :type edge_attributes: dict
+        :return: Generated attribute declarations.
+        :rtype: dict
+        """
         attribute_declarations = {
             "networkAttributes": {item['n']: {'d': item.get('d', 'string')} for item in network_attributes},
             "nodes": {},
@@ -543,6 +743,18 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 
     @staticmethod
     def _process_attributes_for_cx2(entity, attributes, expected_keys=None):
+        """
+        Processes attributes for conversion to CX2 format.
+
+        :param entity: The entity to process attributes for.
+        :type entity: dict
+        :param attributes: Attributes to process.
+        :type attributes: dict
+        :param expected_keys: Optional list of expected keys in the entity.
+        :type expected_keys: list, optional
+        :return: Processed attributes.
+        :rtype: dict
+        """
         attr_vals = {}
         if expected_keys:
             attr_vals = {key: entity[key] for key in expected_keys if key in entity}
@@ -588,22 +800,28 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
             attr_val = self._process_attributes_for_cx2(edge, network.edgeAttributes, ['i'])
             cx2network_obj.add_edge(edge['@id'], edge['s'], edge['t'], attr_val)
 
-        cx2network_obj.set_status([{'error': '', 'success': True}])
+        cx2network_obj.set_status({'error': '', 'success': True})
 
         return cx2network_obj
 
 
 class RawCX2NetworkFactory(CX2NetworkFactory):
+    """
+    Factory class responsible for creating :py:class:`~ndex2.cx2.CX2Network` instances
+    directly from raw CX2 formatted data.
+    """
 
     def __init__(self):
-        """
-        Constructor
-        """
         super(RawCX2NetworkFactory, self).__init__()
 
     def get_cx2network(self, input_data) -> CX2Network:
         """
-        Creates :py:class:`~ndex2.cx2.CX2Network` from raw CX2 data.
+        Converts the provided raw CX2 data into a :py:class:`~ndex2.cx2.CX2Network` object.
+
+        :param input_data: Raw CX2 data to be converted.
+        :type input_data: dict or similar mapping type
+        :return: A constructed :py:class:`~ndex2.cx2.CX2Network` object from the input data.
+        :rtype: :py:class:`~ndex2.cx2.CX2Network`
         """
         cx2network_obj = CX2Network()
         cx2network_obj.create_from_raw_cx2(input_data)

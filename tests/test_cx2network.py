@@ -147,6 +147,21 @@ class TestCX2Network(unittest.TestCase):
         self.assertTrue('represents' in nx.get_attribute_declarations()['nodes'])
         self.assertEqual(type(nx.get_edges()[0]['v']['directed']), bool)
 
+    def test_get_cx2network_from_cx_file_no_cartesian_layout(self):
+        cl = NoStyleCXToCX2NetworkFactory()
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        cx_file_no_layout = os.path.join(current_dir, 'data', 'glypican2.cx')
+        nx = cl.get_cx2network(cx_file_no_layout)
+
+        self.assertEqual('Glypican 2 network', nx.get_network_attributes()['name'])
+        self.assertEqual(2, len(list(nx.get_nodes())))
+        self.assertEqual(1, len(list(nx.get_edges())))
+        self.assertEqual(type(nx), CX2Network)
+        self.assertTrue('edges' in nx.get_attribute_declarations().keys())
+        self.assertTrue('nodes' in nx.get_attribute_declarations().keys())
+        self.assertTrue('represents' in nx.get_attribute_declarations()['nodes'])
+        self.assertEqual(type(nx.get_edges()[0]['v']['directed']), bool)
+
     def test_add_node(self):
         self.cx2_obj.add_node(1, attributes={"name": "Node1"}, x=10, y=20, z=30)
         self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {"name": "Node1"}, "x": 10, "y": 20, "z": 30})

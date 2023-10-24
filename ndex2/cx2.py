@@ -2,6 +2,7 @@ import json
 
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file
 from ndex2.nice_cx_network import NiceCXNetwork
+from itertools import zip_longest
 
 
 def convert_value(dtype, value):
@@ -823,7 +824,8 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 
         cx2network_obj.set_network_attributes(self._translate_network_attributes_to_cx2(network.networkAttributes))
 
-        for node, layout in zip(network.nodes.values(), network.opaqueAspects['cartesianLayout']):
+        for node, layout in zip_longest(network.nodes.values(), network.opaqueAspects.get('cartesianLayout', []),
+                                        fillvalue={}):
             attr_val = self._process_attributes_for_cx2(node, network.nodeAttributes, ['n', 'r'])
             cx2network_obj.add_node(node['@id'], attr_val, layout.get('x'), layout.get('y'), layout.get('z'))
 

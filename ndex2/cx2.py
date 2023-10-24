@@ -90,6 +90,34 @@ class CX2Network(object):
         """
         return self._attribute_declarations
 
+    def _generate_attribute_declarations_for_aspect(self, aspect, attributes, aliases):
+        """
+        Generates attribute declarations for a given aspect of the network.
+
+        This method examines the provided attributes and, if they are not already
+        declared, adds them to the attribute declarations for the specified aspect.
+
+        :param aspect: The aspect of the network (e.g., 'nodes', 'edges') for which
+                       attribute declarations are to be generated.
+        :type aspect: str
+        :param attributes: A dictionary of attributes where keys are attribute names
+                           and values are the corresponding attribute values.
+        :type attributes: dict
+        :param aliases: A dictionary mapping aspect names to their alias declarations.
+                        This is used to ensure that attributes that are aliases are not
+                        added to the attribute declarations.
+        :type aliases: dict
+        """
+        if aspect not in self.get_attribute_declarations().keys():
+            self._attribute_declarations[aspect] = {}
+        if attributes is not None:
+            for attr, value in attributes.items():
+                if (attr not in self.get_attribute_declarations()[aspect].keys() and attr not in aliases.values()
+                        and attr not in aliases.keys()):
+                    self.get_attribute_declarations()[aspect][attr] = {
+                        "d": type(value).__name__
+                    }
+
     def set_attribute_declarations(self, value):
         """
         Sets the attribute declarations.
@@ -119,6 +147,7 @@ class CX2Network(object):
         for key, value in network_attrs.items():
             declared_type = self.get_declared_type('networkAttributes', key)
             processed_network_attrs[key] = convert_value(declared_type, value)
+        self._generate_attribute_declarations_for_aspect('networkAttributes', processed_network_attrs, {})
         self._network_attributes = processed_network_attrs
 
     def get_name(self):
@@ -624,6 +653,7 @@ class CX2Network(object):
                 if value is not None:
                     processed_attrs[actual_key] = convert_value(declared_type, value)
 
+        self._generate_attribute_declarations_for_aspect(aspect_name, processed_attrs, aliases)
         return processed_attrs
 
     def _replace_with_alias(self, aspect_list, aspect_name):

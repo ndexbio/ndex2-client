@@ -187,6 +187,21 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.update_edge(1, attributes={"i": "updated_link"})
         self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 1, "t": 2, "v": {"interaction": "updated_link"}})
 
+    def test_creating_network_without_setting_attribute_declarations(self):
+        net = CX2Network()
+        net.add_node(0, attributes={'name': 'node0'})
+        net.add_node(1, attributes={'name': 'node1'})
+        net.add_edge(0, source=0, target=1, attributes={'foo': 1})
+        netname = 'CX2Network test network'
+        net.set_network_attributes({'name': netname,
+                                    'description': 'Created by test_update_network_with_client() in '
+                                                   'test_integration_cx2network.py integration test in ndex2-client'})
+        self.assertEqual(net.get_attribute_declarations(), {'edges': {'foo': {'d': 'int'}},
+                                                            'networkAttributes': {'description': {'d': 'str'},
+                                                                                  'name': {'d': 'str'}},
+                                                            'nodes': {'name': {'d': 'str'}}})
+        self.assertEqual(len(net.get_attribute_declarations()), 3)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -790,7 +790,8 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         attr_vals = {}
         if expected_keys:
             attr_vals = {key: entity[key] for key in expected_keys if key in entity}
-        attr_vals.update({attr['n']: attr['v'] for attr in attributes[entity['@id']]})
+        if attributes.get(entity['@id']):
+            attr_vals.update({attr['n']: attr['v'] for attr in attributes[entity['@id']]})
         return attr_vals
 
     def get_cx2network(self, input_data) -> CX2Network:

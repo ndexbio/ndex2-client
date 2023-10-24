@@ -585,7 +585,10 @@ class CX2Network(object):
             meta_data.append({"elementCount": aspect_count, "name": aspect_name})
         output_data.append({"metaData": meta_data})
 
-        output_data.append({"attributeDeclarations": [self.get_attribute_declarations()]})
+        if self._attribute_declarations:
+            filtered_attribute_declarations = {k: v for k, v in self.get_attribute_declarations().items()
+                                               if v is not None and v != {}}
+            output_data.append({"attributeDeclarations": [filtered_attribute_declarations]})
         output_data.append({"networkAttributes": [self.get_network_attributes()]})
 
         nodes_list = self._replace_with_alias(list(self.get_nodes().values()), 'nodes')
@@ -593,7 +596,9 @@ class CX2Network(object):
 
         output_nodes = []
         for node in nodes_list:
-            clean_node = {k: v for k, v in node.items() if k not in ['x', 'y', 'z']}
+            clean_node = {k: v for k, v in node.items() if k not in ['x', 'y', 'z', 'v']}
+            if 'v' in node and node['v'] is not None and len(node['v']) > 0:
+                clean_node['v'] = node['v']
             if 'x' in node and node['x'] is not None:
                 clean_node['x'] = node['x']
             if 'y' in node and node['y'] is not None:
@@ -606,8 +611,15 @@ class CX2Network(object):
             "nodes": output_nodes
         })
 
+        output_edges = []
+        for edge in edges_list:
+            clean_edge = {k: v for k, v in edge.items() if k != 'v'}
+            if 'v' in edge and edge['v'] is not None and len(edge['v']) > 0:
+                clean_edge['v'] = edge['v']
+            output_edges.append(clean_edge)
+
         output_data.append({
-            "edges": edges_list
+            "edges": output_edges
         })
 
         if self._visual_properties:

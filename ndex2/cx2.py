@@ -404,7 +404,7 @@ class CX2Network(object):
         :return: The status of the network.
         :rtype: list
         """
-        return [self._status]
+        return self._status
 
     def set_status(self, value):
         """
@@ -624,7 +624,7 @@ class CX2Network(object):
         output_data.extend(self._opaque_aspects)
 
         if self._status:
-            output_data.append({"status": self._status})
+            output_data.append({"status": [self._status]})
 
         return output_data
 

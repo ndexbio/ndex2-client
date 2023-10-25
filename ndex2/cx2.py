@@ -497,6 +497,9 @@ class CX2Network(object):
         :param cx2_data: Path to the CX2 file or a list representing CX2 data to be processed.
         :type cx2_data: str or list
         """
+        if not cx2_data:
+            raise Exception('CX2 is empty')
+
         if isinstance(cx2_data, str):
             with open(cx2_data, 'r') as cx2_file:
                 raw_data = json.load(cx2_file)
@@ -808,7 +811,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
             attr_vals.update({attr['n']: attr['v'] for attr in attributes[entity['@id']]})
         return attr_vals
 
-    def get_cx2network(self, input_data) -> CX2Network:
+    def get_cx2network(self, input_data=None) -> CX2Network:
         """
         Creates :py:class:`~ndex2.cx2.CX2Network` from
         CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
@@ -862,7 +865,7 @@ class RawCX2NetworkFactory(CX2NetworkFactory):
     def __init__(self):
         super(RawCX2NetworkFactory, self).__init__()
 
-    def get_cx2network(self, input_data) -> CX2Network:
+    def get_cx2network(self, input_data=None) -> CX2Network:
         """
         Converts the provided raw CX2 data into a :py:class:`~ndex2.cx2.CX2Network` object.
 

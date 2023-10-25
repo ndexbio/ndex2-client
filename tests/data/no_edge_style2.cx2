@@ -1,0 +1,233 @@
+[
+  {
+    "CXVersion": "2.0",
+    "hasFragments": false
+  },
+  {
+    "metaData": [
+      {
+        "name": "attributeDeclarations",
+        "elementCount": 1
+      },
+      {
+        "name": "networkAttributes",
+        "elementCount": 1
+      },
+      {
+        "name": "edges",
+        "elementCount": 1
+      },
+      {
+        "name": "nodes",
+        "elementCount": 2
+      },
+      {
+        "name": "visualProperties",
+        "elementCount": 1
+      },
+      {
+        "name": "visualEditorProperties",
+        "elementCount": 1
+      },
+      {
+        "name": "edgeBypasses"
+      },
+      {
+        "name": "nodeBypasses"
+      },
+      {
+        "name": "tableVisualProperties"
+      }
+    ]
+  },
+  {
+    "attributeDeclarations": [
+      {
+        "nodes": {
+          "name": {
+            "d": "string"
+          },
+          "selected": {
+            "d": "boolean"
+          }
+        },
+        "networkAttributes": {
+          "shared name": {
+            "d": "string"
+          },
+          "__Annotations": {
+            "d": "list_of_string"
+          },
+          "name": {
+            "d": "string"
+          },
+          "selected": {
+            "d": "boolean"
+          }
+        },
+        "edges": {
+          "shared name": {
+            "d": "string"
+          },
+          "shared interaction": {
+            "d": "string"
+          },
+          "name": {
+            "d": "string"
+          },
+          "interaction": {
+            "d": "string"
+          },
+          "selected": {
+            "d": "boolean"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "networkAttributes": [
+      {
+        "name": "no_edge_style"
+      }
+    ]
+  },
+  {
+    "nodes": [
+      {
+        "id": 437,
+        "x": -34.0,
+        "y": -105.0,
+        "v": {
+          "name": "Node 2"
+        }
+      },
+      {
+        "id": 432,
+        "x": -228.0,
+        "y": -119.0,
+        "v": {
+          "name": "Node 1"
+        }
+      }
+    ]
+  },
+  {
+    "edges": [
+      {
+        "id": 442,
+        "s": 432,
+        "t": 437,
+        "v": {
+          "interaction": "interacts with"
+        }
+      }
+    ]
+  },
+  {
+    "visualEditorProperties": [
+      {
+        "properties": {
+          "nodeSizeLocked": false,
+          "arrowColorMatchesEdge": false,
+          "nodeCustomGraphicsSizeSync": true
+        }
+      }
+    ]
+  },
+  {
+    "visualProperties": [
+      {
+        "default": {
+          "edge": {
+            "EDGE_SOURCE_ARROW_SIZE": 6.0,
+            "EDGE_LABEL_OPACITY": 1.0,
+            "EDGE_TARGET_ARROW_SHAPE": "none",
+            "EDGE_WIDTH": 2.0,
+            "EDGE_SOURCE_ARROW_SHAPE": "none",
+            "EDGE_Z_ORDER": 0.0,
+            "EDGE_LINE_COLOR": "#848484",
+            "EDGE_LABEL_MAX_WIDTH": 200.0,
+            "EDGE_OPACITY": 1.0,
+            "EDGE_LABEL_ROTATION": 0.0,
+            "EDGE_LABEL_FONT_FACE": {
+              "FONT_FAMILY": "sans-serif",
+              "FONT_STYLE": "normal",
+              "FONT_WEIGHT": "normal",
+              "FONT_NAME": "Dialog"
+            },
+            "EDGE_VISIBILITY": "element",
+            "EDGE_LABEL_FONT_SIZE": 10,
+            "EDGE_LABEL_COLOR": "#000000",
+            "EDGE_SELECTED_PAINT": "#FF0000",
+            "EDGE_STACKING": "AUTO_BEND",
+            "EDGE_SELECTED": "false",
+            "EDGE_STACKING_DENSITY": 0.5,
+            "EDGE_SOURCE_ARROW_COLOR": "#000000",
+            "EDGE_LINE_STYLE": "solid",
+            "EDGE_TARGET_ARROW_COLOR": "#000000",
+            "EDGE_CURVED": true,
+            "EDGE_TARGET_ARROW_SIZE": 6.0
+          },
+          "network": {
+            "NETWORK_BACKGROUND_COLOR": "#FFFFFF"
+          },
+          "node": {
+            "NODE_LABEL_COLOR": "#000000",
+            "NODE_SELECTED": false,
+            "NODE_Y_LOCATION": "0.0",
+            "NODE_BORDER_COLOR": "#CCCCCC",
+            "NODE_SHAPE": "round-rectangle",
+            "NODE_BACKGROUND_COLOR": "#89D0F5",
+            "NODE_LABEL_FONT_SIZE": 12,
+            "NODE_X_LOCATION": "0.0",
+            "NODE_WIDTH": 75.0,
+            "NODE_BORDER_OPACITY": 1.0,
+            "NODE_LABEL_ROTATION": 0.0,
+            "NODE_BORDER_WIDTH": 0.0,
+            "COMPOUND_NODE_SHAPE": "ROUND_RECTANGLE",
+            "NODE_LABEL_POSITION": {
+              "HORIZONTAL_ALIGN": "center",
+              "VERTICAL_ALIGN": "center",
+              "HORIZONTAL_ANCHOR": "center",
+              "VERTICAL_ANCHOR": "center",
+              "MARGIN_X": 0.0,
+              "MARGIN_Y": 0.0,
+              "JUSTIFICATION": "center"
+            },
+            "NODE_Z_LOCATION": "0.0",
+            "NODE_VISIBILITY": "element",
+            "NODE_LABEL_OPACITY": 1.0,
+            "NODE_HEIGHT": 35.0,
+            "NODE_BORDER_STYLE": "solid",
+            "COMPOUND_NODE_PADDING": "10.0",
+            "NODE_LABEL_FONT_FACE": {
+              "FONT_FAMILY": "sans-serif",
+              "FONT_STYLE": "normal",
+              "FONT_WEIGHT": "normal",
+              "FONT_NAME": "SansSerif"
+            },
+            "NODE_SELECTED_PAINT": "#FFFF00",
+            "NODE_LABEL_MAX_WIDTH": 200.0,
+            "NODE_BACKGROUND_OPACITY": 1.0
+          }
+        },
+        "nodeMapping": {
+          "NODE_LABEL": {
+            "type": "PASSTHROUGH",
+            "definition": {
+              "attribute": "name"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "status": [
+      {
+        "success": true
+      }
+    ]
+  }
+]

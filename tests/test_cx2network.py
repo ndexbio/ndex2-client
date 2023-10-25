@@ -28,7 +28,7 @@ class TestCX2Network(unittest.TestCase):
         self.assertGreater(len(self.cx2_obj.get_nodes()), 0)
 
     def test_invalid_input_create_from_raw_cx2(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(NDExInvalidCX2Error):
             self.cx2_obj.create_from_raw_cx2(12345)
 
     def test_write_as_raw_cx2(self):

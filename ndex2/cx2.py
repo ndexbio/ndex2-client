@@ -15,20 +15,23 @@ def convert_value(dtype, value):
     :param value: Value to be converted.
     :type value: any
     """
-    if dtype == "integer" or dtype == "long":
-        return int(value)
-    elif dtype == "double":
-        return float(value)
-    elif dtype == "boolean":
-        if isinstance(value, bool):
-            return value
+    try:
+        if dtype == "integer" or dtype == "long":
+            return int(value)
+        elif dtype == "double":
+            return float(value)
+        elif dtype == "boolean":
+            if isinstance(value, bool):
+                return value
+            else:
+                return True if value.lower() == 'true' else False
+        elif dtype.startswith("list_of_"):
+            elem_type = dtype.split("_")[2]
+            return [convert_value(elem_type, v) for v in value]
         else:
-            return True if value.lower() == 'true' else False
-    elif dtype.startswith("list_of_"):
-        elem_type = dtype.split("_")[2]
-        return [convert_value(elem_type, v) for v in value]
-    else:
-        return value
+            return value
+    except ValueError as err:
+        raise NDExInvalidCX2Error('Declared value of attribute data does not match the actual value type: ' + str(err))
 
 
 class CX2Network(object):
@@ -124,14 +127,12 @@ class CX2Network(object):
             return aspect_id
         elif isinstance(aspect_id, str):
             try:
-                aspect_id= int(aspect_id)
+                aspect_id = int(aspect_id)
                 return aspect_id
             except ValueError:
-                raise NDExInvalidCX2Error(f'IDs of nodes, edges and the source and target of edges must be integer or '
-                                          f'long. Got {aspect_id}')
-        else:
-            raise NDExInvalidCX2Error(f'IDs of nodes, edges and the source and target of edges must be integer or '
-                                      f'long. Got {aspect_id}')
+                pass
+        raise NDExInvalidCX2Error(f'IDs of nodes, edges and the source and target of edges must be integer or long. '
+                                  f'Got {aspect_id}')
 
     def get_attribute_declarations(self):
         """
@@ -268,7 +269,6 @@ class CX2Network(object):
         :param node_id: ID of the node to remove.
         :type node_id: int or str
         """
-        # Remove the node
         if node_id in self._nodes:
             del self._nodes[node_id]
 
@@ -292,16 +292,18 @@ class CX2Network(object):
         :param z: Z-coordinate to update.
         :type z: float, optional
         """
-        if node_id in self._nodes:
-            if attributes:
-                processed_attributes = self._process_attributes('nodes', attributes)
-                self._nodes[node_id]["v"].update(processed_attributes)
-            if x is not None:
-                self._nodes[node_id]["x"] = x
-            if y is not None:
-                self._nodes[node_id]["y"] = y
-            if z is not None:
-                self._nodes[node_id]["z"] = z
+        if node_id not in self._nodes:
+            raise NDExError(f"Node with ID {node_id} does not exist.")
+
+        if attributes:
+            processed_attributes = self._process_attributes('nodes', attributes)
+            self._nodes[node_id]["v"].update(processed_attributes)
+        if x is not None:
+            self._nodes[node_id]["x"] = x
+        if y is not None:
+            self._nodes[node_id]["y"] = y
+        if z is not None:
+            self._nodes[node_id]["z"] = z
 
     def get_edges(self):
         """
@@ -371,8 +373,11 @@ class CX2Network(object):
         :param attributes: New attributes for the edge.
         :type attributes: dict, optional
         """
-        processed_attributes = self._process_attributes('edges', attributes)
-        if edge_id in self._edges and processed_attributes:
+        if edge_id not in self._edges:
+            raise NDExError(f"Edge with ID {edge_id} does not exist.")
+
+        if attributes:
+            processed_attributes = self._process_attributes('edges', attributes)
             self._edges[edge_id]["v"].update(processed_attributes)
 
     def get_visual_properties(self):
@@ -561,7 +566,7 @@ class CX2Network(object):
         :type cx2_data: str or list
         """
         if not cx2_data:
-            raise Exception('CX2 is empty')
+            raise NDExError('CX2 is empty')
 
         if isinstance(cx2_data, str):
             with open(cx2_data, 'r') as cx2_file:
@@ -569,7 +574,8 @@ class CX2Network(object):
         elif isinstance(cx2_data, list):
             raw_data = cx2_data
         else:
-            raise ValueError("Invalid input. The input parameter 'cx2_data' should be a file path (str) or a list.")
+            raise NDExInvalidCX2Error("Invalid input. The input parameter 'cx2_data' should be a file path (str) or a "
+                                      "list.")
 
         for section in raw_data:
             if 'attributeDeclarations' in section:
@@ -580,12 +586,10 @@ class CX2Network(object):
 
             elif 'nodes' in section:
                 for node in section['nodes']:
-                    x = node.get("x", None)
-                    y = node.get("y", None)
-                    z = node.get("z", None)
                     if "id" not in node:
                         raise NDExInvalidCX2Error('CX2 is not properly designed. Node requires id.')
-                    self.add_node(node["id"], node.get("v", None), x, y, z)
+                    self.add_node(node["id"], node.get("v", None), node.get("x", None), node.get("y", None),
+                                  node.get("z", None))
 
             elif 'edges' in section:
                 for edge in section['edges']:
@@ -621,20 +625,7 @@ class CX2Network(object):
             output_data = self.to_cx2()
             json.dump(output_data, output_file, indent=4)
 
-    def to_cx2(self):
-        """
-        Generates the CX2 representation of the current state of the instance.
-
-        This method constructs a list structure representing the current state of the network
-        in the CX2 format.
-
-        :return: A list representing the CX2 formatted data of the current network state.
-        :rtype: list
-        """
-        output_data = [{
-            "CXVersion": "2.0",
-            "hasFragments": False
-        }]
+    def _get_meta_data(self):
         meta_data = []
         if self.get_attribute_declarations():
             meta_data.append({"elementCount": 1, "name": "attributeDeclarations"})
@@ -654,41 +645,64 @@ class CX2Network(object):
             aspect_name = list(opaque_aspect.keys())[0]
             aspect_count = len(opaque_aspect[aspect_name])
             meta_data.append({"elementCount": aspect_count, "name": aspect_name})
-        output_data.append({"metaData": meta_data})
+        return meta_data
+
+    @staticmethod
+    def _clean_aspect_data(data_list, fields_to_check):
+        """
+        Cleans the given data list by removing unnecessary fields and adding specific ones.
+
+        :param data_list: List of data dictionaries (nodes or edges).
+        :param fields_to_check: List of fields to check in each data dictionary.
+        :return: List of cleaned data dictionaries.
+        """
+        cleaned_data = []
+
+        for item in data_list:
+            clean_item = {k: v for k, v in item.items() if k not in fields_to_check}
+
+            for field in fields_to_check:
+                if field in item and item[field] is not None:
+                    if field != 'v' or len(item[field]) > 0:
+                        clean_item[field] = item[field]
+
+            cleaned_data.append(clean_item)
+
+        return cleaned_data
+
+    def to_cx2(self):
+        """
+        Generates the CX2 representation of the current state of the instance.
+
+        This method constructs a list structure representing the current state of the network
+        in the CX2 format.
+
+        :return: A list representing the CX2 formatted data of the current network state.
+        :rtype: list
+        """
+        output_data = [
+            {
+                "CXVersion": "2.0",
+                "hasFragments": False
+            },
+            {"metaData": self._get_meta_data()}]
 
         if self._attribute_declarations:
             filtered_attribute_declarations = {k: v for k, v in self.get_attribute_declarations().items()
                                                if v is not None and v != {}}
             output_data.append({"attributeDeclarations": [filtered_attribute_declarations]})
-        output_data.append({"networkAttributes": [self.get_network_attributes()]})
+
+        if self._network_attributes:
+            output_data.append({"networkAttributes": [self.get_network_attributes()]})
 
         nodes_list = self._replace_with_alias(list(self.get_nodes().values()), 'nodes')
-        edges_list = self._replace_with_alias(list(self.get_edges().values()), 'edges')
-
-        output_nodes = []
-        for node in nodes_list:
-            clean_node = {k: v for k, v in node.items() if k not in ['x', 'y', 'z', 'v']}
-            if 'v' in node and node['v'] is not None and len(node['v']) > 0:
-                clean_node['v'] = node['v']
-            if 'x' in node and node['x'] is not None:
-                clean_node['x'] = node['x']
-            if 'y' in node and node['y'] is not None:
-                clean_node['y'] = node['y']
-            if 'z' in node and node['z'] is not None:
-                clean_node['z'] = node['z']
-            output_nodes.append(clean_node)
-
+        output_nodes = self._clean_aspect_data(nodes_list, ['x', 'y', 'z', 'v'])
         output_data.append({
             "nodes": output_nodes
         })
 
-        output_edges = []
-        for edge in edges_list:
-            clean_edge = {k: v for k, v in edge.items() if k != 'v'}
-            if 'v' in edge and edge['v'] is not None and len(edge['v']) > 0:
-                clean_edge['v'] = edge['v']
-            output_edges.append(clean_edge)
-
+        edges_list = self._replace_with_alias(list(self.get_edges().values()), 'edges')
+        output_edges = self._clean_aspect_data(edges_list, ['v'])
         output_data.append({
             "edges": output_edges
         })

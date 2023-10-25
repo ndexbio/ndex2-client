@@ -84,34 +84,54 @@ class CX2Network(object):
         self._status = {}
         self._int_id_generator = {'nodes': 0, 'edges': 0}
 
-    def _get_next_id(self, aspect):
+    def _get_next_id(self, aspect, aspect_id=None):
         """
         Retrieves the next available ID for a given aspect (e.g., 'nodes' or 'edges') and increments the ID counter.
-
-        :param aspect: The aspect for which the ID needs to be generated.
-                       Expected values include 'nodes' or 'edges'.
-        :type aspect: str
-        :return: The next available ID for the given aspect.
-        :rtype: int
-        """
-        return_id = self._int_id_generator[aspect]
-        self._int_id_generator[aspect] += 1
-        return return_id
-
-    def _set_next_id(self, aspect, aspect_id):
-        """
-        Updates the next available ID for a given aspect (e.g., 'nodes' or 'edges').
+        If aspect_id is passed, it updates the next available ID for a given aspect (e.g., 'nodes' or 'edges').
         It sets the ID to the larger of the current ID or the provided aspect_id, then increments by 1.
 
-        :param aspect: The aspect for which the ID needs to be updated.
+        :param aspect: The aspect for which the ID needs to be generated.
                        Expected values include 'nodes' or 'edges'.
         :type aspect: str
         :param aspect_id: The suggested ID for the given aspect.
                           The actual ID set might be this value + 1 or higher depending on the current state.
         :type aspect_id: int
+        :return: The next available ID for the given aspect.
+        :rtype: int
         """
-        old_max = self._int_id_generator[aspect]
-        self._int_id_generator[aspect] = max(aspect_id, old_max) + 1
+        if aspect_id is not None:
+            validated_aspect_id = self._check_and_cast_id(aspect_id)
+            self._int_id_generator[aspect] = max(validated_aspect_id, self._int_id_generator[aspect])
+        return_id = self._int_id_generator[aspect]
+        self._int_id_generator[aspect] += 1
+        return return_id
+
+    @staticmethod
+    def _check_and_cast_id(aspect_id):
+        """
+        Validates and converts a given aspect ID to an integer. The aspect ID can be either an integer or
+        a string representation of an integer. If the aspect ID is neither, or if the string cannot be
+        converted to an integer, an NDExInvalidCX2Error is raised.
+
+        :param aspect_id: The aspect ID to be validated and converted.
+        :type aspect_id: int or str
+        :return: The aspect ID as an integer.
+        :rtype: int
+        :raises NDExInvalidCX2Error: If the aspect ID is neither an integer nor a string that can be
+                                     converted to an integer.
+        """
+        if isinstance(aspect_id, int):
+            return aspect_id
+        elif isinstance(aspect_id, str):
+            try:
+                aspect_id= int(aspect_id)
+                return aspect_id
+            except ValueError:
+                raise NDExInvalidCX2Error(f'IDs of nodes, edges and the source and target of edges must be integer or '
+                                          f'long. Got {aspect_id}')
+        else:
+            raise NDExInvalidCX2Error(f'IDs of nodes, edges and the source and target of edges must be integer or '
+                                      f'long. Got {aspect_id}')
 
     def get_attribute_declarations(self):
         """
@@ -215,12 +235,10 @@ class CX2Network(object):
         :param z: Z-coordinate of the node.
         :type z: float, optional
         """
-        if node_id is None:
-            node_id = self._get_next_id('nodes')
-        elif node_id in self.get_nodes().keys():
+        if node_id in self.get_nodes().keys():
             raise NDExAlreadyExists(f"Node with ID {node_id} already exists.")
         else:
-            self._set_next_id('nodes', int(node_id))
+            node_id = self._get_next_id('nodes', node_id)
         processed_attributes = self._process_attributes('nodes', attributes)
         node = {
             "id": node_id,
@@ -309,17 +327,15 @@ class CX2Network(object):
         """
         if source is None or target is None:
             raise NDExError("Edge must have source and target")
-        if edge_id is None:
-            edge_id = self._get_next_id('edges')
-        elif edge_id in self.get_edges().keys():
+        if edge_id in self.get_edges().keys():
             raise NDExAlreadyExists(f"Edge with ID {edge_id} already exists.")
         else:
-            self._set_next_id('edges', int(edge_id))
+            edge_id = self._get_next_id('edges', edge_id)
         processed_attributes = self._process_attributes('edges', attributes)
         edge = {
             "id": edge_id,
-            "s": source,
-            "t": target,
+            "s": self._check_and_cast_id(source),
+            "t": self._check_and_cast_id(target),
             "v": processed_attributes
         }
         self._edges[edge_id] = edge
@@ -567,14 +583,12 @@ class CX2Network(object):
                     x = node.get("x", None)
                     y = node.get("y", None)
                     z = node.get("z", None)
-                    # TODO: ignore error (if flag is set)
                     if "id" not in node:
                         raise NDExInvalidCX2Error('CX2 is not properly designed. Node requires id.')
                     self.add_node(node["id"], node.get("v", None), x, y, z)
 
             elif 'edges' in section:
                 for edge in section['edges']:
-                    # TODO: ignore error (if flag is set)
                     if "id" not in edge or "s" not in edge or "t" not in edge:
                         raise NDExInvalidCX2Error('CX2 is not properly designed. Edge requires id, source (s) and '
                                                   'target (t).')
@@ -792,7 +806,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         Translates network attributes into CX2 format.
 
         :param network_attributes: Attributes to translate.
-        :type network_attributes: dict
+        :type network_attributes: list
         :return: Translated network attributes.
         :rtype: dict
         """
@@ -804,7 +818,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         Generates attribute declarations based on provided attributes, nodes, and edges.
 
         :param network_attributes: Network attributes.
-        :type network_attributes: dict
+        :type network_attributes: list
         :param nodes: Nodes in the network.
         :type nodes: dict
         :param node_attributes: Node attributes.

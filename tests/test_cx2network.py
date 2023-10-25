@@ -4,7 +4,7 @@ import json
 import tempfile
 import shutil
 from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory
-from ndex2.exceptions import NDExAlreadyExists, NDExError
+from ndex2.exceptions import NDExAlreadyExists, NDExError, NDExInvalidCX2Error
 
 
 class TestCX2Network(unittest.TestCase):
@@ -184,6 +184,20 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.add_node(1, attributes={"name": "Node1"})
         self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {"name": "Node1"}, "x": None, "y": None, "z": None})
 
+    def test_add_node_with_string_id(self):
+        self.cx2_obj.add_node("1", attributes={"name": "Node1"})
+        self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {"name": "Node1"}, "x": None, "y": None, "z": None})
+
+    def test_add_node_with_invalid_string_id(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            self.cx2_obj.add_node("invalid")
+
+    def test_add_multiple_nodes_without_id(self):
+        self.cx2_obj.add_node()
+        self.cx2_obj.add_node()
+        self.assertEqual(self.cx2_obj.get_node(0), {"id": 0, "v": {}, "x": None, "y": None, "z": None})
+        self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {}, "x": None, "y": None, "z": None})
+
     def test_remove_node(self):
         self.cx2_obj.add_node(1, attributes={"name": "Node1"}, x=10, y=20, z=30)
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})
@@ -210,21 +224,39 @@ class TestCX2Network(unittest.TestCase):
             self.cx2_obj.add_edge()
 
     def test_add_edge_without_id(self):
-        self.cx2_obj.add_edge(source="A", target="B")
-        self.assertEqual(self.cx2_obj.get_edge(0), {"id": 0, "s": "A", "t": "B", "v": {}})
+        self.cx2_obj.add_edge(source=1, target=2)
+        self.assertEqual(self.cx2_obj.get_edge(0), {"id": 0, "s": 1, "t": 2, "v": {}})
 
     def test_add_edge_with_existing_id(self):
-        self.cx2_obj.add_edge(edge_id=1, source="A", target="B")
+        self.cx2_obj.add_edge(edge_id=1, source=1, target=1)
         with self.assertRaises(NDExAlreadyExists):
-            self.cx2_obj.add_edge(edge_id=1, source="B", target="A")
+            self.cx2_obj.add_edge(edge_id=1, source=1, target=1)
 
     def test_add_edge_without_source(self):
         with self.assertRaises(NDExError):
-            self.cx2_obj.add_edge(edge_id=1, target="B")
+            self.cx2_obj.add_edge(edge_id=1, target="1")
 
     def test_add_edge_without_target(self):
         with self.assertRaises(NDExError):
-            self.cx2_obj.add_edge(edge_id=1, source="A")
+            self.cx2_obj.add_edge(edge_id=1, source=1)
+
+    def test_add_edge_with_string_source_and_target(self):
+        self.cx2_obj.add_edge(edge_id=1, source="1", target="2")
+        self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 1, "t": 2, "v": {}})
+
+    def test_add_edge_with_invalid_string_source(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            self.cx2_obj.add_edge(edge_id=1, source="invalid", target=1)
+
+    def test_add_edge_with_invalid_string_target(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            self.cx2_obj.add_edge(edge_id=1, source=1, target="invalid")
+
+    def test_add_multiple_edges_without_id(self):
+        self.cx2_obj.add_edge(source=1, target=2)
+        self.cx2_obj.add_edge(source=2, target=3)
+        self.assertEqual(self.cx2_obj.get_edge(0), {"id": 0, "s": 1, "t": 2, "v": {}})
+        self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 2, "t": 3, "v": {}})
 
     def test_remove_edge(self):
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})
@@ -251,6 +283,28 @@ class TestCX2Network(unittest.TestCase):
                                                                                   'name': {'d': 'str'}},
                                                             'nodes': {'name': {'d': 'str'}}})
         self.assertEqual(len(net.get_attribute_declarations()), 3)
+
+    def test_get_next_id_without_aspect_id(self):
+        self.assertEqual(self.cx2_obj._get_next_id('nodes'), 0)
+        self.assertEqual(self.cx2_obj._get_next_id('nodes'), 1)
+
+    def test_get_next_id_with_aspect_id(self):
+        self.assertEqual(self.cx2_obj._get_next_id('nodes', 5), 5)
+        self.assertEqual(self.cx2_obj._get_next_id('nodes'), 6)
+
+    def test_check_and_cast_id_with_integer(self):
+        self.assertEqual(self.cx2_obj._check_and_cast_id(5), 5)
+
+    def test_check_and_cast_id_with_string(self):
+        self.assertEqual(self.cx2_obj._check_and_cast_id("5"), 5)
+
+    def test_check_and_cast_id_with_invalid_string(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            self.cx2_obj._check_and_cast_id("invalid")
+
+    def test_check_and_cast_id_with_invalid_type(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            self.cx2_obj._check_and_cast_id(5.5)
 
 
 if __name__ == '__main__':

@@ -42,10 +42,24 @@ class NDExInvalidCXError(NDExError):
     pass
 
 
+class NDExInvalidCX2Error(NDExError):
+    """
+    Raised due to invalid CX
+    """
+    pass
+
+
 class NDExUnsupportedCallError(NDExError):
     """
     Raised if call is unsupported, for example a
     method that is only supported in 2.0+ of NDEx server
     is attempted against a server running 1.0
+    """
+    pass
+
+
+class NDExAlreadyExists(NDExError):
+    """
+    Raised when node, edge etc. already exists.
     """
     pass

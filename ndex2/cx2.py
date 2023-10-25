@@ -1,6 +1,7 @@
 import json
 
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file
+from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError
 from ndex2.nice_cx_network import NiceCXNetwork
 from itertools import zip_longest
 
@@ -81,6 +82,36 @@ class CX2Network(object):
         self._edge_bypasses = {}
         self._opaque_aspects = []
         self._status = {}
+        self._int_id_generator = {'nodes': 0, 'edges': 0}
+
+    def _get_next_id(self, aspect):
+        """
+        Retrieves the next available ID for a given aspect (e.g., 'nodes' or 'edges') and increments the ID counter.
+
+        :param aspect: The aspect for which the ID needs to be generated.
+                       Expected values include 'nodes' or 'edges'.
+        :type aspect: str
+        :return: The next available ID for the given aspect.
+        :rtype: int
+        """
+        return_id = self._int_id_generator[aspect]
+        self._int_id_generator[aspect] += 1
+        return return_id
+
+    def _set_next_id(self, aspect, aspect_id):
+        """
+        Updates the next available ID for a given aspect (e.g., 'nodes' or 'edges').
+        It sets the ID to the larger of the current ID or the provided aspect_id, then increments by 1.
+
+        :param aspect: The aspect for which the ID needs to be updated.
+                       Expected values include 'nodes' or 'edges'.
+        :type aspect: str
+        :param aspect_id: The suggested ID for the given aspect.
+                          The actual ID set might be this value + 1 or higher depending on the current state.
+        :type aspect_id: int
+        """
+        old_max = self._int_id_generator[aspect]
+        self._int_id_generator[aspect] = max(aspect_id, old_max) + 1
 
     def get_attribute_declarations(self):
         """
@@ -169,12 +200,12 @@ class CX2Network(object):
         """
         return self._nodes
 
-    def add_node(self, node_id, attributes=None, x=None, y=None, z=None):
+    def add_node(self, node_id=None, attributes=None, x=None, y=None, z=None):
         """
         Adds a node to the network.
 
         :param node_id: ID of the node to add.
-        :type node_id: str
+        :type node_id: int or str
         :param attributes: Attributes of the node.
         :type attributes: dict, optional
         :param x: X-coordinate of the node.
@@ -184,6 +215,12 @@ class CX2Network(object):
         :param z: Z-coordinate of the node.
         :type z: float, optional
         """
+        if node_id is None:
+            node_id = self._get_next_id('nodes')
+        elif node_id in self.get_nodes().keys():
+            raise NDExAlreadyExists(f"Node with ID {node_id} already exists.")
+        else:
+            self._set_next_id('nodes', int(node_id))
         processed_attributes = self._process_attributes('nodes', attributes)
         node = {
             "id": node_id,
@@ -199,7 +236,7 @@ class CX2Network(object):
         Retrieves a node based on its ID.
 
         :param node_id: ID of the node to retrieve.
-        :type node_id: str
+        :type node_id: int or str
         :return: Node with the given ID or None if not found.
         :rtype: dict or None
         """
@@ -210,7 +247,7 @@ class CX2Network(object):
         Removes a node and checks for dangling edges (edges without both source and target).
 
         :param node_id: ID of the node to remove.
-        :type node_id: str
+        :type node_id: int or str
         """
         # Remove the node
         if node_id in self._nodes:
@@ -226,7 +263,7 @@ class CX2Network(object):
         Updates the attributes of a node.
 
         :param node_id: ID of the node to update.
-        :type node_id: str
+        :type node_id: int or str
         :param attributes: Attributes to update.
         :type attributes: dict, optional
         :param x: X-coordinate to update.
@@ -256,19 +293,27 @@ class CX2Network(object):
         """
         return self._edges
 
-    def add_edge(self, edge_id, source, target, attributes=None):
+    def add_edge(self, edge_id=None, source=None, target=None, attributes=None):
         """
         Adds an edge to the network.
 
         :param edge_id: ID of the edge to add.
-        :type edge_id: str
+        :type edge_id: int or str
         :param source: Source node of the edge.
-        :type source: str
+        :type source: int or str
         :param target: Target node of the edge.
-        :type target: str
+        :type target: int or str
         :param attributes: Attributes of the edge.
         :type attributes: dict, optional
         """
+        if source is None or target is None:
+            raise NDExError("Edge must have source and target")
+        if edge_id is None:
+            edge_id = self._get_next_id('edges')
+        elif edge_id in self.get_edges().keys():
+            raise NDExAlreadyExists(f"Edge with ID {edge_id} already exists.")
+        else:
+            self._set_next_id('edges', int(edge_id))
         processed_attributes = self._process_attributes('edges', attributes)
         edge = {
             "id": edge_id,
@@ -283,7 +328,7 @@ class CX2Network(object):
         Retrieves an edge based on its ID.
 
         :param edge_id: ID of the edge to retrieve.
-        :type edge_id: str
+        :type edge_id: int or str
         :return: Edge with the given ID or None if not found.
         :rtype: dict or None
         """
@@ -294,7 +339,7 @@ class CX2Network(object):
         Removes an edge from the network based on its ID.
 
         :param edge_id: ID of the edge to remove.
-        :type edge_id: str
+        :type edge_id: int or str
         """
         if edge_id in self._edges:
             del self._edges[edge_id]
@@ -304,7 +349,7 @@ class CX2Network(object):
         Updates the attributes of an edge.
 
         :param edge_id: ID of the edge to update.
-        :type edge_id: str
+        :type edge_id: int or str
         :param attributes: New attributes for the edge.
         :type attributes: dict, optional
         """
@@ -520,12 +565,17 @@ class CX2Network(object):
                     x = node.get("x", None)
                     y = node.get("y", None)
                     z = node.get("z", None)
-                    # TODO: throw exception or ignore error (if flag is set)
+                    # TODO: ignore error (if flag is set)
+                    if "id" not in node:
+                        raise NDExInvalidCX2Error('CX2 is not properly designed. Node requires id.')
                     self.add_node(node["id"], node.get("v", None), x, y, z)
 
             elif 'edges' in section:
                 for edge in section['edges']:
-                    # TODO: throw exception or ignore error (if flag is set)
+                    # TODO: ignore error (if flag is set)
+                    if "id" not in edge or "s" not in edge or "t" not in edge:
+                        raise NDExInvalidCX2Error('CX2 is not properly designed. Edge requires id, source (s) and '
+                                                  'target (t).')
                     self.add_edge(edge["id"], edge["s"], edge["t"], edge.get("v", None))
 
             elif "visualProperties" in section:

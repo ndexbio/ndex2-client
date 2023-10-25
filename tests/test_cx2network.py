@@ -4,6 +4,7 @@ import json
 import tempfile
 import shutil
 from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory
+from ndex2.exceptions import NDExAlreadyExists, NDExError
 
 
 class TestCX2Network(unittest.TestCase):
@@ -170,6 +171,19 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.add_node(1, x=10, y=20, z=30)
         self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {}, "x": 10, "y": 20, "z": 30})
 
+    def test_add_node_without_any_argument(self):
+        self.cx2_obj.add_node()
+        self.assertEqual(self.cx2_obj.get_node(0), {"id": 0, "v": {}, "x": None, "y": None, "z": None})
+
+    def test_add_node_with_existing_id(self):
+        self.cx2_obj.add_node(1)
+        with self.assertRaises(NDExAlreadyExists):
+            self.cx2_obj.add_node(1)
+
+    def test_add_node_without_coordinates(self):
+        self.cx2_obj.add_node(1, attributes={"name": "Node1"})
+        self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {"name": "Node1"}, "x": None, "y": None, "z": None})
+
     def test_remove_node(self):
         self.cx2_obj.add_node(1, attributes={"name": "Node1"}, x=10, y=20, z=30)
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})
@@ -190,6 +204,27 @@ class TestCX2Network(unittest.TestCase):
     def test_add_edge_without_attributes(self):
         self.cx2_obj.add_edge(1, 1, 2)
         self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 1, "t": 2, "v": {}})
+
+    def test_add_edge_without_any_argument(self):
+        with self.assertRaises(NDExError):
+            self.cx2_obj.add_edge()
+
+    def test_add_edge_without_id(self):
+        self.cx2_obj.add_edge(source="A", target="B")
+        self.assertEqual(self.cx2_obj.get_edge(0), {"id": 0, "s": "A", "t": "B", "v": {}})
+
+    def test_add_edge_with_existing_id(self):
+        self.cx2_obj.add_edge(edge_id=1, source="A", target="B")
+        with self.assertRaises(NDExAlreadyExists):
+            self.cx2_obj.add_edge(edge_id=1, source="B", target="A")
+
+    def test_add_edge_without_source(self):
+        with self.assertRaises(NDExError):
+            self.cx2_obj.add_edge(edge_id=1, target="B")
+
+    def test_add_edge_without_target(self):
+        with self.assertRaises(NDExError):
+            self.cx2_obj.add_edge(edge_id=1, source="A")
 
     def test_remove_edge(self):
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})

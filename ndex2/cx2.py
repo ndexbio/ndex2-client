@@ -517,11 +517,13 @@ class CX2Network(object):
                     x = node.get("x", None)
                     y = node.get("y", None)
                     z = node.get("z", None)
-                    self.add_node(node["id"], node["v"], x, y, z)
+                    # TODO: throw exception or ignore error (if flag is set)
+                    self.add_node(node["id"], node.get("v", None), x, y, z)
 
             elif 'edges' in section:
                 for edge in section['edges']:
-                    self.add_edge(edge["id"], edge["s"], edge["t"], edge["v"])
+                    # TODO: throw exception or ignore error (if flag is set)
+                    self.add_edge(edge["id"], edge["s"], edge["t"], edge.get("v", None))
 
             elif "visualProperties" in section:
                 self.set_visual_properties(section["visualProperties"][0])
@@ -703,7 +705,7 @@ class CX2NetworkFactory(object):
     def __init__(self):
         pass
 
-    def get_cx2_network(self, input_data=None) -> CX2Network:
+    def get_cx2network(self, input_data=None) -> CX2Network:
         """
         Creates :py:class:`~ndex2.cx2.CX2Network`
 

@@ -591,7 +591,7 @@ class CX2Network(object):
             elif "metaData" in section or "CXVersion" in section:
                 pass
             elif "status" in section:
-                self.set_status(section["status"])
+                self.set_status(section["status"][0])
             else:
                 self.add_opaque_aspect(section)
 

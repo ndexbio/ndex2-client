@@ -230,6 +230,7 @@ class CX2Network(object):
             "z": z
         }
         self._nodes[node_id] = node
+        return node_id
 
     def get_node(self, node_id):
         """
@@ -322,6 +323,7 @@ class CX2Network(object):
             "v": processed_attributes
         }
         self._edges[edge_id] = edge
+        return edge_id
 
     def get_edge(self, edge_id):
         """

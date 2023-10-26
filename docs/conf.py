@@ -15,6 +15,9 @@
 import sys
 import os
 import re
+import datetime
+
+current_year = datetime.date.today().year
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -38,6 +41,7 @@ print('=====================')
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.autosectionlabel',
     'sphinx.ext.viewcode'
 ]
 
@@ -48,6 +52,9 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None),
                        "pandas": ("https://pandas.pydata.org/docs/", None),
                        "numpy": ("https://numpy.org/doc/stable/", None)
                       }
+
+# prefix document on section labels for references
+autosectionlabel_prefix_document = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -63,7 +70,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ndex2'
-copyright = u'2022, The Regents of the University of California, The Cytoscape Consortium.'
+copyright = str(current_year) + u', The Regents of the University of California, The Cytoscape Consortium.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -124,6 +131,9 @@ pygments_style = 'sphinx'
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
+
+# If true, `todo` and `todoList` produce output, else they produce nothing.
+todo_include_todos = False
 
 
 # -- Options for HTML output ----------------------------------------------

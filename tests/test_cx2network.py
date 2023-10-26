@@ -308,6 +308,17 @@ class TestCX2Network(unittest.TestCase):
                                                             'nodes': {'name': {'d': 'string'}}})
         self.assertEqual(len(net.get_attribute_declarations()), 3)
 
+    def test_to_cx_without_preset_status(self):
+        net = CX2Network()
+        net.add_node(0, attributes={'name': 'node0'})
+        net.add_node(1, attributes={'name': 'node1'})
+        net.add_edge(0, source=0, target=1, attributes={'foo': 1})
+        netname = 'CX2Network test network'
+        net.set_network_attributes({'name': netname,
+                                    'description': 'Created by test_update_network_with_client() in '
+                                                   'test_integration_cx2network.py integration test in ndex2-client'})
+        self.assertTrue('status' in net.to_cx2()[-1])
+
     def test_get_next_id_without_aspect_id(self):
         self.assertEqual(self.cx2_obj._get_next_id('nodes'), 0)
         self.assertEqual(self.cx2_obj._get_next_id('nodes'), 1)

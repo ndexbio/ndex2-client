@@ -761,6 +761,8 @@ class CX2Network(object):
 
         if self._status:
             output_data.append({"status": [self._status]})
+        else:
+            output_data.append({"status": [{'error': '', 'success': True}]})
 
         return output_data
 

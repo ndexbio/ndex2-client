@@ -269,6 +269,30 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.update_edge(1, attributes={"i": "updated_link"})
         self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 1, "t": 2, "v": {"interaction": "updated_link"}})
 
+    def test_add_network_attribute(self):
+        net = CX2Network()
+        net.add_node(0, attributes={'name': 'node0'})
+        net.add_node(1, attributes={'name': 'node1'})
+        net.add_edge(0, source=0, target=1, attributes={'foo': 1})
+        netname = 'CX2Network test network'
+        net.set_network_attributes({'name': netname,
+                                    'description': 'Created by test_update_network_with_client() in '
+                                                   'test_integration_cx2network.py integration test in ndex2-client'})
+        net.add_network_attribute('new_attribute', 'value_of_attribute')
+        self.assertEqual(len(net.get_network_attributes()), 3)
+
+    def test_remove_network_attribute(self):
+        net = CX2Network()
+        net.add_node(0, attributes={'name': 'node0'})
+        net.add_node(1, attributes={'name': 'node1'})
+        net.add_edge(0, source=0, target=1, attributes={'foo': 1})
+        netname = 'CX2Network test network'
+        net.set_network_attributes({'name': netname,
+                                    'description': 'Created by test_update_network_with_client() in '
+                                                   'test_integration_cx2network.py integration test in ndex2-client'})
+        net.remove_network_attribute('description')
+        self.assertEqual(len(net.get_network_attributes()), 1)
+
     def test_creating_network_without_setting_attribute_declarations(self):
         net = CX2Network()
         net.add_node(0, attributes={'name': 'node0'})
@@ -278,10 +302,10 @@ class TestCX2Network(unittest.TestCase):
         net.set_network_attributes({'name': netname,
                                     'description': 'Created by test_update_network_with_client() in '
                                                    'test_integration_cx2network.py integration test in ndex2-client'})
-        self.assertEqual(net.get_attribute_declarations(), {'edges': {'foo': {'d': 'int'}},
-                                                            'networkAttributes': {'description': {'d': 'str'},
-                                                                                  'name': {'d': 'str'}},
-                                                            'nodes': {'name': {'d': 'str'}}})
+        self.assertEqual(net.get_attribute_declarations(), {'edges': {'foo': {'d': 'integer'}},
+                                                            'networkAttributes': {'description': {'d': 'string'},
+                                                                                  'name': {'d': 'string'}},
+                                                            'nodes': {'name': {'d': 'string'}}})
         self.assertEqual(len(net.get_attribute_declarations()), 3)
 
     def test_get_next_id_without_aspect_id(self):
@@ -305,6 +329,33 @@ class TestCX2Network(unittest.TestCase):
     def test_check_and_cast_id_with_invalid_type(self):
         with self.assertRaises(NDExInvalidCX2Error):
             self.cx2_obj._check_and_cast_id(5.5)
+
+    def test_integer_type(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type(100), "integer")
+
+    def test_long_type_positive(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type(2 ** 31), "long")
+
+    def test_long_type_negative(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type(-2 ** 31 - 1), "long")
+
+    def test_double_type(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type(10.5), "double")
+
+    def test_boolean_type(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type(True), "boolean")
+
+    def test_list_of_integers(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type([1, 2, 3]), "list_of_integer")
+
+    def test_list_of_floats(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type([1.2, 2.3]), "list_of_double")
+
+    def test_list_of_strings(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type(["foo", "bar"]), "list_of_string")
+
+    def test_list_of_booleans(self):
+        self.assertEqual(self.cx2_obj._get_cx2_type([True, False]), "list_of_boolean")
 
 
 if __name__ == '__main__':

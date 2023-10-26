@@ -143,6 +143,35 @@ class CX2Network(object):
         """
         return self._attribute_declarations
 
+    def _get_cx2_type(self, value):
+        """
+        Converts the type of the provided value to cx2 type from Python type. For lists,
+        it also determines the type of the list's first element.
+
+        :param value: The value for which the type needs to be determined.
+        :type value: int, float, bool, list, or any other supported type.
+        :return: The custom cx2 type of the value.
+        :rtype: str
+        :raises ValueError: If the value is of an unsupported type.
+        """
+        if isinstance(value, bool):
+            return "boolean"
+        elif isinstance(value, int):
+            if 2 ** 31 - 1 >= value >= -2 ** 31:
+                return "integer"
+            else:
+                return "long"
+        elif isinstance(value, float):
+            return "double"
+        elif isinstance(value, str):
+            return "string"
+        elif isinstance(value, list):
+            if value:
+                inner_type = self._get_cx2_type(value[0])
+                return f"list_of_{inner_type}"
+        else:
+            raise ValueError(f"Unsupported value type: {type(value)}")
+
     def _generate_attribute_declarations_for_aspect(self, aspect, attributes, aliases):
         """
         Generates attribute declarations for a given aspect of the network.
@@ -168,7 +197,7 @@ class CX2Network(object):
                 if (attr not in self.get_attribute_declarations()[aspect].keys() and attr not in aliases.values()
                         and attr not in aliases.keys()):
                     self.get_attribute_declarations()[aspect][attr] = {
-                        "d": type(value).__name__
+                        "d": self._get_cx2_type(value)
                     }
 
     def set_attribute_declarations(self, value):
@@ -202,6 +231,16 @@ class CX2Network(object):
             processed_network_attrs[key] = convert_value(declared_type, value)
         self._generate_attribute_declarations_for_aspect('networkAttributes', processed_network_attrs, {})
         self._network_attributes = processed_network_attrs
+
+    def add_network_attribute(self, key, value):
+        declared_type = self.get_declared_type('networkAttributes', key)
+        converted_value = convert_value(declared_type, value)
+        self._network_attributes[key] = converted_value
+        self._generate_attribute_declarations_for_aspect('networkAttributes', {key: converted_value}, {})
+
+    def remove_network_attribute(self, key):
+        if key in self._network_attributes:
+            del self._network_attributes[key]
 
     def get_name(self):
         """

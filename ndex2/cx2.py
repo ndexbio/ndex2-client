@@ -203,6 +203,16 @@ class CX2Network(object):
         self._generate_attribute_declarations_for_aspect('networkAttributes', processed_network_attrs, {})
         self._network_attributes = processed_network_attrs
 
+    def add_network_attribute(self, key, value):
+        declared_type = self.get_declared_type('networkAttributes', key)
+        converted_value = convert_value(declared_type, value)
+        self._network_attributes[key] = converted_value
+        self._generate_attribute_declarations_for_aspect('networkAttributes', {key: converted_value}, {})
+
+    def remove_network_attribute(self, key):
+        if key in self._network_attributes:
+            del self._network_attributes[key]
+
     def get_name(self):
         """
         Retrieves the network name.

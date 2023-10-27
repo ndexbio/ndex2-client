@@ -77,7 +77,6 @@ class TestNiceCXNetworkIntegration(unittest.TestCase):
         net.set_network_attributes({'name': netname,
                                     'description': 'Created by test_update_network_with_client() in '
                                                    'test_integration_cx2network.py integration test in ndex2-client'})
-        print(json.dumps(net.to_cx2(), indent=2))
         res = client.save_new_cx2_network(net.to_cx2())
         try:
             self.assertTrue('http' in res)
@@ -103,9 +102,8 @@ class TestNiceCXNetworkIntegration(unittest.TestCase):
 
             cx_stream = io.BytesIO(json.dumps(net.to_cx2(),
                                               cls=DecimalEncoder).encode('utf-8'))
-            newres = client.update_cx2_network(cx_stream)
+            client.update_cx2_network(cx_stream, netid)
 
-            self.assertEqual('', newres)
             netsum = self.wait_for_network_to_be_ready(client, netid,
                                                        num_retries=5,
                                                        retry_weight=1)

@@ -105,7 +105,9 @@ class CX2Network(object):
         if aspect_id is not None:
             validated_aspect_id = self._check_and_cast_id(aspect_id)
             self._int_id_generator[aspect] = max(validated_aspect_id, self._int_id_generator[aspect])
-        return_id = self._int_id_generator[aspect]
+            return_id = validated_aspect_id
+        else:
+            return_id = self._int_id_generator[aspect]
         self._int_id_generator[aspect] += 1
         return return_id
 

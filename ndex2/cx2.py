@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file
 from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError
@@ -812,7 +813,7 @@ class CX2Network(object):
         reverse_aliases = {v: k for k, v in aliases.items()}
 
         for item in aspect_list:
-            new_item = item.copy()
+            new_item = deepcopy(item)
             if 'v' in new_item:
                 for attr in list(new_item['v'].keys()):
                     if attr in reverse_aliases:

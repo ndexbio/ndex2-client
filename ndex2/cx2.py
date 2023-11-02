@@ -347,6 +347,9 @@ class CX2Network(object):
         if z is not None:
             self._nodes[node_id]["z"] = z
 
+    def set_node_attribute(self, node_id, attribute, value):
+        self.update_node(node_id, {attribute: value})
+
     def get_edges(self):
         """
         Retrieves the edges in the network.

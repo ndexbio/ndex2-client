@@ -26,3 +26,7 @@ Exceptions
 .. autoclass:: ndex2.exceptions.NDExInvalidCXError
 
 .. autoclass:: ndex2.exceptions.NDExUnsupportedCallError
+
+.. autoclass:: ndex2.exceptions.NDExInvalidCX2Error
+
+.. autoclass:: ndex2.exceptions.NDExAlreadyExists

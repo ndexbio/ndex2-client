@@ -4,23 +4,16 @@
 
 import os
 import re
-import sys
 import io
 import time
 import unittest
 import json
-import uuid
 from datetime import datetime
 
 from requests.exceptions import HTTPError
-from ndex2.exceptions import NDExError
-from ndex2.exceptions import NDExNotFoundError
-from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.client import Ndex2
 from ndex2.cx2 import CX2Network
-from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import DecimalEncoder
-import ndex2
 
 SKIP_REASON = 'NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
               'environment variables not set, cannot run integration' \
@@ -28,7 +21,7 @@ SKIP_REASON = 'NDEX2_TEST_SERVER, NDEX2_TEST_USER, NDEX2_TEST_PASS ' \
 
 
 @unittest.skipUnless(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
-class TestNiceCXNetworkIntegration(unittest.TestCase):
+class TestCX2NetworkIntegration(unittest.TestCase):
 
     TEST_DIR = os.path.dirname(__file__)
     WNT_SIGNAL_FILE = os.path.join(TEST_DIR, 'data', 'wntsignaling.cx')

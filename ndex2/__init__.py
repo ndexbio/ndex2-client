@@ -340,7 +340,7 @@ def create_nice_cx_from_raw_cx(cx):
     """
     Create a :py:func:`~ndex2.nice_cx_network.NiceCXNetwork` from a
     as a `list` of `dict` objects in
-    `CX format <https://www.home.ndexbio.org/data-model/>`__
+    `CX format <https://home.ndexbio.org/data-model/>`__
 
     Example:
 

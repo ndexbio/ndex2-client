@@ -2,7 +2,7 @@
 =========================
 
 .. _NDEx: http://ndexbio.org
-.. _NDEx REST Server API: http://www.home.ndexbio.org/using-the-ndex-server-api
+.. _NDEx REST Server API: http://home.ndexbio.org/using-the-ndex-server-api
 
 .. image:: https://app.travis-ci.com/ndexbio/ndex2-client.svg?branch=master
         :target: https://app.travis-ci.com/ndexbio/ndex2-client.svg?branch=master

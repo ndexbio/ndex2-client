@@ -1,4 +1,4 @@
-CX2Network
+CX2
 -------------
 
 The :class:`~ndex2.cx2.CX2Network` class represents the `CX2 (Cytoscape Exchange) network format. <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)/>`__
@@ -16,22 +16,18 @@ CX2Network methods
               get_edge_bypasses, add_edge_bypass, get_opaque_aspects, set_opaque_aspects,
               add_opaque_aspect, get_status, set_status, get_declared_type, get_alias,
               get_aliases, get_default_value, get_default_values
-    :noindex:
 
 CX2NetworkFactory classes and methods
 ***************************************
 
 .. autoclass:: ndex2.cx2.CX2NetworkFactory
     :members:
-    :noindex:
 
 .. autoclass:: ndex2.cx2.NoStyleCXToCX2NetworkFactory
     :members:
-    :noindex:
 
 .. autoclass:: ndex2.cx2.RawCX2NetworkFactory
     :members:
-    :noindex:
 
 
 Supported data types for attributes

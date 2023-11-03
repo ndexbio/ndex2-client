@@ -37,19 +37,19 @@ def convert_value(dtype, value):
 
 class CX2Network(object):
     """
-    A representation of the CX2 (Cytoscape Exchange) network format.
+    A representation of the `CX2 (Cytoscape Exchange) <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ network format.
 
-    This class provides functionality to read, process, and write data in the CX2 format.
+    This class provides functionality to read, process, and write data in the `CX2 format <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)/>`__.
     It facilitates the structured access and manipulation of network data elements such as nodes, edges,
     attributes, and visual properties.
 
     The class maintains internal data structures that hold network data and provides methods to:
 
-    1. Load data from raw CX2 files.
+    1. Load data from raw `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ files.
 
-    2. Generate the CX2 representation of the current state.
+    2. Generate the `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ representation of the current state.
 
-    3. Write the current state to a CX2 formatted file.
+    3. Write the current state to a `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ formatted file.
 
     Attributes:
         - ``attribute_declarations``
@@ -71,7 +71,8 @@ class CX2Network(object):
         - ``edge_bypasses``
             A dictionary of edge-specific visual properties that bypass default styles.
         - ``opaque_aspects``
-            A list of other aspects in the CX2 format which don't have a defined structure in this class.
+            A list of other aspects in the `CX2 format <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__
+            which don't have a defined structure in this class.
         - ``status``
             A dictionary representing the network's status.
     """
@@ -117,7 +118,7 @@ class CX2Network(object):
         """
         Validates and converts a given aspect ID to an integer. The aspect ID can be either an integer or
         a string representation of an integer. If the aspect ID is neither, or if the string cannot be
-        converted to an integer, an NDExInvalidCX2Error is raised.
+        converted to an integer, an :py:class:`~ndex2.exceptions.NDExInvalidCX2Error` is raised.
 
         :param aspect_id: The aspect ID to be validated and converted.
         :type aspect_id: int or str
@@ -148,12 +149,12 @@ class CX2Network(object):
 
     def _get_cx2_type(self, value):
         """
-        Converts the type of the provided value to cx2 type from Python type. For lists,
+        Converts the type of the provided value to `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ type from Python type. For lists,
         it also determines the type of the list's first element.
 
         :param value: The value for which the type needs to be determined.
         :type value: int, float, bool, list, or any other supported type.
-        :return: The custom cx2 type of the value.
+        :return: The custom `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ type of the value.
         :rtype: str
         :raises ValueError: If the value is of an unsupported type.
         """
@@ -277,6 +278,7 @@ class CX2Network(object):
         :type y: float, optional
         :param z: Z-coordinate of the node.
         :type z: float, optional
+        :raises NDExAlreadyExists: If node with **node_id** already exists
         """
         if node_id in self.get_nodes().keys():
             raise NDExAlreadyExists(f"Node with ID {node_id} already exists.")
@@ -333,6 +335,7 @@ class CX2Network(object):
         :type y: float, optional
         :param z: Z-coordinate to update.
         :type z: float, optional
+        :raises NDExError: if node with **node_id** passed in does not exist
         """
         if node_id not in self._nodes:
             raise NDExError(f"Node with ID {node_id} does not exist.")
@@ -605,10 +608,14 @@ class CX2Network(object):
 
     def create_from_raw_cx2(self, cx2_data):
         """
-        Loads and processes a raw CX2 data into structured data within the instance.
+        Loads and processes a raw `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__
+        data into structured data within the instance.
 
-        :param cx2_data: Path to the CX2 file or a list representing CX2 data to be processed.
+        :param cx2_data: Path to the `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__
+                         file or a list representing `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ data to be processed.
         :type cx2_data: str or list
+        :raises NDExError: If **cx2_data** is ``None``
+        :raises NDExInvalidCX2Error: If there is an error parsing **cx2_data**
         """
         if not cx2_data:
             raise NDExError('CX2 is empty')
@@ -660,9 +667,9 @@ class CX2Network(object):
 
     def write_as_raw_cx2(self, output_path):
         """
-        Writes data from CX2Network object to a raw CX2 formatted JSON file.
+        Writes data from CX2Network object to a raw `CX2 formatted <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ JSON file.
 
-        :param output_path: Destination file path for the CX2 formatted output.
+        :param output_path: Destination file path for the `CX2 formatted <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ output.
         :type output_path: str
         """
 
@@ -717,12 +724,12 @@ class CX2Network(object):
 
     def to_cx2(self):
         """
-        Generates the CX2 representation of the current state of the instance.
+        Generates the `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ representation of the current state of the instance.
 
         This method constructs a list structure representing the current state of the network
-        in the CX2 format.
+        in the `CX2 format. <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__
 
-        :return: A list representing the CX2 formatted data of the current network state.
+        :return: A list representing the `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ formatted data of the current network state.
         :rtype: list
         """
         output_data = [
@@ -864,7 +871,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
     @staticmethod
     def _translate_network_attributes_to_cx2(network_attributes):
         """
-        Translates network attributes into CX2 format.
+        Translates network attributes into `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__.
 
         :param network_attributes: Attributes to translate.
         :type network_attributes: list
@@ -920,7 +927,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
     @staticmethod
     def _process_attributes_for_cx2(entity, attributes, expected_keys=None):
         """
-        Processes attributes for conversion to CX2 format.
+        Processes attributes for conversion to `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__.
 
         :param entity: The entity to process attributes for.
         :type entity: dict
@@ -941,7 +948,8 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
     def get_cx2network(self, input_data=None) -> CX2Network:
         """
         Creates :py:class:`~ndex2.cx2.CX2Network` from
-        CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+        `CX <https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)>`__ data
+        or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
         but does **NOT** convert the style associated with input network
 
         .. note::
@@ -986,7 +994,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 class RawCX2NetworkFactory(CX2NetworkFactory):
     """
     Factory class responsible for creating :py:class:`~ndex2.cx2.CX2Network` instances
-    directly from raw CX2 formatted data.
+    directly from raw `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__.
     """
 
     def __init__(self):
@@ -994,9 +1002,10 @@ class RawCX2NetworkFactory(CX2NetworkFactory):
 
     def get_cx2network(self, input_data=None) -> CX2Network:
         """
-        Converts the provided raw CX2 data into a :py:class:`~ndex2.cx2.CX2Network` object.
+        Converts the provided raw `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__
+        into a :py:class:`~ndex2.cx2.CX2Network` object.
 
-        :param input_data: Raw CX2 data to be converted.
+        :param input_data: Raw `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ to be converted.
         :type input_data: dict or similar mapping type
         :return: A constructed :py:class:`~ndex2.cx2.CX2Network` object from the input data.
         :rtype: :py:class:`~ndex2.cx2.CX2Network`

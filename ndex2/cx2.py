@@ -16,6 +16,24 @@ def convert_value(dtype, value):
     :param value: Value to be converted.
     :type value: any
     """
+    allowed_types = [
+        "string", "long", "integer", "double", "boolean",
+        "list_of_string", "list_of_long", "list_of_integer",
+        "list_of_double", "list_of_boolean"
+    ]
+
+    if dtype not in allowed_types:
+        raise NDExInvalidCX2Error(f'Data type {dtype} is invalid in CX2 format')
+
+    if dtype.startswith("list_of_"):
+        if not isinstance(value, list):
+            raise NDExInvalidCX2Error('Declared value of attribute data does not match the actual value type: '
+                                      'list expected')
+        elem_type = dtype.split("_")[2]
+        if elem_type not in ["string", "long", "integer", "double", "boolean"]:
+            raise NDExInvalidCX2Error(f'Data type {dtype} is invalid in CX2 format')
+        return [convert_value(elem_type, v) for v in value]
+
     try:
         if dtype == "integer" or dtype == "long":
             return int(value)
@@ -25,12 +43,9 @@ def convert_value(dtype, value):
             if isinstance(value, bool):
                 return value
             else:
-                return True if value.lower() == 'true' else False
-        elif dtype.startswith("list_of_"):
-            elem_type = dtype.split("_")[2]
-            return [convert_value(elem_type, v) for v in value]
+                return value.lower() == 'true'
         else:
-            return value
+            return str(value)
     except ValueError as err:
         raise NDExInvalidCX2Error('Declared value of attribute data does not match the actual value type: ' + str(err))
 
@@ -531,7 +546,7 @@ class CX2Network(object):
         """
         self._status = value
 
-    def get_declared_type(self, aspect_name, attribute_name):
+    def get_declared_type(self, aspect_name, attribute_name, attribute_value=None):
         """
         Retrieves the declared data type for a given aspect's attribute.
 
@@ -539,10 +554,18 @@ class CX2Network(object):
         :type aspect_name: str
         :param attribute_name: The attribute whose declared data type needs to be retrieved.
         :type attribute_name: str
+        :param attribute_value
+        :type attribute_value
         :return: The declared data type or 'string' if not found.
         :rtype: str
         """
-        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('d', 'string')
+        declared_type = self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('d')
+        if declared_type is not None:
+            return declared_type
+        elif attribute_value is not None:
+            return self._get_cx2_type(attribute_value)
+        else:
+            return 'string'
 
     def get_alias(self, aspect_name, attribute_name):
         """
@@ -795,13 +818,13 @@ class CX2Network(object):
 
         for key, default_value in default_values.items():
             actual_key = aliases.get(key, key)
-            declared_type = self.get_declared_type(aspect_name, actual_key)
+            declared_type = self.get_declared_type(aspect_name, actual_key, default_value)
             processed_attrs[actual_key] = convert_value(declared_type, default_value)
 
         if attributes is not None:
             for key, value in attributes.items():
                 actual_key = aliases.get(key, key)
-                declared_type = self.get_declared_type(aspect_name, actual_key)
+                declared_type = self.get_declared_type(aspect_name, actual_key, value)
                 if value is not None:
                     processed_attrs[actual_key] = convert_value(declared_type, value)
 

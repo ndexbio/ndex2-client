@@ -368,6 +368,31 @@ class TestCX2Network(unittest.TestCase):
     def test_list_of_booleans(self):
         self.assertEqual(self.cx2_obj._get_cx2_type([True, False]), "list_of_boolean")
 
+    def test_convert_value_with_invalid_list_of_and_string(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            convert_value('list_of_', 'hi')
+
+    def test_convert_value_with_list_of_string_and_string(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            convert_value('list_of_string', 'hi')
+
+    def test_convert_value_with_invalid_list_of_and_number(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            convert_value('list_of_', 7)
+
+    def test_convert_value_with_unrecognized_data_type(self):
+        with self.assertRaises(NDExInvalidCX2Error):
+            convert_value('banana', 7)
+        with self.assertRaises(NDExInvalidCX2Error):
+            convert_value('banana', [1, 2, 3])
+
+    def test_convert_value_with_valid_data_types(self):
+        self.assertEqual(convert_value('string', 123), '123')
+        self.assertEqual(convert_value('integer', '123'), 123)
+        self.assertEqual(convert_value('double', '123.45'), 123.45)
+        self.assertEqual(convert_value('boolean', 'true'), True)
+        self.assertEqual(convert_value('list_of_integer', [1, 2, 3]), [1, 2, 3])
+
 
 if __name__ == '__main__':
     unittest.main()

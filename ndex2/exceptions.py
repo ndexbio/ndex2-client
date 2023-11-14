@@ -63,5 +63,7 @@ class NDExUnsupportedCallError(NDExError):
 class NDExAlreadyExists(NDExError):
     """
     Raised when node, edge etc. already exists.
+
+    .. versionadded:: 3.6.0
     """
     pass

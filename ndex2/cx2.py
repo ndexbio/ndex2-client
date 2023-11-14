@@ -2,7 +2,7 @@ import json
 from copy import deepcopy
 
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file, constants
-from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError
+from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError, NDExNotFoundError
 from ndex2.nice_cx_network import NiceCXNetwork
 from itertools import zip_longest
 
@@ -253,8 +253,10 @@ class CX2Network(object):
         self._generate_attribute_declarations_for_aspect('networkAttributes', {key: converted_value}, {})
 
     def remove_network_attribute(self, key):
-        if key in self._network_attributes:
-            del self._network_attributes[key]
+        if key not in self._network_attributes:
+            raise NDExNotFoundError(f"Network attribute '{key}' does not exist.")
+
+        del self._network_attributes[key]
 
     def get_name(self):
         """
@@ -323,8 +325,10 @@ class CX2Network(object):
         :param node_id: ID of the node to remove.
         :type node_id: int or str
         """
-        if node_id in self._nodes:
-            del self._nodes[node_id]
+        if node_id not in self._nodes:
+            raise NDExNotFoundError(f"Node {node_id} does not exist.")
+
+        del self._nodes[node_id]
 
         edges_to_remove = [edge_id for edge_id, edge in self._edges.items() if
                            edge[constants.EDGE_SOURCE] == node_id or edge[constants.EDGE_TARGET] == node_id]
@@ -419,8 +423,10 @@ class CX2Network(object):
         :param edge_id: ID of the edge to remove.
         :type edge_id: int or str
         """
-        if edge_id in self._edges:
-            del self._edges[edge_id]
+        if edge_id not in self._edges:
+            raise NDExNotFoundError(f"Edge {edge_id} does not exist.")
+
+        del self._edges[edge_id]
 
     def update_edge(self, edge_id, attributes=None):
         """

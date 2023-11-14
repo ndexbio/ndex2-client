@@ -5,6 +5,8 @@ python:
   - "3.8"
   - "3.9"
   - "3.10"
+  - "3.11"
+  - "3.12"
 env:
   - NETX=1.11
   - NETX=true
@@ -15,6 +17,10 @@ jobs:
     - python: "3.9"
       env: NETX=1.11
     - python: "3.10"
+      env: NETX=1.11
+    - python: "3.11"
+      env: NETX=1.11
+    - python: "3.12"
       env: NETX=1.11
 
 install:

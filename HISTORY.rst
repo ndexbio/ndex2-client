@@ -6,7 +6,6 @@ History
 -------------------
 
 * Enhancements
-
     * Added ``CX2Network`` class under ``cx2.py`` module to represent networks `CX2 format <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)/>`__
     * Added ``RawCX2NetworkFactory`` class under ``cx2.py`` to create ``CX2Network`` objects
     * Added ``NoStyleCXToCX2NetworkFactory`` class under ``cx2.py`` to convert ``NiceCXNetwork`` to ``CX2Network``

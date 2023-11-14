@@ -85,6 +85,8 @@ class CX2Network(object):
             which don't have a defined structure in this class.
         - ``status``
             A dictionary representing the network's status.
+
+    .. versionadded:: 3.6.0
     """
 
     def __init__(self):
@@ -555,8 +557,9 @@ class CX2Network(object):
         :type aspect_name: str
         :param attribute_name: The attribute whose declared data type needs to be retrieved.
         :type attribute_name: str
-        :param attribute_value
-        :type attribute_value
+        :param attribute_value: Actual value that will be used to infer data type if data type
+                                has not yet been defined for attribute
+        :type attribute_value: str, int, bool, float, list
         :return: The declared data type or 'string' if not found.
         :rtype: str
         """
@@ -865,6 +868,9 @@ class CX2NetworkFactory(object):
     """
     Base class for Factory classes that create
     :py:class:`~ndex2.cx2.CX2Network` objects
+
+    .. versionadded:: 3.6.0
+
     """
 
     def __init__(self):
@@ -872,11 +878,11 @@ class CX2NetworkFactory(object):
 
     def get_cx2network(self, input_data=None) -> CX2Network:
         """
-        Creates :py:class:`~ndex2.cx2.CX2Network`
+        Defines method that creates :py:class:`~ndex2.cx2.CX2Network`
 
         .. warning::
 
-            Always raises NotImplementedError
+            Subclasses should implement, this method always raises :py:class:`NotImplementedError`
 
         :param input_data: Optional input data for used to generate
                            network
@@ -890,7 +896,10 @@ class CX2NetworkFactory(object):
 class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
     """
     Creates :py:class:`~ndex2.cx2.CX2Network` network from
-    CX data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+    `CX <https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)>`__
+    data or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+
+    .. versionadded:: 3.6.0
     """
 
     def __init__(self):
@@ -990,7 +999,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 
         .. note::
 
-            Style is NOT converted by this call
+            Style is **NOT** converted by this call
 
         :param input_data: Optional input data used to generate network
         :type input_data: str, list or :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
@@ -1034,6 +1043,8 @@ class RawCX2NetworkFactory(CX2NetworkFactory):
     """
     Factory class responsible for creating :py:class:`~ndex2.cx2.CX2Network` instances
     directly from raw `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__.
+
+    .. versionadded:: 3.6.0
     """
 
     def __init__(self):

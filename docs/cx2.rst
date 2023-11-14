@@ -5,6 +5,8 @@ The :class:`~ndex2.cx2.CX2Network` class represents the `CX2 (Cytoscape Exchange
 
 The class provides structured access, manipulation, reading, processing, and writing of network data elements including nodes, edges, attributes, visual properties, and other features of the network.
 
+.. versionadded:: 3.6.0
+
 CX2Network methods
 ********************
 .. autoclass:: ndex2.cx2.CX2Network

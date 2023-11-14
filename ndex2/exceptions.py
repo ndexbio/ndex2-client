@@ -45,6 +45,8 @@ class NDExInvalidCXError(NDExError):
 class NDExInvalidCX2Error(NDExError):
     """
     Raised due to invalid CX
+
+    .. versionadded:: 3.6.0
     """
     pass
 

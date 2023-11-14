@@ -178,3 +178,40 @@ LAYOUT_Y = 'y'
 Key for Y coordinate in :py:const:`CARTESIAN_LAYOUT_ASPECT` 
 opaque aspect
 """
+
+LAYOUT_Z = 'z'
+"""
+Key for Z coordinate in :py:const:`CARTESIAN_LAYOUT_ASPECT` 
+opaque aspect
+"""
+
+NODES_ASPECT = 'nodes'
+"""
+Key for nodes attribute
+"""
+
+EDGES_ASPECT = 'edges'
+"""
+Key for nodes attribute
+"""
+
+ATTR_DATATYPE = 'd'
+"""
+Key for attribute data type
+"""
+
+ATTR_NAME = 'n'
+"""
+Key for attribute name
+"""
+
+ASPECT_ID = 'id'
+"""
+Key for aspect ID
+"""
+
+ASPECT_VALUES = 'v'
+"""
+Key for aspect values
+"""
+

@@ -1,7 +1,7 @@
 import json
 from copy import deepcopy
 
-from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file
+from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file, constants
 from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError
 from ndex2.nice_cx_network import NiceCXNetwork
 from itertools import zip_longest
@@ -16,13 +16,7 @@ def convert_value(dtype, value):
     :param value: Value to be converted.
     :type value: any
     """
-    allowed_types = [
-        "string", "long", "integer", "double", "boolean",
-        "list_of_string", "list_of_long", "list_of_integer",
-        "list_of_double", "list_of_boolean"
-    ]
-
-    if dtype not in allowed_types:
+    if dtype not in constants.VALID_ATTRIBUTE_DATATYPES:
         raise NDExInvalidCX2Error(f'Data type {dtype} is invalid in CX2 format')
 
     if dtype.startswith("list_of_"):
@@ -30,16 +24,17 @@ def convert_value(dtype, value):
             raise NDExInvalidCX2Error('Declared value of attribute data does not match the actual value type: '
                                       'list expected')
         elem_type = dtype.split("_")[2]
-        if elem_type not in ["string", "long", "integer", "double", "boolean"]:
+        if elem_type not in [constants.STRING_DATATYPE, constants.LONG_DATATYPE, constants.INTEGER_DATATYPE,
+                             constants.DOUBLE_DATATYPE, constants.BOOLEAN_DATATYPE]:
             raise NDExInvalidCX2Error(f'Data type {dtype} is invalid in CX2 format')
         return [convert_value(elem_type, v) for v in value]
 
     try:
-        if dtype == "integer" or dtype == "long":
+        if dtype == constants.INTEGER_DATATYPE or dtype == constants.LONG_DATATYPE:
             return int(value)
-        elif dtype == "double":
+        elif dtype == constants.DOUBLE_DATATYPE:
             return float(value)
-        elif dtype == "boolean":
+        elif dtype == constants.BOOLEAN_DATATYPE:
             if isinstance(value, bool):
                 return value
             else:
@@ -102,7 +97,7 @@ class CX2Network(object):
         self._edge_bypasses = {}
         self._opaque_aspects = []
         self._status = {}
-        self._int_id_generator = {'nodes': 0, 'edges': 0}
+        self._int_id_generator = {constants.NODES_ASPECT: 0, constants.EDGES_ASPECT: 0}
 
     def _get_next_id(self, aspect, aspect_id=None):
         """
@@ -174,16 +169,16 @@ class CX2Network(object):
         :raises ValueError: If the value is of an unsupported type.
         """
         if isinstance(value, bool):
-            return "boolean"
+            return constants.BOOLEAN_DATATYPE
         elif isinstance(value, int):
             if 2 ** 31 - 1 >= value >= -2 ** 31:
-                return "integer"
+                return constants.INTEGER_DATATYPE
             else:
-                return "long"
+                return constants.LONG_DATATYPE
         elif isinstance(value, float):
-            return "double"
+            return constants.DOUBLE_DATATYPE
         elif isinstance(value, str):
-            return "string"
+            return constants.STRING_DATATYPE
         elif isinstance(value, list):
             if value:
                 inner_type = self._get_cx2_type(value[0])
@@ -216,7 +211,7 @@ class CX2Network(object):
                 if (attr not in self.get_attribute_declarations()[aspect].keys() and attr not in aliases.values()
                         and attr not in aliases.keys()):
                     self.get_attribute_declarations()[aspect][attr] = {
-                        "d": self._get_cx2_type(value)
+                        constants.ATTR_DATATYPE: self._get_cx2_type(value)
                     }
 
     def set_attribute_declarations(self, value):
@@ -298,14 +293,14 @@ class CX2Network(object):
         if node_id in self.get_nodes().keys():
             raise NDExAlreadyExists(f"Node with ID {node_id} already exists.")
         else:
-            node_id = self._get_next_id('nodes', node_id)
-        processed_attributes = self._process_attributes('nodes', attributes)
+            node_id = self._get_next_id(constants.NODES_ASPECT, node_id)
+        processed_attributes = self._process_attributes(constants.NODES_ASPECT, attributes)
         node = {
-            "id": node_id,
-            "v": processed_attributes,
-            "x": x,
-            "y": y,
-            "z": z
+            constants.ASPECT_ID: node_id,
+            constants.ASPECT_VALUES: processed_attributes,
+            constants.LAYOUT_X: x,
+            constants.LAYOUT_Y: y,
+            constants.LAYOUT_Z: z
         }
         self._nodes[node_id] = node
         return node_id
@@ -332,7 +327,7 @@ class CX2Network(object):
             del self._nodes[node_id]
 
         edges_to_remove = [edge_id for edge_id, edge in self._edges.items() if
-                           edge["s"] == node_id or edge["t"] == node_id]
+                           edge[constants.EDGE_SOURCE] == node_id or edge[constants.EDGE_TARGET] == node_id]
         for edge_id in edges_to_remove:
             self.remove_edge(edge_id)
 
@@ -356,14 +351,14 @@ class CX2Network(object):
             raise NDExError(f"Node with ID {node_id} does not exist.")
 
         if attributes:
-            processed_attributes = self._process_attributes('nodes', attributes)
-            self._nodes[node_id]["v"].update(processed_attributes)
+            processed_attributes = self._process_attributes(constants.NODES_ASPECT, attributes)
+            self._nodes[node_id][constants.ASPECT_VALUES].update(processed_attributes)
         if x is not None:
-            self._nodes[node_id]["x"] = x
+            self._nodes[node_id][constants.LAYOUT_X] = x
         if y is not None:
-            self._nodes[node_id]["y"] = y
+            self._nodes[node_id][constants.LAYOUT_Y] = y
         if z is not None:
-            self._nodes[node_id]["z"] = z
+            self._nodes[node_id][constants.LAYOUT_Z] = z
 
     def set_node_attribute(self, node_id, attribute, value):
         self.update_node(node_id, {attribute: value})
@@ -395,13 +390,13 @@ class CX2Network(object):
         if edge_id in self.get_edges().keys():
             raise NDExAlreadyExists(f"Edge with ID {edge_id} already exists.")
         else:
-            edge_id = self._get_next_id('edges', edge_id)
-        processed_attributes = self._process_attributes('edges', attributes)
+            edge_id = self._get_next_id(constants.EDGES_ASPECT, edge_id)
+        processed_attributes = self._process_attributes(constants.EDGES_ASPECT, attributes)
         edge = {
-            "id": edge_id,
-            "s": self._check_and_cast_id(source),
-            "t": self._check_and_cast_id(target),
-            "v": processed_attributes
+            constants.ASPECT_ID: edge_id,
+            constants.EDGE_SOURCE: self._check_and_cast_id(source),
+            constants.EDGE_TARGET: self._check_and_cast_id(target),
+            constants.ASPECT_VALUES: processed_attributes
         }
         self._edges[edge_id] = edge
         return edge_id
@@ -440,8 +435,8 @@ class CX2Network(object):
             raise NDExError(f"Edge with ID {edge_id} does not exist.")
 
         if attributes:
-            processed_attributes = self._process_attributes('edges', attributes)
-            self._edges[edge_id]["v"].update(processed_attributes)
+            processed_attributes = self._process_attributes(constants.EDGES_ASPECT, attributes)
+            self._edges[edge_id][constants.ASPECT_VALUES].update(processed_attributes)
 
     def get_visual_properties(self):
         """
@@ -559,13 +554,14 @@ class CX2Network(object):
         :return: The declared data type or 'string' if not found.
         :rtype: str
         """
-        declared_type = self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('d')
+        declared_type = (self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {})
+                         .get(constants.ATTR_DATATYPE))
         if declared_type is not None:
             return declared_type
         elif attribute_value is not None:
             return self._get_cx2_type(attribute_value)
         else:
-            return 'string'
+            return constants.STRING_DATATYPE
 
     def get_alias(self, aspect_name, attribute_name):
         """
@@ -609,7 +605,7 @@ class CX2Network(object):
         :return: The default value or None if not found.
         :rtype: str
         """
-        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get('v', None)
+        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get(constants.ASPECT_VALUES, None)
 
     def get_default_values(self, aspect):
         """
@@ -624,7 +620,7 @@ class CX2Network(object):
         if self.get_attribute_declarations():
             declarations = self.get_attribute_declarations().get(aspect, {})
             for key, details in declarations.items():
-                default_value = details.get("v", None)
+                default_value = details.get(constants.ASPECT_VALUES, None)
                 if default_value:
                     default_values[key] = default_value
         return default_values
@@ -644,7 +640,7 @@ class CX2Network(object):
             raise NDExError('CX2 is empty')
 
         if isinstance(cx2_data, str):
-            with open(cx2_data, 'r') as cx2_file:
+            with open(cx2_data, constants.NODE_REPRESENTS) as cx2_file:
                 raw_data = json.load(cx2_file)
         elif isinstance(cx2_data, list):
             raw_data = cx2_data
@@ -659,28 +655,30 @@ class CX2Network(object):
             elif 'networkAttributes' in section:
                 self.set_network_attributes(section['networkAttributes'][0])
 
-            elif 'nodes' in section:
-                for node in section['nodes']:
-                    if "id" not in node:
+            elif constants.NODES_ASPECT in section:
+                for node in section[constants.NODES_ASPECT]:
+                    if constants.ASPECT_ID not in node:
                         raise NDExInvalidCX2Error('CX2 is not properly designed. Node requires id.')
-                    self.add_node(node["id"], node.get("v", None), node.get("x", None), node.get("y", None),
-                                  node.get("z", None))
+                    self.add_node(node[constants.ASPECT_ID], node.get(constants.ASPECT_VALUES, None), node.get(constants.LAYOUT_X, None),
+                                  node.get(constants.LAYOUT_Y, None),
+                                  node.get(constants.LAYOUT_Z, None))
 
-            elif 'edges' in section:
-                for edge in section['edges']:
-                    if "id" not in edge or "s" not in edge or "t" not in edge:
+            elif constants.EDGES_ASPECT in section:
+                for edge in section[constants.EDGES_ASPECT]:
+                    if constants.ASPECT_ID not in edge or constants.EDGE_SOURCE not in edge or constants.EDGE_TARGET not in edge:
                         raise NDExInvalidCX2Error('CX2 is not properly designed. Edge requires id, source (s) and '
                                                   'target (t).')
-                    self.add_edge(edge["id"], edge["s"], edge["t"], edge.get("v", None))
+                    self.add_edge(edge[constants.ASPECT_ID], edge[constants.EDGE_SOURCE], edge[constants.EDGE_TARGET],
+                                  edge.get(constants.ASPECT_VALUES, None))
 
             elif "visualProperties" in section:
                 self.set_visual_properties(section["visualProperties"][0])
             elif "nodeBypasses" in section:
                 for nodeBypass in section["nodeBypasses"]:
-                    self.add_node_bypass(nodeBypass["id"], nodeBypass["v"])
+                    self.add_node_bypass(nodeBypass[constants.ASPECT_ID], nodeBypass[constants.ASPECT_VALUES])
             elif "edgeBypasses" in section:
                 for edgeBypass in section["edgeBypasses"]:
-                    self.add_edge_bypass(edgeBypass["id"], edgeBypass["v"])
+                    self.add_edge_bypass(edgeBypass[constants.ASPECT_ID], edgeBypass[constants.ASPECT_VALUES])
             elif "metaData" in section or "CXVersion" in section:
                 pass
             elif "status" in section:
@@ -707,9 +705,9 @@ class CX2Network(object):
         if self.get_network_attributes():
             meta_data.append({"elementCount": 1, "name": "networkAttributes"})
         if self.get_nodes():
-            meta_data.append({"elementCount": len(self.get_nodes()), "name": "nodes"})
+            meta_data.append({"elementCount": len(self.get_nodes()), "name": constants.NODES_ASPECT})
         if self.get_edges():
-            meta_data.append({"elementCount": len(self.get_edges()), "name": "edges"})
+            meta_data.append({"elementCount": len(self.get_edges()), "name": constants.EDGES_ASPECT})
         if self.get_visual_properties():
             meta_data.append({"elementCount": 1, "name": "visualProperties"})
         if self.get_node_bypasses():
@@ -738,7 +736,7 @@ class CX2Network(object):
 
             for field in fields_to_check:
                 if field in item and item[field] is not None:
-                    if field != 'v' or len(item[field]) > 0:
+                    if field != constants.ASPECT_VALUES or len(item[field]) > 0:
                         clean_item[field] = item[field]
 
             cleaned_data.append(clean_item)
@@ -770,27 +768,28 @@ class CX2Network(object):
         if self._network_attributes:
             output_data.append({"networkAttributes": [self.get_network_attributes()]})
 
-        nodes_list = self._replace_with_alias(list(self.get_nodes().values()), 'nodes')
-        output_nodes = self._clean_aspect_data(nodes_list, ['x', 'y', 'z', 'v'])
+        nodes_list = self._replace_with_alias(list(self.get_nodes().values()), constants.NODES_ASPECT)
+        output_nodes = self._clean_aspect_data(nodes_list, [constants.LAYOUT_X, constants.LAYOUT_Y,
+                                                            constants.LAYOUT_Z, constants.ASPECT_VALUES])
         output_data.append({
-            "nodes": output_nodes
+            constants.NODES_ASPECT: output_nodes
         })
 
-        edges_list = self._replace_with_alias(list(self.get_edges().values()), 'edges')
-        output_edges = self._clean_aspect_data(edges_list, ['v'])
+        edges_list = self._replace_with_alias(list(self.get_edges().values()), constants.EDGES_ASPECT)
+        output_edges = self._clean_aspect_data(edges_list, [constants.ASPECT_VALUES])
         output_data.append({
-            "edges": output_edges
+            constants.EDGES_ASPECT: output_edges
         })
 
         if self._visual_properties:
             output_data.append({"visualProperties": [self.get_visual_properties()]})
 
         if self._node_bypasses:
-            output_node_bypasses = [{"id": k, "v": v} for k, v in self.get_node_bypasses().items()]
+            output_node_bypasses = [{constants.ASPECT_ID: k, constants.ASPECT_VALUES: v} for k, v in self.get_node_bypasses().items()]
             output_data.append({"nodeBypasses": output_node_bypasses})
 
         if self._edge_bypasses:
-            output_edge_bypasses = [{"id": k, "v": v} for k, v in self.get_edge_bypasses().items()]
+            output_edge_bypasses = [{constants.ASPECT_ID: k, constants.ASPECT_VALUES: v} for k, v in self.get_edge_bypasses().items()]
             output_data.append({"edgeBypasses": output_edge_bypasses})
 
         output_data.extend(self._opaque_aspects)
@@ -847,10 +846,10 @@ class CX2Network(object):
 
         for item in aspect_list:
             new_item = deepcopy(item)
-            if 'v' in new_item:
-                for attr in list(new_item['v'].keys()):
+            if constants.ASPECT_VALUES in new_item:
+                for attr in list(new_item[constants.ASPECT_VALUES].keys()):
                     if attr in reverse_aliases:
-                        new_item['v'][reverse_aliases[attr]] = new_item['v'].pop(attr)
+                        new_item[constants.ASPECT_VALUES][reverse_aliases[attr]] = new_item[constants.ASPECT_VALUES].pop(attr)
             new_data.append(new_item)
 
         return new_data
@@ -901,7 +900,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         :return: Translated network attributes.
         :rtype: dict
         """
-        return {item['n']: item['v'] for item in network_attributes}
+        return {item[constants.ATTR_NAME]: item[constants.ASPECT_VALUES] for item in network_attributes}
 
     @staticmethod
     def _generate_attribute_declarations(network_attributes, nodes, node_attributes, edges, edge_attributes):
@@ -922,28 +921,35 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         :rtype: dict
         """
         attribute_declarations = {
-            "networkAttributes": {item['n']: {'d': item.get('d', 'string')} for item in network_attributes},
-            "nodes": {},
-            "edges": {}
+            "networkAttributes": {item[constants.ATTR_NAME]: {constants.ATTR_DATATYPE: item.get(constants.ATTR_DATATYPE,
+                                                                                constants.STRING_DATATYPE)}
+                                  for item in network_attributes},
+            constants.NODES_ASPECT: {},
+            constants.EDGES_ASPECT: {}
         }
 
         node_internal_attributes = {key for val in nodes.values() for key in val}
-        if 'n' in node_internal_attributes:
-            attribute_declarations['nodes']['name'] = {'a': 'n', 'd': 'string'}
-        if 'r' in node_internal_attributes:
-            attribute_declarations['nodes']['represents'] = {'a': 'r', 'd': 'string'}
+        if constants.NODE_NAME in node_internal_attributes:
+            attribute_declarations[constants.NODES_ASPECT]['name'] = \
+                {'a': constants.NODE_NAME, constants.ATTR_DATATYPE: constants.STRING_DATATYPE}
+        if constants.NODE_REPRESENTS in node_internal_attributes:
+            attribute_declarations[constants.NODES_ASPECT]['represents'] = \
+                {'a': constants.NODE_REPRESENTS, constants.ATTR_DATATYPE: constants.STRING_DATATYPE}
 
         for attr_list in node_attributes.values():
             for attr in attr_list:
-                attribute_declarations['nodes'][attr['n']] = {'d': attr.get('d', 'string')}
+                attribute_declarations[constants.NODES_ASPECT][attr[constants.ATTR_NAME]] = \
+                    {constants.ATTR_DATATYPE: attr.get(constants.ATTR_DATATYPE, constants.STRING_DATATYPE)}
 
         edge_internal_attributes = {key for val in edges.values() for key in val}
-        if 'i' in edge_internal_attributes:
-            attribute_declarations['edges']['interaction'] = {'a': 'i', 'd': 'string'}
+        if constants.EDGE_INTERACTION in edge_internal_attributes:
+            attribute_declarations[constants.EDGES_ASPECT]['interaction'] = \
+                {'a': constants.EDGE_INTERACTION, constants.ATTR_DATATYPE: constants.STRING_DATATYPE}
 
         for attr_list in edge_attributes.values():
             for attr in attr_list:
-                attribute_declarations['edges'][attr['n']] = {'d': attr.get('d', 'string')}
+                attribute_declarations[constants.EDGES_ASPECT][attr[constants.ATTR_NAME]] = \
+                    {constants.ATTR_DATATYPE: attr.get(constants.ATTR_DATATYPE, constants.STRING_DATATYPE)}
 
         return attribute_declarations
 
@@ -965,7 +971,8 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         if expected_keys:
             attr_vals = {key: entity[key] for key in expected_keys if key in entity}
         if attributes.get(entity['@id']):
-            attr_vals.update({attr['n']: attr['v'] for attr in attributes[entity['@id']]})
+            attr_vals.update({attr[constants.ATTR_NAME]: attr[constants.ASPECT_VALUES]
+                              for attr in attributes[entity['@id']]})
         return attr_vals
 
     def get_cx2network(self, input_data=None) -> CX2Network:
@@ -1000,14 +1007,17 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
 
         cx2network_obj.set_network_attributes(self._translate_network_attributes_to_cx2(network.networkAttributes))
 
-        for node, layout in zip_longest(network.nodes.values(), network.opaqueAspects.get('cartesianLayout', []),
+        for node, layout in zip_longest(network.nodes.values(), network.opaqueAspects.get(
+                constants.CARTESIAN_LAYOUT_ASPECT, []),
                                         fillvalue={}):
-            attr_val = self._process_attributes_for_cx2(node, network.nodeAttributes, ['n', 'r'])
-            cx2network_obj.add_node(node['@id'], attr_val, layout.get('x'), layout.get('y'), layout.get('z'))
+            attr_val = self._process_attributes_for_cx2(node, network.nodeAttributes,
+                                                        [constants.ATTR_NAME, constants.NODE_REPRESENTS])
+            cx2network_obj.add_node(node['@id'], attr_val, layout.get(constants.LAYOUT_X),
+                                    layout.get(constants.LAYOUT_Y), layout.get(constants.LAYOUT_Z))
 
         for edge in network.edges.values():
-            attr_val = self._process_attributes_for_cx2(edge, network.edgeAttributes, ['i'])
-            cx2network_obj.add_edge(edge['@id'], edge['s'], edge['t'], attr_val)
+            attr_val = self._process_attributes_for_cx2(edge, network.edgeAttributes, [constants.EDGE_INTERACTION])
+            cx2network_obj.add_edge(edge['@id'], edge[constants.EDGE_SOURCE], edge[constants.EDGE_TARGET], attr_val)
 
         cx2network_obj.set_status({'error': '', 'success': True})
 

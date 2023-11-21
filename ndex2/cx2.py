@@ -1,6 +1,8 @@
 import json
 from copy import deepcopy
 
+import networkx as nx
+
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file, constants
 from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError, NDExNotFoundError
 from ndex2.nice_cx_network import NiceCXNetwork
@@ -614,7 +616,8 @@ class CX2Network(object):
         :return: The default value or None if not found.
         :rtype: str
         """
-        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get(constants.ASPECT_VALUES, None)
+        return self.get_attribute_declarations().get(aspect_name, {}).get(attribute_name, {}).get(
+            constants.ASPECT_VALUES, None)
 
     def get_default_values(self, aspect):
         """
@@ -668,7 +671,8 @@ class CX2Network(object):
                 for node in section[constants.NODES_ASPECT]:
                     if constants.ASPECT_ID not in node:
                         raise NDExInvalidCX2Error('CX2 is not properly designed. Node requires id.')
-                    self.add_node(node[constants.ASPECT_ID], node.get(constants.ASPECT_VALUES, None), node.get(constants.LAYOUT_X, None),
+                    self.add_node(node[constants.ASPECT_ID], node.get(constants.ASPECT_VALUES, None),
+                                  node.get(constants.LAYOUT_X, None),
                                   node.get(constants.LAYOUT_Y, None),
                                   node.get(constants.LAYOUT_Z, None))
 
@@ -794,11 +798,13 @@ class CX2Network(object):
             output_data.append({"visualProperties": [self.get_visual_properties()]})
 
         if self._node_bypasses:
-            output_node_bypasses = [{constants.ASPECT_ID: k, constants.ASPECT_VALUES: v} for k, v in self.get_node_bypasses().items()]
+            output_node_bypasses = [{constants.ASPECT_ID: k, constants.ASPECT_VALUES: v} for k, v in
+                                    self.get_node_bypasses().items()]
             output_data.append({"nodeBypasses": output_node_bypasses})
 
         if self._edge_bypasses:
-            output_edge_bypasses = [{constants.ASPECT_ID: k, constants.ASPECT_VALUES: v} for k, v in self.get_edge_bypasses().items()]
+            output_edge_bypasses = [{constants.ASPECT_ID: k, constants.ASPECT_VALUES: v} for k, v in
+                                    self.get_edge_bypasses().items()]
             output_data.append({"edgeBypasses": output_edge_bypasses})
 
         output_data.extend(self._opaque_aspects)
@@ -858,7 +864,8 @@ class CX2Network(object):
             if constants.ASPECT_VALUES in new_item:
                 for attr in list(new_item[constants.ASPECT_VALUES].keys()):
                     if attr in reverse_aliases:
-                        new_item[constants.ASPECT_VALUES][reverse_aliases[attr]] = new_item[constants.ASPECT_VALUES].pop(attr)
+                        new_item[constants.ASPECT_VALUES][reverse_aliases[attr]] = new_item[
+                            constants.ASPECT_VALUES].pop(attr)
             new_data.append(new_item)
 
         return new_data
@@ -937,7 +944,7 @@ class NoStyleCXToCX2NetworkFactory(CX2NetworkFactory):
         """
         attribute_declarations = {
             "networkAttributes": {item[constants.ATTR_NAME]: {constants.ATTR_DATATYPE: item.get(constants.ATTR_DATATYPE,
-                                                                                constants.STRING_DATATYPE)}
+                                                                                                constants.STRING_DATATYPE)}
                                   for item in network_attributes},
             constants.NODES_ASPECT: {},
             constants.EDGES_ASPECT: {}
@@ -1063,3 +1070,45 @@ class RawCX2NetworkFactory(CX2NetworkFactory):
         cx2network_obj = CX2Network()
         cx2network_obj.create_from_raw_cx2(input_data)
         return cx2network_obj
+
+
+class CX2NetworkXFactory(object):
+
+    def __init__(self):
+        pass
+
+    def get_graph(self, cx2network, networkx_graph=None):
+        """
+        Creates NetworkX Graph object which can
+        be one of the multiple types of Graph objects
+
+        :param cx2network: Network to create networkx graph from
+        :type cx2network: :py:class:`~ndex2.cx.CX2Network`
+        :param networkx_graph: Empty networkx graph to populate
+        :type networkx_graph: :class:`networkx.MultiDiGraph` or subtype
+        :return: networkx Graph object of some type
+        :rtype: :class:`networkx.MultiDiGraph`
+        """
+        if networkx_graph is None:
+            networkx_graph = nx.MultiDiGraph()
+
+        for node_id, node_data in cx2network.get_nodes().items():
+            attrs = node_data.get('v', {})
+            if 'x' in node_data:
+                attrs['x'] = node_data['x']
+            if 'y' in node_data:
+                attrs['y'] = node_data['y']
+            if 'z' in node_data:
+                attrs['z'] = node_data['z']
+            networkx_graph.add_node(node_id, **attrs)
+
+        for edge_id, edge_data in cx2network.get_edges().items():
+            source = edge_data['s']
+            target = edge_data['t']
+            attrs = edge_data.get('v', {})
+            networkx_graph.add_edge(source, target, **attrs)
+
+        for attr, value in cx2network.get_network_attributes().items():
+            networkx_graph.graph[attr] = value
+
+        return networkx_graph

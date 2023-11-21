@@ -1073,8 +1073,13 @@ class RawCX2NetworkFactory(CX2NetworkFactory):
 
 
 class CX2NetworkXFactory(object):
-
+    """
+    A factory class for creating NetworkX Graph objects from CX2Network data.
+    """
     def __init__(self):
+        """
+        Constructor
+        """
         pass
 
     def get_graph(self, cx2network, networkx_graph=None):
@@ -1085,8 +1090,8 @@ class CX2NetworkXFactory(object):
         :param cx2network: Network to create networkx graph from
         :type cx2network: :py:class:`~ndex2.cx.CX2Network`
         :param networkx_graph: Empty networkx graph to populate
-        :type networkx_graph: :class:`networkx.MultiDiGraph` or subtype
-        :return: networkx Graph object of some type
+        :type networkx_graph: :class:`networkx.MultiDiGraph`
+        :return: networkx Graph object
         :rtype: :class:`networkx.MultiDiGraph`
         """
         if networkx_graph is None:

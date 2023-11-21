@@ -1072,10 +1072,32 @@ class RawCX2NetworkFactory(CX2NetworkFactory):
         return cx2network_obj
 
 
+class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
+    """
+    Factory class responsible for creating :py:class:`~ndex2.cx2.CX2Network` instances
+    from :py:class:`networkx.Graph`
+    """
+
+    def __init__(self):
+        super(NetworkXToCX2NetworkFactory, self).__init__()
+
+    def get_cx2network(self, input_data=None):
+        """
+        Creates :py:class:`~ndex2.cx2.CX2Network` from :py:class:`networkx.Graph`
+        object
+        :param input_data: Optional input data used to generate network
+        :type input_data: :py:class:`networkx.Graph`, :py:class:`networkx.DiGraph`
+        :return: Generated network
+        :rtype: :py:class:`~ndex2.cx2.CX2Network`
+        """
+        pass
+
+
 class CX2NetworkXFactory(object):
     """
     A factory class for creating NetworkX Graph objects from CX2Network data.
     """
+
     def __init__(self):
         """
         Constructor
@@ -1094,6 +1116,9 @@ class CX2NetworkXFactory(object):
         :return: networkx Graph object
         :rtype: :class:`networkx.MultiDiGraph`
         """
+        if cx2network is None:
+            raise NDExError('input network is None')
+
         if networkx_graph is None:
             networkx_graph = nx.MultiDiGraph()
 

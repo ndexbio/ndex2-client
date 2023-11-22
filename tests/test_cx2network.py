@@ -3,7 +3,10 @@ import os
 import json
 import tempfile
 import shutil
-from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory
+
+import networkx as nx
+
+from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory, NetworkXToCX2NetworkFactory
 from ndex2.exceptions import NDExAlreadyExists, NDExError, NDExInvalidCX2Error
 
 
@@ -392,6 +395,36 @@ class TestCX2Network(unittest.TestCase):
         self.assertEqual(convert_value('double', '123.45'), 123.45)
         self.assertEqual(convert_value('boolean', 'true'), True)
         self.assertEqual(convert_value('list_of_integer', [1, 2, 3]), [1, 2, 3])
+
+    def test_get_cx2network_with_graph(self):
+        factory = NetworkXToCX2NetworkFactory()
+        g = nx.Graph()
+        g.add_node(1, x=100, y=200, z=300, label="Node1")
+        g.add_node(2, label="Node2")
+        g.add_edge(1, 2, weight=1.5)
+        g.graph['name'] = 'Test Graph'
+
+        cx2network = factory.get_cx2network(g)
+
+        self.assertEqual(len(cx2network.get_nodes()), 2)
+        node1 = cx2network.get_node(1)
+        self.assertEqual(node1['x'], 100)
+        self.assertEqual(node1['y'], 200)
+        self.assertEqual(node1['z'], 300)
+        self.assertEqual(node1['v']['label'], 'Node1')
+        node2 = cx2network.get_node(2)
+        self.assertIsNone(node2['x'])
+        self.assertIsNone(node2['y'])
+        self.assertIsNone(node2['z'])
+        self.assertEqual(node2['v']['label'], 'Node2')
+
+        self.assertEqual(len(cx2network.get_edges()), 1)
+        edge = next(iter(cx2network.get_edges().values()))
+        self.assertEqual(edge['s'], 1)
+        self.assertEqual(edge['t'], 2)
+        self.assertEqual(edge['v']['weight'], 1.5)
+
+        self.assertEqual(cx2network.get_network_attributes()['name'], 'Test Graph')
 
 
 if __name__ == '__main__':

@@ -1090,7 +1090,24 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
         :return: Generated network
         :rtype: :py:class:`~ndex2.cx2.CX2Network`
         """
-        pass
+        if not isinstance(input_data, (nx.Graph, nx.DiGraph, nx.MultiDiGraph)):
+            raise TypeError("input_data must be a networkx.Graph, networkx.DiGraph, or networkx.MultiDiGraph object")
+
+        cx2network_obj = CX2Network()
+
+        for node_id, node_data in input_data.nodes(data=True):
+            x = node_data.pop('x', None)
+            y = node_data.pop('y', None)
+            z = node_data.pop('z', None)
+            cx2network_obj.add_node(node_id=node_id, attributes=node_data, x=x, y=y, z=z)
+
+        for source, target, edge_data in input_data.edges(data=True):
+            cx2network_obj.add_edge(source=source, target=target, attributes=edge_data)
+
+        for attr_key, attr_value in input_data.graph.items():
+            cx2network_obj.add_network_attribute(key=attr_key, value=attr_value)
+
+        return cx2network_obj
 
 
 class CX2NetworkXFactory(object):

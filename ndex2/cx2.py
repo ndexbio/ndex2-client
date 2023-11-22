@@ -1090,6 +1090,9 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
         :return: Generated network
         :rtype: :py:class:`~ndex2.cx2.CX2Network`
         """
+        if input_data is None:
+            raise Exception('Networkx input is empty')
+
         if not isinstance(input_data, (nx.Graph, nx.DiGraph, nx.MultiDiGraph)):
             raise TypeError("input_data must be a networkx.Graph, networkx.DiGraph, or networkx.MultiDiGraph object")
 

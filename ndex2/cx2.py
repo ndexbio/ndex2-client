@@ -2,6 +2,7 @@ import json
 from copy import deepcopy
 
 import networkx as nx
+import pandas as pd
 
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file, constants
 from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError, NDExNotFoundError
@@ -1113,6 +1114,49 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
         return cx2network_obj
 
 
+class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
+    def __init__(self):
+        super(PandasDataFrameToCX2NetworkFactory, self).__init__()
+
+    def get_cx2network(self, input_data=None) -> CX2Network:
+
+        if input_data is None:
+            raise Exception('DataFrame input is empty')
+
+        if not isinstance(input_data, pd.DataFrame):
+            raise NDExError("Input data must be a Pandas DataFrame")
+
+        cx2network = CX2Network()
+
+        for index, row in input_data.iterrows():
+            source = row.get('source')
+            target = row.get('target')
+
+            if source is None or target is None:
+                raise NDExError("Missing 'source' or 'target' columns in the DataFrame")
+
+            source_attrs = {}
+            target_attrs = {}
+            edge_attrs = {}
+            for col, value in row.items():
+                if pd.isna(value):
+                    continue
+                if col.startswith('source_'):
+                    source_attrs[col[7:]] = value
+                elif col.startswith('target_'):
+                    target_attrs[col[7:]] = value
+                edge_attrs[col] = value
+            if source not in cx2network.get_nodes():
+                cx2network.add_node(node_id=source, x=source_attrs.pop('x', None), y=source_attrs.pop('y', None),
+                                    z=source_attrs.pop('z', None), attributes=source_attrs)
+            if target not in cx2network.get_nodes():
+                cx2network.add_node(node_id=target, x=target_attrs.pop('x', None), y=target_attrs.pop('y', None),
+                                    z=target_attrs.pop('z', None), attributes=target_attrs)
+            cx2network.add_edge(source=source, target=target, attributes=edge_attrs)
+
+        return cx2network
+
+
 class CX2NetworkXFactory(object):
     """
     A factory class for creating NetworkX Graph objects from CX2Network data.
@@ -1162,3 +1206,55 @@ class CX2NetworkXFactory(object):
             networkx_graph.graph[attr] = value
 
         return networkx_graph
+
+
+class PandasDataFrameFactory:
+    def __init__(self):
+        pass
+
+    def get_dataframe(self, cx2network):
+        if cx2network is None:
+            raise NDExError('input network is None')
+
+        if not isinstance(cx2network, CX2Network):
+            raise TypeError("Input must be a CX2Network object")
+
+        rows = []
+
+        for edge_id, edge in cx2network.get_edges().items():
+            row = {}
+            source_node_id = edge.get('s')
+            target_node_id = edge.get('t')
+
+            row['source'] = source_node_id
+            row['target'] = target_node_id
+
+            source_node_attrs = cx2network.get_node(source_node_id)
+            target_node_attrs = cx2network.get_node(target_node_id)
+
+            # Add node attributes with prefixes to the row
+            for attr_key, attr_value in source_node_attrs.get('v', {}).items():
+                row[f'source_{attr_key}'] = attr_value
+            for attr_key, attr_value in target_node_attrs.get('v', {}).items():
+                row[f'target_{attr_key}'] = attr_value
+
+            # Add coordinates if available
+            if 'x' in source_node_attrs:
+                row['source_x'] = source_node_attrs['x']
+            if 'y' in source_node_attrs:
+                row['source_y'] = source_node_attrs['y']
+            if 'z' in source_node_attrs:
+                row['source_z'] = source_node_attrs['z']
+            if 'x' in target_node_attrs:
+                row['target_x'] = target_node_attrs['x']
+            if 'y' in target_node_attrs:
+                row['target_y'] = target_node_attrs['y']
+            if 'z' in target_node_attrs:
+                row['target_z'] = target_node_attrs['z']
+
+            for attr_key, attr_value in edge.get('v', {}).items():
+                row[attr_key] = attr_value
+
+            rows.append(row)
+
+        return pd.DataFrame(rows)

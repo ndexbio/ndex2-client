@@ -1115,11 +1115,27 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
 
 
 class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
+    """
+    Factory class for converting a Pandas DataFrame into a CX2Network object.
+    """
     def __init__(self):
+        """
+        Constructor
+        """
         super(PandasDataFrameToCX2NetworkFactory, self).__init__()
 
     def get_cx2network(self, input_data=None) -> CX2Network:
+        """
+        Converts a given Pandas DataFrame into a CX2Network object. The DataFrame should
+        contain columns 'source' and 'target' to represent source node and target node of edge
+        , and may contain additional columns for edge and node attributes.
 
+        :param input_data: The Pandas DataFrame to be converted into CX2Network.
+        :type input_data: pd.DataFrame
+        :return: A CX2Network object :py:class:`~ndex2.cx2.CX2Network`
+        :rtype: CX2Network
+        :raises NDExError: If the input DataFrame is None or does not have the necessary columns.
+        """
         if input_data is None:
             raise Exception('DataFrame input is empty')
 
@@ -1209,10 +1225,26 @@ class CX2NetworkXFactory(object):
 
 
 class PandasDataFrameFactory:
+    """
+    Factory class for converting a CX2Network object into a Pandas DataFrame.
+    """
     def __init__(self):
+        """
+        Constructor
+        """
         pass
 
     def get_dataframe(self, cx2network):
+        """
+        Converts a given CX2Network object into a Pandas DataFrame. The DataFrame will contain columns for
+        'source' and 'target' nodes of each edge, along with other edge and node attributes.
+
+        :param cx2network: The CX2Network object to be converted into a DataFrame.
+        :type cx2network: CX2Network
+        :return: A Pandas DataFrame representing the network data from CX2Network.
+        :rtype: pd.DataFrame
+        :raises NDExError: If the input CX2Network is None or not an instance of CX2Network.
+        """
         if cx2network is None:
             raise NDExError('input network is None')
 

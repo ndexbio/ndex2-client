@@ -14,6 +14,9 @@ The NDEx2 Python Client can be broken into three parts:
    :maxdepth: 2
 
    cx2
+   createcx2
+   cxtocx2
+   convertcx2
    ndex2
    createnicecx
    convertnicecx

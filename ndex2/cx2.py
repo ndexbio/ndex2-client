@@ -1192,9 +1192,9 @@ class CX2NetworkXFactory(object):
         :param cx2network: Network to create networkx graph from
         :type cx2network: :py:class:`~ndex2.cx.CX2Network`
         :param networkx_graph: Empty networkx graph to populate
-        :type networkx_graph: :class:`networkx.MultiDiGraph`
+        :type networkx_graph: :class:`networkx.MultiDiGraph`, :class:`networkx.DiGraph`
         :return: networkx Graph object
-        :rtype: :class:`networkx.MultiDiGraph`
+        :rtype: :class:`networkx.MultiDiGraph`, :class:`networkx.DiGraph`
         """
         if cx2network is None:
             raise NDExError('input network is None')

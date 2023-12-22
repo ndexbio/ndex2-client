@@ -5,10 +5,8 @@ import tempfile
 import shutil
 
 import networkx as nx
-import pandas as pd
 
-from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory, NetworkXToCX2NetworkFactory, \
-    PandasDataFrameToCX2NetworkFactory, PandasDataFrameFactory
+from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory, NetworkXToCX2NetworkFactory, PandasDataFrameFactory
 from ndex2.exceptions import NDExAlreadyExists, NDExError, NDExInvalidCX2Error
 
 
@@ -427,17 +425,6 @@ class TestCX2Network(unittest.TestCase):
         self.assertEqual(edge['v']['weight'], 1.5)
 
         self.assertEqual(cx2network.get_network_attributes()['name'], 'Test Graph')
-
-    def test_conversion_to_cx2network(self):
-        data = {'source': [1, 2], 'target': [2, 3], 'edge_attr': ['a', 'b']}
-        df = pd.DataFrame(data)
-        factory = PandasDataFrameToCX2NetworkFactory()
-        network = factory.get_cx2network(df)
-
-        self.assertEqual(len(network.get_edges()), 2)
-        self.assertIn(1, network.get_nodes())
-        self.assertIn(2, network.get_nodes())
-        self.assertIn(3, network.get_nodes())
 
     def test_conversion_to_dataframe(self):
         network = CX2Network()

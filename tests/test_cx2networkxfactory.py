@@ -80,6 +80,9 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         fac = NetworkXToCX2NetworkFactory()
         rt_cx2net = fac.get_cx2network(graph)
 
+
+        # Todo see why this is failing
+        #      Reopened https://ndexbio.atlassian.net/browse/UD-2652
         for node_name in ['721', '737', '747', '751', '753', '764']:
             rt_node = self.get_node_matching_name(cx2net=rt_cx2net, name=node_name)
             orig_node = self.get_node_matching_name(cx2net=self.cx2network, name=node_name)

@@ -23,6 +23,25 @@ class TestCX2Network(unittest.TestCase):
         self.assertIsNotNone(self.cx2_obj.get_attribute_declarations())
         self.assertGreater(len(self.cx2_obj.get_nodes()), 0)
 
+    def test_demo_cx2_loaded(self):
+        self.cx2_obj.create_from_raw_cx2(self.sample_file)
+        node721found = False
+        for node_id, node_obj in self.cx2_obj.get_nodes().items():
+            if node_obj['v']['name'] == '721':
+                self.assertEqual({'Size': 4,
+                                  'align_fdr': 0.0,
+                                  'align_goID': 'GO:0071007',
+                                  'align_score': 0.459948,
+                                  'annot': 'U2-type catalytic step 2 spliceosome',
+                                  'annot_source': 'CC',
+                                  'cc_overlap': '3/30;3/61;3/115;2/21;2/60',
+                                  'genes': 'SNRPB2,CDC40,CCDC12,SNRPA1,',
+                                  'jaccard': 0.5, 'name': '721',
+                                  'overlap': '3/5'}, node_obj['v'])
+                node721found = True
+
+        self.assertTrue(node721found)
+
     def test_create_from_raw_cx2_from_list(self):
         with open(self.sample_file, 'r') as f:
             data_list = json.load(f)

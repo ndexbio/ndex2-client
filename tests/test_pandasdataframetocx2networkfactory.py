@@ -30,7 +30,7 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         panda2cxfac = PandasDataFrameToCX2NetworkFactory()
 
         rt_cx2net = panda2cxfac.get_cx2network(df)
-        self.assertEqual('', rt_cx2net.get_name())
+        self.assertEqual(None, rt_cx2net.get_name())
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file, constant
 from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError, NDExNotFoundError
 from ndex2.nice_cx_network import NiceCXNetwork
 from itertools import zip_longest
+from collections.abc import Iterable
 
 
 def convert_value(dtype, value):
@@ -1159,7 +1160,7 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
             target_attrs = {}
             edge_attrs = {}
             for col, value in row.items():
-                if pd.isna(value):
+                if not isinstance(value, Iterable) and pd.isna(value):
                     continue
                 if col.startswith('source_'):
                     source_attrs[col[7:]] = value

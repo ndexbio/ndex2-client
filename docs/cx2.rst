@@ -32,6 +32,15 @@ CX2NetworkFactory classes and methods
     :members:
 
 
+CX2Network conversion classes
+*******************************
+
+.. autoclass:: ndex2.cx2.CX2NetworkXFactory
+    :members:
+
+.. autoclass:: ndex2.cx2.PandasDataFrameFactory
+    :members:
+
 Supported data types for attributes
 ************************************
 

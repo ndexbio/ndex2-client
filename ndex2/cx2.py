@@ -1077,6 +1077,8 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
     """
     Factory class responsible for creating :py:class:`~ndex2.cx2.CX2Network` instances
     from :py:class:`networkx.Graph`
+
+    .. versionadded:: 3.7.0
     """
 
     def __init__(self):
@@ -1117,6 +1119,8 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
 class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
     """
     Factory class for converting a Pandas DataFrame into a CX2Network object.
+
+    .. versionadded:: 3.7.0
     """
     def __init__(self):
         """
@@ -1176,6 +1180,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
 class CX2NetworkXFactory(object):
     """
     A factory class for creating NetworkX Graph objects from CX2Network data.
+
+    .. versionadded:: 3.7.0
     """
 
     def __init__(self):
@@ -1227,6 +1233,8 @@ class CX2NetworkXFactory(object):
 class PandasDataFrameFactory:
     """
     Factory class for converting a CX2Network object into a Pandas DataFrame.
+
+    .. versionadded:: 3.7.0
     """
     def __init__(self):
         """
@@ -1236,8 +1244,13 @@ class PandasDataFrameFactory:
 
     def get_dataframe(self, cx2network):
         """
-        Converts a given CX2Network object into a Pandas DataFrame. The DataFrame will contain columns for
-        'source' and 'target' nodes of each edge, along with other edge and node attributes.
+        Converts a given CX2Network object into a Pandas DataFrame. The
+        DataFrame will contain columns for 'source' and 'target' nodes
+        of each edge, along with other edge and node attributes. Node
+        attributes will be prefixed with ``source_`` and ``target_``
+        respectively. If coordinates exist on the nodes they will be
+        added as
+        ``source_x, source_y, source_z, target_x, target_y, target_z``
 
         :param cx2network: The CX2Network object to be converted into a DataFrame.
         :type cx2network: CX2Network
@@ -1249,7 +1262,7 @@ class PandasDataFrameFactory:
             raise NDExError('input network is None')
 
         if not isinstance(cx2network, CX2Network):
-            raise TypeError("Input must be a CX2Network object")
+            raise NDExError("Input must be a CX2Network object")
 
         rows = []
 

@@ -9,8 +9,6 @@ Creating a CX2Network from Raw CX2 Data
 
 The ``RawCX2NetworkFactory`` is designed to create a ``CX2Network`` instance directly from raw CX2 data.
 
-Example Usage
-~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -59,8 +57,6 @@ Creating a CX2Network from a Pandas DataFrame
 
 The ``PandasDataFrameToCX2NetworkFactory`` enables the conversion of a Pandas DataFrame into a ``CX2Network``. This is useful for integrating DataFrame data into the CX2 network structure.
 
-Example Usage
-~~~~~~~~~~~~~
 
 .. code-block:: python
 

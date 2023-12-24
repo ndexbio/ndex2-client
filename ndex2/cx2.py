@@ -1151,8 +1151,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         cx2network = CX2Network()
 
         for index, row in input_data.iterrows():
-            source = row.get('source')
-            target = row.get('target')
+            source = row.pop('source')
+            target = row.pop('target')
 
             if source is None or target is None:
                 raise NDExError("Missing 'source' or 'target' columns in the DataFrame")
@@ -1167,7 +1167,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                     source_attrs[col[7:]] = value
                 elif col.startswith('target_'):
                     target_attrs[col[7:]] = value
-                edge_attrs[col] = value
+                else:
+                    edge_attrs[col] = value
             if source not in cx2network.get_nodes():
                 cx2network.add_node(node_id=source, x=source_attrs.pop('x', None), y=source_attrs.pop('y', None),
                                     z=source_attrs.pop('z', None), attributes=source_attrs)

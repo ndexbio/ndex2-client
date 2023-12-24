@@ -64,14 +64,6 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         self.assertAlmostEqual(70.71067822788493, gpc_node['y'], 0.01)
 
         self.assertEqual(1, len(rt_cx2net.get_edges()))
-        # Todo round trip adds a bunch of extra stuff to the edge
-        #      reopened https://ndexbio.atlassian.net/browse/UD-2671
-        import json
-        print('\n\n\n\n\n\n\n')
-        print(json.dumps(orig_edge['v'], indent=2))
-        print('---------------------')
-        print(json.dumps(rt_cx2net.get_edges()[0]['v'], indent=2))
-        print('\n\n\n\n\n\n\n')
         self.assertEqual(orig_edge['v'], rt_cx2net.get_edges()[0]['v'])
 
 

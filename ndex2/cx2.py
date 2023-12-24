@@ -1,3 +1,4 @@
+import copy
 import json
 from copy import deepcopy
 
@@ -1208,6 +1209,8 @@ class CX2NetworkXFactory(object):
 
         if networkx_graph is None:
             networkx_graph = nx.MultiDiGraph()
+
+        cx2network = copy.deepcopy(cx2network)
 
         for node_id, node_data in cx2network.get_nodes().items():
             attrs = node_data.get('v', {})

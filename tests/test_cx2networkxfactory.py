@@ -80,19 +80,9 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         fac = NetworkXToCX2NetworkFactory()
         rt_cx2net = fac.get_cx2network(graph)
 
-
-        # Todo see why this is failing
-        #      Reopened https://ndexbio.atlassian.net/browse/UD-2652
         for node_name in ['721', '737', '747', '751', '753', '764']:
             rt_node = self.get_node_matching_name(cx2net=rt_cx2net, name=node_name)
             orig_node = self.get_node_matching_name(cx2net=self.cx2network, name=node_name)
-            import json
-            print('\nComparing original node with node roundtripped through networkx\n')
-            print(json.dumps(orig_node, indent=2))
-            print('------------------------\n')
-            print(json.dumps(rt_node, indent=2))
-            print(rt_node)
-            print('\n\n\n\n\n\n\n\n\n\n\n')
             self.assertEqual(rt_node['v'], orig_node['v'])
             self.assertAlmostEqual(rt_node['x'], orig_node['x'], 0.001)
             self.assertAlmostEqual(rt_node['y'], orig_node['y'], 0.001)

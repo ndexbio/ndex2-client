@@ -7,6 +7,28 @@ from ndex2.cx2 import NetworkXToCX2NetworkFactory
 
 class TestCX2NetworkXFactory(unittest.TestCase):
 
+    def get_networkx_major_version(self, networkx_version=nx.__version__):
+        """
+        Gets major version of networkx library
+
+        :param networkx_version: raw version of networkx library
+        :type networkx_version: str
+        :return: major version of networkx assuming it will be in format of
+                 MAJOR.MINOR or MAJOR.MINOR.PATCH...
+                 or 0 if there was a problem
+        :rtype: int
+        """
+        if networkx_version is None:
+            return 0
+        netx_ver_str = str(networkx_version)
+        period_pos = netx_ver_str.find('.')
+        if period_pos == -1:
+            return 0
+        try:
+            return int(netx_ver_str[0:period_pos])
+        except ValueError:
+            return 0
+
     def get_node_matching_name(self, cx2net=None, name=None):
         """
         Gets 1st node matching name
@@ -50,15 +72,24 @@ class TestCX2NetworkXFactory(unittest.TestCase):
     def test_graph_creation_without_existing_graph(self):
         graph = self.factory.get_graph(self.cx2network)
         self.assertIsInstance(graph, nx.MultiDiGraph)
-        self.assertEqual(len(graph.nodes), 6)
-        self.assertEqual(len(graph.edges), 6)
+
+        if (self.get_networkx_major_version()) == 1:
+            self.assertEqual(len(graph.nodes()), 6)
+            self.assertEqual(len(graph.edges()), 6)
+        else:
+            self.assertEqual(len(graph.nodes), 6)
+            self.assertEqual(len(graph.edges), 6)
 
     def test_graph_creation_with_existing_graph(self):
         existing_graph = nx.MultiDiGraph()
         graph = self.factory.get_graph(self.cx2network, existing_graph)
         self.assertIs(graph, existing_graph)
-        self.assertEqual(len(graph.nodes), 6)
-        self.assertEqual(len(graph.edges), 6)
+        if (self.get_networkx_major_version()) == 1:
+            self.assertEqual(len(graph.nodes()), 6)
+            self.assertEqual(len(graph.edges()), 6)
+        else:
+            self.assertEqual(len(graph.nodes), 6)
+            self.assertEqual(len(graph.edges), 6)
 
     def test_node_attributes(self):
         graph = self.factory.get_graph(self.cx2network)

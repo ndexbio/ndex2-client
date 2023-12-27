@@ -1235,7 +1235,7 @@ class CX2NetworkXFactory(object):
         return networkx_graph
 
 
-class PandasDataFrameFactory:
+class CX2NetworkPandasDataFrameFactory:
     """
     Factory class for converting a CX2Network object into a Pandas DataFrame.
 
@@ -1258,10 +1258,10 @@ class PandasDataFrameFactory:
         ``source_x, source_y, source_z, target_x, target_y, target_z``
 
         :param cx2network: The CX2Network object to be converted into a DataFrame.
-        :type cx2network: CX2Network
-        :return: A Pandas DataFrame representing the network data from CX2Network.
-        :rtype: pd.DataFrame
+        :type cx2network: :py:class:`~ndex2.cx2.CX2Network`
         :raises NDExError: If the input CX2Network is None or not an instance of CX2Network.
+        :return: A Pandas DataFrame representing the network data from CX2Network.
+        :rtype: :py:class:`pandas.DataFrame`
         """
         if cx2network is None:
             raise NDExError('input network is None')

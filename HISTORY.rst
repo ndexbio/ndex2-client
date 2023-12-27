@@ -2,6 +2,21 @@
 History
 =======
 
+3.7.0 (2023-12-27)
+-------------------
+
+* Enhancements
+    * Added ``CX2NetworkXFactory`` under ``cx2.py`` module to convert
+      ``CX2Network`` object to `NetworkX Graph <https://networkx.org>`__
+    * Added ``NetworkXToCX2NetworkFactory`` under ``cx2.py`` module to convert
+      `NetworkX Graph <https://networkx.org>`__ to ``CX2Network`` object
+    * Added ``PandasDataFrameToCX2NetworkFactory`` under ``cx2.py`` module to
+      convert `Pandas DataFrame <https://pandas.org>`__ to ``CX2Network`` object
+    * Added ``CX2NetworkPandasDataFrameFactory`` under ``cx2.py`` module to convert
+      ``CX2Network`` object to `Pandas DataFrame <https://pandas.org>`__
+
+
+
 3.6.0 (2023-11-14)
 -------------------
 

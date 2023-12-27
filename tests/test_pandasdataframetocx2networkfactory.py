@@ -3,7 +3,7 @@ import unittest
 import pandas as pd
 from ndex2.cx2 import RawCX2NetworkFactory
 from ndex2.cx2 import PandasDataFrameToCX2NetworkFactory
-from ndex2.cx2 import PandasDataFrameFactory
+from ndex2.cx2 import CX2NetworkPandasDataFrameFactory
 
 
 class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
@@ -43,7 +43,7 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         orig_mkd_node = self.get_node_matching_name(cx2network=cx2net, name='MDK')
         orig_gpc_node = self.get_node_matching_name(cx2network=cx2net, name='GPC2')
         orig_edge = cx2net.get_edges()[0]
-        pandafac = PandasDataFrameFactory()
+        pandafac = CX2NetworkPandasDataFrameFactory()
         df = pandafac.get_dataframe(cx2net)
 
         panda2cxfac = PandasDataFrameToCX2NetworkFactory()

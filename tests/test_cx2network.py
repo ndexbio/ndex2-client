@@ -6,7 +6,7 @@ import shutil
 
 import networkx as nx
 
-from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory, NetworkXToCX2NetworkFactory, PandasDataFrameFactory
+from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory, NetworkXToCX2NetworkFactory, CX2NetworkPandasDataFrameFactory
 from ndex2.exceptions import NDExAlreadyExists, NDExError, NDExInvalidCX2Error
 
 
@@ -450,7 +450,7 @@ class TestCX2Network(unittest.TestCase):
         network.add_node(node_id=1)
         network.add_node(node_id=2)
         network.add_edge(source=1, target=2, attributes={'edge_attr': 'a'})
-        factory = PandasDataFrameFactory()
+        factory = CX2NetworkPandasDataFrameFactory()
         df = factory.get_dataframe(network)
 
         self.assertEqual(len(df), 1)

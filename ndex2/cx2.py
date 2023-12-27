@@ -91,6 +91,23 @@ class CX2Network(object):
         - ``status``
             A dictionary representing the network's status.
 
+    **Create a two node network with one edge:**
+
+    .. code-block:: python
+
+        import json
+        from ndex2.cx2 import CX2Network
+
+        cx2_network = CX2Network()
+
+        node_one_id = cx2_network.add_node(attributes={'name': 'node 1', 'age': 5})
+        node_two_id = cx2_network.add_node(attributes={'name': 'node 2', 'age': 10})
+
+        cx2_network.add_edge(source=node_one_id, target=node_two_id, attributes={'weight': 0.3})
+
+        # using json.dumps to pretty print CX2
+        print(json.dumps(cx2_network.to_cx2(), indent=2))
+
     .. versionadded:: 3.6.0
     """
 
@@ -157,9 +174,41 @@ class CX2Network(object):
 
     def get_attribute_declarations(self):
         """
-        Retrieves the attribute declarations.
+        Retrieves the attribute declarations as a dict
+        in the following format:
 
-        :return: The attribute declarations.
+        .. code-block::
+
+            {
+             'nodes': {'<ATTR_NAME>': {'d': '<DATA TYPE OF ATTRIBUTE>'}},
+             'edges': {'<ATTR_NAME>': {'d': '<DATA TYPE OF ATTRIBUTE>'}},
+            }
+
+        .. note::
+
+            ``<DATA TYPE OF ATTRIBUTE>`` above must be one of the following types found
+            in :py:const:`~ndex2.constants.VALID_ATTRIBUTE_DATATYPES`
+
+        **Example:**
+
+        .. code-block::
+
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+
+            node_one_id = cx2_network.add_node(attributes={'name': 'node 1', 'age': 5})
+            node_two_id = cx2_network.add_node(attributes={'name': 'node 2', 'age': 10})
+
+            cx2_network.add_edge(source=node_one_id, target=node_two_id, attributes={'weight': 0.3})
+
+            print(cx2_network.get_attribute_declarations())
+
+            # Above would output:
+            # {'nodes': {'name': {'d': 'string'}, 'age': {'d': 'integer'}}, 'edges': {'weight': {'d': 'double'}}}
+
+        :return: The attribute declarations, if none are set an
+                 empty dict is returned
         :rtype: dict
         """
         return self._attribute_declarations
@@ -223,7 +272,43 @@ class CX2Network(object):
 
     def set_attribute_declarations(self, value):
         """
-        Sets the attribute declarations.
+        Sets the attribute declarations. This is useful to do in case where data type
+        might not easily be inferred for a given attribute or if an alias is desired
+        for one or more attributes in a large network to generate more compact
+        CX2
+
+        .. code-block::
+
+            {
+             'nodes': {'<ATTR_NAME>': {'d': '<DATA TYPE OF ATTRIBUTE>'}},
+             'edges': {'<ATTR_NAME>': {'d': '<DATA TYPE OF ATTRIBUTE>'}},
+            }
+
+        .. note::
+
+            ``<DATA TYPE OF ATTRIBUTE>`` above must be one of the following types found
+            in :py:const:`~ndex2.constants.VALID_ATTRIBUTE_DATATYPES`
+
+        **Example:**
+
+        .. code-block::
+
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+
+            # set the attribute declarations 1st with an alias
+            cx2_network.set_attribute_declarations({'nodes': {'name': {'a': 'n', 'd': 'string'},
+                                                              'age': {'a': 'a', 'd': 'integer'}},
+                                                              'edges': {'weight': {'d': 'double'}}})
+
+            # must use alias for name and age since it was set, cannot mix
+            node_one_id = cx2_network.add_node(attributes={'n': 'node 1', 'a': 5})
+            node_two_id = cx2_network.add_node(attributes={'n': 'node 2', 'a': 10})
+
+            cx2_network.add_edge(source=node_one_id, target=node_two_id, attributes={'weight': 0.3})
+
+
 
         :param value: The attribute declarations to set.
         :type value: dict
@@ -232,7 +317,36 @@ class CX2Network(object):
 
     def get_network_attributes(self):
         """
-        Retrieves the network attributes.
+        Retrieves the network attribute that will be in
+        the following format:
+
+        .. code-block::
+
+            {'<ATTR_NAME>': <ATTR_VAL>}
+
+        **Example:**
+
+        .. code-block:: python
+
+            import json
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+
+            cx2_network.set_network_attributes({'name': 'my network',
+                                                'description': 'description of my network',
+                                                'version': '1.0',
+                                                'type': 'fake network'})
+
+            print(cx2_network.get_network_attributes())
+
+        .. note::
+
+            There are three reserved attribute names:
+
+            * **name** - title of the network
+            * **description** - a brief description of the network
+            * **version** - version of the network
 
         :return: The network attributes.
         :rtype: dict
@@ -241,7 +355,38 @@ class CX2Network(object):
 
     def set_network_attributes(self, network_attrs):
         """
-        Sets the network attributes after processing them using declared types in attribute declarations.
+        Sets the network attributes after processing
+        them using declared types in attribute declarations.
+
+        **Expected format:**
+
+        .. code-block::
+
+            {'<ATTR_NAME>': <ATTR_VAL>}
+
+        **Example:**
+
+        .. code-block:: python
+
+            import json
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+
+            cx2_network.set_network_attributes({'name': 'my network',
+                                                'description': 'description of my network',
+                                                'version': '1.0',
+                                                'type': 'fake network'})
+
+            print(cx2_network.get_network_attributes())
+
+        .. note::
+
+            There are three reserved attribute names:
+
+            * **name** - title of the network
+            * **description** - a brief description of the network
+            * **version** - version of the network
 
         :param network_attrs: The network attributes to set.
         :type network_attrs: dict

@@ -1,17 +1,17 @@
 Converting CX2Network objects to other formats
-----------------------------------------------------------------
+==========================================================================
 
 Below are converters that facilitate conversion of
 :class:`~ndex2.cx2.CX2Network` object to other types
 (such as NetworkX_ or Pandas_)
 
 
-Creating a `NetworkX <https://networkx.org/>`__ Graph from a CX2Network
-==========================================================================
+Networkx
+-----------
 
-The :class:`~ndex2.cx2.CX2NetworkXFactory` is used for generating a :py:class:`networkx.Graph`
-from a :class:`~ndex2.cx2.CX2Network`. This is beneficial for leveraging
-NetworkX_ functionalities with CX2Network data.
+The :class:`~ndex2.cx2.CX2NetworkXFactory` is used for generating a
+:py:class:`networkx.Graph` from a :class:`~ndex2.cx2.CX2Network`. This is
+beneficial for leveraging NetworkX_ functionalities with CX2Network data.
 
 
 .. code-block:: python
@@ -30,12 +30,12 @@ NetworkX_ functionalities with CX2Network data.
 
     # networkx_graph is now a NetworkX graph populated with data from cx2_network
 
-Creating a Pandas DataFrame from a CX2Network
-===============================================================================
+Pandas
+--------
 
-Utilize the py:class:`~ndex2.cx2.PandasDataFrameFactory` to convert a :class:`~ndex2.cx2.CX2Network`
-into a Pandas_ :py:class:`pandas.DataFrame`. This allows for
-analysis and manipulation of network data using Pandas_.
+Utilize the py:class:`~ndex2.cx2.PandasDataFrameFactory` to convert a
+:class:`~ndex2.cx2.CX2Network` into a Pandas_ :py:class:`pandas.DataFrame`.
+This allows for analysis and manipulation of network data using Pandas_.
 
 
 .. code-block:: python

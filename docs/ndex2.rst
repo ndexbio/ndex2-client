@@ -1,18 +1,19 @@
 NiceCXNetwork
 -------------
 
-The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working with NDEx networks
-that are stored in `CX format <https://home.ndexbio.org/data-model>`__
+The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working
+with NDEx_ networks that are stored in `CX format <https://home.ndexbio.org/data-model>`__
 
 .. note::
 
-    The term **niceCX** is `CX <https://home.ndexbio.org/data-model>`__ with no duplicate aspects.
+    The term **niceCX** is `CX <https://home.ndexbio.org/data-model>`__ with no duplicate
+    aspects.
 
 Methods are provided to add nodes, edges, node attributes, edge attributes, etc.
-Once a :class:`~ndex2.nice_cx_network.NiceCXNetwork` object is populated it can be saved to the `NDEx <https://ndexbio.org>`__ server
-by calling either :func:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to()` to create a new network or
-:func:`~ndex2.nice_cx_network.NiceCXNetwork.update_to()` to
-update an existing network.
+Once a :class:`~ndex2.nice_cx_network.NiceCXNetwork` object is populated it can be
+saved to the `NDEx <https://ndexbio.org>`__ server by calling either
+:func:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to()` to create a new network or
+:func:`~ndex2.nice_cx_network.NiceCXNetwork.update_to()` to update an existing network.
 
 Methods
 ===========================
@@ -74,4 +75,4 @@ are supported in methods that accept **type**
 
 These constants are defined here: :py:const:`~ndex2.constants.VALID_ATTRIBUTE_DATATYPES`
 
-
+.. _NDEx: https://www.ndexbio.org

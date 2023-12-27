@@ -3,22 +3,35 @@ Reference
 
 The NDEx2 Python Client can be broken into three parts:
 
-#. :py:class:`~ndex2.nice_cx_network.NiceCXNetwork` provides a data model for working with `NDEx <https://ndexbio.org>`__ networks stored in `CX format <https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)>`__
+#. :py:class:`~ndex2.nice_cx_network.NiceCXNetwork` provides a data model for
+   working networks in `CX format`_
 
-#. :py:class:`~ndex2.cx2.CX2Network` provides a data model for working with `NDEx <https://ndexbio.org>`__ networks stored in `CX2 format <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__
+#. :py:class:`~ndex2.cx2.CX2Network` provides a data model for working with
+   networks in `CX2 format`_
 
-#. :py:class:`~ndex2.client.Ndex2` REST client provides provides methods to interact with `NDEx REST Service <https://home.ndexbio.org/using-the-ndex-server-api/>`__
+#. :py:class:`~ndex2.client.Ndex2` REST client provides provides methods to
+   interact with `NDEx`_ via the `NDEx REST Service`_
 
+.. note::
+
+   :py:class:`~ndex2.cx2.CX2Network` is the preferred data model and
+   all networks on NDEx_ can be retrieved in newer `CX2 format`_ via
+   the `NDEx REST Service`_
 
 .. toctree::
    :maxdepth: 2
 
    cx2
    createcx2
-   cxtocx2
    convertcx2
    ndex2
    createnicecx
    convertnicecx
    ndex2client
    miscref
+
+.. _NDEx: http://www.ndexbio.org
+.. _`CX format`: https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)
+.. _`CX2 format`: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _`NDEx REST Service`: https://home.ndexbio.org/using-the-ndex-server-api
+

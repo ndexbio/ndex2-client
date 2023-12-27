@@ -1,13 +1,14 @@
-Creating a CX2Network objects
-------------------------------
-
-Below are factories that facilitate creation of CX2Network objects in different ways:
-from raw CX2 data, `NetworkX <https://networkx.org/>`__ graphs, and `Pandas <https://pandas.pydata.org>`__ dataframes.
-
-Creating a CX2Network from Raw CX2 Data
+Creating CX2Network objects
 ==========================================
 
-The ``RawCX2NetworkFactory`` is designed to create a ``CX2Network`` instance directly from raw CX2 data.
+Below are factories that facilitate creation of :py:class:`~ndex2.cx2.CX2Network`
+objects in different ways:
+
+Raw CX2
+---------
+
+The :py:class:`~ndex2.cx2.RawCX2NetworkFactory` is designed to create a
+:py:class:`~ndex2.cx2.CX2Network` instance directly from raw `CX2 data`_.
 
 
 .. code-block:: python
@@ -25,13 +26,13 @@ The ``RawCX2NetworkFactory`` is designed to create a ``CX2Network`` instance dir
 
     # cx2_network is now a populated CX2Network instance
 
-Creating a CX2Network from a NetworkX Graph
-===============================================
+NetworkX
+----------
 
-The ``NetworkXToCX2NetworkFactory`` is designed to convert a NetworkX graph into a ``CX2Network``. This conversion is suitable for transferring network data from NetworkX to the CX2 format.
+The :py:class:`~ndex2.cx2.NetworkXToCX2NetworkFactory` is designed to convert a
+NetworkX_ graph into a :py:class:`~ndex2.cx2.CX2Network`.
+This conversion is suitable for transferring network data from NetworkX_ to the CX2_ format.
 
-Example Usage
-~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -52,10 +53,13 @@ Example Usage
 
 
 
-Creating a CX2Network from a Pandas DataFrame
-===============================================
+Pandas
+-------
 
-The ``PandasDataFrameToCX2NetworkFactory`` enables the conversion of a Pandas DataFrame into a ``CX2Network``. This is useful for integrating DataFrame data into the CX2 network structure.
+The :py:class:`~ndex2.cx2.PandasDataFrameToCX2NetworkFactory` enables the conversion
+of a :py:class:`pandas.DataFrame` into a :py:class:`~ndex2.cx2.CX2Network`.
+This is useful for integrating :py:class:`pandas.DataFrame` data into the CX2_ network
+structure.
 
 
 .. code-block:: python
@@ -83,3 +87,7 @@ Column Naming Convention
   - ``source_`` prefix for attributes of the source node (e.g., ``source_color``).
   - ``target_`` prefix for attributes of the target node (e.g., ``target_size``).
 - Edge attributes are directly named after the attribute (e.g., ``weight`` for an edge's weight attribute).
+
+.. _CX2 data: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _CX2: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _NetworkX: https://networkx.org

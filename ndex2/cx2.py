@@ -269,7 +269,7 @@ class CX2Network(object):
         """
         Retrieves the network name.
 
-        :return: Network name
+        :return: Network name or ``None`` if not set
         :rtype: str
         """
         return self.get_network_attributes().get('name', None)

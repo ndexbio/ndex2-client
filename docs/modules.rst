@@ -14,9 +14,9 @@ The NDEx2 Python Client can be broken into three parts:
 
 .. note::
 
-   :py:class:`~ndex2.cx2.CX2Network` is the preferred data model and
-   all networks on NDEx_ can be retrieved in newer `CX2 format`_ via
-   the `NDEx REST Service`_
+   All networks on NDEx_ can be retrieved in newer `CX2 format`_ via
+   the `NDEx REST Service`_ and loaded via newer preferred data model
+   :py:class:`~ndex2.cx2.CX2Network`
 
 .. toctree::
    :maxdepth: 2

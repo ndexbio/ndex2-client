@@ -30,7 +30,7 @@ NetworkX_ functionalities with CX2Network data.
 
     # networkx_graph is now a NetworkX graph populated with data from cx2_network
 
-Creating a Pandas_ :py:class:`pandas.DataFrame` from a CX2Network
+Creating a Pandas DataFrame from a CX2Network
 ===============================================================================
 
 Utilize the py:class:`~ndex2.cx2.PandasDataFrameFactory` to convert a :class:`~ndex2.cx2.CX2Network`

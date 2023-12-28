@@ -413,12 +413,12 @@ class CX2Network(object):
 
         :param key:
         :type key: str
-        :raises NDExError: If ``None`` is passed in as **key**
-        :raises NDExNotFoundError: If **key** is not found in network
+        :raises NDExNotFoundError: If ``None`` is passed in as **key** or
+                                   if **key** is not found in network
                                    attributes
         """
         if key is None:
-            raise NDExError('None is an invalid key')
+            raise NDExNotFoundError('None is an invalid key')
         if key not in self._network_attributes:
             raise NDExNotFoundError(f"Network attribute '{key}' does not exist.")
 
@@ -491,7 +491,13 @@ class CX2Network(object):
 
         :param node_id: ID of the node to remove.
         :type node_id: int or str
+        :raises NDExNotFoundError: If ``None`` is passed in as
+                                   **node_id** or if **node_id**
+                                   is not found
         """
+        if node_id is None:
+            raise NDExNotFoundError('None is an invalid node id.')
+
         if node_id not in self._nodes:
             raise NDExNotFoundError(f"Node {node_id} does not exist.")
 
@@ -589,7 +595,12 @@ class CX2Network(object):
 
         :param edge_id: ID of the edge to remove.
         :type edge_id: int or str
+        :raises NDExNotFoundError: If **edge_id** is ``None`` or not
+                                   found
         """
+        if edge_id is None:
+            raise NDExNotFoundError('None is an invalid edge id.')
+
         if edge_id not in self._edges:
             raise NDExNotFoundError(f"Edge {edge_id} does not exist.")
 

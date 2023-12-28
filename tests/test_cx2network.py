@@ -223,6 +223,22 @@ class TestCX2Network(unittest.TestCase):
         self.assertEqual(self.cx2_obj.get_node(0), {"id": 0, "v": {}, "x": None, "y": None, "z": None})
         self.assertEqual(self.cx2_obj.get_node(1), {"id": 1, "v": {}, "x": None, "y": None, "z": None})
 
+    def test_remove_node_not_found(self):
+        try:
+            net = CX2Network()
+            net.remove_node(1)
+            self.fail('Expected Exception')
+        except NDExNotFoundError as ne:
+            self.assertEqual('Node 1 does not exist.', str(ne))
+
+    def test_remove_node_none_passed_in(self):
+        try:
+            net = CX2Network()
+            net.remove_node(None)
+            self.fail('Expected Exception')
+        except NDExNotFoundError as ne:
+            self.assertEqual('None is an invalid node id.', str(ne))
+
     def test_remove_node(self):
         self.cx2_obj.add_node(1, attributes={"name": "Node1"}, x=10, y=20, z=30)
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})
@@ -282,6 +298,22 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.add_edge(source=2, target=3)
         self.assertEqual(self.cx2_obj.get_edge(0), {"id": 0, "s": 1, "t": 2, "v": {}})
         self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 2, "t": 3, "v": {}})
+
+    def test_remove_edge_none_passed_in(self):
+        try:
+            net = CX2Network()
+            net.remove_edge(None)
+            self.fail('Expected Exception')
+        except NDExNotFoundError as ne:
+            self.assertEqual('None is an invalid edge id.', str(ne))
+
+    def test_remove_edge_not_found(self):
+        try:
+            net = CX2Network()
+            net.remove_edge(1)
+            self.fail('Expected Exception')
+        except NDExNotFoundError as ne:
+            self.assertEqual('Edge 1 does not exist.', str(ne))
 
     def test_remove_edge(self):
         self.cx2_obj.add_edge(1, 1, 2, attributes={"interaction": "link"})
@@ -474,7 +506,7 @@ class TestCX2Network(unittest.TestCase):
             network = CX2Network()
             network.remove_network_attribute(None)
             self.fail('Expected Exception')
-        except NDExError as ne:
+        except NDExNotFoundError as ne:
             self.assertEqual('None is an invalid key', str(ne))
 
     def test_remove_network_attribute_not_found(self):

@@ -19,6 +19,20 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         self.assertIn(2, network.get_nodes())
         self.assertIn(3, network.get_nodes())
 
+    def test_conversion_to_cx2network_with_edge_and_node_attributes(self):
+        data = {'source': [1, 2], 'target': [2, 3],
+                'weight': [1.0, 0.9],
+                'source_size': [5, 6], 'target_size': [6, 7]}
+        df = pd.DataFrame(data)
+
+        # Creating an instance of PandasDataFrameToCX2NetworkFactory
+        factory = PandasDataFrameToCX2NetworkFactory()
+
+        # Converting DataFrame to CX2Network
+        cx2_network = factory.get_cx2network(df)
+        self.assertTrue(3, len(cx2_network.get_nodes()))
+        self.assertTrue(2, len(cx2_network.get_edges()))
+
     def get_node_matching_name(self, cx2network=None, name=None):
         """
         Gets 1st node matching name

@@ -12,6 +12,9 @@ Miscellaneous
 .. autoclass:: ndex2.util.PandasDataConverter
     :members: convert_value
 
+.. autoclass:: ndex2.client.DecimalEncoder
+    :members: default
+
 Exceptions
 ----------
 

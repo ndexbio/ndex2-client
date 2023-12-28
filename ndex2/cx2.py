@@ -1296,8 +1296,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         cx2network = CX2Network()
 
         for index, row in input_data.iterrows():
-            source = row.pop('source')
-            target = row.pop('target')
+            source = int(row.pop('source'))
+            target = int(row.pop('target'))
 
             if source is None or target is None:
                 raise NDExError("Missing 'source' or 'target' columns in the DataFrame")

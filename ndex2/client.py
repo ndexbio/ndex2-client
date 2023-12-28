@@ -2135,7 +2135,29 @@ class Ndex2(object):
 
 
 class DecimalEncoder(json.JSONEncoder):
+    """
+    Custom :py:class:`json.JSONEncoder` that handles
+    :py:class:`numpy.integer`, :py:class:`decimal.Decimal`, and
+    :py:class:`bytes` that can appear in CX data
+    """
+
+    def __init__(self):
+        """
+        Constructor
+        """
+        super(json.JSONEncoder, self).__init__()
+
     def default(self, o):
+        """
+        Converts :py:class:`numpy.integer` to :py:class:`int`,
+        :py:class:`decimal.Decimal` to :py:class:`float`, and
+        :py:class:`bytes` to ascii decoded :py:class:`str` and
+        defaults to :py:meth:`json.JSONEncoder` for all other
+        object types for **o**
+
+        :param o: object to convert
+        :return: converted object **o**
+        """
         if isinstance(o, decimal.Decimal):
             return float(o)
         elif isinstance(o, numpy.integer):

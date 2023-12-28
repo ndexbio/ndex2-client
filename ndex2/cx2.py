@@ -1406,7 +1406,7 @@ class CX2NetworkXFactory(object):
         return networkx_graph
 
 
-class CX2NetworkPandasDataFrameFactory:
+class CX2NetworkPandasDataFrameFactory(object):
     """
     Factory class for converting a CX2Network object into a Pandas DataFrame.
 

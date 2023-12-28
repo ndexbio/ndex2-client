@@ -2141,15 +2141,10 @@ class DecimalEncoder(json.JSONEncoder):
     :py:class:`bytes` that can appear in CX data
     """
 
-    def __init__(self):
-        """
-        Constructor
-        """
-        super(json.JSONEncoder, self).__init__()
-
     def default(self, o):
         """
-        Converts :py:class:`numpy.integer` to :py:class:`int`,
+        Overrides default behavior by
+        converting :py:class:`numpy.integer` to :py:class:`int`,
         :py:class:`decimal.Decimal` to :py:class:`float`, and
         :py:class:`bytes` to ascii decoded :py:class:`str` and
         defaults to :py:meth:`json.JSONEncoder` for all other

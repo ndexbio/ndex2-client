@@ -6,8 +6,11 @@ import shutil
 
 import networkx as nx
 
-from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory, NetworkXToCX2NetworkFactory, CX2NetworkPandasDataFrameFactory
-from ndex2.exceptions import NDExAlreadyExists, NDExError, NDExInvalidCX2Error
+from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory
+from ndex2.cx2 import NetworkXToCX2NetworkFactory
+from ndex2.cx2 import CX2NetworkPandasDataFrameFactory
+from ndex2.exceptions import NDExAlreadyExists, NDExError
+from ndex2.exceptions import NDExInvalidCX2Error, NDExNotFoundError
 
 
 class TestCX2Network(unittest.TestCase):
@@ -291,6 +294,14 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.update_edge(1, attributes={"i": "updated_link"})
         self.assertEqual(self.cx2_obj.get_edge(1), {"id": 1, "s": 1, "t": 2, "v": {"interaction": "updated_link"}})
 
+    def test_set_network_attributes_none_passed(self):
+        net = CX2Network()
+        try:
+            net.set_network_attributes(None)
+            self.fail('Expected Exception')
+        except NDExError as ne:
+            self.assertEqual('network_attrs is None', str(ne))
+
     def test_add_network_attribute(self):
         net = CX2Network()
         net.add_node(0, attributes={'name': 'node0'})
@@ -457,6 +468,22 @@ class TestCX2Network(unittest.TestCase):
         self.assertTrue((df['source'] == 1).any())
         self.assertTrue((df['target'] == 2).any())
         self.assertTrue((df['edge_attr'] == 'a').any())
+
+    def test_remove_network_attribute_passing_none(self):
+        try:
+            network = CX2Network()
+            network.remove_network_attribute(None)
+            self.fail('Expected Exception')
+        except NDExError as ne:
+            self.assertEqual('None is an invalid key', str(ne))
+
+    def test_remove_network_attribute_not_found(self):
+        try:
+            network = CX2Network()
+            network.remove_network_attribute('foo')
+            self.fail('Expected Exception')
+        except NDExNotFoundError as ne:
+            self.assertEqual('Network attribute \'foo\' does not exist.', str(ne))
 
 
 if __name__ == '__main__':

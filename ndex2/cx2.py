@@ -390,7 +390,10 @@ class CX2Network(object):
 
         :param network_attrs: The network attributes to set.
         :type network_attrs: dict
+        :raises NDExError: If **network_attrs** is ``None``
         """
+        if network_attrs is None:
+            raise NDExError('network_attrs is None')
         processed_network_attrs = {}
         for key, value in network_attrs.items():
             declared_type = self.get_declared_type('networkAttributes', key)
@@ -405,6 +408,17 @@ class CX2Network(object):
         self._generate_attribute_declarations_for_aspect('networkAttributes', {key: converted_value}, {})
 
     def remove_network_attribute(self, key):
+        """
+        Removes network attribute matching **key** passed in
+
+        :param key:
+        :type key: str
+        :raises NDExError: If ``None`` is passed in as **key**
+        :raises NDExNotFoundError: If **key** is not found in network
+                                   attributes
+        """
+        if key is None:
+            raise NDExError('None is an invalid key')
         if key not in self._network_attributes:
             raise NDExNotFoundError(f"Network attribute '{key}' does not exist.")
 
@@ -472,7 +486,8 @@ class CX2Network(object):
 
     def remove_node(self, node_id):
         """
-        Removes a node and checks for dangling edges (edges without both source and target).
+        Removes a node and checks for dangling edges
+        (edges without both source and target).
 
         :param node_id: ID of the node to remove.
         :type node_id: int or str

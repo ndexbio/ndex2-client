@@ -39,9 +39,13 @@ This conversion is suitable for transferring network data from NetworkX_ to the 
     import networkx as nx
     from ndex2.cx2 import NetworkXToCX2NetworkFactory, CX2Network
 
-    # Sample NetworkX graph
-    networkx_graph = nx.Graph()
     # Add nodes and edges to networkx_graph...
+    networkx_graph = nx.Graph()
+    networkx_graph.add_node(1, size=5)
+    networkx_graph.add_node(2, size=6)
+    networkx_graph.add_node(3, size=7)
+    networkx_graph.add_edge(1, 2) weight=1.0)
+    networkx_graph.add_edge(2, 3, weight=0.9)
 
     # Creating an instance of NetworkXToCX2NetworkFactory
     factory = NetworkXToCX2NetworkFactory()
@@ -50,7 +54,7 @@ This conversion is suitable for transferring network data from NetworkX_ to the 
     cx2_network = factory.get_cx2network(networkx_graph)
 
     # cx2_network is now a CX2Network instance representing the NetworkX graph
-
+    print(cx2_network.to_cx2())
 
 
 Pandas
@@ -67,8 +71,10 @@ structure.
     import pandas as pd
     from ndex2.cx2 import PandasDataFrameToCX2NetworkFactory, CX2Network
 
-    # Sample Pandas DataFrame
-    data = {'source': [...], 'target': [...], ...}  # DataFrame with source, target, and other columns
+    # DataFrame with source, target, and other columns
+    data = {'source': [1, 2], 'target': [2, 3],
+            'weight': [1.0, 0.9],
+            'source_size': [5, 6], 'target_size': [6, 7]}
     df = pd.DataFrame(data)
 
     # Creating an instance of PandasDataFrameToCX2NetworkFactory
@@ -78,6 +84,7 @@ structure.
     cx2_network = factory.get_cx2network(df)
 
     # cx2_network is now a CX2Network instance based on the DataFrame data
+    print(cx2_network.to_cx2())
 
 Column Naming Convention
 ~~~~~~~~~~~~~~~~~~~~~~~~

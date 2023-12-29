@@ -1,6 +1,12 @@
 Converting NiceCXNetwork objects to other formats
 ==================================================
 
+.. note::
+
+    Using the newer data model :py:class:`~ndex2.cx2.CX2Network`
+    is encouraged since all networks on NDEx_ can be retrieved in newer `CX2 format`_ via
+    the `NDEx REST Service`_
+
 Below are converters that facilitate conversion of
 :class:`~ndex2.nice_cx_network.NiceCXNetwork` object to other types
 
@@ -84,3 +90,7 @@ Why Convert to CX2Network?
 .. _Networkx: https://networkx.org
 .. _`HCX format`: https://cytoscape.org/cx/cx2/hcx-specification
 .. _Pandas: https://pandas.pydata.org
+.. _NDEx: https://www.ndexbio.org
+.. _`CX format`: https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)
+.. _`CX2 format`: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _`NDEx REST Service`: https://home.ndexbio.org/using-the-ndex-server-api

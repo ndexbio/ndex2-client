@@ -1,19 +1,22 @@
 NiceCXNetwork
 -------------
 
-The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working
-with NDEx_ networks that are stored in `CX format <https://home.ndexbio.org/data-model>`__
-
 .. note::
 
-    The term **niceCX** is `CX <https://home.ndexbio.org/data-model>`__ with no duplicate
-    aspects.
+    Using the newer data model :py:class:`~ndex2.cx2.CX2Network`
+    is encouraged since all networks on NDEx_ can be retrieved in newer `CX2 format`_ via
+    the `NDEx REST Service`_
+
+The :class:`~ndex2.nice_cx_network.NiceCXNetwork` class provides a data model for working
+with NDEx_ networks that are stored in the legacy `CX format`_
+
+The term **niceCX** is CX_ with no duplicate aspects.
 
 Methods are provided to add nodes, edges, node attributes, edge attributes, etc.
 Once a :class:`~ndex2.nice_cx_network.NiceCXNetwork` object is populated it can be
-saved to the `NDEx <https://ndexbio.org>`__ server by calling either
-:func:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to()` to create a new network or
-:func:`~ndex2.nice_cx_network.NiceCXNetwork.update_to()` to update an existing network.
+saved to the NDEx_ server by calling either
+:py:meth:`~ndex2.nice_cx_network.NiceCXNetwork.upload_to` to create a new network or
+:py:meth:`~ndex2.nice_cx_network.NiceCXNetwork.update_to` to update an existing network.
 
 Methods
 ===========================
@@ -46,7 +49,6 @@ Miscellaneous methods
     :members: apply_template, apply_style_from_network, print_summary, to_cx, to_cx_stream, to_networkx, to_pandas_dataframe, update_to, upload_to
     :noindex:
 
-
 Supported data types
 =====================
 
@@ -76,3 +78,7 @@ are supported in methods that accept **type**
 These constants are defined here: :py:const:`~ndex2.constants.VALID_ATTRIBUTE_DATATYPES`
 
 .. _NDEx: https://www.ndexbio.org
+.. _`CX format`: https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)
+.. _CX: https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)
+.. _`CX2 format`: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _`NDEx REST Service`: https://home.ndexbio.org/using-the-ndex-server-api

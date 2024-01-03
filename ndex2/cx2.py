@@ -20,6 +20,7 @@ def convert_value(dtype, value):
     :type dtype: str
     :param value: Value to be converted.
     :type value: any
+    :raises NDExInvalidCX2Error: For invalid data
     """
     if dtype not in constants.VALID_ATTRIBUTE_DATATYPES:
         raise NDExInvalidCX2Error(f'Data type {dtype} is invalid in CX2 format')
@@ -222,7 +223,7 @@ class CX2Network(object):
         :type value: int, float, bool, list, or any other supported type.
         :return: The custom `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ type of the value.
         :rtype: str
-        :raises ValueError: If the value is of an unsupported type.
+        :raises NDExError: If the value is of an unsupported type.
         """
         if isinstance(value, bool):
             return constants.BOOLEAN_DATATYPE

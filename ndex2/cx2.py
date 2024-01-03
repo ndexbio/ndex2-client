@@ -240,7 +240,7 @@ class CX2Network(object):
                 inner_type = self._get_cx2_type(value[0])
                 return f"list_of_{inner_type}"
         else:
-            raise ValueError(f"Unsupported value type: {type(value)}")
+            raise NDExError(f"Unsupported value type: {type(value)}")
 
     def _generate_attribute_declarations_for_aspect(self, aspect, attributes, aliases):
         """

@@ -95,6 +95,10 @@ Column Naming Convention
   - ``target_`` prefix for attributes of the target node (e.g., ``target_size``).
 - Edge attributes are directly named after the attribute (e.g., ``weight`` for an edge's weight attribute).
 
+NiceCXNetwork
+--------------
+See `Convert NiceCXNetwork to CX2Netowrk <convertnicecx.html#cx2net>`_
+
 .. _CX2 data: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
 .. _CX2: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
 .. _NetworkX: https://networkx.org

@@ -220,6 +220,51 @@ of node names to node ids. The network downloaded below is
     # Print out dictionary
     print(str(node_name_dict))
 
+Convert NiceCXNetowrk to CX2Network
+-------------------------------------
+The :py:class:`~ndex2.cx2.NoStyleCXToCX2NetworkFactory` class provides a straightforward
+way to convert an existing :py:class:`~ndex2.nice_cx_network.NiceCXNetwork` object into a
+:py:class:`~ndex2.cx2.CX2Network`. It omits the style of the original network.
+
+.. code-block:: python
+
+    from ndex2.nice_cx_network import NiceCXNetwork
+    from ndex2.cx2 import NoStyleCXToCX2NetworkFactory
+
+    # Create a NiceCXNetwork object
+    nice_cx_network = NiceCXNetwork()
+
+    # Your code to populate nice_cx_network...
+
+    # Creating an instance of NoStyleCXToCX2NetworkFactory
+    factory = NoStyleCXToCX2NetworkFactory()
+
+    # Converting NiceCXNetwork to CX2Network without style
+    cx2_network = factory.get_cx2network(nice_cx_network)
+
+    # The resulting cx2_network is now a CX2Network object ready for further use
+
+.. note::
+    The conversion preserves the network's data, data attributes and structure.
+
+.. warning::
+    Be aware that the visual style from the :py:class:`~ndex2.nice_cx_network.NiceCXNetwork`
+    will not be preserved in the :py:class:`~ndex2.cx2.CX2Network`. This includes any
+    node or edge styles, layouts, or color schemes.
+
+Why Convert to CX2Network?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Performance**: Efficient conversion to CX2_ format for improved performance in data processing.
+- **Compatibility**: Ensures compatibility with tools and libraries designed for CX2_ format.
+                     It allows to generate hierarchy in `HCX format`_ which is compatible
+                     with Cytoscape_ Web.
+- **New Features**: Leverage new features and functionalities available in the CX2_ format.
+
+.. note::
+    `CX version 2`_ is commonly referred to as CX2_. In the Cytoscape_ ecosystem, CX2_ files
+    typically carry the ``.cx2`` file extension. This distinguishes them from `CX version 1`_
+    networks, which usually use the ``.cx`` suffix.
 
 More Tutorials and Examples
 -------------------------------------------------
@@ -237,3 +282,15 @@ For information on installing and using Jupyter Notebooks, go to
 `jupyter.org <https://jupyter.org/>`__
 
 * `Click here <https://github.com/ndexcontent/ndexncipidloader>`__ for example code to load content into `NDEx`_
+.. _CX2: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _`CX version 2`: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _`CX version 1`: https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)
+.. _CX: https://cytoscape.org/cx
+.. _Cytoscape: https://cytoscape.org
+.. _Networkx: https://networkx.org
+.. _`HCX format`: https://cytoscape.org/cx/cx2/hcx-specification
+.. _Pandas: https://pandas.pydata.org
+.. _NDEx: https://www.ndexbio.org
+.. _`CX format`: https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)
+.. _`CX2 format`: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+.. _`NDEx REST Service`: https://home.ndexbio.org/using-the-ndex-server-api

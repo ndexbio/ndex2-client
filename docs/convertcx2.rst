@@ -73,7 +73,7 @@ edgelist table. This allows for analysis and manipulation of network data using 
     print(df)
 
 .. note::
-    At a minimum there will be two columns ``source`` and ``target`` which contain
+    At a minimum there will be two columns ``source_id`` and ``target_id`` which contain
     the internal ids of the source and target nodes for a given edge.
     Node attributes will be put into columns with their attribute names prefixed with
     ``source_`` and ``target_``

@@ -9,7 +9,7 @@ from ndex2.cx2 import CX2NetworkPandasDataFrameFactory
 class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
 
     def test_conversion_to_cx2network(self):
-        data = {'source': [1, 2], 'target': [2, 3], 'edge_attr': ['a', 'b']}
+        data = {'source_id': [1, 2], 'target_id': [2, 3], 'edge_attr': ['a', 'b']}
         df = pd.DataFrame(data)
         factory = PandasDataFrameToCX2NetworkFactory()
         network = factory.get_cx2network(df)
@@ -19,8 +19,19 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         self.assertIn(2, network.get_nodes())
         self.assertIn(3, network.get_nodes())
 
+    def test_conversion_to_cx2network_only_names(self):
+        data = {'source': ['ABC', 'XYZ'], 'target': ['XYZ', 'QWE'], 'edge_attr': ['a', 'b']}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        network = factory.get_cx2network(df, source_field='source', target_field='target')
+
+        self.assertEqual(len(network.get_edges()), 2)
+        self.assertIn(0, network.get_nodes())
+        self.assertIn(1, network.get_nodes())
+        self.assertIn(2, network.get_nodes())
+
     def test_conversion_to_cx2network_with_edge_and_node_attributes(self):
-        data = {'source': [1, 2], 'target': [2, 3],
+        data = {'source_id': [1, 2], 'target_id': [2, 3],
                 'weight': [1.0, 0.9],
                 'source_size': [5, 6], 'target_size': [6, 7]}
         df = pd.DataFrame(data)

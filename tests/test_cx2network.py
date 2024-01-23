@@ -497,8 +497,8 @@ class TestCX2Network(unittest.TestCase):
         df = factory.get_dataframe(network)
 
         self.assertEqual(len(df), 1)
-        self.assertTrue((df['source'] == 1).any())
-        self.assertTrue((df['target'] == 2).any())
+        self.assertTrue((df['source_id'] == 1).any())
+        self.assertTrue((df['target_id'] == 2).any())
         self.assertTrue((df['edge_attr'] == 'a').any())
 
     def test_remove_network_attribute_passing_none(self):

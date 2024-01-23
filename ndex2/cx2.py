@@ -485,6 +485,20 @@ class CX2Network(object):
         """
         return self._nodes.get(node_id, None)
 
+    def lookup_node_id_by_name(self, name):
+        """
+        Retrieves a node based on its name.
+
+        :param name: Name of the node to retrieve.
+        :type name: str
+        :return: Node with the given name or None if not found.
+        :rtype: dict or None
+        """
+        for node_id, node in self._nodes.items():
+            if node.get(constants.ASPECT_VALUES, {}).get("name") == name:
+                return node.get('id', None)
+        return None
+
     def remove_node(self, node_id):
         """
         Removes a node and checks for dangling edges
@@ -1296,13 +1310,16 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
 
     .. versionadded:: 3.7.0
     """
+
     def __init__(self):
         """
         Constructor
         """
         super(PandasDataFrameToCX2NetworkFactory, self).__init__()
 
-    def get_cx2network(self, input_data=None) -> CX2Network:
+    def get_cx2network(self, input_data=None, source_field='source_name', target_field='target_name',
+                       source_id='source_id', target_id='target_id', source_node_attr=None, target_node_attr=None,
+                       edge_interaction='interacts-with') -> CX2Network:
         """
         Converts a given Pandas DataFrame into a CX2Network object. The DataFrame should
         contain columns 'source' and 'target' to represent source node and target node of edge
@@ -1310,6 +1327,20 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
 
         :param input_data: The Pandas DataFrame to be converted into CX2Network.
         :type input_data: pd.DataFrame
+        :param source_field
+        :type source_field
+        :param target_field
+        :type target_field
+        :param source_id
+        :type source_id
+        :param target_id
+        :type target_id
+        :param source_node_attr
+        :type source_node_attr
+        :param target_node_attr
+        :type target_node_attr
+        :param edge_interaction
+        :type edge_interaction
         :return: A CX2Network object :py:class:`~ndex2.cx2.CX2Network`
         :rtype: CX2Network
         :raises NDExError: If the input DataFrame is None or does not have the necessary columns.
@@ -1323,10 +1354,13 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         cx2network = CX2Network()
 
         for index, row in input_data.iterrows():
-            source = int(row.pop('source'))
-            target = int(row.pop('target'))
+            source_id_value = int(row.pop(source_id)) if source_id in row else None
+            target_id_value = int(row.pop(target_id)) if target_id in row else None
+            source = row.pop(source_field) if source_field in row else None
+            target = row.pop(target_field) if target_field in row else None
 
-            if source is None or target is None:
+            if (source_id_value is None and target_id_value is None and source is None and target is None) or \
+                    ((source_id_value is None or target_id_value is None) and (source is None or target is None)):
                 raise NDExError("Missing 'source' or 'target' columns in the DataFrame")
 
             source_attrs = {}
@@ -1341,13 +1375,24 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                     target_attrs[col[7:]] = value
                 else:
                     edge_attrs[col] = value
-            if source not in cx2network.get_nodes():
-                cx2network.add_node(node_id=source, x=source_attrs.pop('x', None), y=source_attrs.pop('y', None),
-                                    z=source_attrs.pop('z', None), attributes=source_attrs)
-            if target not in cx2network.get_nodes():
-                cx2network.add_node(node_id=target, x=target_attrs.pop('x', None), y=target_attrs.pop('y', None),
-                                    z=target_attrs.pop('z', None), attributes=target_attrs)
-            cx2network.add_edge(source=source, target=target, attributes=edge_attrs)
+
+            source_node_id = source_id_value if source_id_value is not None else (
+                cx2network.lookup_node_id_by_name(source))
+            if source_node_id not in cx2network.get_nodes():
+                source_attrs['name'] = source
+                source_node_id = cx2network.add_node(node_id=source_id_value, x=source_attrs.pop('x', None),
+                                                     y=source_attrs.pop('y', None),
+                                                     z=source_attrs.pop('z', None), attributes=source_attrs)
+
+            target_node_id = target_id_value if target_id_value is not None else (
+                cx2network.lookup_node_id_by_name(target))
+            if target_node_id not in cx2network.get_nodes():
+                target_attrs['name'] = target
+                target_node_id = cx2network.add_node(node_id=target_id_value, x=target_attrs.pop('x', None),
+                                                     y=target_attrs.pop('y', None),
+                                                     z=target_attrs.pop('z', None), attributes=target_attrs)
+
+            cx2network.add_edge(source=source_node_id, target=target_node_id, attributes=edge_attrs)
 
         return cx2network
 
@@ -1413,6 +1458,7 @@ class CX2NetworkPandasDataFrameFactory(object):
 
     .. versionadded:: 3.7.0
     """
+
     def __init__(self):
         """
         Constructor
@@ -1448,8 +1494,8 @@ class CX2NetworkPandasDataFrameFactory(object):
             source_node_id = edge.get('s')
             target_node_id = edge.get('t')
 
-            row['source'] = source_node_id
-            row['target'] = target_node_id
+            row['source_id'] = source_node_id
+            row['target_id'] = target_node_id
 
             source_node_attrs = cx2network.get_node(source_node_id)
             target_node_attrs = cx2network.get_node(target_node_id)

@@ -1369,10 +1369,15 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
             for col, value in row.items():
                 if not isinstance(value, Iterable) and pd.isna(value):
                     continue
-                if col.startswith('source_'):
+
+                if source_node_attr is None and col.startswith('source_'):
                     source_attrs[col[7:]] = value
-                elif col.startswith('target_'):
+                elif source_node_attr is not None and col in source_node_attr:
+                    source_attrs[col] = value
+                elif target_node_attr is None and col.startswith('target_'):
                     target_attrs[col[7:]] = value
+                elif target_node_attr is not None and col in target_node_attr:
+                    target_attrs[col] = value
                 else:
                     edge_attrs[col] = value
 
@@ -1392,6 +1397,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                                                      y=target_attrs.pop('y', None),
                                                      z=target_attrs.pop('z', None), attributes=target_attrs)
 
+            if edge_attrs.get('interaction', None) is None:
+                edge_attrs['interaction'] = edge_interaction
             cx2network.add_edge(source=source_node_id, target=target_node_id, attributes=edge_attrs)
 
         return cx2network

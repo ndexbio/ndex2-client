@@ -1327,20 +1327,20 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
 
         :param input_data: The Pandas DataFrame to be converted into CX2Network.
         :type input_data: pd.DataFrame
-        :param source_field
-        :type source_field
-        :param target_field
-        :type target_field
-        :param source_id
-        :type source_id
-        :param target_id
-        :type target_id
-        :param source_node_attr
-        :type source_node_attr
-        :param target_node_attr
-        :type target_node_attr
-        :param edge_interaction
-        :type edge_interaction
+        :param source_field: The field name for the source node name.
+        :type source_field: str
+        :param target_field: The field name for the target node name.
+        :type target_field: str
+        :param source_id: The field name for the source node ID.
+        :type source_id: str
+        :param target_id: The field name for the target node ID.
+        :type target_id: str
+        :param source_node_attr: A list of column names to be used as source node attributes.
+        :type source_node_attr: list or None
+        :param target_node_attr: A list of column names to be used as target node attributes.
+        :type target_node_attr: list or None
+        :param edge_interaction: The default interaction type for edges.
+        :type edge_interaction: str
         :return: A CX2Network object :py:class:`~ndex2.cx2.CX2Network`
         :rtype: CX2Network
         :raises NDExError: If the input DataFrame is None or does not have the necessary columns.
@@ -1370,14 +1370,14 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                 if not isinstance(value, Iterable) and pd.isna(value):
                     continue
 
-                if source_node_attr is None and col.startswith('source_'):
-                    source_attrs[col[7:]] = value
-                elif source_node_attr is not None and col in source_node_attr:
+                if source_node_attr is not None and col in source_node_attr:
                     source_attrs[col] = value
+                if target_node_attr is not None and col in target_node_attr:
+                    target_attrs[col] = value
+                elif source_node_attr is None and col.startswith('source_'):
+                    source_attrs[col[7:]] = value
                 elif target_node_attr is None and col.startswith('target_'):
                     target_attrs[col[7:]] = value
-                elif target_node_attr is not None and col in target_node_attr:
-                    target_attrs[col] = value
                 else:
                     edge_attrs[col] = value
 

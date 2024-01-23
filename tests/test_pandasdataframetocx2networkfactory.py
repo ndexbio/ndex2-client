@@ -58,6 +58,18 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         self.assertEqual(network.get_node(3)['v']['attr'], 30)
         self.assertEqual(network.get_node(4)['v']['attr'], 40)
 
+    def test_with_explicit_source_target_node_attrs(self):
+        data = {'source_id': [1, 2], 'target_id': [3, 4], 'target_attr': [30, 40], 'attr1': [10, 20]}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        network = factory.get_cx2network(df, source_node_attr=['attr1'], target_node_attr=['attr1'])
+
+        self.assertEqual(len(network.get_nodes()), 4)
+        self.assertEqual(network.get_node(1)['v']['attr1'], 10)
+        self.assertEqual(network.get_node(2)['v']['attr1'], 20)
+        self.assertEqual(network.get_node(3)['v']['attr1'], 10)
+        self.assertEqual(network.get_node(4)['v']['attr1'], 20)
+
     def test_with_explicit_target_node_attrs(self):
         data = {'source_id': [1, 2], 'target_id': [3, 4], 't_attr1': [30, 40], 'source_attr': [10, 20]}
         df = pd.DataFrame(data)

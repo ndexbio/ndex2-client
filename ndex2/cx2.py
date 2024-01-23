@@ -1346,7 +1346,7 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         :raises NDExError: If the input DataFrame is None or does not have the necessary columns.
         """
         if input_data is None:
-            raise Exception('DataFrame input is empty')
+            raise NDExError('DataFrame input is empty')
 
         if not isinstance(input_data, pd.DataFrame):
             raise NDExError("Input data must be a Pandas DataFrame")

@@ -1,7 +1,9 @@
 import os
 import unittest
 import pandas as pd
-from ndex2.cx2 import RawCX2NetworkFactory
+
+from ndex2 import NDExError
+from ndex2.cx2 import RawCX2NetworkFactory, CX2Network
 from ndex2.cx2 import PandasDataFrameToCX2NetworkFactory
 from ndex2.cx2 import CX2NetworkPandasDataFrameFactory
 
@@ -43,6 +45,74 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         cx2_network = factory.get_cx2network(df)
         self.assertTrue(3, len(cx2_network.get_nodes()))
         self.assertTrue(2, len(cx2_network.get_edges()))
+
+    def test_with_explicit_source_node_attrs(self):
+        data = {'source_id': [1, 2], 'target_id': [3, 4], 'target_attr': [30, 40], 's_attr1': [10, 20]}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        network = factory.get_cx2network(df, source_node_attr=['s_attr1'])
+
+        self.assertEqual(len(network.get_nodes()), 4)
+        self.assertEqual(network.get_node(1)['v']['s_attr1'], 10)
+        self.assertEqual(network.get_node(2)['v']['s_attr1'], 20)
+        self.assertEqual(network.get_node(3)['v']['attr'], 30)
+        self.assertEqual(network.get_node(4)['v']['attr'], 40)
+
+    def test_with_explicit_target_node_attrs(self):
+        data = {'source_id': [1, 2], 'target_id': [3, 4], 't_attr1': [30, 40], 'source_attr': [10, 20]}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        network = factory.get_cx2network(df, target_node_attr=['t_attr1'])
+
+        self.assertEqual(len(network.get_nodes()), 4)
+        self.assertEqual(network.get_node(3)['v']['t_attr1'], 30)
+        self.assertEqual(network.get_node(4)['v']['t_attr1'], 40)
+        self.assertEqual(network.get_node(1)['v']['attr'], 10)
+        self.assertEqual(network.get_node(2)['v']['attr'], 20)
+
+    def test_with_node_attributes_from_columns(self):
+        data = {'source_name': ['A', 'B'], 'target_name': ['B', 'C'], 'source_attr': [5, 6], 'target_attr': [7, 8]}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        network = factory.get_cx2network(df)
+
+        self.assertEqual(network.get_node(network.lookup_node_id_by_name('A'))['v']['attr'], 5)
+        self.assertEqual(network.get_node(network.lookup_node_id_by_name('B'))['v']['attr'], 7)
+
+    def test_with_node_and_edge_attributes(self):
+        data = {'source_name': ['A', 'B'], 'target_name': ['C', 'D'], 'source_attr': [10, 20], 'edge_attr': ['x', 'y']}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        network = factory.get_cx2network(df)
+
+        self.assertEqual(network.get_edge(0)['v']['edge_attr'], 'x')
+        self.assertEqual(network.get_node(network.lookup_node_id_by_name('A'))['v']['attr'], 10)
+
+    def test_missing_target_id_column(self):
+        data = {'source_id': [1, 2], 'edge_attr': ['a', 'b']}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        with self.assertRaises(NDExError):
+            factory.get_cx2network(df)
+
+    def test_invalid_input_none_dataframe(self):
+        factory = PandasDataFrameToCX2NetworkFactory()
+        with self.assertRaises(NDExError):
+            factory.get_cx2network(None)
+
+    def test_invalid_input_non_dataframe(self):
+        factory = PandasDataFrameToCX2NetworkFactory()
+        with self.assertRaises(NDExError):
+            factory.get_cx2network("not a dataframe")
+
+    def test_with_specified_edge_interaction(self):
+        data = {'source_name': ['A', 'B'], 'target_name': ['B', 'C'], 'interaction': ['binds', 'inhibits']}
+        df = pd.DataFrame(data)
+        factory = PandasDataFrameToCX2NetworkFactory()
+        network = factory.get_cx2network(df, edge_interaction='interacts')
+
+        self.assertEqual(network.get_edge(0)['v']['interaction'], 'binds')
+        self.assertEqual(network.get_edge(1)['v']['interaction'], 'inhibits')
 
     def get_node_matching_name(self, cx2network=None, name=None):
         """

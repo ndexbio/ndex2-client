@@ -89,7 +89,7 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
         network = factory.get_cx2network(df)
 
         self.assertEqual(network.get_node(network.lookup_node_id_by_name('A'))['v']['attr'], 5)
-        self.assertEqual(network.get_node(network.lookup_node_id_by_name('B'))['v']['attr'], 7)
+        self.assertEqual(network.get_node(network.lookup_node_id_by_name('B'))['v']['attr'], 6)
 
     def test_with_node_and_edge_attributes(self):
         data = {'source_name': ['A', 'B'], 'target_name': ['C', 'D'], 'source_attr': [10, 20], 'edge_attr': ['x', 'y']}

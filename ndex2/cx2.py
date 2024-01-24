@@ -1378,7 +1378,7 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                     source_attrs[col[7:]] = value
                 elif target_node_attr is None and col.startswith('target_'):
                     target_attrs[col[7:]] = value
-                elif col not in source_node_attr:
+                elif source_node_attr is None or col not in source_node_attr:
                     edge_attrs[col] = value
 
             source_node_id = source_id_value if source_id_value is not None else (

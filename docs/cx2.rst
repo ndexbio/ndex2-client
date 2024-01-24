@@ -25,14 +25,7 @@ with several key goals:
 Methods
 ********************
 .. autoclass:: ndex2.cx2.CX2Network
-    :members: create_from_raw_cx2, write_as_raw_cx2, to_cx2,
-              get_attribute_declarations, set_attribute_declarations, get_network_attributes,
-              set_network_attributes, get_name, get_nodes, add_node, get_node, remove_node,
-              update_node, get_edges, add_edge, get_edge, remove_edge, update_edge,
-              get_visual_properties, set_visual_properties, get_node_bypasses, add_node_bypass,
-              get_edge_bypasses, add_edge_bypass, get_opaque_aspects, set_opaque_aspects,
-              add_opaque_aspect, get_status, set_status, get_declared_type, get_alias,
-              get_aliases, get_default_value, get_default_values
+    :members:
 
 CX2NetworkFactory classes and methods
 ***************************************
@@ -47,6 +40,10 @@ CX2NetworkFactory classes and methods
     :members:
 
 .. autoclass:: ndex2.cx2.NetworkXToCX2NetworkFactory
+    :members:
+
+.. autoclass:: ndex2.cx2.PandasDataFrameToCX2NetworkFactory
+    :members:
 
 CX2Network conversion classes
 *******************************

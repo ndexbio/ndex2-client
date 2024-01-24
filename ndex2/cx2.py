@@ -1475,7 +1475,7 @@ class CX2NetworkPandasDataFrameFactory(object):
     def get_dataframe(self, cx2network):
         """
         Converts a given CX2Network object into a Pandas DataFrame. The
-        DataFrame will contain columns for 'source' and 'target' nodes
+        DataFrame will contain columns for 'source_id' and 'target_id' of nodes
         of each edge, along with other edge and node attributes. Node
         attributes will be prefixed with ``source_`` and ``target_``
         respectively. If coordinates exist on the nodes they will be

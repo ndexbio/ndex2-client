@@ -402,8 +402,39 @@ class CX2Network(object):
         self._generate_attribute_declarations_for_aspect('networkAttributes', processed_network_attrs, {})
         self._network_attributes = processed_network_attrs
 
-    def add_network_attribute(self, key, value):
-        declared_type = self.get_declared_type('networkAttributes', key)
+    def add_network_attribute(self, key, value, datatype=None):
+        """
+        Adds or updates a single network attribute in the network's attributes.
+
+        This method processes the given attribute value using the declared type
+        associated with the attribute key in the attribute declarations. If the
+        attribute already exists, its value is updated; otherwise, the attribute
+        is added to the network.
+
+        **Usage Example:**
+
+        .. code-block:: python
+
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+            cx2_network.add_network_attribute(key='new_attribute', value='attribute_value', datatype='string')
+
+            print(cx2_network.get_network_attributes())
+
+        .. note::
+
+            If datatype is not implicitly defined, this method respects the declared type for the attribute if
+            it existed before. If the attribute key does not have a declared type, it will be inferred from the value.
+
+        :param key: The key (name) of the network attribute to add or update.
+        :type key: str
+        :param value: The value of the network attribute.
+        :param datatype: Type of the value (e.g. string, integer). If not provided, the datatype will be inferred.
+        :type datatype: str
+        :raises NDExError: If the value conversion based on the declared type fails.
+        """
+        declared_type = datatype if datatype is not None else self.get_declared_type('networkAttributes', key)
         converted_value = convert_value(declared_type, value)
         self._network_attributes[key] = converted_value
         self._generate_attribute_declarations_for_aspect('networkAttributes', {key: converted_value}, {})
@@ -553,7 +584,54 @@ class CX2Network(object):
             self._nodes[node_id][constants.LAYOUT_Z] = z
 
     def set_node_attribute(self, node_id, attribute, value):
+        """
+        Adds or updates a specific attribute for a node in the network.
+        This method is similar to `add_node_attribute` but will be deprecated in future versions.
+
+        .. deprecated::
+        This method will be removed in future versions. Use `add_node_attribute` instead.
+
+        :param node_id: The ID of the node to which the attribute will be added or updated.
+        :type node_id: int or str
+        :param attribute: The name of the attribute to add or update.
+        :type attribute: str
+        :param value: The value of the attribute.
+        :raises NDExError: If the node with the given **node_id** does not exist in the network.
+        """
         self.update_node(node_id, {attribute: value})
+
+    def add_node_attribute(self, node_id, key, value, datatype=None):
+        """
+        Adds or updates a specific attribute for a node in the network.
+
+        This method allows for the addition or modification of a single attribute
+        of a specified node. If the attribute already exists for the node, its value
+        is updated; otherwise, the attribute is added to the node.
+
+        The method also  allows specifying the datatype of the attribute.
+
+        **Usage Example:**
+
+        .. code-block:: python
+
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+            cx2_network.add_node_attribute(node_id=1, key='color', value='red')
+
+        :param node_id: The ID of the node to which the attribute will be added or updated.
+        :type node_id: int or str
+        :param key: The name of the attribute to add or update.
+        :type key: str
+        :param value: The value of the attribute.
+        :param datatype: Type of the value (e.g. string, integer). If not provided, the datatype will be inferred.
+        :type datatype: str
+        :raises NDExError: If the node with the given **node_id** does not exist in the network.
+        """
+        declared_type = datatype if datatype is not None else self.get_declared_type(constants.NODES_ASPECT, key)
+        converted_value = convert_value(declared_type, value)
+        self._nodes[node_id][constants.ASPECT_VALUES].update({key: converted_value})
+        self._generate_attribute_declarations_for_aspect(constants.NODES_ASPECT, {key: converted_value}, {})
 
     def get_edges(self):
         """
@@ -636,6 +714,39 @@ class CX2Network(object):
         if attributes:
             processed_attributes = self._process_attributes(constants.EDGES_ASPECT, attributes)
             self._edges[edge_id][constants.ASPECT_VALUES].update(processed_attributes)
+
+    def add_edge_attribute(self, edge_id, key, value, datatype=None):
+        """
+        Adds or updates a specific attribute for a edge in the network.
+
+        This method allows for the addition or modification of a single attribute
+        of a specified edge. If the attribute already exists for the edge, its value
+        is updated; otherwise, the attribute is added to the edge.
+
+        The method also  allows specifying the datatype of the attribute.
+
+        **Usage Example:**
+
+        .. code-block:: python
+
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+            cx2_network.add_edge_attribute(edge_id=1, key='color', value='red')
+
+        :param edge_id: The ID of the edge to which the attribute will be added or updated.
+        :type edge_id: int or str
+        :param key: The name of the attribute to add or update.
+        :type key: str
+        :param value: The value of the attribute.
+        :param datatype: Type of the value (e.g. string, integer). If not provided, the datatype will be inferred.
+        :type datatype: str
+        :raises NDExError: If the edge with the given **edge_id** does not exist in the network.
+        """
+        declared_type = datatype if datatype is not None else self.get_declared_type(constants.EDGES_ASPECT, key)
+        converted_value = convert_value(declared_type, value)
+        self._edges[edge_id][constants.ASPECT_VALUES].update({key: converted_value})
+        self._generate_attribute_declarations_for_aspect(constants.EDGES_ASPECT, {key: converted_value}, {})
 
     def get_visual_properties(self):
         """
@@ -901,6 +1012,18 @@ class CX2Network(object):
             json.dump(output_data, output_file, indent=4)
 
     def _get_meta_data(self):
+        """
+        Gathers and returns metadata for various network elements.
+
+        This method compiles metadata for different aspects of the network,
+        including attribute declarations, network attributes, nodes, edges,
+        visual properties, node and edge bypasses, and any opaque aspects.
+        Each element's count and name are included in the metadata.
+
+        :return: A list of dictionaries, each containing the 'elementCount'
+                 and 'name' for a network aspect.
+        :rtype: list of dict
+        """
         meta_data = []
         if self.get_attribute_declarations():
             meta_data.append({"elementCount": 1, "name": "attributeDeclarations"})

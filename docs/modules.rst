@@ -24,7 +24,6 @@ The NDEx2 Python Client can be broken into three parts:
    cx2
    createcx2
    convertcx2
-   annotatecx2
    ndex2
    createnicecx
    convertnicecx

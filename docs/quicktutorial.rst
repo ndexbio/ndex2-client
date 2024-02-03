@@ -209,7 +209,6 @@ use the :py:func:`~ndex2.cx2.CX2Network.add_network_attribute` method.
     rocrate_id = 0
     cx2_network.add_network_attribute('name', 'my cx2 network')
     cx2_network.add_network_attribute(key='description', value='the description of my network')
-    cx2_network.add_network_attribute('version', 1, datatype='integer')
     # It can be used to add FAIRSCAPE annotations:
     cx2_network.add_network_attribute('prov:wasDerivedFrom', 'RO-crate: ' + str(rocrate_id))
 

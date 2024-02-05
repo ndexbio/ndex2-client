@@ -221,7 +221,6 @@ Output:
     {
         "name": "my cx2 network",
         "description": "the description of my network",
-        "version": 1,
         "prov:wasDerivedFrom": "RO-crate: 0"
     }
 
@@ -299,6 +298,63 @@ Output:
     }
 
 .. _HCX: https://cytoscape.org/cx/cx2/hcx-specification/
+
+Iterate Over Nodes, Edges, and View Attributes
+-------------------------------------------------
+
+Once you have downloaded a network from NDEx and converted it into a `CX2Network` object, or created the network yourself,
+you can explore its structure by iterating over its nodes and edges, or access and display specific attributes of nodes and edges.
+
+To iterate through the nodes in a `CX2Network` object, you can use the `get_nodes()` method.
+This method returns a dictionary where key is node ID and value is the complete node data.
+
+Similarly, you can iterate through the edges using the `get_edges()` method.
+This method returns a dictionary where key is edge ID and value is the complete edge data.
+
+Each node or edge in a `CX2Network` object has an attribute dictionary (`'v'`) containing its attributes.
+To display the attributes of a node or an edge with a given ID, you can access this dictionary directly.
+
+.. code-block:: python
+
+    import json
+    import ndex2
+    from ndex2.cx2 import RawCX2NetworkFactory, CX2NetworkXFactory
+
+    # Create NDEx2 python client
+    client = ndex2.client.Ndex2()
+
+    # Create CX2Network factory
+    factory = RawCX2NetworkFactory()
+
+    # Download BioGRID: Protein-Protein Interactions (SARS-CoV) from NDEx
+    # https://www.ndexbio.org/viewer/networks/669f30a3-cee6-11ea-aaef-0ac135e8bacf
+    client_resp = client.get_network_as_cx2_stream('669f30a3-cee6-11ea-aaef-0ac135e8bacf')
+
+    # Convert downloaded network to CX2Network object
+    net_cx = factory.get_cx2network(json.loads(client_resp.content))
+
+    # Iterate through nodes
+    for node_id, node_data in net_cx.get_nodes().items():
+        print(f'Node ID: {node_id}, Node Data: {node_data}')
+
+    # Iterate through edges
+    for edge_id, edge_data in net_cx.get_edges().items():
+        print(f'Edge ID: {edge_id}, Edge Data: {edge_data}')
+
+    # Display attributes of a specific node by ID
+    node_id_to_check = 1  # Example node ID
+    if node_id_to_check in net_cx.get_nodes():
+        print(f'Attributes of node {node_id_to_check}: {net_cx.get_nodes()[node_id_to_check]["v"]}')
+    else:
+        print(f'Node {node_id_to_check} not found.')
+
+    # Display attributes of a specific edge by ID
+    edge_id_to_check = 1  # Example edge ID
+    if edge_id_to_check in net_cx.get_edges():
+        print(f'Attributes of edge {edge_id_to_check}: {net_cx.get_edges()[edge_id_to_check]["v"]}')
+    else:
+        print(f'Edge {edge_id_to_check} not found.')
+
 
 Build a lookup table for node names to node ids
 --------------------------------------------------------

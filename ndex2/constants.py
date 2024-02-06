@@ -127,6 +127,11 @@ EDGE_INTERACTION = 'i'
 Key for edge interaction
 """
 
+EDGE_INTERACTION_EXPANDED = 'interaction'
+"""
+Expanded key for edge interaction
+"""
+
 NODE_ID = '@id'
 """
 Key for id of node
@@ -135,6 +140,11 @@ Key for id of node
 NODE_NAME = 'n'
 """
 Key for node name
+"""
+
+NODE_NAME_EXPANDED = 'name'
+"""
+Expanded key for node name
 """
 
 NODE_ATTR_NAME = 'n'

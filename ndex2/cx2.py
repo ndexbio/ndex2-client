@@ -1442,7 +1442,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
 
     def get_cx2network(self, input_data=None, source_field='source_name', target_field='target_name',
                        source_id='source_id', target_id='target_id', source_node_attr=None, target_node_attr=None,
-                       edge_interaction='interacts-with') -> CX2Network:
+                       source_node_attr_prefix='source_', target_node_attr_prefix='target_',
+                       edge_attr=None, edge_interaction='interacts-with') -> CX2Network:
         """
         Converts a given Pandas DataFrame into a CX2Network object. The DataFrame should
         contain columns 'source' and 'target' to represent source node and target node of edge
@@ -1462,6 +1463,12 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         :type source_node_attr: list or None
         :param target_node_attr: A list of column names to be used as target node attributes.
         :type target_node_attr: list or None
+        :param source_node_attr_prefix: A prefix for column names to be used as source node attributes.
+        :type source_node_attr_prefix: str
+        :param target_node_attr_prefix: A prefix for column names to be used as target node attributes.
+        :type target_node_attr_prefix: str
+        :param edge_attr: A list of column names to be used as edge attributes.
+        :type edge_attr: list or None
         :param edge_interaction: The default interaction type for edges.
         :type edge_interaction: str
         :return: A CX2Network object :py:class:`~ndex2.cx2.CX2Network`
@@ -1486,50 +1493,60 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                     ((source_id_value is None or target_id_value is None) and (source is None or target is None)):
                 raise NDExError("Missing 'source' or 'target' columns in the DataFrame")
 
-            source_attrs = {}
-            target_attrs = {}
-            edge_attrs = {}
+            source_attrs, target_attrs, edge_attrs = {}, {}, {}
             for col, value in row.items():
                 if not isinstance(value, Iterable) and pd.isna(value):
                     continue
-
+                node_attr = False
                 if source_node_attr is not None and col in source_node_attr:
                     source_attrs[col] = value
+                    node_attr = True
+                elif col.startswith(source_node_attr_prefix):
+                    source_attrs[col[len(source_node_attr_prefix):]] = value
+                    continue
+
                 if target_node_attr is not None and col in target_node_attr:
                     target_attrs[col] = value
-                elif source_node_attr is None and col.startswith('source_'):
-                    source_attrs[col[7:]] = value
-                elif target_node_attr is None and col.startswith('target_'):
-                    target_attrs[col[7:]] = value
-                elif source_node_attr is None or col not in source_node_attr:
+                    node_attr = True
+                elif col.startswith(target_node_attr_prefix):
+                    target_attrs[col[len(target_node_attr_prefix):]] = value
+                    continue
+
+                if (edge_attr is not None and col in edge_attr) or (edge_attr is None and not node_attr):
                     edge_attrs[col] = value
 
             source_node_id = source_id_value if source_id_value is not None else (
                 cx2network.lookup_node_id_by_name(source))
             if source_node_id is None or source_node_id not in cx2network.get_nodes():
                 if source is not None:
-                    source_attrs['name'] = source
-                source_node_id = cx2network.add_node(node_id=source_id_value, x=source_attrs.pop('x', None),
-                                                     y=source_attrs.pop('y', None),
-                                                     z=source_attrs.pop('z', None), attributes=source_attrs)
+                    source_attrs[constants.NODE_NAME_EXPANDED] = source
+                source_node_id = cx2network.add_node(node_id=source_id_value,
+                                                     x=source_attrs.pop(constants.LAYOUT_X, None),
+                                                     y=source_attrs.pop(constants.LAYOUT_Y, None),
+                                                     z=source_attrs.pop(constants.LAYOUT_Z, None),
+                                                     attributes=source_attrs)
             else:
-                cx2network.update_node(node_id=source_node_id, x=source_attrs.pop('x', None),
-                                       y=source_attrs.pop('y', None), z=source_attrs.pop('z', None),
+                cx2network.update_node(node_id=source_node_id, x=source_attrs.pop(constants.LAYOUT_X, None),
+                                       y=source_attrs.pop(constants.LAYOUT_Y, None),
+                                       z=source_attrs.pop(constants.LAYOUT_Z, None),
                                        attributes=source_attrs)
             target_node_id = target_id_value if target_id_value is not None else (
                 cx2network.lookup_node_id_by_name(target))
             if target_node_id is None or target_node_id not in cx2network.get_nodes():
                 if target is not None:
-                    target_attrs['name'] = target
-                target_node_id = cx2network.add_node(node_id=target_id_value, x=target_attrs.pop('x', None),
-                                                     y=target_attrs.pop('y', None),
-                                                     z=target_attrs.pop('z', None), attributes=target_attrs)
+                    target_attrs[constants.NODE_NAME_EXPANDED] = target
+                target_node_id = cx2network.add_node(node_id=target_id_value,
+                                                     x=target_attrs.pop(constants.LAYOUT_X, None),
+                                                     y=target_attrs.pop(constants.LAYOUT_Y, None),
+                                                     z=target_attrs.pop(constants.LAYOUT_Z, None),
+                                                     attributes=target_attrs)
             else:
-                cx2network.update_node(node_id=target_id_value, x=target_attrs.pop('x', None),
-                                       y=target_attrs.pop('y', None), z=target_attrs.pop('z', None),
+                cx2network.update_node(node_id=target_id_value, x=target_attrs.pop(constants.LAYOUT_X, None),
+                                       y=target_attrs.pop(constants.LAYOUT_Y, None),
+                                       z=target_attrs.pop(constants.LAYOUT_Z, None),
                                        attributes=target_attrs)
-            if edge_attrs.get('interaction', None) is None:
-                edge_attrs['interaction'] = edge_interaction
+            if edge_attrs.get(constants.EDGE_INTERACTION_EXPANDED, None) is None:
+                edge_attrs[constants.EDGE_INTERACTION_EXPANDED] = edge_interaction
             cx2network.add_edge(source=source_node_id, target=target_node_id, attributes=edge_attrs)
 
         return cx2network

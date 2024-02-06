@@ -6,6 +6,7 @@
 
    installation
    quicktutorial
+   advancedtutorial
    modules
    license
    history

@@ -1515,41 +1515,39 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                 if (edge_attr is not None and col in edge_attr) or (edge_attr is None and not node_attr):
                     edge_attrs[col] = value
 
-            source_node_id = source_id_value if source_id_value is not None else (
-                cx2network.lookup_node_id_by_name(source))
-            if source_node_id is None or source_node_id not in cx2network.get_nodes():
-                if source is not None:
-                    source_attrs[constants.NODE_NAME_EXPANDED] = source
-                source_node_id = cx2network.add_node(node_id=source_id_value,
-                                                     x=source_attrs.pop(constants.LAYOUT_X, None),
-                                                     y=source_attrs.pop(constants.LAYOUT_Y, None),
-                                                     z=source_attrs.pop(constants.LAYOUT_Z, None),
-                                                     attributes=source_attrs)
-            else:
-                cx2network.update_node(node_id=source_node_id, x=source_attrs.pop(constants.LAYOUT_X, None),
-                                       y=source_attrs.pop(constants.LAYOUT_Y, None),
-                                       z=source_attrs.pop(constants.LAYOUT_Z, None),
-                                       attributes=source_attrs)
-            target_node_id = target_id_value if target_id_value is not None else (
-                cx2network.lookup_node_id_by_name(target))
-            if target_node_id is None or target_node_id not in cx2network.get_nodes():
-                if target is not None:
-                    target_attrs[constants.NODE_NAME_EXPANDED] = target
-                target_node_id = cx2network.add_node(node_id=target_id_value,
-                                                     x=target_attrs.pop(constants.LAYOUT_X, None),
-                                                     y=target_attrs.pop(constants.LAYOUT_Y, None),
-                                                     z=target_attrs.pop(constants.LAYOUT_Z, None),
-                                                     attributes=target_attrs)
-            else:
-                cx2network.update_node(node_id=target_id_value, x=target_attrs.pop(constants.LAYOUT_X, None),
-                                       y=target_attrs.pop(constants.LAYOUT_Y, None),
-                                       z=target_attrs.pop(constants.LAYOUT_Z, None),
-                                       attributes=target_attrs)
+            source_node_id = self._add_or_update_node(cx2network, source_id_value, source, source_attrs)
+            target_node_id = self._add_or_update_node(cx2network, target_id_value, target, target_attrs)
             if edge_attrs.get(constants.EDGE_INTERACTION_EXPANDED, None) is None:
                 edge_attrs[constants.EDGE_INTERACTION_EXPANDED] = edge_interaction
             cx2network.add_edge(source=source_node_id, target=target_node_id, attributes=edge_attrs)
 
         return cx2network
+
+    def _add_or_update_node(self, cx2network, node_id_value, node_name, node_attrs):
+        """
+        Add a new node or update an existing one in the CX2Network, including layout attributes if present.
+
+        :param cx2network: an object of CX2Network class
+        :type cx2network: :py:class:`~ndex2.cx.CX2Network`
+        :param node_id_value: ID of the node
+        :type node_id_value: int or None
+        :param node_name: name of the node
+        :type node_name: str or None
+        :param node_attrs: attributes of the node
+        :type node_attrs: dict
+        """
+        x = node_attrs.pop(constants.LAYOUT_X, None)
+        y = node_attrs.pop(constants.LAYOUT_Y, None)
+        z = node_attrs.pop(constants.LAYOUT_Z, None)
+
+        node_id = node_id_value if node_id_value is not None else cx2network.lookup_node_id_by_name(node_name)
+        if node_id is None or node_id not in cx2network.get_nodes():
+            if node_name is not None:
+                node_attrs[constants.NODE_NAME_EXPANDED] = node_name
+            node_id = cx2network.add_node(node_id=node_id_value, x=x, y=y, z=z, attributes=node_attrs)
+        else:
+            cx2network.update_node(node_id=node_id, x=x, y=y, z=z, attributes=node_attrs)
+        return node_id
 
 
 class CX2NetworkXFactory(object):

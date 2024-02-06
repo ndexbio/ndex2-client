@@ -501,6 +501,31 @@ class TestCX2Network(unittest.TestCase):
         self.assertTrue((df['target_id'] == 2).any())
         self.assertTrue((df['edge_attr'] == 'a').any())
 
+    def test_get_nodelist_table(self):
+        network = CX2Network()
+        network.add_node(node_id=1, attributes={'attr1': 'value1', 'attr2': 10}, x=0.1, y=0.2, z=0.3)
+        network.add_node(node_id=2, attributes={'attr1': 'value2', 'attr2': 20}, x=0.4, y=0.5, z=0.6)
+
+        factory = CX2NetworkPandasDataFrameFactory()
+        df = factory.get_nodelist_table(network)
+
+        self.assertEqual(len(df), 2)
+
+        self.assertTrue(1 in df.index)
+        self.assertTrue(2 in df.index)
+
+        self.assertEqual(df.at[1, 'attr1'], 'value1')
+        self.assertEqual(df.at[1, 'attr2'], 10)
+        self.assertAlmostEqual(df.at[1, 'x'], 0.1)
+        self.assertAlmostEqual(df.at[1, 'y'], 0.2)
+        self.assertAlmostEqual(df.at[1, 'z'], 0.3)
+
+        self.assertEqual(df.at[2, 'attr1'], 'value2')
+        self.assertEqual(df.at[2, 'attr2'], 20)
+        self.assertAlmostEqual(df.at[2, 'x'], 0.4)
+        self.assertAlmostEqual(df.at[2, 'y'], 0.5)
+        self.assertAlmostEqual(df.at[2, 'z'], 0.6)
+
     def test_remove_network_attribute_passing_none(self):
         try:
             network = CX2Network()

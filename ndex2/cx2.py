@@ -1507,7 +1507,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
             source_node_id = source_id_value if source_id_value is not None else (
                 cx2network.lookup_node_id_by_name(source))
             if source_node_id is None or source_node_id not in cx2network.get_nodes():
-                source_attrs['name'] = source
+                if source is not None:
+                    source_attrs['name'] = source
                 source_node_id = cx2network.add_node(node_id=source_id_value, x=source_attrs.pop('x', None),
                                                      y=source_attrs.pop('y', None),
                                                      z=source_attrs.pop('z', None), attributes=source_attrs)
@@ -1518,7 +1519,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
             target_node_id = target_id_value if target_id_value is not None else (
                 cx2network.lookup_node_id_by_name(target))
             if target_node_id is None or target_node_id not in cx2network.get_nodes():
-                target_attrs['name'] = target
+                if target is not None:
+                    target_attrs['name'] = target
                 target_node_id = cx2network.add_node(node_id=target_id_value, x=target_attrs.pop('x', None),
                                                      y=target_attrs.pop('y', None),
                                                      z=target_attrs.pop('z', None), attributes=target_attrs)

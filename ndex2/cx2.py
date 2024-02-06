@@ -1664,3 +1664,28 @@ class CX2NetworkPandasDataFrameFactory(object):
             rows.append(row)
 
         return pd.DataFrame(rows)
+
+    def get_nodelist_table(self, cx2network):
+        """
+        Converts nodes from a CX2Network object into a pandas DataFrame.
+
+        :param cx2network: An instance of CX2Network.
+        :type cx2network: :py:class:`~ndex2.cx2.CX2Network`
+
+        :returns df: A pandas DataFrame with columns node_id and node attributes.
+        :rtype df: :py:class:`pandas.DataFrame`
+        """
+        data = []
+        for node_id, node in cx2network.get_nodes().items():
+            node_data = {
+                'node_id': node_id,
+                **node.get('v', {}),
+                'x': node.get('x'),
+                'y': node.get('y'),
+                'z': node.get('z'),
+            }
+            data.append(node_data)
+
+        df = pd.DataFrame(data).set_index('node_id')
+
+        return df

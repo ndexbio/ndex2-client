@@ -411,6 +411,8 @@ class CX2Network(object):
         attribute already exists, its value is updated; otherwise, the attribute
         is added to the network.
 
+        .. versionadded:: 3.8.0
+
         **Usage Example:**
 
         .. code-block:: python
@@ -520,6 +522,8 @@ class CX2Network(object):
         """
         Retrieves a node based on its name.
 
+        .. versionadded:: 3.8.0
+
         :param name: Name of the node to retrieve.
         :type name: str
         :return: Node with the given name or None if not found.
@@ -588,8 +592,9 @@ class CX2Network(object):
         Adds or updates a specific attribute for a node in the network.
         This method is similar to `add_node_attribute` but will be deprecated in future versions.
 
-        .. deprecated::
-        This method will be removed in future versions. Use `add_node_attribute` instead.
+        .. deprecated:: 3.8.0
+
+            This method will be removed in future versions. Use `add_node_attribute` instead.
 
         :param node_id: The ID of the node to which the attribute will be added or updated.
         :type node_id: int or str
@@ -610,6 +615,8 @@ class CX2Network(object):
 
         The method also  allows specifying the datatype of the attribute.
 
+        .. versionadded:: 3.8.0
+
         **Usage Example:**
 
         .. code-block:: python
@@ -628,7 +635,9 @@ class CX2Network(object):
         :type datatype: str
         :raises NDExError: If the node with the given **node_id** does not exist in the network.
         """
-        declared_type = datatype if datatype is not None else self.get_declared_type(constants.NODES_ASPECT, key)
+        if node_id not in self.get_nodes():
+            raise NDExError(f'Node with id {node_id} does not exist. Attribute cannot be added to nonexistent node')
+        declared_type = datatype if datatype is not None else self.get_declared_type(constants.NODES_ASPECT, key, value)
         converted_value = convert_value(declared_type, value)
         self._nodes[node_id][constants.ASPECT_VALUES].update({key: converted_value})
         self._generate_attribute_declarations_for_aspect(constants.NODES_ASPECT, {key: converted_value}, {})
@@ -725,6 +734,8 @@ class CX2Network(object):
 
         The method also  allows specifying the datatype of the attribute.
 
+        .. versionadded:: 3.8.0
+
         **Usage Example:**
 
         .. code-block:: python
@@ -743,7 +754,9 @@ class CX2Network(object):
         :type datatype: str
         :raises NDExError: If the edge with the given **edge_id** does not exist in the network.
         """
-        declared_type = datatype if datatype is not None else self.get_declared_type(constants.EDGES_ASPECT, key)
+        if edge_id not in self.get_edges():
+            raise NDExError(f'Edge with id {edge_id} does not exist. Attribute cannot be added to nonexistent edge')
+        declared_type = datatype if datatype is not None else self.get_declared_type(constants.EDGES_ASPECT, key, value)
         converted_value = convert_value(declared_type, value)
         self._edges[edge_id][constants.ASPECT_VALUES].update({key: converted_value})
         self._generate_attribute_declarations_for_aspect(constants.EDGES_ASPECT, {key: converted_value}, {})
@@ -1446,8 +1459,58 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                        edge_attr=None, edge_interaction='interacts-with') -> CX2Network:
         """
         Converts a given Pandas DataFrame into a CX2Network object. The DataFrame should
-        contain columns 'source' and 'target' to represent source node and target node of edge
-        , and may contain additional columns for edge and node attributes.
+        contain columns 'source' and 'target' to represent source node and target node of edge,
+        and may contain additional columns for edge and node attributes.
+
+        .. versionchanged:: 3.8.0
+
+            Added new parameters to improve flexibility of converter.
+
+        .. code-block:: python
+
+            import pandas as pd
+            from ndex2.cx2 import PandasDataFrameToCX2NetworkFactory, CX2Network
+
+            # DataFrame with source, target, and other columns
+            data = {'source': [1, 2], 'target': [2, 3],
+                    'weight': [1.0, 0.9],
+                    'source_size': [5, 6], 'target_size': [6, 7]}
+            df = pd.DataFrame(data)
+
+            # Creating an instance of PandasDataFrameToCX2NetworkFactory
+            factory = PandasDataFrameToCX2NetworkFactory()
+
+            # Converting DataFrame to CX2Network
+            cx2_network = factory.get_cx2network(df, source_id='source', target_id='target')
+
+            # cx2_network is now a CX2Network instance based on the DataFrame data
+            print(cx2_network.to_cx2())
+
+        Column Naming Convention
+
+        -  Source and target nodes of an edge.
+            By default, the columns ``source_name`` and ``target_name`` represent the names of the source and target nodes,
+            respectively and ``source_id`` and ``target_id`` represent the unique identifiers for the source and target nodes.
+
+            It can be changed by setting the parameter ``source_field`` and ``target_field`` to column names containing source/ target
+            names, and ``source_id`` and ``target_id`` to column names containing source/target ids. Specifying ids is not necessary.
+
+        -  Node attributes.
+            Node attributes can be specified with a prefix according to their node type:
+                - Use the parameter source_node_attr_prefix to set prefix for attributes of the source node (default ``source_``, e.g., ``source_color``, the node will have attribute ``color``).
+                - Use the parameter target_node_attr_prefix to set prefix for attributes of the target node (default ``target_`` e.g., ``target_size``, the node will have attribute ``size``).
+
+            If the prefixes are used, attributes in the form ``prefix_x`` (e.g. ``source_x``) will be used as x, y, and z coordinates of the node
+
+            They can also be explicitly specified as a list passed in parameter ``source_node_attr`` for edge source node
+            and ``target_node_attr`` for edge target node. The same columns can be used for both source and target node
+            attributes (e.g. ``source_node_attr=['color', 'size']`` and ``target_node_attr=['color', 'size']``).
+
+        -  Edge attributes.
+            Edge attributes can be specified as list in parameter ``edge_attr``. In case the parameter is  not set, all columns that were not used as node attributes will be used (e.g., ``weight`` for an edge's weight attribute).
+
+            The ``edge_interaction`` parameter defines the default interaction type for edges. If not specified in the data frame as edge attribute,
+            this default value is used. If not set, the default interaction is set to ``interacts-with``.
 
         :param input_data: The Pandas DataFrame to be converted into CX2Network.
         :type input_data: pd.DataFrame
@@ -1739,6 +1802,8 @@ class CX2NetworkPandasDataFrameFactory(object):
     def get_nodelist_table(self, cx2network):
         """
         Converts nodes from a CX2Network object into a pandas DataFrame.
+
+        .. versionadded:: 3.8.0
 
         :param cx2network: An instance of CX2Network.
         :type cx2network: :py:class:`~ndex2.cx2.CX2Network`

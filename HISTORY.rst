@@ -2,6 +2,14 @@
 History
 =======
 
+3.8.0 (2024-02-07)
+-------------------
+
+* Enhancements
+    * Added ``add_network_attribute()``, ``add_node_attribute()``, ``add_edge_attribute()``, ``lookup_node_id_by_name()`` to ``CX2Network`` class.
+    * Added new parameters to ``get_cx2network`` in ``PandasDataFrameToCX2NetworkFactory`` to make it easier to convert Pandas Dataframe.
+    * Added ``get_nodelist_table()`` to ``CX2NetworkPandasDataFrameFactory`` class.
+
 3.7.0 (2024-01-03)
 -------------------
 

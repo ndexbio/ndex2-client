@@ -1521,33 +1521,44 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         for col, value in row.items():
             if not isinstance(value, Iterable) and pd.isna(value):
                 continue
-            node_attr = False
-            if source_node_attr is not None:
-                if col in source_node_attr:
-                    source_attrs[col] = value
-                    node_attr = True
-            elif len(source_node_attr_prefix) == 0:
-                raise NDExError("If custom node attribute columns were not set, node attribute prefix should be set, "
-                                "empty string is not supported")
-            elif col.startswith(source_node_attr_prefix):
-                source_attrs[col[len(source_node_attr_prefix):]] = value
-                continue
 
-            if target_node_attr is not None:
-                if col in target_node_attr:
-                    target_attrs[col] = value
-                    node_attr = True
-            elif len(target_node_attr_prefix) == 0:
-                raise NDExError("If custom node attribute columns were not set, node attribute prefix should be set, "
-                                "empty string is not supported")
-            elif col.startswith(target_node_attr_prefix):
-                target_attrs[col[len(target_node_attr_prefix):]] = value
-                continue
+            # Process source attributes
+            extracted_source_attr = self._extract_attributes_by_list_or_prefix(col, value, source_node_attr,
+                                                                               source_node_attr_prefix)
+            if extracted_source_attr is not None:
+                source_attrs[extracted_source_attr[0]] = extracted_source_attr[1]
 
-            if (edge_attr is not None and col in edge_attr) or (edge_attr is None and not node_attr):
+            # Process target attributes
+            extracted_target_attr = self._extract_attributes_by_list_or_prefix(col, value, target_node_attr,
+                                                                               target_node_attr_prefix)
+            if extracted_target_attr is not None:
+                target_attrs[extracted_target_attr[0]] = extracted_target_attr[1]
+
+            if (edge_attr is not None and col in edge_attr) or (edge_attr is None and extracted_source_attr is None and
+                                                                extracted_target_attr is None):
                 edge_attrs[col] = value
 
         return source_attrs, target_attrs, edge_attrs
+
+    def _extract_attributes_by_list_or_prefix(self, col, value, attr_list, attr_prefix):
+        """
+        Extracts attributes based on a direct list of attribute names or a prefix.
+
+        :param col: Column name from the DataFrame row.
+        :param value: Value of the column in the row.
+        :param attr_list: List of attribute names to be included.
+        :param attr_prefix: Prefix for attribute columns.
+        :return: A tuple with the extracted attribute name and value if applicable, otherwise None.
+        """
+        if attr_list is not None:
+            if col in attr_list:
+                return col, value
+        elif len(attr_prefix) == 0:
+            raise NDExError("If custom node attribute columns were not set, node attribute prefix should be set, "
+                            "empty string is not supported")
+        elif col.startswith(attr_prefix):
+            return col[len(attr_prefix):], value
+        return None
 
     def _add_edge(self, cx2network, source_node_id, target_node_id, edge_attrs, edge_interaction):
         """

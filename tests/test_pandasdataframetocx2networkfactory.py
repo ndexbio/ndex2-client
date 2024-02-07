@@ -10,6 +10,9 @@ from ndex2.cx2 import CX2NetworkPandasDataFrameFactory
 
 class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
 
+    def setUp(self):
+        self.factory = PandasDataFrameToCX2NetworkFactory()
+
     def test_conversion_to_cx2network(self):
         data = {'source_id': [1, 2], 'target_id': [2, 3], 'edge_attr': ['a', 'b']}
         df = pd.DataFrame(data)
@@ -172,6 +175,82 @@ class TestPandasDataFrameToCX2NetworkFactory(unittest.TestCase):
 
         self.assertEqual(1, len(rt_cx2net.get_edges()))
         self.assertEqual(orig_edge['v'], rt_cx2net.get_edges()[0]['v'])
+
+    def test_attribute_extraction(self):
+        row = pd.Series({
+            's_attribute': 'value1',
+            't_attribute': 'value2',
+            'some_edge_attribute': 'value3',
+            'source_prefix_attr': 'sourceValue',
+            'target_prefix_attr': 'targetValue'
+        })
+        source_node_attr = ['s_attribute']
+        source_node_attr_prefix = 'source_'
+        target_node_attr = ['t_attribute']
+        target_node_attr_prefix = 'target_'
+        edge_attr = ['some_edge_attribute']
+
+        source_attrs, target_attrs, edge_attrs = self.factory._process_row_for_attributes(
+            row,
+            source_node_attr,
+            source_node_attr_prefix,
+            target_node_attr,
+            target_node_attr_prefix,
+            edge_attr
+        )
+
+        self.assertEqual(source_attrs, {'s_attribute': 'value1'})
+        self.assertEqual(target_attrs, {'t_attribute': 'value2'})
+        self.assertEqual(edge_attrs, {'some_edge_attribute': 'value3'})
+
+    def test_missing_attributes(self):
+        row = pd.Series({
+            'unrelated_column': 'some_value'
+        })
+        source_node_attr = ['nonexistent_source_attr']
+        source_node_attr_prefix = 'source_'
+        target_node_attr = ['nonexistent_target_attr']
+        target_node_attr_prefix = 'target_'
+        edge_attr = ['nonexistent_edge_attr']
+
+        source_attrs, target_attrs, edge_attrs = self.factory._process_row_for_attributes(
+            row,
+            source_node_attr,
+            source_node_attr_prefix,
+            target_node_attr,
+            target_node_attr_prefix,
+            edge_attr
+        )
+
+        self.assertEqual(source_attrs, {})
+        self.assertEqual(target_attrs, {})
+        self.assertEqual(edge_attrs, {})
+
+    def test_edge_case_empty_row(self):
+        row = pd.Series({})
+        source_attrs, target_attrs, edge_attrs = self.factory._process_row_for_attributes(
+            row,
+            [],
+            'source_',
+            [],
+            'target_',
+            []
+        )
+
+        self.assertEqual(source_attrs, {})
+        self.assertEqual(target_attrs, {})
+        self.assertEqual(edge_attrs, {})
+
+    def test_empty_attributes(self):
+        row = pd.Series({'a_column': 'some_value'})
+
+        with self.assertRaises(NDExError):
+            self.factory._process_row_for_attributes(
+                row,
+                None, '',
+                None, '',
+                None
+            )
 
 
 if __name__ == '__main__':

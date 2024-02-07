@@ -542,6 +542,133 @@ class TestCX2Network(unittest.TestCase):
         except NDExNotFoundError as ne:
             self.assertEqual('Network attribute \'foo\' does not exist.', str(ne))
 
+    def test_add_node_attribute(self):
+        self.cx2_obj.add_node(1)
+        self.cx2_obj.add_node_attribute(node_id=1, key='color', value='red')
+        node = self.cx2_obj.get_node(1)
+        self.assertIn('color', node['v'])
+        self.assertEqual(node['v']['color'], 'red')
+
+        self.cx2_obj.add_node_attribute(node_id=1, key='color', value='blue')
+        node = self.cx2_obj.get_node(1)
+        self.assertEqual(node['v']['color'], 'blue')
+
+        self.cx2_obj.add_node_attribute(node_id=1, key='size', value=10, datatype='integer')
+        node = self.cx2_obj.get_node(1)
+        self.assertIn('size', node['v'])
+        self.assertEqual(node['v']['size'], 10)
+
+    def test_add_node_attribute_for_nonexistent_node(self):
+        with self.assertRaises(NDExError):
+            self.cx2_obj.add_node_attribute(node_id=999, key='nonexistent', value='value')
+
+    def test_add_edge_attribute(self):
+        self.cx2_obj.add_node(1)
+        self.cx2_obj.add_node(2)
+        self.cx2_obj.add_edge(edge_id=1, source=1, target=2)
+        self.cx2_obj.add_edge_attribute(edge_id=1, key='weight', value=1.5)
+        edge = self.cx2_obj.get_edge(1)
+        self.assertIn('weight', edge['v'])
+        self.assertEqual(edge['v']['weight'], 1.5)
+        # Test updating the attribute
+        self.cx2_obj.add_edge_attribute(edge_id=1, key='weight', value=2.5)
+        edge = self.cx2_obj.get_edge(1)
+        self.assertEqual(edge['v']['weight'], 2.5)
+        # Test adding attribute with datatype
+        self.cx2_obj.add_edge_attribute(edge_id=1, key='label', value='edge1', datatype='string')
+        edge = self.cx2_obj.get_edge(1)
+        self.assertIn('label', edge['v'])
+        self.assertEqual(edge['v']['label'], 'edge1')
+        # Test for non-existing edge
+        with self.assertRaises(NDExError):
+            self.cx2_obj.add_edge_attribute(edge_id=999, key='nonexistent', value='value')
+
+    def test_get_default_value(self):
+        # Set up some attribute declarations with default values
+        self.cx2_obj.set_attribute_declarations({
+            'nodes': {
+                'color': {'d': 'string', 'v': 'red'},  # 'd' for datatype, 'v' for default value
+                'size': {'d': 'integer', 'v': 10}
+            },
+            'edges': {
+                'weight': {'d': 'double', 'v': 1.0}
+            }
+        })
+
+        # Test retrieving default values for node attributes
+        default_color = self.cx2_obj.get_default_value('nodes', 'color')
+        self.assertEqual(default_color, 'red')
+
+        default_size = self.cx2_obj.get_default_value('nodes', 'size')
+        self.assertEqual(default_size, 10)
+
+        # Test retrieving default value for edge attribute
+        default_weight = self.cx2_obj.get_default_value('edges', 'weight')
+        self.assertEqual(default_weight, 1.0)
+
+        # Test retrieving default value when aspect name is incorrect
+        default_nonexistent_aspect = self.cx2_obj.get_default_value('nonexistent_aspect', 'color')
+        self.assertIsNone(default_nonexistent_aspect)
+
+        # Test retrieving default value when attribute name does not exist
+        default_nonexistent_attribute = self.cx2_obj.get_default_value('nodes', 'nonexistent_attribute')
+        self.assertIsNone(default_nonexistent_attribute)
+
+    def test_get_alias(self):
+        # Set up some attribute declarations with aliases
+        self.cx2_obj.set_attribute_declarations({
+            'nodes': {
+                'color': {'d': 'string', 'a': 'clr'},  # 'd' for datatype, 'a' for alias
+                'size': {'d': 'integer', 'a': 'sz'}
+            },
+            'edges': {
+                'weight': {'d': 'double', 'a': 'wt'}
+            }
+        })
+
+        # Test retrieving alias for node attributes
+        alias_color = self.cx2_obj.get_alias('nodes', 'color')
+        self.assertEqual(alias_color, 'clr')
+
+        alias_size = self.cx2_obj.get_alias('nodes', 'size')
+        self.assertEqual(alias_size, 'sz')
+
+        # Test retrieving alias for edge attribute
+        alias_weight = self.cx2_obj.get_alias('edges', 'weight')
+        self.assertEqual(alias_weight, 'wt')
+
+        # Test retrieving alias when aspect name is incorrect
+        alias_nonexistent_aspect = self.cx2_obj.get_alias('nonexistent_aspect', 'color')
+        self.assertIsNone(alias_nonexistent_aspect)
+
+        # Test retrieving alias when attribute name does not exist
+        alias_nonexistent_attribute = self.cx2_obj.get_alias('nodes', 'nonexistent_attribute')
+        self.assertIsNone(alias_nonexistent_attribute)
+
+    def test_set_node_attribute(self):
+        self.cx2_obj.add_node(1)
+
+        # Set a new attribute for the node
+        self.cx2_obj.set_node_attribute(node_id=1, attribute='color', value='red')
+        node = self.cx2_obj.get_node(1)
+        self.assertIn('color', node['v'])
+        self.assertEqual(node['v']['color'], 'red')
+
+        # Update the existing attribute of the node
+        self.cx2_obj.set_node_attribute(node_id=1, attribute='color', value='blue')
+        node = self.cx2_obj.get_node(1)
+        self.assertEqual(node['v']['color'], 'blue')
+
+        # Set another attribute for the node
+        self.cx2_obj.set_node_attribute(node_id=1, attribute='size', value=10)
+        node = self.cx2_obj.get_node(1)
+        self.assertIn('size', node['v'])
+        self.assertEqual(node['v']['size'], 10)
+
+        # Attempt to set an attribute for a non-existing node
+        with self.assertRaises(NDExError):
+            self.cx2_obj.set_node_attribute(node_id=999, attribute='nonexistent', value='value')
+
 
 if __name__ == '__main__':
     unittest.main()

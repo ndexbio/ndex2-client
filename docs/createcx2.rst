@@ -100,15 +100,16 @@ Column Naming Convention
 
 -  Node attributes.
     Node attributes can be specified with a prefix according to their node type:
-        - Use the ``source_`` prefix for attributes of the source node (e.g., ``source_color``).
-        - Use the ``target_`` prefix for attributes of the target node (e.g., ``target_size``).
+        - Use the parameter source_node_attr_prefix to set prefix for attributes of the source node (default ``source_``, e.g., ``source_color``, the node will have attribute ``color``).
+        - Use the parameter target_node_attr_prefix to set prefix for attributes of the target node (default ``target_`` e.g., ``target_size``, the node will have attribute ``size``).
+    If the prefixes are used, attributes in the form ``prefix_x`` (e.g. ``source_x``) will be used as x, y, and z coordinates of the node
 
     They can also be explicitly specified as a list passed in parameter ``source_node_attr`` for edge source node
     and ``target_node_attr`` for edge target node. The same columns can be used for both source and target node
     attributes (e.g. ``source_node_attr=['color', 'size']`` and ``target_node_attr=['color', 'size']``).
 
 -  Edge attributes.
-    Edge attributes should be directly named (e.g., ``weight`` for an edge's weight attribute).
+    Edge attributes can be specified as list in parameter ``edge_attr``. In case the parameter is  not set, all columns that were not used as node attributes will be used (e.g., ``weight`` for an edge's weight attribute).
 
     The ``edge_interaction`` parameter defines the default interaction type for edges. If not specified in the data frame as edge attribute,
     this default value is used. If not set, the default interaction is set to ``interacts-with``.

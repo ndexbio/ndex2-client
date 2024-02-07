@@ -1522,16 +1522,18 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
             if not isinstance(value, Iterable) and pd.isna(value):
                 continue
             node_attr = False
-            if source_node_attr is not None and col in source_node_attr:
-                source_attrs[col] = value
-                node_attr = True
+            if source_node_attr is not None:
+                if col in source_node_attr:
+                    source_attrs[col] = value
+                    node_attr = True
             elif col.startswith(source_node_attr_prefix):
                 source_attrs[col[len(source_node_attr_prefix):]] = value
                 continue
 
-            if target_node_attr is not None and col in target_node_attr:
-                target_attrs[col] = value
-                node_attr = True
+            if target_node_attr is not None:
+                if col in target_node_attr:
+                    target_attrs[col] = value
+                    node_attr = True
             elif col.startswith(target_node_attr_prefix):
                 target_attrs[col[len(target_node_attr_prefix):]] = value
                 continue

@@ -1493,35 +1493,72 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                     ((source_id_value is None or target_id_value is None) and (source is None or target is None)):
                 raise NDExError("Missing 'source' or 'target' columns in the DataFrame")
 
-            source_attrs, target_attrs, edge_attrs = {}, {}, {}
-            for col, value in row.items():
-                if not isinstance(value, Iterable) and pd.isna(value):
-                    continue
-                node_attr = False
-                if source_node_attr is not None and col in source_node_attr:
-                    source_attrs[col] = value
-                    node_attr = True
-                elif col.startswith(source_node_attr_prefix):
-                    source_attrs[col[len(source_node_attr_prefix):]] = value
-                    continue
-
-                if target_node_attr is not None and col in target_node_attr:
-                    target_attrs[col] = value
-                    node_attr = True
-                elif col.startswith(target_node_attr_prefix):
-                    target_attrs[col[len(target_node_attr_prefix):]] = value
-                    continue
-
-                if (edge_attr is not None and col in edge_attr) or (edge_attr is None and not node_attr):
-                    edge_attrs[col] = value
+            source_attrs, target_attrs, edge_attrs = self._process_row_for_attributes(
+                row, source_node_attr, source_node_attr_prefix,
+                target_node_attr, target_node_attr_prefix, edge_attr
+            )
 
             source_node_id = self._add_or_update_node(cx2network, source_id_value, source, source_attrs)
             target_node_id = self._add_or_update_node(cx2network, target_id_value, target, target_attrs)
-            if edge_attrs.get(constants.EDGE_INTERACTION_EXPANDED, None) is None:
-                edge_attrs[constants.EDGE_INTERACTION_EXPANDED] = edge_interaction
-            cx2network.add_edge(source=source_node_id, target=target_node_id, attributes=edge_attrs)
+            self._add_edge(cx2network, source_node_id, target_node_id, edge_attrs, edge_interaction)
 
         return cx2network
+
+    def _process_row_for_attributes(self, row, source_node_attr, source_node_attr_prefix,
+                                    target_node_attr, target_node_attr_prefix, edge_attr):
+        """
+        Process a single DataFrame row to extract source attributes, target attributes, and edge attributes.
+
+        :param row: A single row from a Pandas DataFrame.
+        :param source_node_attr: List of column names for source node attributes.
+        :param source_node_attr_prefix: Prefix for source node attribute columns.
+        :param target_node_attr: List of column names for target node attributes.
+        :param target_node_attr_prefix: Prefix for target node attribute columns.
+        :param edge_attr: List of column names for edge attributes.
+        :return: Tuple of dictionaries for source attributes, target attributes, and edge attributes.
+        """
+        source_attrs, target_attrs, edge_attrs = {}, {}, {}
+        for col, value in row.items():
+            if not isinstance(value, Iterable) and pd.isna(value):
+                continue
+            node_attr = False
+            if source_node_attr is not None and col in source_node_attr:
+                source_attrs[col] = value
+                node_attr = True
+            elif col.startswith(source_node_attr_prefix):
+                source_attrs[col[len(source_node_attr_prefix):]] = value
+                continue
+
+            if target_node_attr is not None and col in target_node_attr:
+                target_attrs[col] = value
+                node_attr = True
+            elif col.startswith(target_node_attr_prefix):
+                target_attrs[col[len(target_node_attr_prefix):]] = value
+                continue
+
+            if (edge_attr is not None and col in edge_attr) or (edge_attr is None and not node_attr):
+                edge_attrs[col] = value
+
+        return source_attrs, target_attrs, edge_attrs
+
+    def _add_edge(self, cx2network, source_node_id, target_node_id, edge_attrs, edge_interaction):
+        """
+        Add an edge between two nodes in the CX2Network and sets default interaction if it was not specified.
+
+        :param cx2network: an object of CX2Network class
+        :type cx2network: :py:class:`~ndex2.cx.CX2Network`
+        :param source_node_id: ID of the source node
+        :type source_node_id: int
+        :param target_node_id: ID of the target node
+        :type target_node_id: int
+        :param edge_attrs: attributes of the edge
+        :type edge_attrs: dict
+        :param edge_interaction: default interaction value
+        :type edge_interaction: str
+        """
+        if edge_attrs.get(constants.EDGE_INTERACTION_EXPANDED, None) is None:
+            edge_attrs[constants.EDGE_INTERACTION_EXPANDED] = edge_interaction
+        cx2network.add_edge(source=source_node_id, target=target_node_id, attributes=edge_attrs)
 
     def _add_or_update_node(self, cx2network, node_id_value, node_name, node_attrs):
         """

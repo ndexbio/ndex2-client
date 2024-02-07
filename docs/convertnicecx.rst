@@ -33,6 +33,7 @@ For conversion to `Pandas`_ see
 :py:func:`~ndex2.nice_cx_network.NiceCXNetwork.to_pandas_dataframe`
 
 .. _cx2net:
+
 CX2Network
 ------------
 

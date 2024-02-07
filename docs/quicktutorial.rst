@@ -454,6 +454,7 @@ For information on installing and using Jupyter Notebooks, go to
 `jupyter.org <https://jupyter.org/>`__
 
 * `Click here <https://github.com/ndexcontent/ndexncipidloader>`__ for example code to load content into `NDEx`_
+
 .. _CX2: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
 .. _`CX version 2`: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
 .. _`CX version 1`: https://cytoscape.org/cx/specification/cytoscape-exchange-format-specification-(version-1)

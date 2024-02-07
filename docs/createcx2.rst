@@ -102,6 +102,7 @@ Column Naming Convention
     Node attributes can be specified with a prefix according to their node type:
         - Use the parameter source_node_attr_prefix to set prefix for attributes of the source node (default ``source_``, e.g., ``source_color``, the node will have attribute ``color``).
         - Use the parameter target_node_attr_prefix to set prefix for attributes of the target node (default ``target_`` e.g., ``target_size``, the node will have attribute ``size``).
+
     If the prefixes are used, attributes in the form ``prefix_x`` (e.g. ``source_x``) will be used as x, y, and z coordinates of the node
 
     They can also be explicitly specified as a list passed in parameter ``source_node_attr`` for edge source node

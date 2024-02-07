@@ -1526,6 +1526,9 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                 if col in source_node_attr:
                     source_attrs[col] = value
                     node_attr = True
+            elif len(source_node_attr_prefix) == 0:
+                raise NDExError("If custom node attribute columns were not set, node attribute prefix should be set, "
+                                "empty string is not supported")
             elif col.startswith(source_node_attr_prefix):
                 source_attrs[col[len(source_node_attr_prefix):]] = value
                 continue
@@ -1534,6 +1537,9 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
                 if col in target_node_attr:
                     target_attrs[col] = value
                     node_attr = True
+            elif len(target_node_attr_prefix) == 0:
+                raise NDExError("If custom node attribute columns were not set, node attribute prefix should be set, "
+                                "empty string is not supported")
             elif col.startswith(target_node_attr_prefix):
                 target_attrs[col[len(target_node_attr_prefix):]] = value
                 continue

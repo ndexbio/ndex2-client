@@ -832,7 +832,7 @@ class CX2Network(object):
         Adds a node-specific visual property bypass.
 
         :param node_id: ID of the node.
-        :type node_id: str
+        :type node_id: str or int
         :param value: Visual property bypass value.
         :type value: Any
         """
@@ -852,7 +852,7 @@ class CX2Network(object):
         Adds an edge-specific visual property bypass.
 
         :param edge_id: ID of the edge.
-        :type edge_id: str
+        :type edge_id: str or int
         :param value: Visual property bypass value.
         :type value: Any
         """
@@ -988,6 +988,30 @@ class CX2Network(object):
                 if default_value:
                     default_values[key] = default_value
         return default_values
+
+    def apply_style_from_network(self, style_cx2):
+        """
+        Applies visual styles, including visual properties and specific node and edge bypasses,
+        from another `CX2Network` instance to this network.
+
+        :param style_cx2: Network to extract style from
+        :type style_cx2: :py:class:`~.CX2Network`
+        :raises TypeError: If object passed in is NOT a :py:class:`~.CX2Network` object or if object is None
+        """
+        if style_cx2 is None:
+            raise TypeError('Object passed in is None')
+        if not isinstance(style_cx2, CX2Network):
+            raise TypeError('Object passed in is not CX2Network')
+
+        vis_prop = style_cx2.get_visual_properties()
+        node_bypasses = style_cx2.get_node_bypasses()
+        edge_bypasses = style_cx2.get_edge_bypasses()
+
+        self.set_visual_properties(vis_prop)
+        for node_id, bp in node_bypasses:
+            self.add_node_bypass(node_id, bp)
+        for edge_id, bp in edge_bypasses:
+            self.add_edge_bypass(edge_id, bp)
 
     def create_from_raw_cx2(self, cx2_data):
         """

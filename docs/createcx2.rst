@@ -65,6 +65,7 @@ of a :py:class:`pandas.DataFrame` into a :py:class:`~ndex2.cx2.CX2Network`.
 This is useful for integrating :py:class:`pandas.DataFrame` data into the CX2_ network
 structure.
 
+Example 1 (setting node ids)
 
 .. code-block:: python
 
@@ -86,6 +87,32 @@ structure.
     # cx2_network is now a CX2Network instance based on the DataFrame data
     print(cx2_network.to_cx2())
 
+Example 2 (using node names)
+
+.. code-block:: python
+
+    import pandas as pd
+    from ndex2.cx2 import PandasDataFrameToCX2NetworkFactory, CX2Network
+
+    # DataFrame with source, target, and other columns
+    data = {'source': ['A', 'B'], 'target': ['B', 'C'],
+            'weight': [1.0, 0.9],
+            'source_size': [5, 6], 'target_size': [6, 7]}
+    df = pd.DataFrame(data)
+
+    # Creating an instance of PandasDataFrameToCX2NetworkFactory
+    factory = PandasDataFrameToCX2NetworkFactory()
+
+    # Converting DataFrame to CX2Network
+    cx2_network = factory.get_cx2network(df, source_field='source', target_field='target')
+
+    # cx2_network is now a CX2Network instance based on the DataFrame data
+    print(cx2_network.to_cx2())
+
+.. warning::
+    Use ``source_field`` and ``target_field`` when you use node names (e.g. gene symbols, proteins etc.),
+    use ``source_id`` and ``target_id`` when you want to set specific node IDs (numerical values). It is possible
+    to use both.
 
 
 Column Naming Convention

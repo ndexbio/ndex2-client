@@ -5,6 +5,7 @@ import tempfile
 import shutil
 
 import networkx as nx
+from ndex2 import constants
 
 from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory
 from ndex2.cx2 import NetworkXToCX2NetworkFactory
@@ -668,6 +669,67 @@ class TestCX2Network(unittest.TestCase):
         # Attempt to set an attribute for a non-existing node
         with self.assertRaises(NDExError):
             self.cx2_obj.set_node_attribute(node_id=999, attribute='nonexistent', value='value')
+
+    def test_remove_specific_node_attribute(self):
+        self.cx2_obj.add_node(1, attributes={'color': 'red', 'size': 'small'})
+        self.cx2_obj.add_node(2, attributes={'color': 'blue', 'size': 'large'})
+
+        # Removing 'color' attribute from node 1
+        self.cx2_obj.remove_node_attribute(1, 'color')
+
+        node1 = self.cx2_obj.get_node(1)
+        node2 = self.cx2_obj.get_node(2)
+
+        self.assertNotIn('color', node1['v'])
+        self.assertIn('size', node1['v'])
+        self.assertIn('color', node2['v'])  # Node 2 should still have its 'color' attribute
+
+    def test_remove_specific_edge_attribute(self):
+        self.cx2_obj.add_node(1)
+        self.cx2_obj.add_node(2)
+        self.cx2_obj.add_edge(1, 1, 2, attributes={'weight': 1.5, 'label': 'edge1'})
+        self.cx2_obj.add_edge(2, 2, 1, attributes={'weight': 2.5, 'label': 'edge2'})
+
+        # Removing 'weight' attribute from edge 1
+        self.cx2_obj.remove_edge_attribute(1, 'weight')
+
+        edge1 = self.cx2_obj.get_edge(1)
+        edge2 = self.cx2_obj.get_edge(2)
+
+        self.assertNotIn('weight', edge1['v'])
+        self.assertIn('label', edge1['v'])
+        self.assertIn('weight', edge2['v'])  # Edge 2 should still have its 'weight' attribute
+
+    def test_remove_node_attribute_nonexistent_node(self):
+        with self.assertRaises(NDExNotFoundError) as context:
+            self.cx2_obj.remove_node_attribute(999, 'color')
+        self.assertEqual('Node 999 does not exist.', str(context.exception))
+
+    def test_remove_edge_attribute_nonexistent_edge(self):
+        with self.assertRaises(NDExNotFoundError) as context:
+            self.cx2_obj.remove_edge_attribute(999, 'weight')
+        self.assertEqual('Edge 999 does not exist.', str(context.exception))
+
+    def test_set_name_for_network(self):
+        test_name = "Test Network Name"
+        self.cx2_obj.set_name(test_name)
+        self.assertEqual(self.cx2_obj.get_network_attributes()['name'], test_name)
+
+    def test_cleanup_attribute_declarations(self):
+        self.cx2_obj.add_node(1, attributes={'color': 'red', 'shape': 'circle'})
+        self.cx2_obj.add_node(2, attributes={'color': 'blue', 'shape': 'square'})
+        self.cx2_obj.add_edge(1, 1, 2, attributes={'weight': 1.5, 'type': 'dashed'})
+
+        self.cx2_obj.remove_node_attribute(1, 'color')
+        self.cx2_obj.remove_node_attribute(2, 'color')
+        self.cx2_obj.remove_edge_attribute(1, 'weight')
+
+        self.cx2_obj._cleanup_attribute_declarations()
+
+        self.assertNotIn('color', self.cx2_obj.get_attribute_declarations().get(constants.NODES_ASPECT, {}))
+        self.assertIn('shape', self.cx2_obj.get_attribute_declarations().get(constants.NODES_ASPECT, {}))
+        self.assertNotIn('weight', self.cx2_obj.get_attribute_declarations().get(constants.EDGES_ASPECT, {}))
+        self.assertIn('type', self.cx2_obj.get_attribute_declarations().get(constants.EDGES_ASPECT, {}))
 
 
 if __name__ == '__main__':

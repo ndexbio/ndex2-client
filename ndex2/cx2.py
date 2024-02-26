@@ -3,9 +3,11 @@ import json
 from copy import deepcopy
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file, constants
+from ndex2.constants import VALID_ATTRIBUTE_DATATYPES_PLUS_SHORT
 from ndex2.exceptions import NDExInvalidCX2Error, NDExAlreadyExists, NDExError, NDExNotFoundError
 from ndex2.nice_cx_network import NiceCXNetwork
 from itertools import zip_longest
@@ -22,7 +24,7 @@ def convert_value(dtype, value):
     :type value: any
     :raises NDExInvalidCX2Error: For invalid data
     """
-    if dtype not in constants.VALID_ATTRIBUTE_DATATYPES:
+    if dtype not in VALID_ATTRIBUTE_DATATYPES_PLUS_SHORT:
         raise NDExInvalidCX2Error(f'Data type {dtype} is invalid in CX2 format')
 
     if dtype.startswith("list_of_"):
@@ -36,11 +38,11 @@ def convert_value(dtype, value):
         return [convert_value(elem_type, v) for v in value]
 
     try:
-        if dtype == constants.INTEGER_DATATYPE or dtype == constants.LONG_DATATYPE:
+        if dtype == constants.INTEGER_DATATYPE or dtype == constants.LONG_DATATYPE or dtype == 'int':
             return int(value)
-        elif dtype == constants.DOUBLE_DATATYPE:
+        elif dtype == constants.DOUBLE_DATATYPE or dtype == 'float':
             return float(value)
-        elif dtype == constants.BOOLEAN_DATATYPE:
+        elif dtype == constants.BOOLEAN_DATATYPE or dtype == 'bool':
             if isinstance(value, bool):
                 return value
             else:
@@ -225,16 +227,16 @@ class CX2Network(object):
         :rtype: str
         :raises NDExError: If the value is of an unsupported type.
         """
-        if isinstance(value, bool):
+        if isinstance(value, (bool, np.bool_)):
             return constants.BOOLEAN_DATATYPE
-        elif isinstance(value, int):
-            if 2 ** 31 - 1 >= value >= -2 ** 31:
+        elif isinstance(value, (int, np.integer)):
+            if 2 ** 31 - 1 >= int(value) >= -2 ** 31:
                 return constants.INTEGER_DATATYPE
             else:
                 return constants.LONG_DATATYPE
-        elif isinstance(value, float):
+        elif isinstance(value, (float, np.floating)):
             return constants.DOUBLE_DATATYPE
-        elif isinstance(value, str):
+        elif isinstance(value, (str, np.str_)):
             return constants.STRING_DATATYPE
         elif isinstance(value, list):
             if value:

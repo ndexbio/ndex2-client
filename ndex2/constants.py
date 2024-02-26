@@ -71,6 +71,13 @@ VALID_ATTRIBUTE_DATATYPES = [
 List of valid attribute data types
 """
 
+VALID_ATTRIBUTE_DATATYPES_PLUS_SHORT = VALID_ATTRIBUTE_DATATYPES + [
+    'str',
+    'int',
+    'bool',
+    'float'
+]
+
 CARTESIAN_LAYOUT_ASPECT = 'cartesianLayout'
 """
 Name of opaque aspect containing coordinates of nodes

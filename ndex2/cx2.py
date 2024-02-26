@@ -1008,9 +1008,9 @@ class CX2Network(object):
         edge_bypasses = style_cx2.get_edge_bypasses()
 
         self.set_visual_properties(vis_prop)
-        for node_id, bp in node_bypasses:
+        for node_id, bp in node_bypasses.items():
             self.add_node_bypass(node_id, bp)
-        for edge_id, bp in edge_bypasses:
+        for edge_id, bp in edge_bypasses.items():
             self.add_edge_bypass(edge_id, bp)
 
     def create_from_raw_cx2(self, cx2_data):

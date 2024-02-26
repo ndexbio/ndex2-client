@@ -1120,6 +1120,29 @@ class CX2Network(object):
 
         return cleaned_data
 
+    def _cleanup_attribute_declarations(self):
+        """
+        Removes attribute declarations that are no longer used in any node, edge, or network attribute.
+        """
+        used_node_attrs = set()
+        for node in self._nodes.values():
+            used_node_attrs.update(node.get('v', {}).keys())
+        node_attrs_to_remove = set(self._attribute_declarations.get(constants.NODES_ASPECT, {}).keys()) - used_node_attrs
+        for attr in node_attrs_to_remove:
+            self._attribute_declarations[constants.NODES_ASPECT].pop(attr, None)
+
+        used_edge_attrs = set()
+        for edge in self._edges.values():
+            used_edge_attrs.update(edge.get('v', {}).keys())
+        edge_attrs_to_remove = set(self._attribute_declarations.get(constants.EDGES_ASPECT, {}).keys()) - used_edge_attrs
+        for attr in edge_attrs_to_remove:
+            self._attribute_declarations[constants.EDGES_ASPECT].pop(attr, None)
+
+        used_network_attrs = set(self._network_attributes.keys())
+        network_attrs_to_remove = set(self._attribute_declarations.get('networkAttributes', {}).keys()) - used_network_attrs
+        for attr in network_attrs_to_remove:
+            self._attribute_declarations['networkAttributes'].pop(attr, None)
+
     def to_cx2(self):
         """
         Generates the `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__ representation of the current state of the instance.
@@ -1137,6 +1160,7 @@ class CX2Network(object):
             },
             {"metaData": self._get_meta_data()}]
 
+        self._cleanup_attribute_declarations()
         if self._attribute_declarations:
             filtered_attribute_declarations = {k: v for k, v in self.get_attribute_declarations().items()
                                                if v is not None and v != {}}

@@ -460,6 +460,15 @@ class CX2Network(object):
 
         del self._network_attributes[key]
 
+    def set_name(self, name):
+        """
+        Sets the name of the network.
+
+        :param name: The name of the network.
+        :type name: str
+        """
+        self.add_network_attribute('name', name)
+
     def get_name(self):
         """
         Retrieves the network name.
@@ -644,6 +653,20 @@ class CX2Network(object):
         self._nodes[node_id][constants.ASPECT_VALUES].update({key: converted_value})
         self._generate_attribute_declarations_for_aspect(constants.NODES_ASPECT, {key: converted_value}, {})
 
+    def remove_node_attribute(self, node_id, attribute_name):
+        """
+        Removes a specific attribute from a node.
+
+        :param node_id: The ID of the node.
+        :type node_id: int
+        :param attribute_name: The name of the attribute to remove.
+        :type attribute_name: str
+        """
+        if node_id not in self._nodes:
+            raise NDExNotFoundError(f"Node {node_id} does not exist.")
+
+        self._nodes[node_id]['v'].pop(attribute_name, None)
+
     def get_edges(self):
         """
         Retrieves the edges in the network.
@@ -762,6 +785,20 @@ class CX2Network(object):
         converted_value = convert_value(declared_type, value)
         self._edges[edge_id][constants.ASPECT_VALUES].update({key: converted_value})
         self._generate_attribute_declarations_for_aspect(constants.EDGES_ASPECT, {key: converted_value}, {})
+
+    def remove_edge_attribute(self, edge_id, attribute_name):
+        """
+        Removes a specific attribute from an edge.
+
+        :param edge_id: The ID of the edge.
+        :type edge_id: int
+        :param attribute_name: The name of the attribute to remove.
+        :type attribute_name: str
+        """
+        if edge_id not in self._edges:
+            raise NDExNotFoundError(f"Edge {edge_id} does not exist.")
+
+        self._edges[edge_id]['v'].pop(attribute_name, None)
 
     def get_visual_properties(self):
         """

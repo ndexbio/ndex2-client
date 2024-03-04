@@ -42,7 +42,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'sphinx_copybutton'
 ]
 
 # intersphinx mapping

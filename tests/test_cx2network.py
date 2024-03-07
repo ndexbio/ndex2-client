@@ -759,6 +759,22 @@ class TestCX2Network(unittest.TestCase):
             main_network.apply_style_from_network("Not a CX2Network")
         self.assertEqual(str(context.exception), 'Object passed in is not CX2Network')
 
+    def test_opaque_aspect_operations(self):
+        self.cx2_obj.set_opaque_aspect('aspect1', 'value1')
+        self.assertIn({'aspect1': 'value1'}, self.cx2_obj.get_opaque_aspects())
+
+        aspect_value = self.cx2_obj.get_opaque_aspect('aspect1')
+        self.assertEqual(aspect_value, 'value1')
+
+        non_existing_aspect_value = self.cx2_obj.get_opaque_aspect('non_existing_aspect')
+        self.assertIsNone(non_existing_aspect_value)
+
+        self.cx2_obj.set_opaque_aspect('aspect1', 'updated_value1')
+        self.assertIn({'aspect1': 'updated_value1'}, self.cx2_obj.get_opaque_aspects())
+
+        self.cx2_obj.set_opaque_aspect('aspect2', 'value2')
+        self.assertIn({'aspect2': 'value2'}, self.cx2_obj.get_opaque_aspects())
+
 
 if __name__ == '__main__':
     unittest.main()

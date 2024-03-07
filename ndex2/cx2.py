@@ -876,6 +876,36 @@ class CX2Network(object):
         """
         self._opaque_aspects = value
 
+    def get_opaque_aspect(self, aspect_name):
+        """
+        Retrieves a specific opaque aspect from the network by its name.
+
+        :param aspect_name: The name of the opaque aspect to retrieve.
+        :type aspect_name: str
+        :return: The value of the specified opaque aspect, or None if not found.
+        :rtype: any
+        """
+        for aspect in self._opaque_aspects:
+            if aspect_name in aspect:
+                return aspect[aspect_name]
+        return None
+
+    def set_opaque_aspect(self, aspect_name, value):
+        """
+        Sets or updates an opaque aspect in the network. If the aspect already exists, its value is updated.
+        Otherwise, it is added to the network.
+
+        :param aspect_name: The name of the opaque aspect to set or update.
+        :type aspect_name: str
+        :param value: The value to set for the opaque aspect.
+        :type value: any
+        """
+        for aspect in self._opaque_aspects:
+            if aspect_name in aspect:
+                aspect[aspect_name] = value
+                return
+        self.add_opaque_aspect({aspect_name: value})
+
     def add_opaque_aspect(self, aspect):
         """
         Adds an opaque aspect to the list of opaque aspects.

@@ -841,6 +841,15 @@ class CX2Network(object):
         """
         Adds an opaque aspect to the list of opaque aspects.
 
+        **Usage Example:**
+
+        .. code-block:: python
+
+            from ndex2.cx2 import CX2Network
+
+            cx2_network = CX2Network()
+            cx2_network.add_opaque_aspect({'aspect_key': 'aspect_value'})
+
         :param aspect: The opaque aspect to add.
         :type aspect: dict
         """

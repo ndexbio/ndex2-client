@@ -747,6 +747,34 @@ class TestCX2Network(unittest.TestCase):
         self.cx2_obj.set_opaque_aspect('aspect2', 'value2')
         self.assertIn({'aspect2': 'value2'}, self.cx2_obj.get_opaque_aspects())
 
+    # def test_apply_style_from_network(self):
+    #     main_network = CX2Network()
+    #     style_network = CX2Network()
+    #
+    #     visual_properties = {'background': 'white'}
+    #     node_bypasses = {1: {'color': 'red'}, 2: {'color': 'blue'}}
+    #     edge_bypasses = {1: {'width': 2.0}}
+    #
+    #     style_network.set_visual_properties(visual_properties)
+    #     for node_id, bypass in node_bypasses.items():
+    #         style_network.add_node_bypass(node_id, bypass)
+    #     for edge_id, bypass in edge_bypasses.items():
+    #         style_network.add_edge_bypass(edge_id, bypass)
+    #
+    #     main_network.apply_style_from_network(style_network)
+    #
+    #     self.assertEqual(main_network.get_visual_properties(), visual_properties)
+    #     self.assertEqual(main_network.get_node_bypasses(), node_bypasses)
+    #     self.assertEqual(main_network.get_edge_bypasses(), edge_bypasses)
+    #
+    #     with self.assertRaises(TypeError) as context:
+    #         main_network.apply_style_from_network(None)
+    #     self.assertEqual(str(context.exception), 'Object passed in is None')
+    #
+    #     with self.assertRaises(TypeError) as context:
+    #         main_network.apply_style_from_network("Not a CX2Network")
+    #     self.assertEqual(str(context.exception), 'Object passed in is not CX2Network')
+
 
 if __name__ == '__main__':
     unittest.main()

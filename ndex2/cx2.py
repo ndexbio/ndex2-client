@@ -1019,6 +1019,49 @@ class CX2Network(object):
                     default_values[key] = default_value
         return default_values
 
+    def _remove_attribute_specific_visual_properties(self, visual_properties):
+        cleaned_visual_properties = {}
+        for entry, entry_value in visual_properties.items():
+            if entry == 'edgeMapping':
+                edge_attribute_names = list(self.get_attribute_declarations().get('edges', {}).keys())
+                cleaned_mapping = {}
+                for vis_prop_key, vis_prop_val in entry_value.items():
+                    if ('definition' in vis_prop_val.keys() and 'attribute' in vis_prop_val.keys()['definition'] and
+                            vis_prop_val['definition']['attribute'] in edge_attribute_names):
+                        cleaned_mapping[vis_prop_key] = vis_prop_val
+                cleaned_visual_properties[entry] = cleaned_mapping
+            elif entry == 'nodeMapping':
+                node_attribute_names = list(self.get_attribute_declarations().get('nodes', {}).keys())
+                cleaned_mapping = {}
+                for vis_prop_key, vis_prop_val in entry_value.items():
+                    if ('definition' in vis_prop_val.keys() and 'attribute' in vis_prop_val.keys()['definition'] and
+                            vis_prop_val['definition']['attribute'] in node_attribute_names):
+                        cleaned_mapping[vis_prop_key] = vis_prop_val
+                cleaned_visual_properties[entry] = cleaned_mapping
+            else:
+                cleaned_visual_properties[entry] = entry_value
+
+        return cleaned_visual_properties
+
+    def apply_style_from_network(self, style_cx2):
+        """
+        Applies visual styles, including visual properties and specific node and edge bypasses,
+        from another `CX2Network` instance to this network.
+
+        :param style_cx2: Network to extract style from
+        :type style_cx2: :py:class:`~.CX2Network`
+        :raises TypeError: If object passed in is NOT a :py:class:`~.CX2Network` object or if object is None
+        """
+        if style_cx2 is None:
+            raise TypeError('Object passed in is None')
+        if not isinstance(style_cx2, CX2Network):
+            raise TypeError('Object passed in is not CX2Network')
+
+        vis_prop = style_cx2.get_visual_properties()
+        cleaned_vis_prop = self._remove_attribute_specific_visual_properties(vis_prop)
+
+        self.set_visual_properties(cleaned_vis_prop)
+
     def create_from_raw_cx2(self, cx2_data):
         """
         Loads and processes a raw `CX2 <https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)>`__

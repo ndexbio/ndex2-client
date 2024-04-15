@@ -6,7 +6,7 @@ History
 -------------------
 
 * Enhancements
-    * Added ``set_name()``, ``remove_node_attribute()``, ``remove_edge_attribute``, ``apply_style_from_network()``
+    * Added ``set_name()``, ``remove_node_attribute()``, ``remove_edge_attribute``,
       ``get_opaque_aspect()``, and ``set_opaque_aspect()`` to ``CX2Network`` class.
 
 * Bug fixes

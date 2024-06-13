@@ -515,6 +515,10 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
     .. note::
         The datatype for everything added to the network is the CX string type
 
+    .. warning::
+        This method does not handle multi-edges, use PandasDataFrameToCX2NetworkFactory from ndex2.cx2
+        to handle multi-edges.
+
 
     :param df: Pandas dataframe to process
     :type df: :py:class:`pandas.DataFrame`

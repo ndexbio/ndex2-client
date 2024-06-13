@@ -392,7 +392,7 @@ of node names to node ids. The network downloaded below is
     # Print out dictionary
     print(str(node_name_dict))
 
-Convert NiceCXNetowrk to CX2Network
+Convert NiceCXNetwork to CX2Network
 -------------------------------------
 The :py:class:`~ndex2.cx2.NoStyleCXToCX2NetworkFactory` class provides a straightforward
 way to convert an existing :py:class:`~ndex2.nice_cx_network.NiceCXNetwork` object into a

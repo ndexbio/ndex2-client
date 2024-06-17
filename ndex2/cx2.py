@@ -1043,7 +1043,7 @@ class CX2Network(object):
             raise NDExError('CX2 is empty')
 
         if isinstance(cx2_data, str):
-            with open(cx2_data, constants.NODE_REPRESENTS) as cx2_file:
+            with open(cx2_data, 'r') as cx2_file:
                 raw_data = json.load(cx2_file)
         elif isinstance(cx2_data, list):
             raw_data = cx2_data

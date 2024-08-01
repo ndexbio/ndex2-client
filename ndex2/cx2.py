@@ -538,7 +538,7 @@ class CX2Network(object):
         :param name: Name of the node to retrieve.
         :type name: str
         :return: Node with the given name or None if not found.
-        :rtype: dict or None
+        :rtype: int or str
         """
         for node_id, node in self._nodes.items():
             if node.get(constants.ASPECT_VALUES, {}).get("name") == name:

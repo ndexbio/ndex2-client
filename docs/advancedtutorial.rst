@@ -92,3 +92,69 @@ Example:
 
 .. _HCX: https://cytoscape.org/cx/cx2/hcx-specification/
 .. _`CX2 format`: https://cytoscape.org/cx/cx2/specification/cytoscape-exchange-format-specification-(version-2)
+
+Modify network attributes
+--------------------------
+
+Network attributes in NDEx can be programmatically modified to update or correct information. This involves downloading
+the network from NDEx, processing the attributes, and applying transformations or replacements as needed.
+
+Using regular expressions, specific patterns within attribute values can be identified and replaced to maintain data
+integrity or reflect updated resources. After modifications, the network can either be saved as a new instance or
+updated in place on the NDEx server.
+
+Here’s the process:
+
+- Connect to NDEx: Authenticate using a username and password.
+- Download the Network: Retrieve the desired network in CX2 format from NDEx using its UUID.
+- Create a Network Object: Use the ``RawCX2NetworkFactory`` to convert the downloaded network into a ``CX2Network`` object.
+- Modify Attributes: Iterate through network attributes and make updates.
+- Save or Update the Network: Save the modified network as a new CX2 network (recommended for safety) or overwrite the existing network.
+
+Similar process can be applied to modify node or edge attributes.
+
+Example: Replace broken image URLs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    import re
+    import json
+    import ndex2
+    import io
+    from ndex2.cx2 import RawCX2NetworkFactory
+    from ndex2.client import DecimalEncoder
+
+    # Create NDEx2 python client
+    client = ndex2.client.Ndex2(username='<USER>', password='<PASSWORD>')
+
+    # Create CX2Network factory
+    factory = RawCX2NetworkFactory()
+
+    # Download network which network attributes you want to modify
+    client_resp = client.get_network_as_cx2_stream('17a6b7ce-b342-11ef-99aa-005056ae3c32')
+
+    # Convert downloaded network to CX2Network object
+    net = factory.get_cx2network(json.loads(client_resp.content))
+
+    # Define the pattern to be replaced and the replacement (here to replace broken URLs with new ones, converting NCBI URLs to EuropePMC)
+    pattern = r'https://www.ncbi.nlm.nih.gov/pmc/articles/([A-Za-z0-9]+)/bin/([^"]+)'
+    replacement = r'https://europepmc.org/articles/\1/bin/\2'
+
+    # Iterate through attributes and replace defined pattern in each
+    for attribute_key, attribute_val in net.get_network_attributes().items():
+        # Apply a regex pattern to replace broken URLs with new ones (in this case, converting NCBI URLs to EuropePMC)
+        modified_attribute_val = re.sub(pattern, replacement, attribute_val)
+        # Set modified attribute value for given attribute key
+        net.add_network_attribute(attribute_key, modified_attribute_val)
+
+    # Save network to NDEx, value returned is link to raw CX data on server.
+    res = client.save_new_cx2_network(net.to_cx2(), visibility='PRIVATE')
+
+    # Update network in place (WARNING: it will override original network - use with caution)
+    # # Create bytes stream
+    # stream = io.BytesIO(json.dumps(net.to_cx2(), cls=DecimalEncoder).encode('utf-8'))
+    # # Update network in NDEx by completely replacing the network with
+    # # one set in cx_stream
+    # client.update_cx2_network(stream, 'aad56606-b342-11ef-99aa-005056ae3c32')
+

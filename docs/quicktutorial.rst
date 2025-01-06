@@ -146,6 +146,41 @@ The code block below shows how to update a network **already** on NDEx_
     # NOTE: above call will not return any output
 
 
+Load CX2 file or CX2-JSON to create CX2 Network
+------------------------------------------------
+
+You can load CX2 file via NDEx Python package by passing the file name in `get_cx2network` method.
+
+.. code-block:: python
+
+    import json
+    from ndex2.cx2 import RawCX2NetworkFactory
+
+    factory = RawCX2NetworkFactory()
+
+    net = factory.get_cx2network('my_network.cx2')
+
+    print('The nodes')
+    for node_id, node in net.get_nodes().items():
+        print(node['v']['name'])
+    print('The edges')
+    for edge_id, edge in net.get_edges().items():
+        print(edge['v'])
+
+You can also directly load CX2 in JSON format if you have previously loaded the file.
+
+.. code-block:: python
+
+    import json
+    from ndex2.cx2 import RawCX2NetworkFactory
+
+    with open('my_network.cx2', 'r') as f:
+        data = json.load(f)
+
+    factory = RawCX2NetworkFactory()
+    net = factory.get_cx2network(data)
+
+
 Add nodes, edges, and attributes to network
 -------------------------------------------------
 

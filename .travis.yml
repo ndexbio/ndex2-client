@@ -26,8 +26,9 @@ jobs:
 install:
   - if [ $NETX = 1.11 ] ; then echo 'installing networkx 1.11' ; pip install networkx==1.11 ; fi
   - pip install -r requirements.txt
+  - pip install -r requirements_test.txt
   - pip install coveralls
 script:
-  - coverage run --source ndex2 setup.py test
+  - coverage run --source ndex2 -m unittest discover
 
 after_success: coveralls

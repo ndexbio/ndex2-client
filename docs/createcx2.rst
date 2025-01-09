@@ -33,6 +33,9 @@ The :py:class:`~ndex2.cx2.NetworkXToCX2NetworkFactory` is designed to convert a
 NetworkX_ graph into a :py:class:`~ndex2.cx2.CX2Network`.
 This conversion is suitable for transferring network data from NetworkX_ to the CX2_ format.
 
+.. warning::
+    As for now, only the conversion only handles networkx graphs with integer IDs of nodes. This will be fix in
+    version 3.9.1.
 
 .. code-block:: python
 

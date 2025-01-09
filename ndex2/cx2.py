@@ -1518,6 +1518,8 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
         :type input_data: :py:class:`networkx.Graph`, :py:class:`networkx.DiGraph`
         :return: Generated network
         :rtype: :py:class:`~ndex2.cx2.CX2Network`
+
+        TODO: add flag take_position_from_node_attribues_or_pos_zpos
         """
         if input_data is None:
             raise Exception('Networkx input is empty')
@@ -1531,7 +1533,11 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
             x = node_data.pop('x', None)
             y = node_data.pop('y', None)
             z = node_data.pop('z', None)
-            cx2network_obj.add_node(node_id=node_id, attributes=node_data, x=x, y=y, z=z)
+            if isinstance(node_id, int):
+                cx2network_obj.add_node(node_id=node_id, attributes=node_data, x=x, y=y, z=z)
+            else:
+                node_data['name'] = node_id
+                cx2network_obj.add_node(attributes=node_data, x=x, y=y, z=z)
 
         for source, target, edge_data in input_data.edges(data=True):
             cx2network_obj.add_edge(source=source, target=target, attributes=edge_data)
@@ -1784,7 +1790,7 @@ class CX2NetworkXFactory(object):
         """
         pass
 
-    def get_graph(self, cx2network, networkx_graph=None):
+    def get_graph(self, cx2network, networkx_graph=None, store_layout_in_pos=False):
         """
         Creates NetworkX Graph object which can
         be one of the multiple types of Graph objects
@@ -1793,6 +1799,8 @@ class CX2NetworkXFactory(object):
         :type cx2network: :py:class:`~ndex2.cx.CX2Network`
         :param networkx_graph: Empty networkx graph to populate
         :type networkx_graph: :class:`networkx.MultiDiGraph`, :class:`networkx.DiGraph`
+        :param store_layout_in_pos: if True store in Graph().pos the actual node position
+        :type store_layout_in_pos: Boolean
         :return: networkx Graph object
         :rtype: :class:`networkx.MultiDiGraph`, :class:`networkx.DiGraph`
         """

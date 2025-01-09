@@ -464,6 +464,8 @@ class CX2Network(object):
         """
         Sets the name of the network.
 
+        .. versionadded:: 3.9.0
+
         :param name: The name of the network.
         :type name: str
         """
@@ -538,7 +540,7 @@ class CX2Network(object):
         :param name: Name of the node to retrieve.
         :type name: str
         :return: Node with the given name or None if not found.
-        :rtype: dict or None
+        :rtype: int or str
         """
         for node_id, node in self._nodes.items():
             if node.get(constants.ASPECT_VALUES, {}).get("name") == name:
@@ -656,6 +658,8 @@ class CX2Network(object):
     def remove_node_attribute(self, node_id, attribute_name):
         """
         Removes a specific attribute from a node.
+
+        .. versionadded:: 3.9.0
 
         :param node_id: The ID of the node.
         :type node_id: int
@@ -790,6 +794,8 @@ class CX2Network(object):
         """
         Removes a specific attribute from an edge.
 
+        .. versionadded:: 3.9.0
+
         :param edge_id: The ID of the edge.
         :type edge_id: int
         :param attribute_name: The name of the attribute to remove.
@@ -862,6 +868,8 @@ class CX2Network(object):
         """
         Retrieves the opaque aspects of the network.
 
+        .. versionadded:: 3.9.0
+
         :return: The opaque aspects of the network.
         :rtype: list
         """
@@ -870,6 +878,8 @@ class CX2Network(object):
     def set_opaque_aspects(self, value):
         """
         Sets the opaque aspects for the network.
+
+        .. versionadded:: 3.9.0
 
         :param value: New opaque aspects for the network.
         :type value: list

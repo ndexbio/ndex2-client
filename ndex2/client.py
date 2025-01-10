@@ -30,7 +30,7 @@ userAgent = 'NDEx2-Python/' + __version__
 User agent value to prepend to all requests
 """
 
-DEFAULT_SERVER = "http://public.ndexbio.org"
+DEFAULT_SERVER = "http://www.ndexbio.org"
 
 
 class Ndex2(object):

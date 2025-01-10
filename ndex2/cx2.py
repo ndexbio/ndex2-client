@@ -1543,9 +1543,10 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
             x = node_data.pop(constants.LAYOUT_X, None)
             y = node_data.pop(constants.LAYOUT_Y, None)
             z = node_data.pop(constants.LAYOUT_Z, None)
-            if isinstance(node_id, int):
-                cx2network_obj.add_node(node_id=node_id, attributes=node_data, x=x, y=y, z=z)
-            else:
+            try:
+                node_id_int = int(node_id)
+                cx2network_obj.add_node(node_id=node_id_int, attributes=node_data, x=x, y=y, z=z)
+            except (ValueError, TypeError):
                 node_data[constants.NODE_NAME_EXPANDED] = node_id
                 cx2network_obj.add_node(attributes=node_data, x=x, y=y, z=z)
 

@@ -543,8 +543,8 @@ class CX2Network(object):
         :rtype: int or str
         """
         for node_id, node in self._nodes.items():
-            if node.get(constants.ASPECT_VALUES, {}).get("name") == name:
-                return node.get('id', None)
+            if node.get(constants.ASPECT_VALUES, {}).get(constants.NODE_NAME_EXPANDED, None) == name:
+                return node.get(constants.ASPECT_ID, None)
         return None
 
     def remove_node(self, node_id):
@@ -804,7 +804,7 @@ class CX2Network(object):
         if edge_id not in self._edges:
             raise NDExNotFoundError(f"Edge {edge_id} does not exist.")
 
-        self._edges[edge_id]['v'].pop(attribute_name, None)
+        self._edges[edge_id][constants.ASPECT_VALUES].pop(attribute_name, None)
 
     def get_visual_properties(self):
         """
@@ -1175,7 +1175,7 @@ class CX2Network(object):
         """
         used_node_attrs = set()
         for node in self._nodes.values():
-            used_node_attrs.update(node.get('v', {}).keys())
+            used_node_attrs.update(node.get(constants.ASPECT_VALUES, {}).keys())
         node_attrs_to_remove = set(self._attribute_declarations.get(constants.NODES_ASPECT, {}).keys()) - used_node_attrs
         for attr in node_attrs_to_remove:
             self._attribute_declarations[constants.NODES_ASPECT].pop(attr, None)
@@ -1540,13 +1540,13 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
         cx2network_obj = CX2Network()
 
         for node_id, node_data in input_data.nodes(data=True):
-            x = node_data.pop('x', None)
-            y = node_data.pop('y', None)
-            z = node_data.pop('z', None)
+            x = node_data.pop(constants.LAYOUT_X, None)
+            y = node_data.pop(constants.LAYOUT_Y, None)
+            z = node_data.pop(constants.LAYOUT_Z, None)
             if isinstance(node_id, int):
                 cx2network_obj.add_node(node_id=node_id, attributes=node_data, x=x, y=y, z=z)
             else:
-                node_data['name'] = node_id
+                node_data[constants.NODE_NAME_EXPANDED] = node_id
                 cx2network_obj.add_node(attributes=node_data, x=x, y=y, z=z)
 
         for source, target, edge_data in input_data.edges(data=True):
@@ -1730,6 +1730,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         :param attr_list: List of attribute names to be included.
         :param attr_prefix: Prefix for attribute columns.
         :return: A tuple with the extracted attribute name and value if applicable, otherwise None.
+
+        TODO: fix this if column names are integers
         """
         if attr_list is not None:
             if col in attr_list:
@@ -1823,19 +1825,19 @@ class CX2NetworkXFactory(object):
         cx2network = copy.deepcopy(cx2network)
 
         for node_id, node_data in cx2network.get_nodes().items():
-            attrs = node_data.get('v', {})
-            if 'x' in node_data:
-                attrs['x'] = node_data['x']
-            if 'y' in node_data:
-                attrs['y'] = node_data['y']
-            if 'z' in node_data:
-                attrs['z'] = node_data['z']
+            attrs = node_data.get(constants.ASPECT_VALUES, {})
+            if constants.LAYOUT_X in node_data:
+                attrs[constants.LAYOUT_X] = node_data[constants.LAYOUT_X]
+            if constants.LAYOUT_Y in node_data:
+                attrs[constants.LAYOUT_Y] = node_data[constants.LAYOUT_Y]
+            if constants.LAYOUT_Z in node_data:
+                attrs[constants.LAYOUT_Z] = node_data[constants.LAYOUT_Z]
             networkx_graph.add_node(node_id, **attrs)
 
         for edge_id, edge_data in cx2network.get_edges().items():
-            source = edge_data['s']
-            target = edge_data['t']
-            attrs = edge_data.get('v', {})
+            source = edge_data[constants.EDGE_SOURCE]
+            target = edge_data[constants.EDGE_TARGET]
+            attrs = edge_data.get(constants.ASPECT_VALUES, {})
             networkx_graph.add_edge(source, target, **attrs)
 
         for attr, value in cx2network.get_network_attributes().items():
@@ -1883,8 +1885,8 @@ class CX2NetworkPandasDataFrameFactory(object):
 
         for edge_id, edge in cx2network.get_edges().items():
             row = {}
-            source_node_id = edge.get('s')
-            target_node_id = edge.get('t')
+            source_node_id = edge.get(constants.EDGE_SOURCE)
+            target_node_id = edge.get(constants.EDGE_TARGET)
 
             row['source_id'] = source_node_id
             row['target_id'] = target_node_id
@@ -1899,20 +1901,20 @@ class CX2NetworkPandasDataFrameFactory(object):
                 row[f'target_{attr_key}'] = attr_value
 
             # Add coordinates if available
-            if 'x' in source_node_attrs:
-                row['source_x'] = source_node_attrs['x']
-            if 'y' in source_node_attrs:
-                row['source_y'] = source_node_attrs['y']
-            if 'z' in source_node_attrs:
-                row['source_z'] = source_node_attrs['z']
-            if 'x' in target_node_attrs:
-                row['target_x'] = target_node_attrs['x']
-            if 'y' in target_node_attrs:
-                row['target_y'] = target_node_attrs['y']
-            if 'z' in target_node_attrs:
-                row['target_z'] = target_node_attrs['z']
+            if constants.LAYOUT_X in source_node_attrs:
+                row['source_x'] = source_node_attrs[constants.LAYOUT_X]
+            if constants.LAYOUT_Y in source_node_attrs:
+                row['source_y'] = source_node_attrs[constants.LAYOUT_Y]
+            if constants.LAYOUT_Z in source_node_attrs:
+                row['source_z'] = source_node_attrs[constants.LAYOUT_Z]
+            if constants.LAYOUT_X in target_node_attrs:
+                row['target_x'] = target_node_attrs[constants.LAYOUT_X]
+            if constants.LAYOUT_Y in target_node_attrs:
+                row['target_y'] = target_node_attrs[constants.LAYOUT_Y]
+            if constants.LAYOUT_Z in target_node_attrs:
+                row['target_z'] = target_node_attrs[constants.LAYOUT_Z]
 
-            for attr_key, attr_value in edge.get('v', {}).items():
+            for attr_key, attr_value in edge.get(constants.ASPECT_VALUES, {}).items():
                 row[attr_key] = attr_value
 
             rows.append(row)
@@ -1935,10 +1937,10 @@ class CX2NetworkPandasDataFrameFactory(object):
         for node_id, node in cx2network.get_nodes().items():
             node_data = {
                 'node_id': node_id,
-                **node.get('v', {}),
-                'x': node.get('x'),
-                'y': node.get('y'),
-                'z': node.get('z'),
+                **node.get(constants.ASPECT_VALUES, {}),
+                constants.LAYOUT_X: node.get(constants.LAYOUT_X, None),
+                constants.LAYOUT_Y: node.get(constants.LAYOUT_Y, None),
+                constants.LAYOUT_Z: node.get(constants.LAYOUT_Z, None),
             }
             data.append(node_data)
 

@@ -1520,16 +1520,18 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
     def __init__(self):
         super(NetworkXToCX2NetworkFactory, self).__init__()
 
-    def get_cx2network(self, input_data=None):
+    def get_cx2network(self, input_data=None, get_layout_from_pos=False):
         """
         Creates :py:class:`~ndex2.cx2.CX2Network` from :py:class:`networkx.Graph`
         object
         :param input_data: Optional input data used to generate network
         :type input_data: :py:class:`networkx.Graph`, :py:class:`networkx.DiGraph`
+        :param get_layout_from_pos: Determines the source of the layout coordinates. If True, the layout is derived
+                                    from G.pos (x and y) and G.zpos. If False, the layout uses the (x, y, z) values
+                                    specified as the node attributes.
+        :type get_layout_from_pos: boolean
         :return: Generated network
         :rtype: :py:class:`~ndex2.cx2.CX2Network`
-
-        TODO: add flag take_position_from_node_attribues_or_pos_zpos
         """
         if input_data is None:
             raise Exception('Networkx input is empty')
@@ -1539,10 +1541,23 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
 
         cx2network_obj = CX2Network()
 
+        x, y, z = None, None, None
         for node_id, node_data in input_data.nodes(data=True):
-            x = node_data.pop(constants.LAYOUT_X, None)
-            y = node_data.pop(constants.LAYOUT_Y, None)
-            z = node_data.pop(constants.LAYOUT_Z, None)
+            if get_layout_from_pos:
+                if hasattr(input_data, 'pos'):
+                    xy_pos = input_data.pos.get(node_id, None)
+                    if xy_pos is not None:
+                        x = float(xy_pos[0])
+                        y = float(-xy_pos[1])
+                if hasattr(input_data, 'zpos'):
+                    z_pos = input_data.zpos.get(node_id, None)
+                    if z_pos is not None:
+                        z = float(z_pos)
+            else:
+                x = node_data.pop(constants.LAYOUT_X, None)
+                y = node_data.pop(constants.LAYOUT_Y, None)
+                z = node_data.pop(constants.LAYOUT_Z, None)
+
             try:
                 node_id_int = int(node_id)
                 cx2network_obj.add_node(node_id=node_id_int, attributes=node_data, x=x, y=y, z=z)
@@ -1812,7 +1827,8 @@ class CX2NetworkXFactory(object):
         :type cx2network: :py:class:`~ndex2.cx.CX2Network`
         :param networkx_graph: Empty networkx graph to populate
         :type networkx_graph: :class:`networkx.MultiDiGraph`, :class:`networkx.DiGraph`
-        :param store_layout_in_pos: if True store in Graph().pos the actual node position
+        :param store_layout_in_pos: If True, saves the current node positions into G.pos (x and y) and G.zpos (z).
+                                    If False, the layout is saved as
         :type store_layout_in_pos: Boolean
         :return: networkx Graph object
         :rtype: :class:`networkx.MultiDiGraph`, :class:`networkx.DiGraph`
@@ -1824,15 +1840,22 @@ class CX2NetworkXFactory(object):
             networkx_graph = nx.MultiDiGraph()
 
         cx2network = copy.deepcopy(cx2network)
+        networkx_graph.pos = {}
+        networkx_graph.zpos = {}
 
         for node_id, node_data in cx2network.get_nodes().items():
             attrs = node_data.get(constants.ASPECT_VALUES, {})
-            if constants.LAYOUT_X in node_data:
-                attrs[constants.LAYOUT_X] = node_data[constants.LAYOUT_X]
-            if constants.LAYOUT_Y in node_data:
-                attrs[constants.LAYOUT_Y] = node_data[constants.LAYOUT_Y]
-            if constants.LAYOUT_Z in node_data:
-                attrs[constants.LAYOUT_Z] = node_data[constants.LAYOUT_Z]
+            if store_layout_in_pos:
+                networkx_graph.pos[node_id] = (node_data.get(constants.LAYOUT_X, None),
+                                               -node_data.get(constants.LAYOUT_Y, None))
+                networkx_graph.zpos[node_id] = node_data.get(constants.LAYOUT_Z, None)
+            else:
+                if constants.LAYOUT_X in node_data:
+                    attrs[constants.LAYOUT_X] = node_data[constants.LAYOUT_X]
+                if constants.LAYOUT_Y in node_data:
+                    attrs[constants.LAYOUT_Y] = node_data[constants.LAYOUT_Y]
+                if constants.LAYOUT_Z in node_data:
+                    attrs[constants.LAYOUT_Z] = node_data[constants.LAYOUT_Z]
             networkx_graph.add_node(node_id, **attrs)
 
         for edge_id, edge_data in cx2network.get_edges().items():

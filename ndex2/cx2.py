@@ -1761,8 +1761,6 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         :param attr_list: List of attribute names to be included.
         :param attr_prefix: Prefix for attribute columns.
         :return: A tuple with the extracted attribute name and value if applicable, otherwise None.
-
-        TODO: fix this if column names are integers
         """
         if attr_list is not None:
             if col in attr_list:

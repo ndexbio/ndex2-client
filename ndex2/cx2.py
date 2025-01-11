@@ -1566,6 +1566,12 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
                 cx2network_obj.add_node(attributes=node_data, x=x, y=y, z=z)
 
         for source, target, edge_data in input_data.edges(data=True):
+            try:
+                source = int(source)
+                target = int(target)
+            except (ValueError, TypeError):
+                source = cx2network_obj.lookup_node_id_by_name(source)
+                target = cx2network_obj.lookup_node_id_by_name(target)
             cx2network_obj.add_edge(source=source, target=target, attributes=edge_data)
 
         for attr_key, attr_value in input_data.graph.items():

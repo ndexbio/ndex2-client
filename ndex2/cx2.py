@@ -1596,7 +1596,7 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
     def get_cx2network(self, input_data=None, source_field='source_name', target_field='target_name',
                        source_id='source_id', target_id='target_id', source_node_attr=None, target_node_attr=None,
                        source_node_attr_prefix='source_', target_node_attr_prefix='target_',
-                       edge_attr=None, edge_interaction='interacts-with') -> CX2Network:
+                       edge_attr=None, edge_interaction='interacts-with', interaction_col=None) -> CX2Network:
         """
         Converts a given Pandas DataFrame into a CX2Network object. The DataFrame should
         contain columns 'source' and 'target' to represent source node and target node of edge,
@@ -1655,13 +1655,13 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         :param input_data: The Pandas DataFrame to be converted into CX2Network.
         :type input_data: pd.DataFrame
         :param source_field: The field name for the source node name.
-        :type source_field: str
+        :type source_field: str or int
         :param target_field: The field name for the target node name.
-        :type target_field: str
+        :type target_field: str or int
         :param source_id: The field name for the source node ID.
-        :type source_id: str
+        :type source_id: str or int
         :param target_id: The field name for the target node ID.
-        :type target_id: str
+        :type target_id: str or int
         :param source_node_attr: A list of column names to be used as source node attributes.
         :type source_node_attr: list or None
         :param target_node_attr: A list of column names to be used as target node attributes.
@@ -1674,6 +1674,8 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         :type edge_attr: list or None
         :param edge_interaction: The default interaction type for edges.
         :type edge_interaction: str
+        :param interaction_col: Name of column with edge interaction
+        :type interaction_col: str or int
         :return: A CX2Network object :py:class:`~ndex2.cx2.CX2Network`
         :rtype: CX2Network
         :raises NDExError: If the input DataFrame is None or does not have the necessary columns.
@@ -1694,11 +1696,15 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
 
             if (source_id_value is None and target_id_value is None and source is None and target is None) or \
                     ((source_id_value is None or target_id_value is None) and (source is None or target is None)):
-                raise NDExError("Missing 'source' or 'target' columns in the DataFrame")
+                if row.get(0, None) is not None and row.get(1, None) is not None:
+                    source = row.get(0)
+                    target = row.get(1)
+                else:
+                    raise NDExError("Missing 'source' or 'target' columns in the DataFrame")
 
             source_attrs, target_attrs, edge_attrs = self._process_row_for_attributes(
                 row, source_node_attr, source_node_attr_prefix,
-                target_node_attr, target_node_attr_prefix, edge_attr
+                target_node_attr, target_node_attr_prefix, edge_attr, interaction_col
             )
 
             source_node_id = self._add_or_update_node(cx2network, source_id_value, source, source_attrs)
@@ -1708,7 +1714,7 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         return cx2network
 
     def _process_row_for_attributes(self, row, source_node_attr, source_node_attr_prefix,
-                                    target_node_attr, target_node_attr_prefix, edge_attr):
+                                    target_node_attr, target_node_attr_prefix, edge_attr, interaction_col=None):
         """
         Process a single DataFrame row to extract source attributes, target attributes, and edge attributes.
 
@@ -1739,7 +1745,10 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
 
             if (edge_attr is not None and col in edge_attr) or (edge_attr is None and extracted_source_attr is None and
                                                                 extracted_target_attr is None):
-                edge_attrs[col] = value
+                if col == interaction_col:
+                    edge_attrs[constants.EDGE_INTERACTION_EXPANDED] = value
+                else:
+                    edge_attrs[col] = value
 
         return source_attrs, target_attrs, edge_attrs
 
@@ -1761,7 +1770,7 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         elif len(attr_prefix) == 0:
             raise NDExError("If custom node attribute columns were not set, node attribute prefix should be set, "
                             "empty string is not supported")
-        elif col.startswith(attr_prefix):
+        elif isinstance(col, str) and col.startswith(attr_prefix):
             return col[len(attr_prefix):], value
         return None
 

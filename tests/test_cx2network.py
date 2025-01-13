@@ -5,9 +5,11 @@ import tempfile
 import shutil
 
 import networkx as nx
+import pandas as pd
+
 from ndex2 import constants
 
-from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory
+from ndex2.cx2 import CX2Network, convert_value, NoStyleCXToCX2NetworkFactory, PandasDataFrameToCX2NetworkFactory
 from ndex2.cx2 import NetworkXToCX2NetworkFactory
 from ndex2.cx2 import CX2NetworkPandasDataFrameFactory
 from ndex2.exceptions import NDExAlreadyExists, NDExError
@@ -746,6 +748,29 @@ class TestCX2Network(unittest.TestCase):
 
         self.cx2_obj.set_opaque_aspect('aspect2', 'value2')
         self.assertIn({'aspect2': 'value2'}, self.cx2_obj.get_opaque_aspects())
+
+    def test_create_cx2_from_df_with_no_headers(self):
+        data = [('ABC', 'DEF'), ('DEF', 'XYZ')]
+
+        df = pd.DataFrame.from_records(data)
+
+        pd_factory = PandasDataFrameToCX2NetworkFactory()
+
+        cx2_df_2_column = pd_factory.get_cx2network(df)
+        self.assertEqual(cx2_df_2_column.get_node(0)[constants.ASPECT_VALUES]['name'], 'ABC')
+        self.assertEqual(len(cx2_df_2_column.get_edges()), 2)
+
+    def test_interaction_column(self):
+        data = [('ABC', 'DEF', 'interacts-with'), ('DEF', 'XYZ', 'neighbor-of')]
+
+        df = pd.DataFrame.from_records(data)
+
+        pd_factory = PandasDataFrameToCX2NetworkFactory()
+
+        cx2_df_3_column = pd_factory.get_cx2network(df, interaction_col=2)
+
+        self.assertEqual(cx2_df_3_column.get_edge(0)[constants.ASPECT_VALUES]['interaction'], 'interacts-with')
+        self.assertEqual(cx2_df_3_column.get_edge(1)[constants.ASPECT_VALUES]['interaction'], 'neighbor-of')
 
 
 if __name__ == '__main__':

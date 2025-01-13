@@ -237,7 +237,7 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network = CX2Network()
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network)
-        if float(nx.__version__) > 1.11:
+        if self.get_networkx_major_version() > 1:
             self.assertEqual(len(graph.nodes), 0)
             self.assertEqual(len(graph.edges), 0)
 
@@ -247,7 +247,7 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network.add_node(1, attributes={'name': 'Node1'})
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network)
-        if float(nx.__version__) > 1.11:
+        if self.get_networkx_major_version() > 1:
             self.assertEqual(len(graph.nodes), 1)
             self.assertEqual(len(graph.edges), 0)
             self.assertIn(1, graph.nodes)
@@ -271,7 +271,7 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network.add_node(1, x=1.0, y=2.0, z=3.0)
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network, store_layout_in_pos=False)
-        if float(nx.__version__) > 1.11:
+        if self.get_networkx_major_version() > 1:
             self.assertNotIn(1, graph.pos)
             self.assertEqual(graph.nodes[1]['x'], 1.0)
             self.assertEqual(graph.nodes[1]['y'], 2.0)
@@ -285,7 +285,7 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network.add_edge(source=1, target=2, attributes={'interaction': 'activates'})
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network)
-        if float(nx.__version__) > 1.11:
+        if self.get_networkx_major_version() > 1:
             self.assertEqual(len(graph.edges), 1)
         self.assertTrue(graph.has_edge(1, 2))
         self.assertEqual(graph[1][2][0]['interaction'], 'activates')

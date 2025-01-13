@@ -30,14 +30,6 @@ with open(os.path.join('ndex2', 'version.py')) as ver_file:
             version=re.sub("'", "", line[line.index("'"):]).rstrip()
 
 
-test_requirements = [
-    'unittest2',
-    'requests-mock',
-    'mock; python_version < "3.3"',
-    'nose'
-]
-
-
 if __name__ == '__main__':
     setup(
         name='ndex2',
@@ -93,9 +85,6 @@ if __name__ == '__main__':
         # You can just specify the packages manually here if your project is
         # simple. Or you can use find_packages().
         packages=find_packages(include=['ndex2', 'ndex2cx']),
-
-        test_suite='tests',
-        tests_require=test_requirements,
         install_requires=[
             'six',
             'ijson',

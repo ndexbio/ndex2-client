@@ -57,13 +57,13 @@ systemtest: ## run legacy system tests (under ndex2/tests/) and unit tests via n
 	nosetests -v
 
 test: ## run tests with default Python, for system tests set NDEX2_TEST_SERVER, ..._USER, ..._PASS env variables
-	python setup.py test
+	pytest
 
 test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source ndex2,ndex2cx setup.py test
+	coverage run --source ndex2,ndex2cx -m unittest discover
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html

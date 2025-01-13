@@ -29,44 +29,68 @@ The :py:class:`~ndex2.cx2.RawCX2NetworkFactory` is designed to create a
 NetworkX
 ----------
 
-The :py:class:`~ndex2.cx2.NetworkXToCX2NetworkFactory` is designed to convert a
-NetworkX_ graph into a :py:class:`~ndex2.cx2.CX2Network`.
-This conversion is suitable for transferring network data from NetworkX_ to the CX2_ format.
+The :py:class:`~ndex2.cx2.NetworkXToCX2NetworkFactory` facilitates the conversion of a NetworkX_ graph
+into a :py:class:`~ndex2.cx2.CX2Network`. This allows you to leverage the CX2_ format for sharing, storing, or processing
+networks in Cytoscape Ecosystem.
+
+Features:
+
+* Converts nodes, edges, and their attributes from a NetworkX graph to a CX2Network.
+* Supports layout extraction from node attributes (x, y, z) or external position dictionaries (G.pos and G.zpos).
+* Handles edge attributes, network-level attributes, and node-level attributes.
+* Automatically assigns unique IDs to nodes when non-integer IDs are used.
+
+Layout storage settings:
+
+* If get_layout_from_pos=True, layout coordinates are extracted from G.pos and G.zpos.
+* G.pos: A dictionary mapping node IDs to (x, y) tuples
+* G.zpos: A dictionary mapping node IDs to z-coordinates.
+* If get_layout_from_pos=False, layout coordinates are extracted from node attributes (x, y, z) if they exist.
+
 
 .. warning::
-    As for now, only the conversion only handles networkx graphs with integer IDs of nodes. This will be fix in
-    version 3.9.1.
+    If the Networkx graph contains string node IDs that cannot be converted to integers, the node IDs will be saved
+    in the ``name`` attribute. If the graph already has a name attribute for its nodes, this may result in a conflict
+    and loss of information. To avoid this, please rename the existing name attribute before saving the graph.
 
 .. code-block:: python
 
     import networkx as nx
     from ndex2.cx2 import NetworkXToCX2NetworkFactory, CX2Network
 
-    # Add nodes and edges to networkx_graph...
-    networkx_graph = nx.Graph()
-    networkx_graph.add_node(1, size=5)
-    networkx_graph.add_node(2, size=6)
-    networkx_graph.add_node(3, size=7)
-    networkx_graph.add_edge(1, 2) weight=1.0)
-    networkx_graph.add_edge(2, 3, weight=0.9)
+    # Create and populate a NetworkX graph
+    networkx_graph = nx.MultiDiGraph()
+    networkx_graph.add_node(1, name='Node1', size=5)
+    networkx_graph.add_node(2, name='Node2', size=10)
+    networkx_graph.add_edge(1, 2, weight=1.0, interaction='activates')
 
-    # Creating an instance of NetworkXToCX2NetworkFactory
+    # Add layout positions to the graph
+    networkx_graph.pos = {1: (10.0, 20.0), 2: (15.0, 25.0)}
+    networkx_graph.zpos = {1: 5.0, 2: 7.0}
+
+    # Convert to CX2Network using the factory
     factory = NetworkXToCX2NetworkFactory()
+    cx2_network = factory.get_cx2network(networkx_graph, get_layout_from_pos=True)
 
-    # Converting NetworkX graph to CX2Network
-    cx2_network = factory.get_cx2network(networkx_graph)
-
-    # cx2_network is now a CX2Network instance representing the NetworkX graph
+    # View the CX2Network data
     print(cx2_network.to_cx2())
 
 
 Pandas
 -------
 
-The :py:class:`~ndex2.cx2.PandasDataFrameToCX2NetworkFactory` enables the conversion
-of a :py:class:`pandas.DataFrame` into a :py:class:`~ndex2.cx2.CX2Network`.
-This is useful for integrating :py:class:`pandas.DataFrame` data into the CX2_ network
-structure.
+The :py:class:`~ndex2.cx2.PandasDataFrameToCX2NetworkFactory` facilitates the conversion of
+a :py:class:`pandas.DataFrame` into a :py:class:`~ndex2.cx2.CX2Network`. This is particularly useful for integrating
+tabular data into the CX2_ network structure for visualization, analysis, and sharing in Cytoscape Ecosystem.
+
+Features
+
+* Customizable Input: Supports defining custom source and target node fields and node and edge attributes via prefixes or explicit column lists.
+* Flexible Layout Handling: Automatically detects and uses node layout attributes (x, y, z) when present.
+* Edge Interactions: Supports custom interaction column name (`interaction_col` parameter). Default edge interaction type can be set using the edge_interaction parameter.
+* Default Behavior: If no custom edge attributes are provided, all non-node attribute columns are treated as edge attributes.
+* Node Attribute Updates: Nodes listed multiple times will have their attributes updated based on the latest occurrence in the DataFrame.
+
 
 Example 1 (setting node ids)
 

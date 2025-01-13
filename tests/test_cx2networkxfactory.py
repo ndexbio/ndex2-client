@@ -237,8 +237,9 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network = CX2Network()
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network)
-        self.assertEqual(len(graph.nodes), 0)
-        self.assertEqual(len(graph.edges), 0)
+        if float(nx.__version__) > 1.11:
+            self.assertEqual(len(graph.nodes), 0)
+            self.assertEqual(len(graph.edges), 0)
 
     def test_single_node_cx2_network(self):
         """Test conversion of a CX2Network with a single node to a NetworkX graph."""
@@ -246,10 +247,11 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network.add_node(1, attributes={'name': 'Node1'})
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network)
-        self.assertEqual(len(graph.nodes), 1)
-        self.assertEqual(len(graph.edges), 0)
-        self.assertIn(1, graph.nodes)
-        self.assertEqual(graph.nodes[1]['name'], 'Node1')
+        if float(nx.__version__) > 1.11:
+            self.assertEqual(len(graph.nodes), 1)
+            self.assertEqual(len(graph.edges), 0)
+            self.assertIn(1, graph.nodes)
+            self.assertEqual(graph.nodes[1]['name'], 'Node1')
 
     def test_nodes_with_layout_and_store_layout_in_pos(self):
         """Test storing layout in graph.pos and graph.zpos with store_layout_in_pos=True."""
@@ -269,10 +271,11 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network.add_node(1, x=1.0, y=2.0, z=3.0)
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network, store_layout_in_pos=False)
-        self.assertNotIn(1, graph.pos)
-        self.assertEqual(graph.nodes[1]['x'], 1.0)
-        self.assertEqual(graph.nodes[1]['y'], 2.0)
-        self.assertEqual(graph.nodes[1]['z'], 3.0)
+        if float(nx.__version__) > 1.11:
+            self.assertNotIn(1, graph.pos)
+            self.assertEqual(graph.nodes[1]['x'], 1.0)
+            self.assertEqual(graph.nodes[1]['y'], 2.0)
+            self.assertEqual(graph.nodes[1]['z'], 3.0)
 
     def test_edges_and_attributes(self):
         """Test conversion of edges and their attributes."""
@@ -282,7 +285,8 @@ class TestCX2NetworkXFactory(unittest.TestCase):
         cx2_network.add_edge(source=1, target=2, attributes={'interaction': 'activates'})
         factory = CX2NetworkXFactory()
         graph = factory.get_graph(cx2_network)
-        self.assertEqual(len(graph.edges), 1)
+        if float(nx.__version__) > 1.11:
+            self.assertEqual(len(graph.edges), 1)
         self.assertTrue(graph.has_edge(1, 2))
         self.assertEqual(graph[1][2][0]['interaction'], 'activates')
 

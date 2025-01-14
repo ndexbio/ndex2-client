@@ -1532,6 +1532,10 @@ class NetworkXToCX2NetworkFactory(CX2NetworkFactory):
         :type get_layout_from_pos: boolean
         :return: Generated network
         :rtype: :py:class:`~ndex2.cx2.CX2Network`
+
+        .. versionchanged:: 3.10.0
+
+            Added get_layout_from_pos parameter.
         """
         if input_data is None:
             raise Exception('Networkx input is empty')
@@ -1601,6 +1605,10 @@ class PandasDataFrameToCX2NetworkFactory(CX2NetworkFactory):
         Converts a given Pandas DataFrame into a CX2Network object. The DataFrame should
         contain columns 'source' and 'target' to represent source node and target node of edge,
         and may contain additional columns for edge and node attributes.
+
+        .. versionchanged:: 3.10.0
+
+            Added interaction_col parameter.
 
         .. versionchanged:: 3.8.0
 
@@ -1845,6 +1853,10 @@ class CX2NetworkXFactory(object):
         :type store_layout_in_pos: Boolean
         :return: networkx Graph object
         :rtype: :class:`networkx.MultiDiGraph`, :class:`networkx.DiGraph`
+
+         .. versionchanged:: 3.10.0
+
+            Added store_layout_in_pos parameter.
         """
         if cx2network is None:
             raise NDExError('input network is None')

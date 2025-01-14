@@ -2,6 +2,24 @@
 History
 =======
 
+3.10.0 (2025-01-14)
+-------------------
+
+* Enhancements
+    * Added ``store_layout_in_pos`` argument in ``get_graph`` method of ``CX2NetworkXFactory`` that saves layout
+      coordinates in G.pos (x and y) and G.zpos (z).
+    * Added ``get_layout_from_pos`` argument in ``get_cx2network`` method of ``NetworkXToCX2NetworkFactory`` that
+      determines the source of the layout coordinates. If True, the layout is derived from G.pos (x and y) and G.zpos.
+      If False, the layout uses the (x, y, z) values specified as the node attributes.
+    * Added ``interaction_col`` argument in ``get_cx2network`` of ``PandasDataFrameToCX2NetworkFactory`` that allows to
+      specify the name of the column with edge interactions
+
+* Bug fixes
+    * Fix for string IDs in NetworkX networks - cast to integer if possible or add as name attribute.
+    * Fix for DataFrames without column names
+
+
+
 3.9.0 (2024-06-18)
 -------------------
 

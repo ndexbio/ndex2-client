@@ -79,7 +79,7 @@ Example:
 
     # Add HCX::members attribute to nodes
     for node_id, node_obj in hier_net.get_nodes().items():
-        memberlist = hier_net.get_node(node_id).get('v', {}).get('CD_MemberList', []).split(' ')
+        memberlist = hier_net.get_node(node_id).get('v', {}).get('CD_MemberList', '').split(' ')
         membersids = []
         for member in memberlist:
             membersids.append(parent_net.lookup_node_id_by_name(member))

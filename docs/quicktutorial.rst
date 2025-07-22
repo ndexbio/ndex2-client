@@ -390,6 +390,67 @@ To display the attributes of a node or an edge with a given ID, you can access t
     else:
         print(f'Edge {edge_id_to_check} not found.')
 
+Changing Attribute Data Types
+-------------------------------
+
+The :py:class:`~ndex2.cx2.CX2Network` object enforces consistency between attribute values and their declared data types. Attempting to change 
+an attribute's type by directly calling :py:class:`update_edge` or :py:class:`~ndex2.cx2.CX2Network.update_node` **will not update** 
+the attribute's data type and will save the value as the original type, potentially leading to data loss or format corruption.
+
+To change the data type of an existing attribute (e.g., from `string` to `list_of_string`), follow these steps:
+
+1. **Rename the original attribute** to preserve its values.
+2. **Re-add the attribute under the original name**, with the new values and desired data type.
+
+**Example: Convert an edge attribute "author" from string to list_of_string**
+
+Suppose your CX2 network has an edge attribute `"author"` that contains comma-separated strings.
+You want to convert this to a list of author names.
+
+.. code-block:: python
+
+    import json
+    from ndex2.cx2 import RawCX2NetworkFactory
+
+    factory = RawCX2NetworkFactory()
+    net = factory.get_cx2network('author.cx2')
+
+    # Step 1: Rename the original 'author' attribute to preserve its original string value
+    for edge_id, edge in net.get_edges().items():
+        old_author = edge['v'].get('author')
+        if old_author is not None:
+            net.add_edge_attribute(edge_id=edge_id, key='author_string', value=old_author, datatype='string')
+
+    # Step 2: Add 'author' again, this time with list_of_string type
+    for edge_id, edge in net.get_edges().items():
+        raw_val = edge['v'].get('author_string')
+        if raw_val:
+            author_list = [name.strip() for name in raw_val.split(',')]
+            net.add_edge_attribute(edge_id=edge_id, key='author', value=author_list, datatype='list_of_string')
+
+    # Optionally: remove the temporary attribute
+    for edge_id in net.get_edges():
+        net.remove_edge_attribute(edge_id=edge_id, attribute_name='author_string')
+
+    # Save or inspect the new CX2 data
+    print(json.dumps(net.to_cx2(), indent=2))
+
+
+.. note::
+
+   This approach is necessary because CX2 enforces strict attribute typing via declared types in the network.
+   Calling :py:meth:`~ndex2.cx2.CX2Network.update_edge` with a mismatched data type will save the value as the original type.
+
+.. tip::
+
+    You can inspect all declared types in a network using:
+
+    .. code-block:: python
+
+        print(net.get_attribute_declarations())
+
+
+This practice ensures valid CX2 output that respects the schema and avoids data loss or format corruption.
 
 Build a lookup table for node names to node ids
 --------------------------------------------------------

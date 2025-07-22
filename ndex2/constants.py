@@ -232,3 +232,7 @@ ASPECT_VALUES = 'v'
 Key for aspect values
 """
 
+NETWORK_ATTRIBUTES_ASPECT = 'networkAttributes'
+"""
+Key for network attributes aspect
+"""

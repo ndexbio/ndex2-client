@@ -399,9 +399,9 @@ class CX2Network(object):
             raise NDExError('network_attrs is None')
         processed_network_attrs = {}
         for key, value in network_attrs.items():
-            declared_type = self.get_declared_type('networkAttributes', key)
+            declared_type = self.get_declared_type(constants.NETWORK_ATTRIBUTES_ASPECT, key)
             processed_network_attrs[key] = convert_value(declared_type, value)
-        self._generate_attribute_declarations_for_aspect('networkAttributes', processed_network_attrs, {})
+        self._generate_attribute_declarations_for_aspect(constants.NETWORK_ATTRIBUTES_ASPECT, processed_network_attrs, {})
         self._network_attributes = processed_network_attrs
 
     def add_network_attribute(self, key, value, datatype=None):
@@ -438,10 +438,10 @@ class CX2Network(object):
         :type datatype: str
         :raises NDExError: If the value conversion based on the declared type fails.
         """
-        declared_type = datatype if datatype is not None else self.get_declared_type('networkAttributes', key)
+        declared_type = datatype if datatype is not None else self.get_declared_type(constants.NETWORK_ATTRIBUTES_ASPECT, key)
         converted_value = convert_value(declared_type, value)
         self._network_attributes[key] = converted_value
-        self._generate_attribute_declarations_for_aspect('networkAttributes', {key: converted_value}, {})
+        self._generate_attribute_declarations_for_aspect(constants.NETWORK_ATTRIBUTES_ASPECT, {key: converted_value}, {})
 
     def remove_network_attribute(self, key):
         """
@@ -806,6 +806,44 @@ class CX2Network(object):
 
         self._edges[edge_id][constants.ASPECT_VALUES].pop(attribute_name, None)
 
+
+    def rename_attribute(self, aspect, old_key, new_key):
+        """
+        Renames an attribute in the given aspect (nodes, edges, or networkAttributes).
+
+        :param aspect: The aspect to modify ('nodes', 'edges', or 'networkAttributes').
+        :type aspect: str
+        :param old_key: The current attribute name.
+        :type old_key: str
+        :param new_key: The new attribute name to use.
+        :type new_key: str
+        :raises NDExError: If the aspect is invalid or old_key doesn't exist.
+        """
+        if aspect not in [constants.NODES_ASPECT, constants.EDGES_ASPECT, constants.NETWORK_ATTRIBUTES_ASPECT]:
+            raise NDExError(f"Unsupported aspect: {aspect}")
+
+        # Rename attribute in the relevant entities
+        if aspect == constants.NODES_ASPECT:
+            for node in self._nodes.values():
+                values = node.get(constants.ASPECT_VALUES, {})
+                if old_key in values:
+                    values[new_key] = values.pop(old_key)
+
+        elif aspect == constants.EDGES_ASPECT:
+            for edge in self._edges.values():
+                values = edge.get(constants.ASPECT_VALUES, {})
+                if old_key in values:
+                    values[new_key] = values.pop(old_key)
+
+        elif aspect == constants.NETWORK_ATTRIBUTES_ASPECT:
+            if old_key in self._network_attributes:
+                self._network_attributes[new_key] = self._network_attributes.pop(old_key)
+
+        # Update attribute declarations
+        aspect_decls = self._attribute_declarations.get(aspect, {})
+        if old_key in aspect_decls:
+            aspect_decls[new_key] = aspect_decls.pop(old_key)
+
     def get_visual_properties(self):
         """
         Retrieves the visual properties of the network.
@@ -1065,8 +1103,8 @@ class CX2Network(object):
             if 'attributeDeclarations' in section:
                 self.set_attribute_declarations(section['attributeDeclarations'][0])
 
-            elif 'networkAttributes' in section:
-                self.set_network_attributes(section['networkAttributes'][0])
+            elif constants.NETWORK_ATTRIBUTES_ASPECT in section:
+                self.set_network_attributes(section[constants.NETWORK_ATTRIBUTES_ASPECT][0])
 
             elif constants.NODES_ASPECT in section:
                 for node in section[constants.NODES_ASPECT]:
@@ -1188,9 +1226,9 @@ class CX2Network(object):
             self._attribute_declarations[constants.EDGES_ASPECT].pop(attr, None)
 
         used_network_attrs = set(self._network_attributes.keys())
-        network_attrs_to_remove = set(self._attribute_declarations.get('networkAttributes', {}).keys()) - used_network_attrs
+        network_attrs_to_remove = set(self._attribute_declarations.get(constants.NETWORK_ATTRIBUTES_ASPECT, {}).keys()) - used_network_attrs
         for attr in network_attrs_to_remove:
-            self._attribute_declarations['networkAttributes'].pop(attr, None)
+            self._attribute_declarations[constants.NETWORK_ATTRIBUTES_ASPECT].pop(attr, None)
 
     def to_cx2(self):
         """

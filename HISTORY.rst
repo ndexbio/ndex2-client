@@ -2,6 +2,12 @@
 History
 =======
 
+3.11.0 (2025-07-22)
+-------------------
+
+* Enhancements
+    * Added `CX2Network.rename_attribute` method to rename attributes in the network.
+
 3.10.0 (2025-01-14)
 -------------------
 

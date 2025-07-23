@@ -415,13 +415,10 @@ You want to convert this to a list of author names.
     factory = RawCX2NetworkFactory()
     net = factory.get_cx2network('author.cx2')
 
-    # Step 1: Rename the original 'author' attribute to preserve its original string value
-    for edge_id, edge in net.get_edges().items():
-        old_author = edge['v'].get('author')
-        if old_author is not None:
-            net.add_edge_attribute(edge_id=edge_id, key='author_string', value=old_author, datatype='string')
+    # Step 1: Rename the existing 'author' attribute to preserve original values and declaration
+    net.rename_attribute('edges', 'author', 'author_string')
 
-    # Step 2: Add 'author' again, this time with list_of_string type
+    # Step 2: Re-add 'author' with the new data type and value (list_of_string)
     for edge_id, edge in net.get_edges().items():
         raw_val = edge['v'].get('author_string')
         if raw_val:

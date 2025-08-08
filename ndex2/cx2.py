@@ -1346,6 +1346,82 @@ class CX2Network(object):
 
         return new_data
 
+    def _build_summary_dict(self) -> dict:
+        """
+        Builds a summary dictionary about this network including counts of
+        nodes, edges, and unique attribute names on nodes and edges.
+
+        .. versionadded:: 3.12.0
+
+        :return: Summary information
+        :rtype: dict
+        """
+        network_name = self.get_name()
+
+        node_attribute_names = set()
+        for node in self._nodes.values():
+            node_attribute_names.update(node.get(constants.ASPECT_VALUES, {}).keys())
+
+        edge_attribute_names = set()
+        for edge in self._edges.values():
+            edge_attribute_names.update(edge.get(constants.ASPECT_VALUES, {}).keys())
+
+        summary_json = {
+            'Name': network_name,
+            'Nodes': len(self._nodes),
+            'Edges': len(self._edges),
+            'Node Attributes': len(node_attribute_names),
+            'Edge Attributes': len(edge_attribute_names)
+        }
+        return summary_json
+
+    def _build_summary_string(self) -> str:
+        """
+        Builds a multi-line string summary matching print_summary format.
+
+        .. versionadded:: 3.12.0
+        """
+        summary = self._build_summary_dict()
+        network_name = summary['Name']
+        n_nodes = summary['Nodes']
+        n_edges = summary['Edges']
+        n_a_count = summary['Node Attributes']
+        e_a_count = summary['Edge Attributes']
+        summary_string = (
+            'Name: ' + (network_name if network_name is not None else 'None') + '\n'
+            'Nodes: ' + str(n_nodes) + '\n'
+            + 'Edges: ' + str(n_edges) + '\n'
+            + 'Node Attributes: ' + str(n_a_count) + '\n'
+            + 'Edge Attributes: ' + str(e_a_count) + '\n'
+        )
+        return summary_string
+
+    def get_summary(self):
+        """
+        Returns a summary of the network containing:
+        Name, counts of Nodes, Edges, Node Attributes (unique keys), and Edge Attributes (unique keys).
+
+        :return: Summary string
+        :rtype: str
+        """
+        return self._build_summary_dict()
+
+    def print_summary(self):
+        """
+        Returns a string representation of the network summary.
+
+        .. versionadded:: 3.12.0
+        """
+        print(self._build_summary_string())
+
+    def __str__(self):
+        """
+        Returns a string representation of the network summary.
+
+        .. versionadded:: 3.12.0
+        """
+        return self._build_summary_string()
+
 
 class CX2NetworkFactory(object):
     """

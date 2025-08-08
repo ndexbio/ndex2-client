@@ -5,6 +5,7 @@ from copy import deepcopy
 import networkx as nx
 import numpy as np
 import pandas as pd
+import os
 
 from ndex2 import create_nice_cx_from_raw_cx, create_nice_cx_from_file, constants
 from ndex2.constants import VALID_ATTRIBUTE_DATATYPES_PLUS_SHORT
@@ -2034,3 +2035,295 @@ class CX2NetworkPandasDataFrameFactory(object):
         df = pd.DataFrame(data).set_index('node_id')
 
         return df
+
+
+class CX2NetworkSIFFactory(object):
+    """
+    Factory class for converting a CX2Network object into SIF (Simple Interaction Format) format.
+
+    The SIF format specifies nodes and interactions only, with each line containing:
+    source_node interaction_type target_node1 target_node2 ...
+
+    .. versionadded:: 3.12.0
+    """
+
+    def __init__(self):
+        """
+        Constructor
+        """
+        pass
+
+    def get_sif(self, cx2network, output_file=None, default_interaction='interacts-with'):
+        """
+        Converts a given CX2Network object into SIF format.
+
+        The SIF format is a simple text format where each line represents an interaction:
+        source_node interaction_type target_node1 target_node2 ...
+
+        **Example:**
+
+        .. code-block:: python
+
+            from ndex2.cx2 import CX2Network, CX2NetworkSIFFactory
+
+            # Create a CX2Network
+            cx2_network = CX2Network()
+            node1 = cx2_network.add_node(attributes={'name': 'GeneA'})
+            node2 = cx2_network.add_node(attributes={'name': 'GeneB'})
+            node3 = cx2_network.add_node(attributes={'name': 'GeneC'})
+
+            cx2_network.add_edge(source=node1, target=node2, attributes={'interaction': 'activates'})
+            cx2_network.add_edge(source=node1, target=node3, attributes={'interaction': 'inhibits'})
+
+            # Convert to SIF
+            factory = CX2NetworkSIFFactory()
+            sif_content = factory.get_sif(cx2_network)
+            print(sif_content)
+
+        **Output:**
+        ::
+
+            GeneA activates GeneB
+            GeneA inhibits GeneC
+
+        :param cx2network: The CX2Network object to be converted into SIF format.
+        :type cx2network: :py:class:`~ndex2.cx2.CX2Network`
+        :param output_file: Optional file path to write the SIF content. If None, returns the content as string.
+        :type output_file: str or None
+        :param default_interaction: Default interaction type to use when edge has no interaction attribute.
+        :type default_interaction: str
+        :raises NDExError: If the input CX2Network is None or not an instance of CX2Network.
+        :return: SIF format content as string if output_file is None, otherwise None.
+        :rtype: str or None
+        """
+        if cx2network is None:
+            raise NDExError('input network is None')
+
+        if not isinstance(cx2network, CX2Network):
+            raise NDExError("Input must be a CX2Network object")
+
+        # Group edges by source node and interaction type
+        edge_groups = {}
+
+        for edge_id, edge in cx2network.get_edges().items():
+            source_id = edge.get(constants.EDGE_SOURCE)
+            target_id = edge.get(constants.EDGE_TARGET)
+
+            # Get source and target node names
+            source_node = cx2network.get_node(source_id)
+            target_node = cx2network.get_node(target_id)
+
+            source_name = source_node.get(constants.ASPECT_VALUES, {}).get(constants.NODE_NAME_EXPANDED, str(source_id))
+            target_name = target_node.get(constants.ASPECT_VALUES, {}).get(constants.NODE_NAME_EXPANDED, str(target_id))
+
+            # Get interaction type
+            interaction = edge.get(constants.ASPECT_VALUES, {}).get(constants.EDGE_INTERACTION_EXPANDED,
+                                                                    default_interaction)
+
+            # Group by source and interaction
+            key = (source_name, interaction)
+            if key not in edge_groups:
+                edge_groups[key] = []
+            edge_groups[key].append(target_name)
+
+        # Generate SIF content
+        sif_lines = []
+        for (source_name, interaction), target_names in edge_groups.items():
+            line = f"{source_name}\t{interaction}\t" + "\t".join(target_names)
+            sif_lines.append(line)
+
+        # Add nodes with no edges (isolated nodes)
+        nodes_with_edges = set()
+        for edge_id, edge in cx2network.get_edges().items():
+            source_id = edge.get(constants.EDGE_SOURCE)
+            target_id = edge.get(constants.EDGE_TARGET)
+            source_node = cx2network.get_node(source_id)
+            target_node = cx2network.get_node(target_id)
+            source_name = source_node.get(constants.ASPECT_VALUES, {}).get(constants.NODE_NAME_EXPANDED, str(source_id))
+            target_name = target_node.get(constants.ASPECT_VALUES, {}).get(constants.NODE_NAME_EXPANDED, str(target_id))
+            nodes_with_edges.add(source_name)
+            nodes_with_edges.add(target_name)
+
+        # Add isolated nodes
+        for node_id, node in cx2network.get_nodes().items():
+            node_name = node.get(constants.ASPECT_VALUES, {}).get(constants.NODE_NAME_EXPANDED, str(node_id))
+            if node_name not in nodes_with_edges:
+                sif_lines.append(node_name)
+
+        sif_content = "\n".join(sif_lines)
+
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write(sif_content)
+            return None
+        else:
+            return sif_content
+
+
+class SIFToCX2NetworkFactory(CX2NetworkFactory):
+    """
+    Factory class for converting SIF (Simple Interaction Format) data into a CX2Network object.
+
+    The SIF format specifies nodes and interactions only, with each line containing:
+    source_node interaction_type target_node1 target_node2 ...
+
+    This factory handles the parsing of SIF format and converts it to a CX2Network.
+
+    .. versionadded:: 3.12.0
+    """
+
+    def __init__(self):
+        """
+        Constructor
+        """
+        super(SIFToCX2NetworkFactory, self).__init__()
+
+    def get_cx2network(self, input_data=None, default_interaction='interacts-with',
+                       use_tabs_as_delimiters=None) -> CX2Network:
+        """
+        Creates :py:class:`~ndex2.cx2.CX2Network` from SIF format data.
+
+        The SIF format supports both space and tab delimiters. If the file contains any tab characters,
+        tabs are used as delimiters and spaces are considered part of the node names. If no tabs are present,
+        spaces are used as delimiters.
+
+        **Example:**
+
+        .. code-block:: python
+
+            from ndex2.cx2 import SIFToCX2NetworkFactory
+
+            # SIF content as string
+            sif_content = '''GeneA\tactivates\tGeneB\tGeneC
+            GeneD\tinhibits\tGeneE
+            GeneF'''
+
+            # Create factory and convert
+            factory = SIFToCX2NetworkFactory()
+            cx2_network = factory.get_cx2network(sif_content)
+
+            print(cx2_network.get_nodes())
+            print(cx2_network.get_edges())
+
+        **Supported SIF formats:**
+
+        - **Basic interaction**: ``source interaction target``
+        - **Multiple targets**: ``source interaction target1 target2 target3``
+        - **Isolated nodes**: ``node_name`` (no interaction)
+        - **Self-edges**: ``node interaction node``
+
+        :param input_data: SIF format data as string or file path.
+        :type input_data: str
+        :param default_interaction: Default interaction type to use when not specified.
+        :type default_interaction: str
+        :param use_tabs_as_delimiters: Force use of tabs as delimiters. If None, auto-detects based on content.
+        :type use_tabs_as_delimiters: bool or None
+        :return: Generated CX2Network object.
+        :rtype: :py:class:`~ndex2.cx2.CX2Network`
+        :raises NDExError: If input_data is None or empty.
+        :raises NDExInvalidCX2Error: If SIF format is invalid.
+        """
+        if input_data is None:
+            raise NDExError('SIF input is empty')
+
+        # Read SIF content
+        if isinstance(input_data, str):
+            # Check if it's a file path
+            if os.path.isfile(input_data):
+                with open(input_data, 'r') as f:
+                    sif_content = f.read()
+            else:
+                sif_content = input_data
+        else:
+            raise NDExInvalidCX2Error("Input data must be a string (file path or SIF content)")
+
+        if not sif_content.strip():
+            raise NDExError('SIF content is empty')
+
+        cx2network_obj = CX2Network()
+
+        # Parse SIF content
+        lines = sif_content.strip().split('\n')
+
+        # Auto-detect delimiter if not specified
+        if use_tabs_as_delimiters is None:
+            use_tabs_as_delimiters = any('\t' in line for line in lines)
+
+        delimiter = '\t' if use_tabs_as_delimiters else ' '
+
+        # Track nodes and their names for ID mapping
+        node_name_to_id = {}
+        next_node_id = 0
+
+        for line_num, line in enumerate(lines, 1):
+            line = line.strip()
+            if not line or line.startswith('#'):  # Skip empty lines and comments
+                continue
+
+            # Split the line
+            parts = line.split(delimiter)
+            if len(parts) < 1:
+                raise NDExInvalidCX2Error(f"Invalid SIF line {line_num}: {line}")
+
+            source_name = parts[0].strip()
+            if not source_name:
+                raise NDExInvalidCX2Error(f"Empty source node name in line {line_num}: {line}")
+
+            # Handle isolated nodes (no interaction)
+            if len(parts) == 1:
+                # Add isolated node
+                if source_name not in node_name_to_id:
+                    node_name_to_id[source_name] = next_node_id
+                    cx2network_obj.add_node(node_id=next_node_id,
+                                            attributes={constants.NODE_NAME_EXPANDED: source_name})
+                    next_node_id += 1
+                continue
+
+            # Handle interactions
+            if len(parts) < 2:
+                raise NDExInvalidCX2Error(f"Invalid SIF line {line_num}: {line}")
+
+            interaction_type = parts[1].strip()
+            target_names = [name.strip() for name in parts[2:] if name.strip()]
+
+            # If interaction type is empty, but we have target nodes, use default
+            if not interaction_type and target_names:
+                interaction_type = default_interaction
+            elif not interaction_type and not target_names:
+                # This is an isolated node case
+                if source_name not in node_name_to_id:
+                    node_name_to_id[source_name] = next_node_id
+                    cx2network_obj.add_node(node_id=next_node_id,
+                                            attributes={constants.NODE_NAME_EXPANDED: source_name})
+                    next_node_id += 1
+                continue
+            elif interaction_type and not target_names:
+                # Has interaction type but no targets - this is invalid
+                raise NDExInvalidCX2Error(
+                    f"Invalid SIF line {line_num}: interaction type '{interaction_type}' specified but no target nodes provided")
+
+            # Add source node if not exists
+            if source_name not in node_name_to_id:
+                node_name_to_id[source_name] = next_node_id
+                cx2network_obj.add_node(node_id=next_node_id,
+                                        attributes={constants.NODE_NAME_EXPANDED: source_name})
+                next_node_id += 1
+
+            source_id = node_name_to_id[source_name]
+
+            # Add target nodes and edges
+            for target_name in target_names:
+                if target_name not in node_name_to_id:
+                    node_name_to_id[target_name] = next_node_id
+                    cx2network_obj.add_node(node_id=next_node_id,
+                                            attributes={constants.NODE_NAME_EXPANDED: target_name})
+                    next_node_id += 1
+
+                target_id = node_name_to_id[target_name]
+
+                # Add edge
+                cx2network_obj.add_edge(source=source_id,
+                                        target=target_id,
+                                        attributes={constants.EDGE_INTERACTION_EXPANDED: interaction_type})
+
+        return cx2network_obj

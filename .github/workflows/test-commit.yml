@@ -1,0 +1,45 @@
+name: Develop Branch Test Pipeline
+
+on:
+  workflow_dispatch:
+
+  # push:
+  #   branches:
+  #     - dev
+  #     - main
+
+# Strictly limits execution to 1 run at a time for the develop branch
+concurrency:
+  group: ndex2-client-${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Force a 30-second pause to wait for subsequent commits (Debounce)
+      - name: Wait 30 seconds for follow-up commits
+        run: sleep 30
+
+      # Step 2: Checkout the ndex2-client source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 3: Set up Python环境 (Matching repository requirements)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9' # Repository lists Python 3.5+ compatibility
+
+      # Step 4: Install dependencies & run project checks
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements_test.txt ]; then pip install -r requirements_test.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install .
+
+      # Step 5: Execute test suite
+      - name: Run tests
+        run: |
+          pytest

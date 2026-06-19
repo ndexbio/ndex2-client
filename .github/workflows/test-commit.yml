@@ -3,10 +3,9 @@ name: Develop Branch Test Pipeline
 on:
   workflow_dispatch:
 
-  # push:
-  #   branches:
-  #     - dev
-  #     - main
+  push:
+  
+  pull_request:
 
 # Strictly limits execution to 1 run at a time for the develop branch
 concurrency:

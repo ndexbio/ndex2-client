@@ -3,6 +3,7 @@
 import requests
 import json
 import logging
+import warnings
 from requests_toolbelt import MultipartEncoder
 import io
 import sys
@@ -31,6 +32,26 @@ User agent value to prepend to all requests
 """
 
 DEFAULT_SERVER = "http://www.ndexbio.org"
+
+
+def _warn_removed_in_v3(name, replacement):
+    """
+    Emits a :py:exc:`DeprecationWarning` for a method backed by a v2 only
+    endpoint.
+
+    The call still reaches the v2 endpoint, which remains available on NDEx
+    servers, but has no v3 equivalent and will stop working once v2 is
+    retired.
+
+    :param name: Name of the deprecated method
+    :type name: str
+    :param replacement: Guidance naming the v3 equivalent
+    :type replacement: str
+    """
+    warnings.warn(name + ' relies on the NDEx v2 API and has no v3 '
+                         'equivalent. It will be removed in a future '
+                         'release. ' + replacement,
+                  DeprecationWarning, stacklevel=3)
 
 
 class Ndex2(object):
@@ -813,9 +834,8 @@ class Ndex2(object):
 
         :param network_id: The UUID of the network
         :type network_id: str
-        :param aspect_name: Name of CX2 aspect.
-                            Example aspects: ``nodes``, ``edges``,
-                                             ``networkAttributes`` etc.
+        :param aspect_name: Name of CX2 aspect. Example aspects:
+                            ``nodes``, ``edges``, ``networkAttributes`` etc.
         :type aspect_name: str
         :param access_key: Optional access key UUID
         :param size: Denotes number of elements of given aspect to return. If < 0 or
@@ -994,6 +1014,11 @@ class Ndex2(object):
         else:
             route = "/search/network?start=%s&size=%s" % (start, size)
             if include_groups:
+                _warn_removed_in_v3('The include_groups parameter of '
+                                    'search_networks',
+                                    'Groups were removed in v3. Use '
+                                    'ndex2.client_v3.Ndex3.search_files '
+                                    'instead.')
                 post_data["includeGroups"] = True
 
         if account_name:
@@ -1605,6 +1630,10 @@ class Ndex2(object):
         :return: Result
         :rtype: dict
         """
+        _warn_removed_in_v3('update_network_group_permission',
+                            'Groups were removed in v3. Use '
+                            'ndex2.client_v3.Ndex3.set_sharing_members to '
+                            'grant per user permissions.')
         route = "/network/%s/permission?groupid=%s&permission=%s" % (networkid, groupid, permission)
         self.put(route)
 
@@ -1637,6 +1666,10 @@ class Ndex2(object):
         :return: Result
         :rtype: dict
         """
+        _warn_removed_in_v3('grant_networks_to_group',
+                            'Groups were removed in v3. Use '
+                            'ndex2.client_v3.Ndex3.set_sharing_members to '
+                            'grant per user permissions.')
         for networkid in networkids:
             self.update_network_group_permission(groupid, networkid, permission)
 
@@ -1906,6 +1939,8 @@ class Ndex2(object):
         :return: URI of the newly created network set
         :rtype: str
         """
+        _warn_removed_in_v3('create_networkset',
+                            'Use ndex2.client_v3.Ndex3.create_folder instead.')
         route = '/networkset'
         return self.post(route, json.dumps({"name": name,
                                             "description": description}))
@@ -1933,6 +1968,9 @@ class Ndex2(object):
         :return: network set information
         :rtype: dict
         """
+        _warn_removed_in_v3('get_networkset',
+                            'Use ndex2.client_v3.Ndex3.get_folder '
+                            'and list_folder_items instead.')
         route = '/networkset/%s' % set_id
 
         return self.get(route)
@@ -2003,6 +2041,10 @@ class Ndex2(object):
         :return: list with dict objects containing Network Sets
         :rtype: list
         """
+        _warn_removed_in_v3('get_networksets_for_user_id',
+                            'Use ndex2.client_v3.Ndex3.list_folders, or '
+                            'get_user_home to walk the folder tree from '
+                            'its root.')
         if user_id is None or not isinstance(user_id, str):
             raise NDExInvalidParameterError('user_id must be of type str')
 
@@ -2052,6 +2094,8 @@ class Ndex2(object):
         :raises NDExError: For any other error with contents of error in message
         :return: None upon success
         """
+        _warn_removed_in_v3('delete_networkset',
+                            'Use ndex2.client_v3.Ndex3.delete_folder instead.')
         if networkset_id is None:
             raise NDExInvalidParameterError('networkset id cannot be None')
         if not isinstance(networkset_id, str):
@@ -2092,6 +2136,11 @@ class Ndex2(object):
         :return: None
         :rtype: None
         """
+        _warn_removed_in_v3('add_networks_to_networkset',
+                            'Use '
+                            'ndex2.client_v3.Ndex3.move_networks_to_folder, '
+                            'or create_shortcut to list a network in more '
+                            'than one folder.')
 
         route = '/networkset/%s/members' % set_id
 
@@ -2111,6 +2160,11 @@ class Ndex2(object):
         :return: None
         :rtype: None
         """
+        _warn_removed_in_v3('delete_networks_from_networkset',
+                            'Use '
+                            'ndex2.client_v3.Ndex3.move_networks_to_folder '
+                            'to move the networks elsewhere, or '
+                            'delete_shortcut.')
 
         route = '/networkset/%s/members' % set_id
         post_json = json.dumps(networks)

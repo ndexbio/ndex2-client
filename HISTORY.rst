@@ -2,6 +2,50 @@
 History
 =======
 
+4.0.0 (unreleased)
+------------------
+
+* Enhancements
+    * Added ``ndex2.client_v3.Ndex3``, a client for the NDEx **v3** REST API
+      covering folders, shortcuts, trash, sharing, batch operations, file
+      search, network queries, users and Cytoscape Web workspaces.
+    * Added ``ndex2.client_v3.FileType``, ``Visibility`` and ``Permissions``
+      constant classes.
+    * ``Ndex3`` accepts an OAuth/Keycloak id token via the ``bearer_token``
+      constructor argument or ``Ndex3.signin()``, in addition to username and
+      password.
+    * Added ``query_network_as_cx2_stream``,
+      ``interconnect_query_as_cx2_stream`` and ``get_node_attributes``. The v2
+      search routes ``/search/network/{id}/...`` were renamed to
+      ``/search/networks/{id}/...`` in v3 and now return CX2.
+    * ``make_network_public``, ``make_network_private``,
+      ``update_network_user_permission``, ``grant_networks_to_user`` and
+      ``grant_network_to_user_by_username`` are reimplemented on ``Ndex3``
+      against v3 endpoints. ``grant_networks_to_user`` now issues a single
+      batched request rather than one per network.
+    * Added ``scripts/v3_smoke_test.py``, an end-to-end check that exercises
+      47 operations against a live NDEx v3 server.
+
+* Backwards incompatible changes
+    * On ``Ndex3`` the three CX2 network creation methods
+      (``save_new_cx2_network``, ``save_cx2_stream_as_new_network`` and
+      ``save_new_cx2_network_in_folder``) return the UUID of the new network
+      rather than its full URL. Pass ``return_url=True`` for the previous
+      behaviour. ``Ndex2`` is unchanged and still returns a URL.
+
+* Deprecations
+    * Network set and group methods on ``ndex2.client.Ndex2`` now emit a
+      ``DeprecationWarning``. They still call the v2 endpoints, which remain
+      available, but the v3 API has no equivalent and these methods will be
+      removed in a future release. See ``MIGRATION_V3.md`` for replacements.
+    * The ``include_groups`` argument of ``Ndex2.search_networks`` emits a
+      ``DeprecationWarning`` when set to ``True``.
+    * On ``Ndex3`` these methods raise ``NDExUnsupportedCallError`` instead.
+      The same applies to CX (version 1) network I/O, tasks, provenance,
+      sample networks, system properties and profile updates, none of which
+      the v3 API serves. Each error message names its replacement where one
+      exists.
+
 3.11.0 (2025-07-22)
 -------------------
 

@@ -14,6 +14,10 @@ from ndex2.exceptions import NDExNotFoundError
 from ndex2.exceptions import NDExError
 from ndex2.nice_cx_network import NiceCXNetwork
 from ndex2.client import Ndex2
+from ndex2.client_v3 import Ndex3
+from ndex2.client_v3 import FileType
+from ndex2.client_v3 import Visibility
+from ndex2.client_v3 import Permissions
 from ndex2 import constants
 
 

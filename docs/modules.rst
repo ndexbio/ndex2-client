@@ -10,7 +10,9 @@ The NDEx2 Python Client can be broken into three parts:
    networks in `CX2 format`_
 
 #. :py:class:`~ndex2.client.Ndex2` REST client provides provides methods to
-   interact with `NDEx`_ via the `NDEx REST Service`_
+   interact with `NDEx`_ via the `NDEx REST Service`_. The v3 endpoints are
+   grouped into namespaces on the same client, described in
+   :doc:`v3namespaces`
 
 .. note::
 
@@ -28,7 +30,7 @@ The NDEx2 Python Client can be broken into three parts:
    createnicecx
    convertnicecx
    ndex2client
-   ndex3client
+   v3namespaces
    miscref
 
 .. _NDEx: http://www.ndexbio.org

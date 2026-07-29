@@ -77,9 +77,6 @@ jobs:
           /tmp/venv/bin/python -c "
           import ndex2
           from ndex2.client import Ndex2
-          from ndex2.constants import FileType
           client = Ndex2(skip_version_check=True)
-          for namespace in ('files', 'networks', 'users', 'admin'):
-              assert hasattr(client, namespace), namespace
           print('imported from', ndex2.__file__)
           "

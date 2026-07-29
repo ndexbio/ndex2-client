@@ -192,3 +192,30 @@ class TestAdmin(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+@unittest.skipIf(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)
+class TestPackageLevelExports(unittest.TestCase):
+    """Guards ndex2/__init__.py, which no other test imports through.
+
+    Everything else does ``from ndex2.client import Ndex2``, so a name
+    accidentally dropped from the package __init__ would not fail CI.
+    """
+
+    def test_ndex2_importable_from_package_root(self):
+        from ndex2 import Ndex2 as PackageNdex2
+        from ndex2.client import Ndex2 as ModuleNdex2
+        self.assertIs(PackageNdex2, ModuleNdex2)
+
+    def test_documented_package_level_names_present(self):
+        import ndex2
+        for name in ('Ndex2', 'NiceCXNetwork', 'NiceCXBuilder',
+                     'NetworkXFactory', 'NDExError', 'NDExNotFoundError'):
+            self.assertTrue(hasattr(ndex2, name),
+                            'ndex2.%s is no longer exported' % name)
+
+    def test_v3_constants_importable(self):
+        from ndex2.constants import FileType, Visibility, Permissions
+        self.assertEqual('NETWORK', FileType.NETWORK)
+        self.assertEqual('PUBLIC', Visibility.PUBLIC)
+        self.assertEqual('READ', Permissions.READ)

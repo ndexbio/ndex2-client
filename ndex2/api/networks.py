@@ -288,12 +288,16 @@ class NetworksAPI(object):
                edge_limit, error_when_limit, direct_only, node_ids, aspects,
                access_key, save, preserve_coordinates):
         """
-        Builds and sends a path query. Shared by :py:meth:`query` and
-        :py:meth:`interconnect_query`, which differ only in route.
+        Builds and sends a path query.
+
+        Shared by :py:meth:`query` and :py:meth:`interconnect_query`, which
+        differ only in *route*. Every argument other than *route* is
+        documented on those two methods and passed through unchanged.
 
         :param network_id: UUID of the network to query
         :type network_id: str
-        :param route: Query route below the network id
+        :param route: Query route appended below the network id, either
+                      ``/query`` or ``/interconnectquery``
         :type route: str
         :return: Streamed response whose body is the CX2 result
         :rtype: :py:class:`requests.Response`
@@ -424,7 +428,7 @@ class NetworksAPI(object):
         ``POST /v3/search/networks/{networkid}/nodes``
 
         Replaces the flat
-        :py:meth:`~ndex2.client.Ndex2.search_network_nodes`, which targets
+        ``Ndex2.search_network_nodes()``, which targets
         the v2 route.
 
         .. versionadded:: 3.12.0

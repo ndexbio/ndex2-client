@@ -86,7 +86,8 @@ if __name__ == '__main__':
 
         # You can just specify the packages manually here if your project is
         # simple. Or you can use find_packages().
-        packages=find_packages(include=['ndex2', 'ndex2cx']),
+        packages=find_packages(include=['ndex2', 'ndex2.api',
+                                        'ndex2cx']),
         install_requires=[
             'six',
             'ijson',

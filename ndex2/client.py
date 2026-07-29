@@ -231,7 +231,7 @@ class Ndex2(object):
         """
         :raises NDExUnauthorizedError: If no credentials are found in this object
         """
-        if not self.s.auth:
+        if not self.s.auth and 'Authorization' not in self.s.headers:
             raise NDExUnauthorizedError("This method requires user authentication")
 
     def _get_user_agent(self):

@@ -57,7 +57,7 @@ counterpart. Both remain available:
    * - :py:meth:`~ndex2.client.Ndex2.delete_network`
      - :py:meth:`~ndex2.api.networks.NetworksAPI.delete`
      - trash, restorable
-   * - :py:meth:`~ndex2.client.Ndex2.search_network_nodes`
+   * - ``Ndex2.search_network_nodes()``
      - :py:meth:`~ndex2.api.networks.NetworksAPI.get_node_attributes`
      - renamed route, CX2
    * - :py:meth:`~ndex2.client.Ndex2.get_neighborhood_as_cx_stream`
@@ -135,6 +135,12 @@ client. It is not normally constructed directly.
 
 .. autoclass:: ndex2.transport.HttpTransport
     :members:
+
+.. autodata:: ndex2.transport.V2
+
+.. autodata:: ndex2.transport.V3
+
+.. autodata:: ndex2.transport.DEFAULT_TIMEOUT
 
 Constants
 ---------

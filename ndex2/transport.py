@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 HTTP layer shared by the v3 API namespaces.
@@ -126,16 +125,23 @@ class HttpTransport(object):
     @property
     def is_authenticated(self):
         """
-        Whether any credentials are currently set.
+        Whether the shared session will send credentials.
+
+        Derived from the session rather than from the values passed to
+        :py:meth:`set_auth`, so that it stays correct even if the session
+        is modified directly, for example by assigning to ``client.s.auth``.
+        Holding a second copy of the credentials here would let the two
+        disagree, and this check would then reject calls the server would
+        have accepted.
 
         .. versionadded:: 3.12.0
 
-        :return: ``True`` if a bearer token, or both a username and
-                 password, are set
+        :return: ``True`` if the session carries basic credentials or an
+                 ``Authorization`` header
         :rtype: bool
         """
-        return (self.bearer_token is not None or
-                (self.username is not None and self.password is not None))
+        return bool(self.session.auth) or \
+            'Authorization' in self.session.headers
 
     def require_auth(self):
         """
@@ -166,7 +172,8 @@ class HttpTransport(object):
         :param route: Path below the version prefix, for example
                       ``/files/folders/``
         :type route: str
-        :param version: :py:const:`V2` or :py:const:`V3`
+        :param version: :py:const:`~ndex2.transport.V2` or
+                        :py:const:`~ndex2.transport.V3`
         :type version: str
         :return: Absolute URL
         :rtype: str
@@ -184,7 +191,8 @@ class HttpTransport(object):
         :type method: str
         :param route: Path below the version prefix
         :type route: str
-        :param version: :py:const:`V2` or :py:const:`V3`. Passed per call
+        :param version: :py:const:`~ndex2.transport.V2` or
+                        :py:const:`~ndex2.transport.V3`. Passed per call
                         rather than fixed on the instance so a single
                         namespace can span both versions.
         :type version: str

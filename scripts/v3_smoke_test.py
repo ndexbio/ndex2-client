@@ -475,6 +475,9 @@ def main():
     # to NDExError, so both have to be treated as failure here
     AUTH_FAILURES = (NDExError, requests.exceptions.HTTPError)
 
+    # message raised by Ndex2._require_auth when it refuses to send at all
+    CLIENT_REFUSAL = 'This method requires user authentication'
+
     def flat_v2_call_works():
         """Calls a flat v2 method that requires credentials.
 
@@ -486,6 +489,18 @@ def main():
         if isinstance(record, str):
             return json.loads(record)
         return record
+
+    def flat_gated_call():
+        """Calls a flat v2 method that gates on _require_auth() before
+        issuing a request.
+
+        get_user_by_username does not, so on its own it cannot detect the
+        client refusing to send a bearer-authenticated request. Twelve
+        methods do gate, including save_cx2_stream_as_new_network, which
+        carries the new folder_id argument. Renaming the network to what it
+        is already called keeps this harmless."""
+        return client.update_network_profile(
+            net_id, {'name': prefix + ' / network A'})
 
     r.step('flat v2 method authenticates with basic auth',
            lambda: 'externalId ' + str(flat_v2_call_works()
@@ -504,22 +519,53 @@ def main():
         be in play. Credentials are restored either way, so a failure here
         does not strand the rest of the run."""
         rejected = False
+        refused_locally = None
         try:
             client._http.set_auth(bearer_token='not-a-real-token')
             try:
                 flat_v2_call_works()
-            except AUTH_FAILURES:
+            except AUTH_FAILURES as e:
                 rejected = True
+                if CLIENT_REFUSAL in str(e):
+                    refused_locally = str(e)
         finally:
             client._http.set_auth(username=args.username,
                                   password=args.password)
+        if refused_locally is not None:
+            raise NDExError('the client refused to send the request rather '
+                            'than letting the server judge it: %s'
+                            % refused_locally)
         if not rejected:
             raise NDExError('flat v2 call succeeded with an invalid bearer '
                             'token, so it is still using basic auth')
         return 'flat v2 call correctly rejected the bogus token'
 
+    def gated_flat_method_is_not_refused_locally():
+        """With a bearer token set, a gated flat method must at least reach
+        the server. A client side refusal here means _require_auth does not
+        recognise bearer tokens, which silently disables twelve methods for
+        anyone who signs in with one."""
+        if net_id is None:
+            raise NDExError('no network available to test against')
+        try:
+            client._http.set_auth(bearer_token='not-a-real-token')
+            try:
+                flat_gated_call()
+            except AUTH_FAILURES as e:
+                if CLIENT_REFUSAL in str(e):
+                    raise NDExError(
+                        'a gated flat method was refused client side with a '
+                        'bearer token set; _require_auth checks session.auth '
+                        'only, which a bearer token clears')
+        finally:
+            client._http.set_auth(username=args.username,
+                                  password=args.password)
+        return 'gated flat method reached the server'
+
     r.step('bearer token replaces basic auth on the flat path',
            bogus_bearer_reaches_flat_path)
+    r.step('gated flat method is not refused client side',
+           gated_flat_method_is_not_refused_locally)
     r.step('basic auth can be restored', restore_basic)
 
     if args.id_token:
@@ -537,9 +583,17 @@ def main():
                 raise NDExError('flat v2 call did not return a user record')
             return 'flat v2 method works with a bearer token'
 
+        def gated_flat_works_with_token():
+            if net_id is None:
+                raise NDExError('no network available to test against')
+            flat_gated_call()
+            return 'gated flat method works with a bearer token'
+
         r.step('users.signin with a real id token', real_signin)
         r.step('flat v2 method authenticates with the bearer token',
                flat_works_with_token)
+        r.step('gated flat method authenticates with the bearer token',
+               gated_flat_works_with_token)
         r.step('basic auth restored after sign-in', restore_basic)
     else:
         r.skipped.append('real bearer token sign-in (pass --id-token)')

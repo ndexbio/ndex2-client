@@ -8,5 +8,5 @@ Each module here defines one namespace reached as an attribute of
 receive a shared :py:class:`~ndex2.transport.HttpTransport` and never
 build URLs or touch :py:mod:`requests` themselves.
 
-.. versionadded:: 4.0.0
+.. versionadded:: 3.12.0
 """

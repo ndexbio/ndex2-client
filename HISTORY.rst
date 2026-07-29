@@ -24,6 +24,21 @@ History
       exception type.
     * Bearer token authentication is supported via ``client.users.signin()``.
 
+* Deprecations
+    * Network set and group methods now emit a ``DeprecationWarning`` pointing
+      at the namespace equivalent: ``create_networkset``, ``get_networkset``,
+      ``get_network_set``, ``get_networksets_for_user_id``,
+      ``delete_networkset``, ``add_networks_to_networkset``,
+      ``delete_networks_from_networkset``,
+      ``update_network_group_permission``, ``grant_networks_to_group``, and the
+      ``include_groups`` argument of ``search_networks``.
+    * These methods remain fully supported and there is currently no planned removal. On
+      the server a network set is stored as a folder, and a group as a folder
+      several users hold permissions on, so the v2 endpoints continue to work.
+      Because a network set is a folder, ``client.files.get_folder()`` accepts
+      a network set UUID and network sets appear in
+      ``client.files.list_folders()``.
+
 * Notes
     * No existing method was removed, renamed, or changed in behaviour. The v3
       endpoints are additive.

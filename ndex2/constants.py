@@ -242,7 +242,7 @@ class FileType(object):
     """
     Valid values for the ``type`` of a v3 file item.
 
-    .. versionadded:: 4.0.0
+    .. versionadded:: 3.12.0
     """
 
     NETWORK = 'NETWORK'
@@ -256,7 +256,7 @@ class Visibility(object):
     """
     Valid visibility values for v3 file items.
 
-    .. versionadded:: 4.0.0
+    .. versionadded:: 3.12.0
     """
 
     PUBLIC = 'PUBLIC'
@@ -270,7 +270,7 @@ class Permissions(object):
     """
     Valid permission values used when sharing v3 file items.
 
-    .. versionadded:: 4.0.0
+    .. versionadded:: 3.12.0
     """
 
     READ = 'READ'

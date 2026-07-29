@@ -41,23 +41,25 @@ User agent value to prepend to all requests
 DEFAULT_SERVER = "http://www.ndexbio.org"
 
 
-def _warn_removed_in_v3(name, replacement):
+def _warn_deprecated(name, replacement, note=''):
     """
-    Emits a :py:exc:`DeprecationWarning` for a method backed by a v2 only
-    endpoint.
+    Emits a :py:exc:`DeprecationWarning` for a network set or group method.
 
-    The call still reaches the v2 endpoint, which remains available on NDEx
-    servers, but has no v3 equivalent and will stop working once v2 is
-    retired.
+    These methods remain fully supported. On the server a network set is
+    stored as a folder, and a group as a folder several users hold
+    permissions on, so the v2 endpoints continue to work. The warning exists
+    to steer new code towards the ``client.files`` and ``client.networks``
+    namespaces.
 
     :param name: Name of the deprecated method
     :type name: str
-    :param replacement: Guidance naming the v3 equivalent
+    :param replacement: Namespace method to use instead
     :type replacement: str
+    :param note: Optional extra sentence appended to the message
+    :type note: str
     """
-    warnings.warn(name + ' relies on the NDEx v2 API and has no v3 '
-                         'equivalent. It will be removed in a future '
-                         'release. ' + replacement,
+    warnings.warn(name + '() is deprecated in favour of ' + replacement +
+                  '.' + note,
                   DeprecationWarning, stacklevel=3)
 
 
@@ -870,8 +872,9 @@ class Ndex2(object):
 
         :param network_id: The UUID of the network
         :type network_id: str
-        :param aspect_name: Name of CX2 aspect. Example aspects:
-                            ``nodes``, ``edges``, ``networkAttributes`` etc.
+        :param aspect_name: Name of CX2 aspect.
+                            Example aspects: ``nodes``, ``edges``,
+                                             ``networkAttributes`` etc.
         :type aspect_name: str
         :param access_key: Optional access key UUID
         :param size: Denotes number of elements of given aspect to return. If < 0 or
@@ -1050,11 +1053,9 @@ class Ndex2(object):
         else:
             route = "/search/network?start=%s&size=%s" % (start, size)
             if include_groups:
-                _warn_removed_in_v3('The include_groups parameter of '
-                                    'search_networks',
-                                    'Groups were removed in v3. Use '
-                                    'ndex2.client_v3.Ndex3.search_files '
-                                    'instead.')
+                _warn_deprecated('The include_groups parameter of '
+                                 'search_networks',
+                                 'client.files.search()')
                 post_data["includeGroups"] = True
 
         if account_name:
@@ -1657,6 +1658,9 @@ class Ndex2(object):
         """
         Updated group permissions
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.set_members()`` instead.
+
         :param groupid: Group id
         :type groupid: str
         :param networkid: Network id
@@ -1666,10 +1670,8 @@ class Ndex2(object):
         :return: Result
         :rtype: dict
         """
-        _warn_removed_in_v3('update_network_group_permission',
-                            'Groups were removed in v3. Use '
-                            'ndex2.client_v3.Ndex3.set_sharing_members to '
-                            'grant per user permissions.')
+        _warn_deprecated('update_network_group_permission',
+                         'client.files.set_members()')
         route = "/network/%s/permission?groupid=%s&permission=%s" % (networkid, groupid, permission)
         self.put(route)
 
@@ -1693,6 +1695,9 @@ class Ndex2(object):
         """
         Set group permission for a set of networks
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.set_members()`` instead.
+
         :param groupid: Group id
         :type groupid: str
         :param networkids: List of network ids
@@ -1702,10 +1707,8 @@ class Ndex2(object):
         :return: Result
         :rtype: dict
         """
-        _warn_removed_in_v3('grant_networks_to_group',
-                            'Groups were removed in v3. Use '
-                            'ndex2.client_v3.Ndex3.set_sharing_members to '
-                            'grant per user permissions.')
+        _warn_deprecated('grant_networks_to_group',
+                         'client.files.set_members()')
         for networkid in networkids:
             self.update_network_group_permission(groupid, networkid, permission)
 
@@ -1968,6 +1971,9 @@ class Ndex2(object):
         """
         Creates a new network set
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.create_folder()`` instead.
+
         :param name: Network set name
         :type name: str
         :param description: Network set description
@@ -1975,8 +1981,8 @@ class Ndex2(object):
         :return: URI of the newly created network set
         :rtype: str
         """
-        _warn_removed_in_v3('create_networkset',
-                            'Use ndex2.client_v3.Ndex3.create_folder instead.')
+        _warn_deprecated('create_networkset',
+                         'client.files.create_folder()')
         route = '/networkset'
         return self.post(route, json.dumps({"name": name,
                                             "description": description}))
@@ -1999,14 +2005,18 @@ class Ndex2(object):
         """
         Gets the network set information including the list of networks
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.get_folder()`` instead.
+
         :param set_id: network set id
         :type set_id: str
         :return: network set information
         :rtype: dict
         """
-        _warn_removed_in_v3('get_networkset',
-                            'Use ndex2.client_v3.Ndex3.get_folder '
-                            'and list_folder_items instead.')
+        _warn_deprecated('get_networkset',
+                         'client.files.get_folder()',
+                         ' A network set is stored as a folder, so the '
+                         'same UUID works.')
         route = '/networkset/%s' % set_id
 
         return self.get(route)
@@ -2047,6 +2057,8 @@ class Ndex2(object):
              'networks': ['face63b6-aba7-11eb-9e72-0ac135e8bacf',
                           'fae4d1e8-aba7-11eb-9e72-0ac135e8bacf']
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.list_folders()`` instead.
 
         :param user_id: Id of user on NDEx. To get Id of user see
                         :py:func:`get_id_for_user`
@@ -2077,10 +2089,10 @@ class Ndex2(object):
         :return: list with dict objects containing Network Sets
         :rtype: list
         """
-        _warn_removed_in_v3('get_networksets_for_user_id',
-                            'Use ndex2.client_v3.Ndex3.list_folders, or '
-                            'get_user_home to walk the folder tree from '
-                            'its root.')
+        _warn_deprecated('get_networksets_for_user_id',
+                         'client.files.list_folders()',
+                         ' Network sets appear in the folder listing, '
+                         'since a network set is stored as a folder.')
         if user_id is None or not isinstance(user_id, str):
             raise NDExInvalidParameterError('user_id must be of type str')
 
@@ -2122,6 +2134,9 @@ class Ndex2(object):
         """
         Deletes the network set, requires credentials
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.delete_folder()`` instead.
+
         :param networkset_id: networkset UUID id
         :type networkset_id: str
         :raises NDExInvalidParameterError: for invalid networkset id parameter
@@ -2130,8 +2145,8 @@ class Ndex2(object):
         :raises NDExError: For any other error with contents of error in message
         :return: None upon success
         """
-        _warn_removed_in_v3('delete_networkset',
-                            'Use ndex2.client_v3.Ndex3.delete_folder instead.')
+        _warn_deprecated('delete_networkset',
+                         'client.files.delete_folder()')
         if networkset_id is None:
             raise NDExInvalidParameterError('networkset id cannot be None')
         if not isinstance(networkset_id, str):
@@ -2165,6 +2180,9 @@ class Ndex2(object):
         """
         Add networks to a network set.  User must have visibility of all networks being added
 
+        .. deprecated:: 3.12.0
+           Use ``client.networks.move_to_folder()`` instead.
+
         :param set_id: network set id
         :type set_id: str
         :param networks: networks (ids as str) that will be added to the set
@@ -2172,11 +2190,11 @@ class Ndex2(object):
         :return: None
         :rtype: None
         """
-        _warn_removed_in_v3('add_networks_to_networkset',
-                            'Use '
-                            'ndex2.client_v3.Ndex3.move_networks_to_folder, '
-                            'or create_shortcut to list a network in more '
-                            'than one folder.')
+        _warn_deprecated('add_networks_to_networkset',
+                         'client.networks.move_to_folder()',
+                         ' A network lives in exactly one folder; use '
+                         'client.files.create_shortcut() to list it in '
+                         'more than one place.')
 
         route = '/networkset/%s/members' % set_id
 
@@ -2187,6 +2205,9 @@ class Ndex2(object):
         """
         Removes network(s) from a network set.
 
+        .. deprecated:: 3.12.0
+           Use ``client.networks.move_to_folder()`` instead.
+
         :param set_id: network set id
         :type set_id: str
         :param networks: networks (ids as str) that will be removed from the set
@@ -2196,11 +2217,8 @@ class Ndex2(object):
         :return: None
         :rtype: None
         """
-        _warn_removed_in_v3('delete_networks_from_networkset',
-                            'Use '
-                            'ndex2.client_v3.Ndex3.move_networks_to_folder '
-                            'to move the networks elsewhere, or '
-                            'delete_shortcut.')
+        _warn_deprecated('delete_networks_from_networkset',
+                         'client.networks.move_to_folder()')
 
         route = '/networkset/%s/members' % set_id
         post_json = json.dumps(networks)

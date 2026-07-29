@@ -42,3 +42,44 @@ jobs:
       - name: Run tests
         run: |
           pytest
+
+  # Verifies the built artifact, not just the source tree. The test job above
+  # runs pytest from the repository root, so it imports ./ndex2 and would pass
+  # even if the wheel were missing a package.
+  packaging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Build the wheel
+        run: |
+          python -m pip install --upgrade pip build
+          rm -rf build dist *.egg-info
+          python -m build --wheel --outdir dist/
+
+      - name: Verify every source package is in the wheel
+        run: python scripts/check_packaging.py 'dist/*.whl'
+
+      # The cd is essential. python -c puts the current directory first on
+      # sys.path, so running this from the repository root would import the
+      # local source instead of the installed package and always pass.
+      - name: Import from a clean install, outside the source tree
+        run: |
+          python -m venv /tmp/venv
+          /tmp/venv/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/venv/bin/python -c "
+          import ndex2
+          from ndex2.client import Ndex2
+          from ndex2.constants import FileType
+          client = Ndex2(skip_version_check=True)
+          for namespace in ('files', 'networks', 'users', 'admin'):
+              assert hasattr(client, namespace), namespace
+          print('imported from', ndex2.__file__)
+          "

@@ -186,7 +186,7 @@ class TestClient(unittest.TestCase):
                 self.fail('Expected exception')
             except Exception as e:
                 self.assertEqual(str(e),
-                                 'This release only supports NDEx 2.x server.')
+                                 'This release only supports NDEx 2.x and 3.x servers.')
 
     def test_ndex2_constructor_with_defaulthost_thatisversiontwo(self):
         with requests_mock.mock() as m:
@@ -195,6 +195,21 @@ class TestClient(unittest.TestCase):
             ndex = Ndex2()
             self.assertEqual(ndex.debug, False)
             self.assertEqual(ndex.version, '2.1')
+            self.assertEqual(ndex.status, {})
+            self.assertEqual(ndex.username, None)
+            self.assertEqual(ndex.password, None)
+            self.assertEqual(ndex.user_agent, '')
+            self.assertEqual(ndex.version_endpoint, '/v2')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER)
+            self.assertTrue(ndex.s is not None)
+
+    def test_ndex2_constructor_with_defaulthost_thatisversionthree(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version='3.1'))
+            ndex = Ndex2()
+            self.assertEqual(ndex.debug, False)
+            self.assertEqual(ndex.version, '3.1')
             self.assertEqual(ndex.status, {})
             self.assertEqual(ndex.username, None)
             self.assertEqual(ndex.password, None)

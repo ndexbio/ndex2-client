@@ -129,7 +129,7 @@ class Ndex2(object):
         if host is None:
             host = DEFAULT_SERVER
         elif 'http' not in host:
-            host = 'http://' + host
+            host = 'https://' + host
 
         if "localhost" in host:
             self.host = "http://localhost:8080/ndexbio-rest"
@@ -158,12 +158,12 @@ class Ndex2(object):
                     if prop is not None:
                         pv = prop.get('ServerVersion')
                         if pv is not None:
-                            if not pv.startswith('2.'):
-                                raise Exception("This release only supports "
-                                                "NDEx 2.x server.")
-                            else:
+                            if pv.startswith('2.') or pv.startswith('3.'):
                                 self.version = pv
                                 self.version_endpoint = '/v2'
+                            else:
+                                raise Exception("This release only supports "
+                                                "NDEx 2.x and 3.x servers.")
                         else:
                             self.logger.warning("Warning: This release "
                                                 "doesn't fully "

@@ -12,10 +12,6 @@ The NDEx2 Python Client can be broken into three parts:
 #. :py:class:`~ndex2.client.Ndex2` REST client provides provides methods to
    interact with `NDEx`_ via the `NDEx REST Service`_
 
-#. :py:class:`~ndex2.client_v3.Ndex3` REST client provides methods to interact
-   with `NDEx`_ via the **v3** `NDEx REST Service`_, which organizes user
-   content into folders and shortcuts
-
 .. note::
 
    All networks on NDEx_ can be retrieved in newer `CX2 format`_ via

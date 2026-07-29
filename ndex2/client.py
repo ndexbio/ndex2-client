@@ -14,6 +14,13 @@ from ndex2.version import __version__
 from ndex2.exceptions import NDExInvalidCXError
 from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExError
+from ndex2.exceptions import raise_from_exception
+from ndex2.exceptions import raise_from_requests_http_error
+from ndex2.transport import HttpTransport
+from ndex2.api.files import FilesAPI
+from ndex2.api.networks import NetworksAPI
+from ndex2.api.users import UsersAPI
+from ndex2.api.admin import AdminAPI
 from ndex2.exceptions import NDExUnsupportedCallError
 from ndex2.exceptions import NDExInvalidParameterError
 from ndex2.exceptions import NDExNotFoundError
@@ -179,6 +186,21 @@ class Ndex2(object):
             # add credentials to the session, if available
             self.s.auth = (username, password)
 
+        # Shared HTTP layer for the v3 API namespaces. It reuses the session
+        # created above so that there is one connection pool and one place
+        # credentials are held, rather than one per code path.
+        self._http = HttpTransport(host=self.host, username=username,
+                                   password=password, timeout=timeout,
+                                   user_agent=self.user_agent, debug=debug,
+                                   session=self.s)
+
+        # v3 API namespaces. These share the transport above, so
+        # authenticating one authenticates all of them.
+        self.files = FilesAPI(self._http)
+        self.networks = NetworksAPI(self._http)
+        self.users = UsersAPI(self._http)
+        self.admin = AdminAPI(self._http)
+
         if update_status:
             self.update_status()
 
@@ -193,9 +215,11 @@ class Ndex2(object):
         :type time_in_secs: int
         """
         self.timeout = time_in_secs
+        self._http.timeout = time_in_secs
 
     def set_debug_mode(self, debug):
         self.debug = debug
+        self._http.debug = debug
 
     def debug_response(self, response):
         if self.debug:
@@ -270,15 +294,7 @@ class Ndex2(object):
                                    is 404
         :raises NDExUnauthorizedError: Raises this error if status code is 401
         """
-        if http_error is None:
-            raise NDExError('Caught unknown server error')
-        errmsg = 'Caught ' + str(http_error.response.status_code) + \
-                 ' from server: ' + str(http_error.response.text)
-        if http_error.response.status_code == 404:
-            raise NDExNotFoundError(errmsg)
-        if http_error.response.status_code == 401:
-            raise NDExUnauthorizedError(errmsg)
-        raise NDExError(errmsg)
+        raise_from_requests_http_error(http_error)
 
     def _convert_exception_to_ndex_error(self, error):
         """
@@ -289,10 +305,7 @@ class Ndex2(object):
         :type error: Exception
         :raises NDExError: always raises error
         """
-        if error is None:
-            raise NDExError('Caught unknown error')
-        raise NDExError('Caught ' + str(error.__class__.__name__) +
-                        ': ' + str(error))
+        raise_from_exception(error)
 
     def _get_version_endpoint(self, alt_version_endpoint=None):
         if alt_version_endpoint is None:
@@ -517,7 +530,7 @@ class Ndex2(object):
 
         return self.post_multipart(route, fields, query_string=query_string)
 
-    def save_new_cx2_network(self, cx, visibility=None):
+    def save_new_cx2_network(self, cx, visibility=None, folder_id=None):
         """
         Create a new network (CX2) on the server
 
@@ -547,6 +560,15 @@ class Ndex2(object):
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
                            If ``None`` sets visibility to PRIVATE
         :type visibility: str
+        :param folder_id: Optional UUID of a folder to create the network
+                          in, saving a follow up call to
+                          ``client.networks.move_to_folder()``. If ``None``
+                          the network is created at the top level of the
+                          user's home, which is the behavior of releases
+                          before 3.12.0.
+
+                          .. versionadded:: 3.12.0
+        :type folder_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :raises NDExInvalidCXError: if **cx** is ``None``, not a list,
                                     or is an empty list
@@ -567,9 +589,11 @@ class Ndex2(object):
         else:
             stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 
-        return self.save_cx2_stream_as_new_network(stream, visibility=visibility)
+        return self.save_cx2_stream_as_new_network(
+            stream, visibility=visibility, folder_id=folder_id)
 
-    def save_cx2_stream_as_new_network(self, cx_stream, visibility=None):
+    def save_cx2_stream_as_new_network(self, cx_stream, visibility=None,
+                                       folder_id=None):
         """
         Create a new network from a CX2 stream
 
@@ -603,6 +627,15 @@ class Ndex2(object):
         :type cx_stream: BytesIO like object
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: str
+        :param folder_id: Optional UUID of a folder to create the network
+                          in, saving a follow up call to
+                          ``client.networks.move_to_folder()``. If ``None``
+                          the network is created at the top level of the
+                          user's home, which is the behavior of releases
+                          before 3.12.0.
+
+                          .. versionadded:: 3.12.0
+        :type folder_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :raises NDExError: if there is an error saving the network
         :return: Full URL to newly created network
@@ -610,9 +643,12 @@ class Ndex2(object):
         :rtype: str
         """
         self._require_auth()
-        query_string = None
+        query_params = []
         if visibility:
-            query_string = 'visibility=' + str(visibility)
+            query_params.append('visibility=' + str(visibility))
+        if folder_id:
+            query_params.append('folderId=' + str(folder_id))
+        query_string = '&'.join(query_params) if query_params else None
 
         fields = {
             'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')

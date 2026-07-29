@@ -236,3 +236,46 @@ NETWORK_ATTRIBUTES_ASPECT = 'networkAttributes'
 """
 Key for network attributes aspect
 """
+
+
+class FileType(object):
+    """
+    Valid values for the ``type`` of a v3 file item.
+
+    .. versionadded:: 4.0.0
+    """
+
+    NETWORK = 'NETWORK'
+    FOLDER = 'FOLDER'
+    SHORTCUT = 'SHORTCUT'
+
+    ALL = frozenset([NETWORK, FOLDER, SHORTCUT])
+
+
+class Visibility(object):
+    """
+    Valid visibility values for v3 file items.
+
+    .. versionadded:: 4.0.0
+    """
+
+    PUBLIC = 'PUBLIC'
+    PRIVATE = 'PRIVATE'
+    UNLISTED = 'UNLISTED'
+
+    ALL = frozenset([PUBLIC, PRIVATE, UNLISTED])
+
+
+class Permissions(object):
+    """
+    Valid permission values used when sharing v3 file items.
+
+    .. versionadded:: 4.0.0
+    """
+
+    READ = 'READ'
+    WRITE = 'WRITE'
+    ADMIN = 'ADMIN'
+    MEMBER = 'MEMBER'
+
+    ALL = frozenset([READ, WRITE, ADMIN, MEMBER])

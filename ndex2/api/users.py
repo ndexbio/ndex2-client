@@ -23,6 +23,8 @@ class UsersAPI(object):
     Not instantiated directly. Reached as ``client.users`` on
     :py:class:`~ndex2.client.Ndex2`.
 
+    .. versionadded:: 3.12.0
+
     :param http: Shared transport, supplied by the client
     :type http: :py:class:`~ndex2.transport.HttpTransport`
     """
@@ -35,6 +37,8 @@ class UsersAPI(object):
         Retrieves a user by account name.
 
         ``GET /v3/users?username=``
+
+        .. versionadded:: 3.12.0
 
         :param username: Account name of the user
         :type username: str
@@ -55,6 +59,8 @@ class UsersAPI(object):
         This is the entry point for walking a user's folder tree: it
         returns the items that have no parent folder. Anonymous callers
         see only public items.
+
+        .. versionadded:: 3.12.0
 
         :param user_id: UUID of the user
         :type user_id: str
@@ -82,6 +88,8 @@ class UsersAPI(object):
         shares its session with the flat methods, this re-authenticates
         the whole client, replacing any username and password previously
         set.
+
+        .. versionadded:: 3.12.0
 
         :param id_token: OAuth/Keycloak id token
         :type id_token: str

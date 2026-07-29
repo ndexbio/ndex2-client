@@ -34,6 +34,8 @@ class NetworksAPI(object):
     Not instantiated directly. Reached as ``client.networks`` on
     :py:class:`~ndex2.client.Ndex2`.
 
+    .. versionadded:: 3.12.0
+
     :param http: Shared transport, supplied by the client
     :type http: :py:class:`~ndex2.transport.HttpTransport`
     """
@@ -54,6 +56,8 @@ class NetworksAPI(object):
         The v3 summary adds a ``folderId`` field naming the folder holding
         the network, which the flat
         :py:meth:`~ndex2.client.Ndex2.get_network_summary` does not report.
+
+        .. versionadded:: 3.12.0
 
         :param network_id: UUID of the network
         :type network_id: str
@@ -78,6 +82,8 @@ class NetworksAPI(object):
 
         ``POST /v3/batch/networks/summary``
 
+        .. versionadded:: 3.12.0
+
         :param network_ids: UUIDs of the networks
         :type network_ids: list or str
         :param access_key: Access key granting read access
@@ -101,6 +107,8 @@ class NetworksAPI(object):
         Lists the CX2 aspect metadata of a network.
 
         ``GET /v3/networks/{networkid}/aspects``
+
+        .. versionadded:: 3.12.0
 
         :param network_id: UUID of the network
         :type network_id: str
@@ -130,6 +138,8 @@ class NetworksAPI(object):
         ``client.files.restore()`` can recover it. Pass *permanent* to
         match the flat method's behaviour.
 
+        .. versionadded:: 3.12.0
+
         :param network_id: UUID of the network
         :type network_id: str
         :param permanent: If ``True``, bypass the trash and delete
@@ -155,6 +165,8 @@ class NetworksAPI(object):
         adds. To have a network appear in more than one place, use
         ``client.files.create_shortcut()``.
 
+        .. versionadded:: 3.12.0
+
         :param folder_id: UUID of the destination folder
         :type folder_id: str
         :param network_ids: UUIDs of the networks to move
@@ -175,6 +187,8 @@ class NetworksAPI(object):
         Transfers ownership of networks to another user.
 
         ``POST /v3/files/sharing/transfer``
+
+        .. versionadded:: 3.12.0
 
         :param network_ids: UUIDs of the networks to transfer
         :type network_ids: list or str
@@ -204,6 +218,8 @@ class NetworksAPI(object):
         The response is streamed, so the body is available as
         ``.text`` or ``.content`` on the returned object rather than being
         parsed.
+
+        .. versionadded:: 3.12.0
 
         :param network_id: UUID of the network
         :type network_id: str
@@ -237,6 +253,8 @@ class NetworksAPI(object):
         Requests a DOI for a network.
 
         ``GET /v3/networks/{networkid}/DOI``
+
+        .. versionadded:: 3.12.0
 
         :param network_id: UUID of the network
         :type network_id: str
@@ -311,6 +329,8 @@ class NetworksAPI(object):
         :py:meth:`~ndex2.client.Ndex2.get_neighborhood_as_cx_stream`, which
         targets the v2 route.
 
+        .. versionadded:: 3.12.0
+
         :param network_id: UUID of the network to query
         :type network_id: str
         :param search_string: Query terms identifying the starting nodes
@@ -361,6 +381,8 @@ class NetworksAPI(object):
         Arguments match :py:meth:`query`. The CX equivalent is the flat
         :py:meth:`~ndex2.client.Ndex2.get_interconnectquery_as_cx_stream`.
 
+        .. versionadded:: 3.12.0
+
         :param network_id: UUID of the network to query
         :type network_id: str
         :param search_string: Query terms identifying the nodes to
@@ -404,6 +426,8 @@ class NetworksAPI(object):
         Replaces the flat
         :py:meth:`~ndex2.client.Ndex2.search_network_nodes`, which targets
         the v2 route.
+
+        .. versionadded:: 3.12.0
 
         :param network_id: UUID of the network
         :type network_id: str

@@ -43,6 +43,8 @@ class HttpTransport(object):
     """
     Performs authenticated HTTP requests against an NDEx server.
 
+    .. versionadded:: 3.12.0
+
     :param host: Base URL of the server, including any servlet context
                  path. A missing scheme is assumed to be ``http``.
     :type host: str
@@ -100,6 +102,8 @@ class HttpTransport(object):
         here is immediately visible to all of them. Calling with no
         arguments clears authentication.
 
+        .. versionadded:: 3.12.0
+
         :param username: Account name for HTTP Basic authentication
         :type username: str
         :param password: Password for *username*
@@ -124,6 +128,8 @@ class HttpTransport(object):
         """
         Whether any credentials are currently set.
 
+        .. versionadded:: 3.12.0
+
         :return: ``True`` if a bearer token, or both a username and
                  password, are set
         :rtype: bool
@@ -137,6 +143,8 @@ class HttpTransport(object):
 
         Lets a namespace reject an unauthenticated call before spending a
         network round trip on a request the server will refuse.
+
+        .. versionadded:: 3.12.0
 
         :raises NDExUnauthorizedError: If no credentials are set
         :return: ``None``
@@ -153,6 +161,8 @@ class HttpTransport(object):
         """
         Builds the absolute URL for a route.
 
+        .. versionadded:: 3.12.0
+
         :param route: Path below the version prefix, for example
                       ``/files/folders/``
         :type route: str
@@ -167,6 +177,8 @@ class HttpTransport(object):
                 extra_headers=None, stream=False, return_response=False):
         """
         Issues one request and normalizes the outcome.
+
+        .. versionadded:: 3.12.0
 
         :param method: HTTP verb, for example ``GET``
         :type method: str
@@ -242,6 +254,8 @@ class HttpTransport(object):
         """
         Issues a ``GET``. See :py:meth:`request` for arguments.
 
+        .. versionadded:: 3.12.0
+
         :param route: Path below the version prefix
         :type route: str
         :return: Result of :py:meth:`request`
@@ -251,6 +265,8 @@ class HttpTransport(object):
     def post(self, route, **kwargs):
         """
         Issues a ``POST``. See :py:meth:`request` for arguments.
+
+        .. versionadded:: 3.12.0
 
         :param route: Path below the version prefix
         :type route: str
@@ -262,6 +278,8 @@ class HttpTransport(object):
         """
         Issues a ``PUT``. See :py:meth:`request` for arguments.
 
+        .. versionadded:: 3.12.0
+
         :param route: Path below the version prefix
         :type route: str
         :return: Result of :py:meth:`request`
@@ -271,6 +289,8 @@ class HttpTransport(object):
     def delete(self, route, **kwargs):
         """
         Issues a ``DELETE``. See :py:meth:`request` for arguments.
+
+        .. versionadded:: 3.12.0
 
         :param route: Path below the version prefix
         :type route: str
@@ -293,6 +313,8 @@ class HttpTransport(object):
         hand callers a string where a dict is expected, producing a
         failure far from its cause. Bare scalars are left as text, so a
         ``text/plain`` body of ``123`` does not become an int.
+
+        .. versionadded:: 3.12.0
 
         :param response: Response to read
         :type response: :py:class:`requests.Response`
@@ -318,6 +340,8 @@ class HttpTransport(object):
         The v3 create endpoints return an ``NdexObjectUpdateStatus`` body
         carrying a ``uuid`` field and also set a ``Location`` header. The
         body is preferred and the header is the fallback.
+
+        .. versionadded:: 3.12.0
 
         :param response: Response from a create call
         :type response: :py:class:`requests.Response`

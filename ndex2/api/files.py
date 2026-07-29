@@ -38,6 +38,8 @@ class FilesAPI(object):
     Not instantiated directly. Reached as ``client.files`` on
     :py:class:`~ndex2.client.Ndex2`.
 
+    .. versionadded:: 3.12.0
+
     :param http: Shared transport, supplied by the client
     :type http: :py:class:`~ndex2.transport.HttpTransport`
     """
@@ -55,6 +57,8 @@ class FilesAPI(object):
         Creates a folder.
 
         ``POST /v3/files/folders/``
+
+        .. versionadded:: 3.12.0
 
         :param name: Name of the new folder
         :type name: str
@@ -96,6 +100,8 @@ class FilesAPI(object):
         Because a network set is stored as a folder, a network set UUID is
         accepted here as well.
 
+        .. versionadded:: 3.12.0
+
         :param folder_id: UUID of the folder
         :type folder_id: str
         :param access_key: Access key granting read access to a folder the
@@ -119,6 +125,8 @@ class FilesAPI(object):
         Updates a folder. Setting *parent* moves it.
 
         ``PUT /v3/files/folders/{folderid}``
+
+        .. versionadded:: 3.12.0
 
         :param folder_id: UUID of the folder to update
         :type folder_id: str
@@ -164,6 +172,8 @@ class FilesAPI(object):
         with :py:meth:`restore`, and the server refuses to delete a folder
         that still has children.
 
+        .. versionadded:: 3.12.0
+
         :param folder_id: UUID of the folder
         :type folder_id: str
         :param force: If ``True``, delete the folder even when it still
@@ -194,6 +204,8 @@ class FilesAPI(object):
         ``parent`` field of each entry to rebuild the tree. Network sets
         appear here too, since a network set is stored as a folder.
 
+        .. versionadded:: 3.12.0
+
         :param limit: Maximum number of folders to return
         :type limit: int
         :raises NDExUnauthorizedError: If no credentials are set
@@ -210,6 +222,8 @@ class FilesAPI(object):
         Lists the direct children of a folder.
 
         ``GET /v3/files/folders/{folderid}/list``
+
+        .. versionadded:: 3.12.0
 
         :param folder_id: UUID of the folder
         :type folder_id: str
@@ -245,6 +259,8 @@ class FilesAPI(object):
 
         ``GET /v3/files/folders/{folderid}/count``
 
+        .. versionadded:: 3.12.0
+
         :param folder_id: UUID of the folder
         :type folder_id: str
         :param access_key: Access key granting read access
@@ -264,6 +280,8 @@ class FilesAPI(object):
         ``GET /v3/files/folders/{folderid}/accesskey``
 
         Use :py:meth:`share` to create one.
+
+        .. versionadded:: 3.12.0
 
         :param folder_id: UUID of the folder
         :type folder_id: str
@@ -289,6 +307,8 @@ class FilesAPI(object):
 
         A shortcut lets one network or folder appear in several folders
         without being copied.
+
+        .. versionadded:: 3.12.0
 
         :param name: Name of the shortcut
         :type name: str
@@ -331,6 +351,8 @@ class FilesAPI(object):
 
         ``GET /v3/files/shortcuts/{shortcutid}``
 
+        .. versionadded:: 3.12.0
+
         :param shortcut_id: UUID of the shortcut
         :type shortcut_id: str
         :raises NDExNotFoundError: If no such shortcut exists
@@ -349,6 +371,8 @@ class FilesAPI(object):
         Updates a shortcut.
 
         ``PUT /v3/files/shortcuts/{shortcutid}``
+
+        .. versionadded:: 3.12.0
 
         :param shortcut_id: UUID of the shortcut to update
         :type shortcut_id: str
@@ -397,6 +421,8 @@ class FilesAPI(object):
 
         ``DELETE /v3/files/shortcuts/{shortcutid}``
 
+        .. versionadded:: 3.12.0
+
         :param shortcut_id: UUID of the shortcut
         :type shortcut_id: str
         :raises NDExNotFoundError: If no such shortcut exists
@@ -412,6 +438,8 @@ class FilesAPI(object):
         Lists shortcuts owned by the authenticated user.
 
         ``GET /v3/files/shortcuts/``
+
+        .. versionadded:: 3.12.0
 
         :raises NDExUnauthorizedError: If no credentials are set
         :return: Shortcuts owned by the user
@@ -431,6 +459,8 @@ class FilesAPI(object):
 
         ``GET /v3/files/trash``
 
+        .. versionadded:: 3.12.0
+
         :raises NDExUnauthorizedError: If no credentials are set
         :return: File item summaries for trashed items
         :rtype: list
@@ -444,6 +474,8 @@ class FilesAPI(object):
         Restores items from the trash to their previous location.
 
         ``POST /v3/files/trash/restore``
+
+        .. versionadded:: 3.12.0
 
         :param networks: UUIDs of networks to restore
         :type networks: list
@@ -476,6 +508,8 @@ class FilesAPI(object):
 
         ``DELETE /v3/files/trash``
 
+        .. versionadded:: 3.12.0
+
         :raises NDExUnauthorizedError: If no credentials are set
         :return: ``None``
         """
@@ -487,6 +521,8 @@ class FilesAPI(object):
         Permanently deletes one trashed item. Cannot be undone.
 
         ``DELETE /v3/files/trash/{uuid}``
+
+        .. versionadded:: 3.12.0
 
         :param item_id: UUID of the trashed item
         :type item_id: str
@@ -511,6 +547,8 @@ class FilesAPI(object):
         Anyone holding a returned key can read the item by passing it as
         the ``access_key`` argument of the read methods.
 
+        .. versionadded:: 3.12.0
+
         :param files: Items to share. A ``{uuid: type}`` map, a list of
                       ``(uuid, type)`` pairs, or a list of UUIDs when
                       *default_type* is set.
@@ -532,6 +570,8 @@ class FilesAPI(object):
         Revokes the public access keys of file items.
 
         ``POST /v3/files/sharing/unshare``
+
+        .. versionadded:: 3.12.0
 
         :param files: Items to unshare, in any form accepted by
                       :py:meth:`share`
@@ -555,6 +595,8 @@ class FilesAPI(object):
 
         Granting on a folder covers the items inside it, which is usually
         preferable to granting on each network individually.
+
+        .. versionadded:: 3.12.0
 
         :param files: Items to share, in any form accepted by
                       :py:meth:`share`
@@ -592,6 +634,8 @@ class FilesAPI(object):
 
         ``POST /v3/files/sharing/members/list``
 
+        .. versionadded:: 3.12.0
+
         :param files: Items to inspect, in any form accepted by
                       :py:meth:`share`
         :type files: dict or list or str
@@ -615,6 +659,8 @@ class FilesAPI(object):
 
         ``GET /v3/files/sharing/list``
 
+        .. versionadded:: 3.12.0
+
         :param limit: Maximum number of items to return
         :type limit: int
         :raises NDExUnauthorizedError: If no credentials are set
@@ -635,6 +681,8 @@ class FilesAPI(object):
         Copies a network or shortcut into a folder.
 
         ``POST /v3/files/copy``
+
+        .. versionadded:: 3.12.0
 
         :param file_id: UUID of the item to copy
         :type file_id: str
@@ -670,6 +718,8 @@ class FilesAPI(object):
 
         ``GET /v3/files/count``
 
+        .. versionadded:: 3.12.0
+
         :raises NDExUnauthorizedError: If no credentials are set
         :return: Counts keyed by ``network``, ``folder`` and ``shortcut``
         :rtype: dict
@@ -685,6 +735,8 @@ class FilesAPI(object):
 
         Accepts networks, folders and shortcuts alike, which is why this
         lives here rather than on ``client.networks``.
+
+        .. versionadded:: 3.12.0
 
         :param visibility: One of :py:class:`~ndex2.constants.Visibility`
         :type visibility: str
@@ -715,6 +767,8 @@ class FilesAPI(object):
 
         Covers folders and shortcuts as well as networks, and is the v3
         counterpart to :py:meth:`~ndex2.client.Ndex2.search_networks`.
+
+        .. versionadded:: 3.12.0
 
         :param search_string: Query text. An empty string matches
                               everything.

@@ -16,6 +16,8 @@ class AdminAPI(object):
     Not instantiated directly. Reached as ``client.admin`` on
     :py:class:`~ndex2.client.Ndex2`.
 
+    .. versionadded:: 3.12.0
+
     :param http: Shared transport, supplied by the client
     :type http: :py:class:`~ndex2.transport.HttpTransport`
     """
@@ -33,6 +35,8 @@ class AdminAPI(object):
         namespaces. The flat
         :py:meth:`~ndex2.client.Ndex2.update_status` reports the v2 status
         and caches it on the client; this does neither.
+
+        .. versionadded:: 3.12.0
 
         :param format: ``full`` for the complete status object, or
                        ``standard`` for a reduced one

@@ -53,9 +53,10 @@ class NetworksAPI(object):
 
         ``GET /v3/networks/{networkid}/summary``
 
-        The v3 summary adds a ``folderId`` field naming the folder holding
-        the network, which the flat
-        :py:meth:`~ndex2.client.Ndex2.get_network_summary` does not report.
+        The summary includes a ``folderId`` field naming the folder holding
+        the network. Field names and types follow the v3
+        ``NetworkSummaryV3`` model, which differs in places from what the
+        flat :py:meth:`~ndex2.client.Ndex2.get_network_summary` returns.
 
         .. versionadded:: 3.12.0
 

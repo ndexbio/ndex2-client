@@ -21,15 +21,24 @@ credentials regardless of which API version serves a given call:
     client = Ndex2(username='bob', password='secret',
                    skip_version_check=True)
 
+    # a small CX2 network. Give it a name via networkAttributes, otherwise
+    # the network has none and the field is absent everywhere it is reported.
+    cx2 = [{'CXVersion': '2.0', 'hasFragments': False},
+           {'networkAttributes': [{'name': 'BRCA pathway'}]},
+           {'nodes': [{'id': 1, 'v': {'name': 'ALPHA'}}]},
+           {'status': [{'success': True}]}]
+
     # create a folder and a network inside it
     folder = client.files.create_folder('My Pathways')
     net_url = client.save_new_cx2_network(cx2, folder_id=folder)
+    net_id = net_url.rstrip('/').split('/')[-1]
 
-    # walk the folder
+    # list what is in the folder
     for item in client.files.list_folder_items(folder):
         print(item['name'], item['type'])
 
     # share the folder, which covers everything inside it
+    alice_id = client.users.get('alice')['externalId']
     client.files.set_members({folder: FileType.FOLDER},
                              {alice_id: Permissions.WRITE})
 
@@ -53,7 +62,7 @@ counterpart. Both remain available:
      - What v3 adds
    * - :py:meth:`~ndex2.client.Ndex2.get_network_summary`
      - :py:meth:`~ndex2.api.networks.NetworksAPI.get_summary`
-     - ``folderId`` field
+     - v3 ``NetworkSummaryV3`` field set
    * - :py:meth:`~ndex2.client.Ndex2.delete_network`
      - :py:meth:`~ndex2.api.networks.NetworksAPI.delete`
      - trash, restorable
@@ -86,6 +95,13 @@ which returns the items with no parent folder, then recurse:
 
     user = client.users.get('bob')
     walk(client, client.users.home(user['externalId']))
+
+.. note::
+
+   A file item summary omits any field the server has no value for, rather than
+   reporting it as null. A network created without a ``name`` network attribute
+   therefore has no ``name`` key at all, so code walking arbitrary content may
+   want :py:meth:`dict.get`. ``uuid`` and ``type`` are always present.
 
 Network sets appear in this listing, because a network set is stored as a
 folder on the server. ``client.files.get_folder()`` accepts a network set UUID.

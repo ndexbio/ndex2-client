@@ -88,7 +88,7 @@ which returns the items with no parent folder, then recurse:
 
     def walk(client, items, depth=0):
         for item in items:
-            print('  ' * depth + item['name'] + ' [' + item['type'] + ']')
+            print('  ' * depth + item.get('name', '<NA>') + ' [' + item['type'] + ']')
             if item['type'] == FileType.FOLDER:
                 walk(client, client.files.list_folder_items(item['uuid']),
                      depth + 1)

@@ -7,6 +7,9 @@ an `NDEx`_ server either anonymously or using a specific user account. For
 each `NDEx`_ server and user account that you want to use in your script or
 application, you create an :py:class:`~ndex2.client.Ndex2` instance.
 
+.. versionadded:: 3.12.0
+
+Client now provides methods for v3 files endpoints. :doc:`Click here for more information <v3namespaces>`
     Example creating anonymous connection:
 
         .. code-block:: python

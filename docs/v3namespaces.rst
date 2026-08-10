@@ -139,26 +139,6 @@ Server status.
 .. autoclass:: ndex2.api.admin.AdminAPI
     :members:
 
-Transport
----------
-
-Every namespace shares one :py:class:`~ndex2.transport.HttpTransport`, created
-by :py:class:`~ndex2.client.Ndex2` and reachable as ``client._http``. It is
-documented because the authentication model depends on it: because it is built
-on the session :py:class:`~ndex2.client.Ndex2` already holds, changing
-credentials on the transport changes them for the flat methods as well. That is
-why :py:meth:`~ndex2.api.users.UsersAPI.signin` re-authenticates the whole
-client. It is not normally constructed directly.
-
-.. autoclass:: ndex2.transport.HttpTransport
-    :members:
-
-.. autodata:: ndex2.transport.V2
-
-.. autodata:: ndex2.transport.V3
-
-.. autodata:: ndex2.transport.DEFAULT_TIMEOUT
-
 Constants
 ---------
 

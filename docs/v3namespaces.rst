@@ -35,7 +35,7 @@ credentials regardless of which API version serves a given call:
 
     # list what is in the folder
     for item in client.files.list_folder_items(folder):
-        print(item['name'], item['type'])
+        print(item.get('name', '<NA>'), item['type'])
 
     # share the folder, which covers everything inside it
     alice_id = client.users.get('alice')['externalId']

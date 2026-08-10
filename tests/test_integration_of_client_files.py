@@ -76,6 +76,23 @@ class TestFoldersIntegration(V3IntegrationBase):
             1, len(self.client.files.list_folder_items(
                 parent, item_type=FileType.FOLDER)))
 
+    def test_list_folder_items_defaults_to_home(self):
+        """With no argument the special 'home' id lists the user's top
+        level, which is where a new top level folder lands."""
+        folder = self.new_folder('home-default')
+        uuids = [i.get('uuid') for i in self.client.files.list_folder_items()]
+        self.assertIn(folder, uuids)
+
+    def test_home_default_agrees_with_users_home(self):
+        """files.list_folder_items() and users.home() reach the same
+        listing by different routes."""
+        self.new_folder('home-agree')
+        via_files = sorted(i['uuid'] for i in
+                           self.client.files.list_folder_items())
+        via_users = sorted(i['uuid'] for i in
+                           self.client.users.home(self.user_id()))
+        self.assertEqual(via_users, via_files)
+
     def test_get_unknown_folder_raises(self):
         self.assertRaises(NDExError, self.client.files.get_folder,
                           '00000000-0000-0000-0000-000000000000')

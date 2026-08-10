@@ -185,6 +185,42 @@ class TestFolders(unittest.TestCase):
             self.assertIn('type=NETWORK', url)
             self.assertIn('format=update', url)
 
+    def test_list_folder_items_defaults_to_home(self):
+        """'home' is a special folder id the server resolves to the
+        authenticated user's top level, so no argument is required."""
+        c = client()
+        with requests_mock.mock() as m:
+            m.get(V3 + '/files/folders/home/list',
+                  json=[{'uuid': FOLDER_ID, 'type': 'FOLDER'}],
+                  headers=JSON_HEADERS)
+            self.assertEqual(1, len(c.files.list_folder_items()))
+            self.assertIn('/files/folders/home/list',
+                          m.request_history[0].url)
+
+    def test_list_folder_items_home_constant_matches_default(self):
+        from ndex2.api.files import HOME
+        c = client()
+        with requests_mock.mock() as m:
+            m.get(V3 + '/files/folders/home/list', json=[],
+                  headers=JSON_HEADERS)
+            c.files.list_folder_items(HOME)
+            self.assertIn('/files/folders/home/list',
+                          m.request_history[0].url)
+
+    def test_list_folder_items_home_requires_credentials(self):
+        """The server cannot resolve 'home' for an anonymous caller, so
+        reject it before spending a request."""
+        self.assertRaises(NDExUnauthorizedError,
+                          client(authenticated=False).files.list_folder_items)
+
+    def test_explicit_folder_id_still_allows_anonymous_with_key(self):
+        c = client(authenticated=False)
+        with requests_mock.mock() as m:
+            m.get(V3 + '/files/folders/' + FOLDER_ID + '/list', json=[],
+                  headers=JSON_HEADERS)
+            c.files.list_folder_items(FOLDER_ID, access_key='abc')
+            self.assertEqual(['abc'], m.request_history[0].qs['accesskey'])
+
     def test_list_folder_items_empty_returns_list(self):
         c = client()
         with requests_mock.mock() as m:

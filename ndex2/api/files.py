@@ -30,6 +30,12 @@ FILES = '/files'
 BATCH_FILES = '/batch/files'
 SEARCH_FILES = '/search/files'
 
+HOME = 'home'
+"""
+Special folder identifier accepted in place of a UUID, denoting the top
+level of the authenticated user's home.
+"""
+
 
 class FilesAPI(object):
     """
@@ -194,16 +200,31 @@ class FilesAPI(object):
             params={'force': str(bool(force)).lower(),
                     'permanent': str(bool(permanent)).lower()})
 
-    def list_folder_items(self, folder_id, item_type=None, format='update',
-                          access_key=None):
+    def list_folder_items(self, folder_id=HOME, item_type=None,
+                          format='update', access_key=None):
         """
         Lists the direct children of a folder.
 
         ``GET /v3/files/folders/{folderid}/list``
 
+        Called with no arguments this lists the top level of the
+        authenticated user's home, because *folder_id* defaults to the
+        special identifier ``home`` rather than a UUID. That is the
+        starting point for walking a user's own content:
+
+        .. code-block:: python
+
+            for item in client.files.list_folder_items():
+                print(item['name'], item['type'])
+
+        To list another user's home, use
+        :py:meth:`~ndex2.api.users.UsersAPI.home` with their UUID.
+
         .. versionadded:: 3.12.0
 
-        :param folder_id: UUID of the folder
+        :param folder_id: UUID of the folder, or the special value
+                          :py:const:`~ndex2.api.files.HOME` to list the
+                          authenticated user's home. Defaults to ``home``.
         :type folder_id: str
         :param item_type: Restrict results to one
                           :py:class:`~ndex2.constants.FileType`. Omit for
@@ -216,7 +237,9 @@ class FilesAPI(object):
         :type access_key: str
         :raises NDExInvalidParameterError: For invalid arguments
         :raises NDExNotFoundError: If no such folder exists
-        :raises NDExUnauthorizedError: If read access is denied
+        :raises NDExUnauthorizedError: If read access is denied, or if
+                                       *folder_id* is ``home`` and no
+                                       credentials are set
         :return: File item summaries. ``uuid`` and ``type`` are always
                  present. Other keys, including ``name``, are omitted rather
                  than reported as null when the server has no value, so a
@@ -226,6 +249,9 @@ class FilesAPI(object):
         :rtype: list
         """
         require_str(folder_id, 'folder_id')
+        if str(folder_id) == HOME:
+            # the server cannot resolve 'home' without knowing who is asking
+            self._http.require_auth()
         params = {'format': format,
                   'accesskey': access_key,
                   'type': require_enum(item_type, FileType.ALL,

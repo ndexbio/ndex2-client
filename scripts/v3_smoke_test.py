@@ -279,6 +279,16 @@ def main():
     r.step('folder_child_count',
            lambda: json.dumps(client.files.folder_child_count(parent)))
 
+    def check_home_default():
+        """No argument means the special 'home' id, so a top level folder
+        should appear."""
+        for item in client.files.list_folder_items():
+            if str(item.get('uuid')) == str(parent):
+                return 'found in home listing'
+        raise NDExError('parent folder missing from list_folder_items()')
+
+    r.step('list_folder_items() defaults to home', check_home_default)
+
     # ------------------------------------------------------------------
     r.section('Creating a network directly in a folder')
     # ------------------------------------------------------------------

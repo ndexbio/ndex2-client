@@ -114,6 +114,8 @@ Folders, shortcuts, trash, sharing and file search.
 .. autoclass:: ndex2.api.files.FilesAPI
     :members:
 
+.. autodata:: ndex2.api.files.HOME
+
 client.networks
 ---------------
 
@@ -129,7 +131,6 @@ User lookup, home directory listing and token sign-in.
 
 .. autoclass:: ndex2.api.users.UsersAPI
     :members:
-    :exclude-members: signin
 
 client.admin
 ------------

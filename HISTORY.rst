@@ -6,7 +6,7 @@ History
 -------------------
 
 * Enhancements
-    * Added namespace attributes to :py:class:`~ndex2.client.Ndex2` exposing the
+    * Added namespace attributes to ``ndex2.client.Ndex2`` exposing the
       NDEx **v3** API, so a single client covers both API versions:
       ``client.files`` (folders, shortcuts, trash, sharing, file search),
       ``client.networks`` (summaries, aspects, queries, export, ownership),

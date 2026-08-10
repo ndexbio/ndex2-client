@@ -38,11 +38,14 @@ class TestFoldersIntegration(V3IntegrationBase):
                          self.client.files.get_folder(folder)
                          .get('description'))
 
-    def test_new_folder_appears_in_list_folders(self):
+    def test_new_folder_appears_in_user_home(self):
+        """A top level folder shows up in the user's home listing. The
+        former list_folders() wrapper is gone: GET /v3/files/folders is
+        being retired from the server."""
         folder = self.new_folder('listed')
-        ids = [f.get('externalId') for f in
-               self.client.files.list_folders(limit=500)]
-        self.assertIn(folder, ids)
+        uuids = [i.get('uuid') for i in
+                 self.client.users.home(self.user_id())]
+        self.assertIn(folder, uuids)
 
     def test_child_count_reflects_contents(self):
         parent = self.new_folder('counted')
@@ -77,12 +80,10 @@ class TestFoldersIntegration(V3IntegrationBase):
         self.assertRaises(NDExError, self.client.files.get_folder,
                           '00000000-0000-0000-0000-000000000000')
 
-    def test_delete_folder_removes_it_from_the_listing(self):
+    def test_deleted_folder_is_no_longer_retrievable(self):
         folder = self.client.files.create_folder(self.name('doomed'))
         self.client.files.delete_folder(folder, force=True, permanent=True)
-        ids = [f.get('externalId') for f in
-               self.client.files.list_folders(limit=500)]
-        self.assertNotIn(folder, ids)
+        self.assertRaises(NDExError, self.client.files.get_folder, folder)
 
 
 @unittest.skipUnless(os.getenv('NDEX2_TEST_SERVER') is not None,
@@ -98,13 +99,16 @@ class TestShortcutsIntegration(V3IntegrationBase):
         record = self.client.files.get_shortcut(sid)
         self.assertEqual(str(target), str(record.get('target')))
 
-    def test_shortcut_appears_in_list_shortcuts(self):
+    def test_top_level_shortcut_appears_in_user_home(self):
+        """The former list_shortcuts() wrapper is gone: GET
+        /v3/files/shortcuts is being retired from the server."""
         target = self.new_folder('sc-list-target')
         sid = self.client.files.create_shortcut(
             self.name('sc-listed'), target, FileType.FOLDER)
         self._shortcuts.append(sid)
-        ids = [s.get('externalId') for s in self.client.files.list_shortcuts()]
-        self.assertIn(sid, ids)
+        uuids = [i.get('uuid') for i in
+                 self.client.users.home(self.user_id())]
+        self.assertIn(sid, uuids)
 
 
 @unittest.skipUnless(os.getenv('NDEX2_TEST_SERVER') is not None,

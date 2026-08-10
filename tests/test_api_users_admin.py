@@ -46,7 +46,7 @@ class TestNamespaceWiring(unittest.TestCase):
         counts = {ns: len([m for m in dir(getattr(c, ns))
                            if not m.startswith('_')])
                   for ns in ('files', 'networks', 'users', 'admin')}
-        self.assertEqual({'files': 26, 'networks': 11, 'users': 3,
+        self.assertEqual({'files': 24, 'networks': 11, 'users': 3,
                           'admin': 1}, counts)
 
 

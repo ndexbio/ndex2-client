@@ -269,12 +269,12 @@ def main():
            or 'updated')
 
     def check_listed():
-        for folder in client.files.list_folders(limit=500):
-            if str(folder.get('externalId')) == str(parent):
-                return 'found in list'
-        raise NDExError('parent folder missing from list_folders')
+        for item in client.users.home(user_id):
+            if str(item.get('uuid')) == str(parent):
+                return 'found in home listing'
+        raise NDExError('parent folder missing from users.home()')
 
-    r.step('folder appears in list_folders', check_listed)
+    r.step('folder appears in users.home()', check_listed)
 
     r.step('folder_child_count',
            lambda: json.dumps(client.files.folder_child_count(parent)))

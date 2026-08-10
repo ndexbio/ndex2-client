@@ -32,12 +32,12 @@ History
       ``delete_networks_from_networkset``,
       ``update_network_group_permission``, ``grant_networks_to_group``, and the
       ``include_groups`` argument of ``search_networks``.
-    * These methods remain fully supported and there is currently no planned removal. On
+    * These methods remain fully supported and there is no planned removal. On
       the server a network set is stored as a folder, and a group as a folder
       several users hold permissions on, so the v2 endpoints continue to work.
       Because a network set is a folder, ``client.files.get_folder()`` accepts
       a network set UUID and network sets appear in
-      ``client.files.list_folders()``.
+      ``client.files.search()``.
 
 * Notes
     * No existing method was removed, renamed, or changed in behaviour. The v3

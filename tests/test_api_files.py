@@ -48,9 +48,15 @@ class TestFilesAPIWiring(unittest.TestCase):
         c = client()
         self.assertIs(c.s, c.files._http.session)
 
-    def test_all_26_methods_present(self):
+    def test_all_24_methods_present(self):
         methods = [m for m in dir(client().files) if not m.startswith('_')]
-        self.assertEqual(26, len(methods))
+        self.assertEqual(24, len(methods))
+
+    def test_discontinued_listing_methods_are_gone(self):
+        """GET /v3/files/folders and /v3/files/shortcuts are being retired
+        from the server, so the client no longer wraps them."""
+        for gone in ('list_folders', 'list_shortcuts'):
+            self.assertFalse(hasattr(client().files, gone), gone)
 
     def test_unauthenticated_write_rejected_before_request(self):
         c = client(authenticated=False)
@@ -167,14 +173,6 @@ class TestFolders(unittest.TestCase):
             self.assertEqual(['true'], qs['force'])
             self.assertEqual(['true'], qs['permanent'])
 
-    def test_list_folders(self):
-        c = client()
-        with requests_mock.mock() as m:
-            m.get(V3 + '/files/folders/', json=[{'name': 'a'}],
-                  headers=JSON_HEADERS)
-            self.assertEqual(1, len(c.files.list_folders(limit=5)))
-            self.assertEqual(['5'], m.request_history[0].qs['limit'])
-
     def test_list_folder_items(self):
         c = client()
         with requests_mock.mock() as m:
@@ -264,12 +262,6 @@ class TestShortcuts(unittest.TestCase):
         with requests_mock.mock() as m:
             m.delete(V3 + '/files/shortcuts/' + SHORTCUT_ID, status_code=204)
             self.assertIsNone(c.files.delete_shortcut(SHORTCUT_ID))
-
-    def test_list_shortcuts(self):
-        c = client()
-        with requests_mock.mock() as m:
-            m.get(V3 + '/files/shortcuts/', json=[], headers=JSON_HEADERS)
-            self.assertEqual([], c.files.list_shortcuts())
 
 
 @unittest.skipIf(os.getenv('NDEX2_TEST_SERVER') is not None, SKIP_REASON)

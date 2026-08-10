@@ -2058,7 +2058,7 @@ class Ndex2(object):
                           'fae4d1e8-aba7-11eb-9e72-0ac135e8bacf']
 
         .. deprecated:: 3.12.0
-           Use ``client.files.list_folders()`` instead.
+           Use ``client.files.search()`` instead.
 
         :param user_id: Id of user on NDEx. To get Id of user see
                         :py:func:`get_id_for_user`
@@ -2090,9 +2090,9 @@ class Ndex2(object):
         :rtype: list
         """
         _warn_deprecated('get_networksets_for_user_id',
-                         'client.files.list_folders()',
-                         ' Network sets appear in the folder listing, '
-                         'since a network set is stored as a folder.')
+                         'client.files.search()',
+                         ' Search with file_type=FOLDER; a network set is '
+                         'stored as a folder.')
         if user_id is None or not isinstance(user_id, str):
             raise NDExInvalidParameterError('user_id must be of type str')
 

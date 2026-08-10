@@ -194,28 +194,6 @@ class FilesAPI(object):
             params={'force': str(bool(force)).lower(),
                     'permanent': str(bool(permanent)).lower()})
 
-    def list_folders(self, limit=100):
-        """
-        Lists folders owned by the authenticated user.
-
-        ``GET /v3/files/folders/``
-
-        The listing is flat and spans every nesting level; use the
-        ``parent`` field of each entry to rebuild the tree. Network sets
-        appear here too, since a network set is stored as a folder.
-
-        .. versionadded:: 3.12.0
-
-        :param limit: Maximum number of folders to return
-        :type limit: int
-        :raises NDExUnauthorizedError: If no credentials are set
-        :return: Folders owned by the user
-        :rtype: list
-        """
-        self._http.require_auth()
-        result = self._http.get(FOLDERS + '/', params={'limit': limit})
-        return [] if result is None else result
-
     def list_folder_items(self, folder_id, item_type=None, format='update',
                           access_key=None):
         """
@@ -239,9 +217,12 @@ class FilesAPI(object):
         :raises NDExInvalidParameterError: For invalid arguments
         :raises NDExNotFoundError: If no such folder exists
         :raises NDExUnauthorizedError: If read access is denied
-        :return: File item summaries, each with keys including ``uuid``,
-                 ``type``, ``name``, ``owner``, ``visibility``,
-                 ``permission``, ``edges`` and ``modificationTime``
+        :return: File item summaries. ``uuid`` and ``type`` are always
+                 present. Other keys, including ``name``, are omitted rather
+                 than reported as null when the server has no value, so a
+                 network created without a ``name`` network attribute has no
+                 ``name`` key. Which fields are populated also varies with
+                 *format*.
         :rtype: list
         """
         require_str(folder_id, 'folder_id')
@@ -432,22 +413,6 @@ class FilesAPI(object):
         self._http.require_auth()
         require_str(shortcut_id, 'shortcut_id')
         return self._http.delete(SHORTCUTS + '/' + str(shortcut_id))
-
-    def list_shortcuts(self):
-        """
-        Lists shortcuts owned by the authenticated user.
-
-        ``GET /v3/files/shortcuts/``
-
-        .. versionadded:: 3.12.0
-
-        :raises NDExUnauthorizedError: If no credentials are set
-        :return: Shortcuts owned by the user
-        :rtype: list
-        """
-        self._http.require_auth()
-        result = self._http.get(SHORTCUTS + '/')
-        return [] if result is None else result
 
     # ------------------------------------------------------------------
     # trash

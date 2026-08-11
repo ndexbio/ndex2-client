@@ -131,6 +131,7 @@ User lookup, home directory listing and token sign-in.
 
 .. autoclass:: ndex2.api.users.UsersAPI
     :members:
+    :exclude-members: signin
 
 client.admin
 ------------

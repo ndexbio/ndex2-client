@@ -215,7 +215,7 @@ class FilesAPI(object):
         .. code-block:: python
 
             for item in client.files.list_folder_items():
-                print(item['name'], item['type'])
+                print(item.get('name', '<NA>'), item['type'])
 
         To list another user's home, use
         :py:meth:`~ndex2.api.users.UsersAPI.home` with their UUID.

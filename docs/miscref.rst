@@ -33,3 +33,7 @@ Exceptions
 .. autoclass:: ndex2.exceptions.NDExInvalidCX2Error
 
 .. autoclass:: ndex2.exceptions.NDExAlreadyExists
+
+.. autofunction:: ndex2.exceptions.raise_from_requests_http_error
+
+.. autofunction:: ndex2.exceptions.raise_from_exception

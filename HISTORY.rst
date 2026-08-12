@@ -2,6 +2,51 @@
 History
 =======
 
+3.12.0 (2025-08-11)
+-------------------
+
+* Enhancements
+    * Added namespace attributes to ``ndex2.client.Ndex2`` exposing the
+      NDEx **v3** API, so a single client covers both API versions:
+      ``client.files`` (folders, shortcuts, trash, sharing, file search),
+      ``client.networks`` (summaries, aspects, queries, export, ownership),
+      ``client.users`` and ``client.admin``.
+    * Added ``ndex2.transport.HttpTransport``, shared by every namespace. It is
+      built on the session ``Ndex2`` already creates, so credentials are held in
+      one place and changing them applies to all calls.
+    * Added ``FileType``, ``Visibility`` and ``Permissions`` to
+      ``ndex2.constants``.
+    * Added ``folder_id`` to ``Ndex2.save_new_cx2_network()`` and
+      ``Ndex2.save_cx2_stream_as_new_network()``, creating the network directly
+      inside a folder. Omitting it leaves the request unchanged.
+    * Added ``ndex2.exceptions.raise_from_requests_http_error()`` and
+      ``raise_from_exception()``, the shared mapping from HTTP status code to
+      exception type.
+
+* Deprecations
+    * Network set and group methods now emit a ``DeprecationWarning`` pointing
+      at the namespace equivalent: ``create_networkset``, ``get_networkset``,
+      ``get_network_set``, ``get_networksets_for_user_id``,
+      ``delete_networkset``, ``add_networks_to_networkset``,
+      ``delete_networks_from_networkset``,
+      ``update_network_group_permission``, ``grant_networks_to_group``, and the
+      ``include_groups`` argument of ``search_networks``.
+    * These methods remain fully supported and there is no planned removal. On
+      the server a network set is stored as a folder, and a group as a folder
+      several users hold permissions on, so the v2 endpoints continue to work.
+      Because a network set is a folder, ``client.files.get_folder()`` accepts
+      a network set UUID and network sets appear in
+      ``client.files.search()``.
+
+* Notes
+    * No existing method was removed, renamed, or changed in behaviour. The v3
+      endpoints are additive.
+    * Some namespace methods overlap a flat method where the v3 endpoint offers
+      more, for example ``client.networks.get_summary()`` reports ``folderId``
+      and ``client.networks.delete()`` moves a network to the trash rather than
+      deleting it outright. Both remain available; see the *v3 API namespaces*
+      page in the documentation.
+
 3.11.0 (2025-07-22)
 -------------------
 

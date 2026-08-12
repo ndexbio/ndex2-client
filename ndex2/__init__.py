@@ -675,11 +675,14 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
             # =============
             # ADD NODES
             # =============
-            source_node_id = cx_builder.add_node(name=str(row[0]),
-                                                 represents=str(row[0]))
+            # Use positional indexing to avoid label lookup errors with
+            # non‑integer column names (pandas 3.x changed Series[0] to
+            # be label-based when an integer label exists).
+            source_node_id = cx_builder.add_node(name=str(row.iloc[0]),
+                                                 represents=str(row.iloc[0]))
 
-            target_node_id = cx_builder.add_node(name=str(row[1]),
-                                                 represents=str(row[1]))
+            target_node_id = cx_builder.add_node(name=str(row.iloc[1]),
+                                                 represents=str(row.iloc[1]))
 
             # =============
             # ADD EDGES
@@ -688,7 +691,7 @@ def create_nice_cx_from_pandas(df, source_field=None, target_field=None,
                 cx_builder.add_edge(id=index,
                                     source=source_node_id,
                                     target=target_node_id,
-                                    interaction=row[2])
+                                    interaction=row.iloc[2])
             else:
                 cx_builder.add_edge(id=index,
                                     source=source_node_id,
@@ -776,4 +779,3 @@ def create_nice_cx_from_file(path):
             return my_nicecx
     else:
         raise Exception('The file ' + path + '  does not exist.')
-

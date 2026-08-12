@@ -186,7 +186,7 @@ class TestClient(unittest.TestCase):
                 self.fail('Expected exception')
             except Exception as e:
                 self.assertEqual(str(e),
-                                 'This release only supports NDEx 2.x server.')
+                                 'This release only supports NDEx 2.x and 3.x servers.')
 
     def test_ndex2_constructor_with_defaulthost_thatisversiontwo(self):
         with requests_mock.mock() as m:
@@ -195,6 +195,21 @@ class TestClient(unittest.TestCase):
             ndex = Ndex2()
             self.assertEqual(ndex.debug, False)
             self.assertEqual(ndex.version, '2.1')
+            self.assertEqual(ndex.status, {})
+            self.assertEqual(ndex.username, None)
+            self.assertEqual(ndex.password, None)
+            self.assertEqual(ndex.user_agent, '')
+            self.assertEqual(ndex.version_endpoint, '/v2')
+            self.assertEqual(ndex.host, client.DEFAULT_SERVER)
+            self.assertTrue(ndex.s is not None)
+
+    def test_ndex2_constructor_with_defaulthost_thatisversionthree(self):
+        with requests_mock.mock() as m:
+            m.get(self.get_rest_admin_status_url(),
+                  json=self.get_rest_admin_status_dict(version='3.1'))
+            ndex = Ndex2()
+            self.assertEqual(ndex.debug, False)
+            self.assertEqual(ndex.version, '3.1')
             self.assertEqual(ndex.status, {})
             self.assertEqual(ndex.username, None)
             self.assertEqual(ndex.password, None)
@@ -959,6 +974,119 @@ class TestClient(unittest.TestCase):
             self.assertTrue('Content-Type: application/'
                             'octet-stream' in decode_txt)
             self.assertTrue('{"foo": "123"}' in decode_txt)
+
+    def test_save_new_cx2_network_no_folder_id_sends_no_param(self):
+        """Omitting folder_id must leave the request as it was pre 3.12.0."""
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            ndex.save_new_cx2_network([{'foo': '123'}])
+            self.assertTrue('?' not in m.last_request.url)
+
+    def test_save_new_cx2_network_with_folder_id(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER +
+                   '/v3/networks?folderId=folder1',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            res = ndex.save_new_cx2_network([{'foo': '123'}],
+                                            folder_id='folder1')
+            self.assertEqual(res, resurl)
+            self.assertTrue('folderId=folder1' in m.last_request.url)
+
+    def test_save_new_cx2_network_with_visibility_and_folder_id(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            ndex.save_new_cx2_network([{'foo': '123'}], visibility='PUBLIC',
+                                      folder_id='folder1')
+            self.assertTrue('visibility=PUBLIC' in m.last_request.url)
+            self.assertTrue('folderId=folder1' in m.last_request.url)
+
+    def test_save_new_cx2_network_with_folder_id_is_one_request(self):
+        """The point of folder_id is to avoid a follow up move call."""
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            ndex.save_new_cx2_network([{'foo': '123'}], folder_id='folder1')
+            self.assertEqual(1, len(m.request_history))
+
+    def test_save_cx2_stream_as_new_network_no_folder_id(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            stream = io.BytesIO(json.dumps([{'foo': '123'}]).encode('utf-8'))
+            res = ndex.save_cx2_stream_as_new_network(stream)
+            self.assertEqual(res, resurl)
+            self.assertTrue('?' not in m.last_request.url)
+
+    def test_save_cx2_stream_as_new_network_with_folder_id(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            stream = io.BytesIO(json.dumps([{'foo': '123'}]).encode('utf-8'))
+            res = ndex.save_cx2_stream_as_new_network(
+                stream, folder_id='folder1')
+            self.assertEqual(res, resurl)
+            self.assertTrue('folderId=folder1' in m.last_request.url)
+
+    def test_save_cx2_stream_as_new_network_visibility_and_folder(self):
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            stream = io.BytesIO(json.dumps([{'foo': '123'}]).encode('utf-8'))
+            ndex.save_cx2_stream_as_new_network(stream, visibility='PRIVATE',
+                                                folder_id='folder1')
+            self.assertTrue('visibility=PRIVATE' in m.last_request.url)
+            self.assertTrue('folderId=folder1' in m.last_request.url)
+
+    def test_save_cx2_stream_as_new_network_empty_folder_id(self):
+        """An empty folder_id is treated as absent, like visibility."""
+        with requests_mock.mock() as m:
+            resurl = client.DEFAULT_SERVER + '/v3/networks/asdf'
+            m.post(client.DEFAULT_SERVER + '/v3/networks',
+                   request_headers={'Connection': 'close'},
+                   headers={'Location': resurl},
+                   status_code=202)
+            ndex = Ndex2(username='bob', password='warnerbrandis',
+                         skip_version_check=True)
+            stream = io.BytesIO(json.dumps([{'foo': '123'}]).encode('utf-8'))
+            ndex.save_cx2_stream_as_new_network(stream, folder_id='')
+            self.assertTrue('?' not in m.last_request.url)
 
     def test_save_new_cx2_network_with_nourl(self):
         with requests_mock.mock() as m:

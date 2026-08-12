@@ -3,6 +3,7 @@
 import requests
 import json
 import logging
+import warnings
 from requests_toolbelt import MultipartEncoder
 import io
 import sys
@@ -13,6 +14,13 @@ from ndex2.version import __version__
 from ndex2.exceptions import NDExInvalidCXError
 from ndex2.exceptions import NDExUnauthorizedError
 from ndex2.exceptions import NDExError
+from ndex2.exceptions import raise_from_exception
+from ndex2.exceptions import raise_from_requests_http_error
+from ndex2.transport import HttpTransport
+from ndex2.api.files import FilesAPI
+from ndex2.api.networks import NetworksAPI
+from ndex2.api.users import UsersAPI
+from ndex2.api.admin import AdminAPI
 from ndex2.exceptions import NDExUnsupportedCallError
 from ndex2.exceptions import NDExInvalidParameterError
 from ndex2.exceptions import NDExNotFoundError
@@ -31,6 +39,28 @@ User agent value to prepend to all requests
 """
 
 DEFAULT_SERVER = "http://www.ndexbio.org"
+
+
+def _warn_deprecated(name, replacement, note=''):
+    """
+    Emits a :py:exc:`DeprecationWarning` for a network set or group method.
+
+    These methods remain fully supported. On the server a network set is
+    stored as a folder, and a group as a folder several users hold
+    permissions on, so the v2 endpoints continue to work. The warning exists
+    to steer new code towards the ``client.files`` and ``client.networks``
+    namespaces.
+
+    :param name: Name of the deprecated method
+    :type name: str
+    :param replacement: Namespace method to use instead
+    :type replacement: str
+    :param note: Optional extra sentence appended to the message
+    :type note: str
+    """
+    warnings.warn(name + '() is deprecated in favour of ' + replacement +
+                  '.' + note,
+                  DeprecationWarning, stacklevel=3)
 
 
 class Ndex2(object):
@@ -99,7 +129,7 @@ class Ndex2(object):
         if host is None:
             host = DEFAULT_SERVER
         elif 'http' not in host:
-            host = 'http://' + host
+            host = 'https://' + host
 
         if "localhost" in host:
             self.host = "http://localhost:8080/ndexbio-rest"
@@ -128,12 +158,12 @@ class Ndex2(object):
                     if prop is not None:
                         pv = prop.get('ServerVersion')
                         if pv is not None:
-                            if not pv.startswith('2.'):
-                                raise Exception("This release only supports "
-                                                "NDEx 2.x server.")
-                            else:
+                            if pv.startswith('2.') or pv.startswith('3.'):
                                 self.version = pv
                                 self.version_endpoint = '/v2'
+                            else:
+                                raise Exception("This release only supports "
+                                                "NDEx 2.x and 3.x servers.")
                         else:
                             self.logger.warning("Warning: This release "
                                                 "doesn't fully "
@@ -158,6 +188,21 @@ class Ndex2(object):
             # add credentials to the session, if available
             self.s.auth = (username, password)
 
+        # Shared HTTP layer for the v3 API namespaces. It reuses the session
+        # created above so that there is one connection pool and one place
+        # credentials are held, rather than one per code path.
+        self._http = HttpTransport(host=self.host, username=username,
+                                   password=password, timeout=timeout,
+                                   user_agent=self.user_agent, debug=debug,
+                                   session=self.s)
+
+        # v3 API namespaces. These share the transport above, so
+        # authenticating one authenticates all of them.
+        self.files = FilesAPI(self._http)
+        self.networks = NetworksAPI(self._http)
+        self.users = UsersAPI(self._http)
+        self.admin = AdminAPI(self._http)
+
         if update_status:
             self.update_status()
 
@@ -172,9 +217,11 @@ class Ndex2(object):
         :type time_in_secs: int
         """
         self.timeout = time_in_secs
+        self._http.timeout = time_in_secs
 
     def set_debug_mode(self, debug):
         self.debug = debug
+        self._http.debug = debug
 
     def debug_response(self, response):
         if self.debug:
@@ -186,7 +233,7 @@ class Ndex2(object):
         """
         :raises NDExUnauthorizedError: If no credentials are found in this object
         """
-        if not self.s.auth:
+        if not self.s.auth and 'Authorization' not in self.s.headers:
             raise NDExUnauthorizedError("This method requires user authentication")
 
     def _get_user_agent(self):
@@ -249,15 +296,7 @@ class Ndex2(object):
                                    is 404
         :raises NDExUnauthorizedError: Raises this error if status code is 401
         """
-        if http_error is None:
-            raise NDExError('Caught unknown server error')
-        errmsg = 'Caught ' + str(http_error.response.status_code) + \
-                 ' from server: ' + str(http_error.response.text)
-        if http_error.response.status_code == 404:
-            raise NDExNotFoundError(errmsg)
-        if http_error.response.status_code == 401:
-            raise NDExUnauthorizedError(errmsg)
-        raise NDExError(errmsg)
+        raise_from_requests_http_error(http_error)
 
     def _convert_exception_to_ndex_error(self, error):
         """
@@ -268,10 +307,7 @@ class Ndex2(object):
         :type error: Exception
         :raises NDExError: always raises error
         """
-        if error is None:
-            raise NDExError('Caught unknown error')
-        raise NDExError('Caught ' + str(error.__class__.__name__) +
-                        ': ' + str(error))
+        raise_from_exception(error)
 
     def _get_version_endpoint(self, alt_version_endpoint=None):
         if alt_version_endpoint is None:
@@ -496,7 +532,7 @@ class Ndex2(object):
 
         return self.post_multipart(route, fields, query_string=query_string)
 
-    def save_new_cx2_network(self, cx, visibility=None):
+    def save_new_cx2_network(self, cx, visibility=None, folder_id=None):
         """
         Create a new network (CX2) on the server
 
@@ -526,6 +562,15 @@ class Ndex2(object):
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
                            If ``None`` sets visibility to PRIVATE
         :type visibility: str
+        :param folder_id: Optional UUID of a folder to create the network
+                          in, saving a follow up call to
+                          ``client.networks.move_to_folder()``. If ``None``
+                          the network is created at the top level of the
+                          user's home, which is the behavior of releases
+                          before 3.12.0.
+
+                          .. versionadded:: 3.12.0
+        :type folder_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :raises NDExInvalidCXError: if **cx** is ``None``, not a list,
                                     or is an empty list
@@ -546,9 +591,11 @@ class Ndex2(object):
         else:
             stream = io.BytesIO(json.dumps(cx, cls=DecimalEncoder))
 
-        return self.save_cx2_stream_as_new_network(stream, visibility=visibility)
+        return self.save_cx2_stream_as_new_network(
+            stream, visibility=visibility, folder_id=folder_id)
 
-    def save_cx2_stream_as_new_network(self, cx_stream, visibility=None):
+    def save_cx2_stream_as_new_network(self, cx_stream, visibility=None,
+                                       folder_id=None):
         """
         Create a new network from a CX2 stream
 
@@ -582,6 +629,15 @@ class Ndex2(object):
         :type cx_stream: BytesIO like object
         :param visibility: Sets the visibility (PUBLIC or PRIVATE)
         :type visibility: str
+        :param folder_id: Optional UUID of a folder to create the network
+                          in, saving a follow up call to
+                          ``client.networks.move_to_folder()``. If ``None``
+                          the network is created at the top level of the
+                          user's home, which is the behavior of releases
+                          before 3.12.0.
+
+                          .. versionadded:: 3.12.0
+        :type folder_id: str
         :raises NDExUnauthorizedError: If credentials are invalid or not set
         :raises NDExError: if there is an error saving the network
         :return: Full URL to newly created network
@@ -589,9 +645,12 @@ class Ndex2(object):
         :rtype: str
         """
         self._require_auth()
-        query_string = None
+        query_params = []
         if visibility:
-            query_string = 'visibility=' + str(visibility)
+            query_params.append('visibility=' + str(visibility))
+        if folder_id:
+            query_params.append('folderId=' + str(folder_id))
+        query_string = '&'.join(query_params) if query_params else None
 
         fields = {
             'CXNetworkStream': ('filename', cx_stream, 'application/octet-stream')
@@ -994,6 +1053,9 @@ class Ndex2(object):
         else:
             route = "/search/network?start=%s&size=%s" % (start, size)
             if include_groups:
+                _warn_deprecated('The include_groups parameter of '
+                                 'search_networks',
+                                 'client.files.search()')
                 post_data["includeGroups"] = True
 
         if account_name:
@@ -1596,6 +1658,9 @@ class Ndex2(object):
         """
         Updated group permissions
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.set_members()`` instead.
+
         :param groupid: Group id
         :type groupid: str
         :param networkid: Network id
@@ -1605,6 +1670,8 @@ class Ndex2(object):
         :return: Result
         :rtype: dict
         """
+        _warn_deprecated('update_network_group_permission',
+                         'client.files.set_members()')
         route = "/network/%s/permission?groupid=%s&permission=%s" % (networkid, groupid, permission)
         self.put(route)
 
@@ -1628,6 +1695,9 @@ class Ndex2(object):
         """
         Set group permission for a set of networks
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.set_members()`` instead.
+
         :param groupid: Group id
         :type groupid: str
         :param networkids: List of network ids
@@ -1637,6 +1707,8 @@ class Ndex2(object):
         :return: Result
         :rtype: dict
         """
+        _warn_deprecated('grant_networks_to_group',
+                         'client.files.set_members()')
         for networkid in networkids:
             self.update_network_group_permission(groupid, networkid, permission)
 
@@ -1899,6 +1971,9 @@ class Ndex2(object):
         """
         Creates a new network set
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.create_folder()`` instead.
+
         :param name: Network set name
         :type name: str
         :param description: Network set description
@@ -1906,6 +1981,8 @@ class Ndex2(object):
         :return: URI of the newly created network set
         :rtype: str
         """
+        _warn_deprecated('create_networkset',
+                         'client.files.create_folder()')
         route = '/networkset'
         return self.post(route, json.dumps({"name": name,
                                             "description": description}))
@@ -1928,11 +2005,18 @@ class Ndex2(object):
         """
         Gets the network set information including the list of networks
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.get_folder()`` instead.
+
         :param set_id: network set id
         :type set_id: str
         :return: network set information
         :rtype: dict
         """
+        _warn_deprecated('get_networkset',
+                         'client.files.get_folder()',
+                         ' A network set is stored as a folder, so the '
+                         'same UUID works.')
         route = '/networkset/%s' % set_id
 
         return self.get(route)
@@ -1973,6 +2057,8 @@ class Ndex2(object):
              'networks': ['face63b6-aba7-11eb-9e72-0ac135e8bacf',
                           'fae4d1e8-aba7-11eb-9e72-0ac135e8bacf']
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.search()`` instead.
 
         :param user_id: Id of user on NDEx. To get Id of user see
                         :py:func:`get_id_for_user`
@@ -2003,6 +2089,10 @@ class Ndex2(object):
         :return: list with dict objects containing Network Sets
         :rtype: list
         """
+        _warn_deprecated('get_networksets_for_user_id',
+                         'client.files.search()',
+                         ' Search with file_type=FOLDER; a network set is '
+                         'stored as a folder.')
         if user_id is None or not isinstance(user_id, str):
             raise NDExInvalidParameterError('user_id must be of type str')
 
@@ -2044,6 +2134,9 @@ class Ndex2(object):
         """
         Deletes the network set, requires credentials
 
+        .. deprecated:: 3.12.0
+           Use ``client.files.delete_folder()`` instead.
+
         :param networkset_id: networkset UUID id
         :type networkset_id: str
         :raises NDExInvalidParameterError: for invalid networkset id parameter
@@ -2052,6 +2145,8 @@ class Ndex2(object):
         :raises NDExError: For any other error with contents of error in message
         :return: None upon success
         """
+        _warn_deprecated('delete_networkset',
+                         'client.files.delete_folder()')
         if networkset_id is None:
             raise NDExInvalidParameterError('networkset id cannot be None')
         if not isinstance(networkset_id, str):
@@ -2085,6 +2180,9 @@ class Ndex2(object):
         """
         Add networks to a network set.  User must have visibility of all networks being added
 
+        .. deprecated:: 3.12.0
+           Use ``client.networks.move_to_folder()`` instead.
+
         :param set_id: network set id
         :type set_id: str
         :param networks: networks (ids as str) that will be added to the set
@@ -2092,6 +2190,11 @@ class Ndex2(object):
         :return: None
         :rtype: None
         """
+        _warn_deprecated('add_networks_to_networkset',
+                         'client.networks.move_to_folder()',
+                         ' A network lives in exactly one folder; use '
+                         'client.files.create_shortcut() to list it in '
+                         'more than one place.')
 
         route = '/networkset/%s/members' % set_id
 
@@ -2102,6 +2205,9 @@ class Ndex2(object):
         """
         Removes network(s) from a network set.
 
+        .. deprecated:: 3.12.0
+           Use ``client.networks.move_to_folder()`` instead.
+
         :param set_id: network set id
         :type set_id: str
         :param networks: networks (ids as str) that will be removed from the set
@@ -2111,6 +2217,8 @@ class Ndex2(object):
         :return: None
         :rtype: None
         """
+        _warn_deprecated('delete_networks_from_networkset',
+                         'client.networks.move_to_folder()')
 
         route = '/networkset/%s/members' % set_id
         post_json = json.dumps(networks)

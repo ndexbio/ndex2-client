@@ -22,7 +22,6 @@ History
     * Added ``ndex2.exceptions.raise_from_requests_http_error()`` and
       ``raise_from_exception()``, the shared mapping from HTTP status code to
       exception type.
-    * Bearer token authentication is supported via ``client.users.signin()``.
 
 * Deprecations
     * Network set and group methods now emit a ``DeprecationWarning`` pointing
